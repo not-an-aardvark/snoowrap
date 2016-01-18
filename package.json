@@ -1,0 +1,32 @@
+{
+  "name": "snoowrap",
+  "version": "0.1.0",
+  "license": "MIT",
+  "description": "A Node.js wrapper for the reddit API",
+  "main": "src/snoowrap.js",
+  "scripts": {
+    "test": "eslint . && mocha --harmony-proxies"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/not-an-aardvark/snoowrap.git"
+  },
+  "keywords": [],
+  "author": "not-an-aardvark <not-an-aardvark@users.noreply.github.com>",
+  "bugs": {
+    "url": "https://github.com/not-an-aardvark/snoowrap/issues"
+  },
+  "homepage": "https://github.com/not-an-aardvark/snoowrap",
+  "dependencies": {
+    "bluebird": "^3.1.1",
+    "harmony-reflect": "^1.4.2",
+    "lodash": "^4.0.0",
+    "moment": "^2.11.1",
+    "request-promise": "^2.0.0"
+  },
+  "devDependencies": {
+    "chai": "^3.4.1",
+    "eslint": "^1.10.3",
+    "mocha": "^2.3.4"
+  }
+}
