@@ -38,3 +38,6 @@ node_modules
 
 # Confidential info (tokens, etc.) for tests
 oauth_info.json
+
+# Babel-generated files
+lib

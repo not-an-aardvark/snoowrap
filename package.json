@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "license": "Apache-2.0",
   "description": "A Node.js wrapper for the reddit API",
-  "main": "src/snoowrap.js",
+  "main": "lib/snoowrap.js",
   "scripts": {
+    "compile": "babel -d lib/ src/",
+    "prepublish": "npm run compile",
     "test": "eslint . && mocha --harmony_proxies --compilers js:babel-core/register"
   },
   "repository": {
@@ -30,6 +32,7 @@
     "request-promise": "^2.0.0"
   },
   "devDependencies": {
+    "babel-cli": "^6.4.0",
     "babel-core": "^6.4.0",
     "babel-eslint": "^4.1.6",
     "babel-plugin-transform-async-to-generator": "^6.4.0",
