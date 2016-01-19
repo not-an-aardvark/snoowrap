@@ -15,31 +15,40 @@ describe('snoowrap', function () {
     beforeEach(() => {
       user = r.get_user('not_an_aardvark');
     });
-    it('should get a user profile', done => {
-      user.fetch().then(() => {
+    it('gets a user profile', async done => {
+      try {
+        await user.fetch();
         assert.strictEqual(user.name, 'not_an_aardvark');
         assert.strictEqual(user.created_utc, 1419104352);
         assert.strictEqual(user.nonexistent_property, undefined);
         done();
-      }, done);
+      } catch (err) {
+        done(err);
+      }
     });
-    it('should return individual properties as Promises', done => {
-      user.has_verified_email.then(response => {
-        assert.strictEqual(response, true);
+    it('returns individual properties as Promises', async done => {
+      try {
+        assert.strictEqual(await user.has_verified_email, true);
         done();
-      }, done);
+      } catch (err) {
+        done(err);
+      }
     });
-    it('should ensure that someone keeps buying me reddit gold so that the tests will pass', done => { // :D
-      user.is_gold.then(response => {
-        assert.strictEqual(response, true);
+    it('ensures that someone keeps buying me reddit gold so that the tests will pass', async done => { // :D
+      try {
+        assert.strictEqual(await user.is_gold, true);
         done();
-      }, done);
+      } catch (err) {
+        done(err);
+      }
     });
-    it('should return a promise that resolves as undefined if given a nonexistent property before fetching', done => {
-      user.nonexistent_property.then(response => {
-        assert.strictEqual(response, undefined);
+    it('returns a promise that resolves as undefined when fetching a nonexistent property', async done => {
+      try {
+        assert.strictEqual(await user.nonexistent_property, undefined);
         done();
-      }, done);
+      } catch (err) {
+        done(err);
+      }
     });
   });
   describe('getting a comment', () => {
@@ -47,19 +56,23 @@ describe('snoowrap', function () {
     beforeEach(() => {
       comment = r.get_comment('coip909');
     });
-    it('should retrieve a comment and get its text', done => {
-      comment.fetch().then(() => {
-        assert.strictEqual(comment.body, '`RuntimeError: maximum humor depth exceeded`');
+    it('should retrieve a comment and get its text', async done => {
+      try {
+        await comment.fetch;
+        assert.strictEqual(await comment.body, '`RuntimeError: maximum humor depth exceeded`');
         done();
-      }, done);
+      } catch (err) {
+        done(err);
+      }
     });
-    it('should convert the comment author to a RedditUser object and be able to get its properties', done => {
-      comment.author.then(author => {
-        author.has_verified_email.then(result => {
-          assert.strictEqual(result, true);
-          done();
-        }, done);
-      }, done);
+    it('should convert the comment author to a RedditUser object and be able to get its properties', async done => {
+      try {
+        let author = await comment.author;
+        assert.strictEqual(await author.has_verified_email, true);
+        done();
+      } catch (err) {
+        done(err);
+      }
     });
   });
 });
