@@ -1,7 +1,7 @@
 {
   "name": "snoowrap",
   "version": "0.1.0",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "description": "A Node.js wrapper for the reddit API",
   "main": "src/snoowrap.js",
   "scripts": {
