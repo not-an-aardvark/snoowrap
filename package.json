@@ -1,13 +1,13 @@
 {
   "name": "snoowrap",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "Apache-2.0",
   "description": "A Node.js wrapper for the reddit API",
   "main": "lib/snoowrap.js",
   "scripts": {
     "compile": "babel -d lib/ src/",
     "prepublish": "npm run compile",
-    "test": "eslint . && mocha --harmony_proxies --compilers js:babel-core/register"
+    "test": "eslint --ignore-path .gitignore . && mocha --harmony_proxies --compilers js:babel-core/register"
   },
   "repository": {
     "type": "git",
@@ -29,6 +29,7 @@
     "harmony-reflect": "^1.4.2",
     "lodash": "^4.0.0",
     "moment": "^2.11.1",
+    "promise-chains": "^0.1.1",
     "request-promise": "^2.0.0"
   },
   "devDependencies": {
@@ -37,6 +38,7 @@
     "babel-eslint": "^4.1.6",
     "babel-plugin-transform-async-to-generator": "^6.4.0",
     "chai": "^3.4.1",
+    "chai-as-promised": "^5.2.0",
     "mocha": "^2.3.4"
   }
 }
