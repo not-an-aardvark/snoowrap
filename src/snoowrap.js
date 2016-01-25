@@ -97,11 +97,9 @@ objects.RedditContent = class RedditContent {
       return this.fetch()[key];
     }});
   }
-  inspect () { // TODO: Simplify this when lodash fixes _.pickBy
-    let property_display = _.pick(this, _.filter(_.keys(this), key => {
-      return key.indexOf('_') !== 0 && typeof this[key] !== 'function';
-    }));
-    return `<${constants.MODULE_NAME}.objects.${this.constructor.name}> ${util.inspect(property_display)}`;
+  inspect () {
+    let public_properties = _.pickBy(this, (value, key) => (key.charAt(0) !== '_' && typeof value !== 'function'));
+    return `<${constants.MODULE_NAME}.objects.${this.constructor.name}> ${util.inspect(public_properties)}`;
   }
   get oauth_requester () {
     return this._fetcher.oauth_requester;
@@ -128,6 +126,7 @@ objects.Comment = class Comment extends objects.RedditContent {
     return `/api/info?id=${this.name}`;
   }
 };
+
 objects.RedditUser = class RedditUser extends objects.RedditContent {
   constructor (options, _fetcher, has_fetched) {
     super(options, _fetcher, has_fetched);
