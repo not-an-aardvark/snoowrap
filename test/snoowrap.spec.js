@@ -1,5 +1,5 @@
 'use strict';
-let assert = require('chai').use(require('chai-as-promised')).assert;
+let expect = require('chai').use(require('chai-as-promised')).expect;
 let Promise = require('bluebird');
 let snoowrap = require('../src/snoowrap');
 let errors = require('../src/errors');
@@ -15,23 +15,22 @@ describe('snoowrap', function () {
     });
     it('gets a user profile', async () => {
       await user.fetch();
-      assert.strictEqual(user.name, 'not_an_aardvark');
-      assert.strictEqual(user.created_utc, 1419104352);
-      assert.strictEqual(user.nonexistent_property, undefined);
+      expect(user.name).to.equal('not_an_aardvark');
+      expect(user.created_utc).to.equal(1419104352);
+      expect(user.nonexistent_property).to.equal(undefined);
     });
     it('returns individual properties as Promises', async () => {
-      assert.strictEqual(await user.has_verified_email, true);
+      expect(await user.has_verified_email).to.equal(true);
     });
     it('ensures that someone keeps buying me reddit gold so that the tests will pass', async () => { // :D
-      assert.strictEqual(await user.is_gold, true);
+      expect(await user.is_gold).to.equal(true);
     });
     it('returns a promise that resolves as undefined when fetching a nonexistent property', async () => {
-      assert.strictEqual(await user.nonexistent_property, undefined);
+      expect(await user.nonexistent_property).to.equal(undefined);
     });
     it('throws an error if it tries to fetch the profile of a deleted/invalid account', () => {
-      return r.get_user('[deleted]').fetch().then(assert.fail, err => {
-        return assert.instanceOf(err, errors.InvalidUserError);
-      });
+      let deleted_account = r.get_user('[deleted]');
+      expect(deleted_account.fetch.bind(deleted_account)).to.throw(errors.InvalidUserError);
     });
   });
 
@@ -41,10 +40,10 @@ describe('snoowrap', function () {
       comment = r.get_comment('coip909');
     });
     it('should retrieve a comment and get its text', async () => {
-      assert.strictEqual(await comment.body, '`RuntimeError: maximum humor depth exceeded`');
+      expect(await comment.body).to.equal('`RuntimeError: maximum humor depth exceeded`');
     });
     it('should convert the comment author to a RedditUser object and be able to get its properties', async () => {
-      assert.strictEqual(await comment.author.has_verified_email, true);
+      expect(await comment.author.has_verified_email).to.equal(true);
     });
   });
 
@@ -54,7 +53,7 @@ describe('snoowrap', function () {
       subreddit = r.get_subreddit('askreddit');
     });
     it('can fetch information directly from a subreddit\'s info page', async () => {
-      assert.strictEqual(await subreddit.created_utc, 1201233135);
+      expect(await subreddit.created_utc).to.equal(1201233135);
     });
   });
 
@@ -62,15 +61,15 @@ describe('snoowrap', function () {
     it('can chain properties together before they get resolved', async () => {
       let comment = r.get_comment('coip909');
       let first_mod_of_that_subreddit = await comment.subreddit.get_moderators()[0];
-      assert.strictEqual(first_mod_of_that_subreddit.name, 'krispykrackers');
-      assert.strictEqual(await first_mod_of_that_subreddit.created_utc, 1211483632);
+      expect(first_mod_of_that_subreddit.name).to.equal('krispykrackers');
+      expect(await first_mod_of_that_subreddit.created_utc).to.equal(1211483632);
     });
     it('throttles requests as specified by the config parameters', async () => {
       r.config.request_delay = 2000;
       let timer = Promise.delay(1999);
       await r.get_user('not_an_aardvark').fetch();
       await r.get_user('actually_an_aardvark').fetch();
-      assert.strictEqual(timer.isFulfilled(), true);
+      expect(timer.isFulfilled()).to.equal(true);
     });
   });
 });

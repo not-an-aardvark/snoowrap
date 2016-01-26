@@ -105,10 +105,9 @@ objects.RedditContent = class RedditContent {
     this._fetcher = _fetcher;
     this.has_fetched = !!has_fetched;
     _.assign(this, options);
-    this._fetch = _.once(async () => {
-      let response = await this._fetcher.get({uri: this._uri});
-      let transformed = this._transform_api_response(response);
-      _.assign(this, transformed);
+    this._fetch = _.once(async uri => {
+      let response = await this._fetcher.get(uri).then(this._transform_api_response);
+      _.assign(this, response);
       this.has_fetched = true;
       return this;
     });
@@ -127,7 +126,7 @@ objects.RedditContent = class RedditContent {
     if (this.has_fetched) {
       return this;
     }
-    return promise_wrap(this._fetch());
+    return promise_wrap(this._fetch({uri: this._uri}));
   }
   _transform_api_response (response_obj) {
     return response_obj;
