@@ -23,7 +23,7 @@ let snoowrap = class AuthenticatedClient {
     this.ratelimit_remaining = options.ratelimit_remaining;
     this.ratelimit_reset_point = options.ratelimit_reset_point;
     this.config = default_config;
-    this.throttler = Promise.resolve();
+    this.throttle = Promise.resolve();
   }
   get_user (name) {
     return new objects.RedditUser({name: name}, this);
@@ -60,7 +60,7 @@ let snoowrap = class AuthenticatedClient {
         return helpers._populate(body, this);
       }
     });
-    return new Proxy(default_requester, {apply: async (requester, self, args) => {
+    let handle_request = async (requester, self, args, attempts = 0) => {
       if (this.ratelimit_remaining < 1 && this.ratelimit_reset_point.isAfter()) {
         if (this.config.continue_after_ratelimit_error) {
           this.warn(`Warning: ${constants.MODULE_NAME} temporarily stopped sending requests because${
@@ -73,19 +73,25 @@ let snoowrap = class AuthenticatedClient {
         }
       }
 
-      /* this.throttler_promise is a timer that gets reset to this.config.request_delay whenever a request is sent.
+      /* this.throttle is a timer that gets reset to this.config.request_delay whenever a request is sent.
       This ensures that requests are ratelimited and that no requests are lost. */
-      await this.throttler;
-      this.throttler = Promise.delay(this.config.request_delay);
+      await this.throttle;
+      this.throttle = Promise.delay(this.config.request_delay);
 
       // If the access token has expired (or will expire in the next 10 seconds), refresh it.
       if (!this.token_expiration || moment(this.token_expiration).subtract(10, 'seconds').isBefore()) {
         await this._update_access_token();
       }
-
+      let requester_with_access_token = requester.defaults({headers: {Authorization: `bearer ${this.access_token}`}});
       // Send the request and return the response.
-      return await requester.defaults({headers: {Authorization: `bearer ${this.access_token}`}}).apply(self, args);
-    }});
+      return await requester_with_access_token.apply(self, args).catch(err => {
+        if (attempts < this.config.max_retry_attempts && _.includes(this.config.retry_error_codes, err.statusCode)) {
+          return handle_request(requester, self, args, attempts + 1);
+        }
+        throw err;
+      });
+    };
+    return new Proxy(default_requester, {apply: handle_request});
   }
   /*gotta*/ get get () {
     return this._oauth_requester.defaults({method: 'get'});
