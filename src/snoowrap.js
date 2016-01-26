@@ -25,6 +25,12 @@ let snoowrap = class AuthenticatedClient {
     this.config = default_config;
     this.throttle = Promise.resolve();
   }
+  get_me () {
+    return this.get('/api/v1/me').then(result => {
+      this.own_user_info = new objects.RedditUser(result, this, true);
+      return this.own_user_info;
+    });
+  }
   get_user (name) {
     return new objects.RedditUser({name: name}, this);
   }
@@ -36,7 +42,7 @@ let snoowrap = class AuthenticatedClient {
   }
   async _update_access_token () {
     let token_response = await request.post({
-      url: `https://www.${constants.ENDPOINT_DOMAIN}/api/v1/access_token`,
+      url: `https://www.${this.config.ENDPOINT_DOMAIN}/api/v1/access_token`,
       headers: {
         Authorization: `Basic ${Buffer(`${this.client_id}:${this.client_secret}`).toString('base64')}`,
         'User-Agent': this.user_agent
@@ -51,7 +57,7 @@ let snoowrap = class AuthenticatedClient {
   get _oauth_requester () {
     let default_requester = request.defaults({
       headers: {'User-Agent': this.user_agent},
-      baseUrl: `https://oauth.${constants.ENDPOINT_DOMAIN}`,
+      baseUrl: `https://oauth.${this.config.ENDPOINT_DOMAIN}`,
       qs: {raw_json: 1}, // This tells reddit to unescape html characters, e.g. it will send '<' instead of '&lt;'
       resolveWithFullResponse: true,
       transform: (body, response) => {
@@ -93,6 +99,22 @@ let snoowrap = class AuthenticatedClient {
     };
     return new Proxy(default_requester, {apply: handle_request});
   }
+  inspect () {
+    // Hide confidential information (tokens, client IDs, etc.) from the console.log output.
+    // Also, hide some things that aren't converted to text well.
+    let keys_for_hidden_values = ['client_secret', 'refresh_token', 'access_token'];
+    let hidden_keys = ['throttle'];
+    let formatted = util.inspect(_(this).omit(hidden_keys).mapValues((value, key) => {
+      if (_.includes(keys_for_hidden_values, key)) {
+        return value && '(redacted)';
+      }
+      if (value instanceof moment) {
+        return value.format();
+      }
+      return value;
+    }).value());
+    return `<${constants.MODULE_NAME} AuthenticatedClient> ${formatted}`;
+  }
   /*gotta*/ get get () {
     return this._oauth_requester.defaults({method: 'get'});
   }
@@ -111,14 +133,15 @@ objects.RedditContent = class RedditContent {
     this._fetcher = _fetcher;
     this.has_fetched = !!has_fetched;
     _.assign(this, options);
-    this._fetch = _.once(async uri => {
-      let response = await this._fetcher.get(uri).then(this._transform_api_response);
-      _.assign(this, response);
-      this.has_fetched = true;
-      return this;
+    this.fetch = _.once(() => {
+      return promise_wrap(this._fetcher.get({uri: this._uri}).then(this._transform_api_response).then(response => {
+        _.assign(this, response);
+        this.has_fetched = true;
+        return this;
+      }));
     });
     return new Proxy(this, {get: (target, key) => {
-      if (key in target || key in Promise.prototype || this.has_fetched) {
+      if (key in target || key in Promise.prototype || target.has_fetched) {
         return target[key];
       }
       return this.fetch()[key];
@@ -127,12 +150,6 @@ objects.RedditContent = class RedditContent {
   inspect () {
     let public_properties = _.pickBy(this, (value, key) => (key.charAt(0) !== '_' && typeof value !== 'function'));
     return `<${constants.MODULE_NAME}.objects.${this.constructor.name}> ${util.inspect(public_properties)}`;
-  }
-  fetch () {
-    if (this.has_fetched) {
-      return this;
-    }
-    return promise_wrap(this._fetch({uri: this._uri}));
   }
   _transform_api_response (response_obj) {
     return response_obj;

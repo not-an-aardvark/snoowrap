@@ -1,5 +1,4 @@
 module.exports = {
-  ENDPOINT_DOMAIN: 'reddit.com',
   MODULE_NAME: 'snoowrap',
   USER_KEYS: ['author', 'approved_by', 'banned_by'],
   SUBREDDIT_KEYS: ['subreddit'],

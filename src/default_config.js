@@ -1,4 +1,7 @@
 module.exports = {
+  // The domain that requests should be sent to
+  ENDPOINT_DOMAIN: 'reddit.com',
+
   /* This is the minimum delay between requests, in milliseconds. Setting this to more than 1 will ensure that the
   ratelimit is never reached, but it will make things run slower than necessary if only a few requests are being sent.
   If this is set to zero, snoowrap will not enforce any delay between individual requests, but it will still refuse

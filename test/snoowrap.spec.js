@@ -1,7 +1,7 @@
 'use strict';
 let expect = require('chai').use(require('chai-as-promised')).expect;
 let Promise = require('bluebird');
-let snoowrap = require('../src/snoowrap');
+let snoowrap = require('..');
 let errors = require('../src/errors');
 describe('snoowrap', function () {
   this.timeout(10000);
@@ -13,11 +13,16 @@ describe('snoowrap', function () {
     beforeEach(() => {
       user = r.get_user('not_an_aardvark');
     });
-    it('gets a user profile', async () => {
+    it('gets information from a user profile', async () => {
       await user.fetch();
       expect(user.name).to.equal('not_an_aardvark');
       expect(user.created_utc).to.equal(1419104352);
       expect(user.nonexistent_property).to.equal(undefined);
+    });
+    it('gets information from the requester\'s own profile', async () => {
+      let me = await r.get_me();
+      expect(me.name).to.equal(r.own_user_info.name); // (this doesn't necessarily mean that the name is correct)
+      expect(me.name).to.be.a('string');
     });
     it('returns individual properties as Promises', async () => {
       expect(await user.has_verified_email).to.equal(true);
@@ -30,7 +35,8 @@ describe('snoowrap', function () {
     });
     it('throws an error if it tries to fetch the profile of a deleted/invalid account', () => {
       let deleted_account = r.get_user('[deleted]');
-      expect(deleted_account.fetch.bind(deleted_account)).to.throw(errors.InvalidUserError);
+      // Ideally this would just be expect(...).to.throw(errors.InvalidUserError), but that fails due to a bug in chai
+      expect(deleted_account.fetch.bind(deleted_account)).to.throw(Error, /Cannot fetch information on/);
     });
   });
 
