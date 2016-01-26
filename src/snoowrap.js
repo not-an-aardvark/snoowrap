@@ -8,6 +8,7 @@ let promise_wrap = require('promise-chains');
 let util = require('util');
 let constants = require('./constants');
 let errors = require('./errors');
+let default_config = require('./default_config');
 let objects = {};
 let helpers = {};
 
@@ -21,6 +22,8 @@ let snoowrap = class AuthenticatedClient {
     this.token_expiration = options.token_expiration;
     this.ratelimit_remaining = options.ratelimit_remaining;
     this.ratelimit_reset_point = options.ratelimit_reset_point;
+    this.config = default_config;
+    this.throttler = Promise.resolve();
   }
   get_user (name) {
     return new objects.RedditUser({name: name}, this);
@@ -45,20 +48,11 @@ let snoowrap = class AuthenticatedClient {
     this.scopes = token_response.scope.split(' ');
   }
 
-  get oauth_requester () {
-    let request_filter_proxy = (requester, thisArg, args) => {
-      if (this.ratelimit_remaining < 1 && this.ratelimit_reset_point.isAfter()) {
-        throw new errors.RateLimitError(this.ratelimit_reset_point.diff(moment(), 'seconds'));
-      }
-      let needs_refresh = !this.token_expiration || moment(this.token_expiration).subtract(10, 'seconds').isBefore();
-      return promise_wrap((needs_refresh ? this._update_access_token() : Promise.resolve()).then(() => {
-        return requester.defaults({headers: {Authorization: `bearer ${this.access_token}`}}).apply(thisArg, args);
-      }));
-    };
+  get _oauth_requester () {
     let default_requester = request.defaults({
       headers: {'User-Agent': this.user_agent},
       baseUrl: `https://oauth.${constants.ENDPOINT_DOMAIN}`,
-      qs: {raw_json: 1}, // This tells reddit to unescape html characters, so that it sends '<' instead of '&lt;'
+      qs: {raw_json: 1}, // This tells reddit to unescape html characters, e.g. it will send '<' instead of '&lt;'
       resolveWithFullResponse: true,
       transform: (body, response) => {
         this.ratelimit_remaining = response.headers['x-ratelimit-remaining'];
@@ -66,15 +60,43 @@ let snoowrap = class AuthenticatedClient {
         return helpers._populate(body, this);
       }
     });
-    return new Proxy(default_requester, {
-      apply: request_filter_proxy,
-      get: (target, key) => { // Allow both request(args) and request.post(args)
-        if (_.includes(['get', 'head', 'post', 'put', 'patch', 'del'], key)) {
-          return new Proxy(target.defaults({method: key}), {apply: request_filter_proxy});
+    return new Proxy(default_requester, {apply: async (requester, self, args) => {
+      if (this.ratelimit_remaining < 1 && this.ratelimit_reset_point.isAfter()) {
+        if (this.config.continue_after_ratelimit_error) {
+          this.warn(`Warning: ${constants.MODULE_NAME} temporarily stopped sending requests because${
+          ''} reddit's ratelimit was exceeded. The request you attempted to send was queued, and will be${
+          ''} sent to reddit when the current ratelimit period expires in${
+          ''} ${this.ratelimit_reset_point.diff(moment(), 'seconds')} seconds.`);
+          await Promise.delay(this.ratelimit_reset_point.diff());
+        } else {
+          throw new errors.RateLimitError();
         }
-        return target[key];
       }
-    });
+
+      /* this.throttler_promise is a timer that gets reset to this.config.request_delay whenever a request is sent.
+      This ensures that requests are ratelimited and that no requests are lost. */
+      await this.throttler;
+      this.throttler = Promise.delay(this.config.request_delay);
+
+      // If the access token has expired (or will expire in the next 10 seconds), refresh it.
+      if (!this.token_expiration || moment(this.token_expiration).subtract(10, 'seconds').isBefore()) {
+        await this._update_access_token();
+      }
+
+      // Send the request and return the response.
+      return await requester.defaults({headers: {Authorization: `bearer ${this.access_token}`}}).apply(self, args);
+    }});
+  }
+  /*gotta*/ get get () {
+    return this._oauth_requester.defaults({method: 'get'});
+  }
+  get post () {
+    return this._oauth_requester.defaults({method: 'post'});
+  }
+  warn (...args) {
+    if (!this.config.suppress_warnings) {
+      console.warn(...args);
+    }
   }
 };
 
@@ -84,14 +106,14 @@ objects.RedditContent = class RedditContent {
     this.has_fetched = !!has_fetched;
     _.assign(this, options);
     this._fetch = _.once(async () => {
-      let response = await this._fetcher.oauth_requester.get({uri: this._uri});
+      let response = await this._fetcher.get({uri: this._uri});
       let transformed = this._transform_api_response(response);
       _.assign(this, transformed);
       this.has_fetched = true;
       return this;
     });
     return new Proxy(this, {get: (target, key) => {
-      if (key in target || key === 'length' || key in Promise.prototype || this.has_fetched) {
+      if (key in target || key in Promise.prototype || this.has_fetched) {
         return target[key];
       }
       return this.fetch()[key];
@@ -100,9 +122,6 @@ objects.RedditContent = class RedditContent {
   inspect () {
     let public_properties = _.pickBy(this, (value, key) => (key.charAt(0) !== '_' && typeof value !== 'function'));
     return `<${constants.MODULE_NAME}.objects.${this.constructor.name}> ${util.inspect(public_properties)}`;
-  }
-  get oauth_requester () {
-    return this._fetcher.oauth_requester;
   }
   fetch () {
     if (this.has_fetched) {
@@ -165,7 +184,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
     return `/r/${this.display_name}/about`;
   }
   get_moderators () {
-    return this._fetcher.oauth_requester.get(`/r/${this.display_name}/about/moderators`);
+    return this._fetcher.get(`/r/${this.display_name}/about/moderators`);
   }
 };
 

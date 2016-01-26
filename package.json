@@ -20,14 +20,15 @@
   },
   "babel": {
     "plugins": [
-      "transform-async-to-generator"
+      "transform-async-to-generator",
+      "transform-es2015-parameters"
     ]
   },
   "homepage": "https://github.com/not-an-aardvark/snoowrap",
   "dependencies": {
     "bluebird": "^3.1.1",
     "harmony-reflect": "^1.4.2",
-    "lodash": "^4.0.0",
+    "lodash": "^4.0.1",
     "moment": "^2.11.1",
     "promise-chains": "^0.1.1",
     "request-promise": "^2.0.0"
@@ -37,6 +38,7 @@
     "babel-core": "^6.4.0",
     "babel-eslint": "^4.1.6",
     "babel-plugin-transform-async-to-generator": "^6.4.0",
+    "babel-plugin-transform-es2015-parameters": "^6.4.5",
     "chai": "^3.4.1",
     "chai-as-promised": "^5.2.0",
     "mocha": "^2.3.4"

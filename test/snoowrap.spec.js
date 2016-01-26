@@ -1,5 +1,6 @@
 'use strict';
 let assert = require('chai').use(require('chai-as-promised')).assert;
+let Promise = require('bluebird');
 let snoowrap = require('../src/snoowrap');
 let errors = require('../src/errors');
 describe('snoowrap', function () {
@@ -63,6 +64,13 @@ describe('snoowrap', function () {
       let first_mod_of_that_subreddit = await comment.subreddit.get_moderators()[0];
       assert.strictEqual(first_mod_of_that_subreddit.name, 'krispykrackers');
       assert.strictEqual(await first_mod_of_that_subreddit.created_utc, 1211483632);
+    });
+    it('throttles requests as specified by the config parameters', async () => {
+      r.config.request_delay = 2000;
+      let timer = Promise.delay(1999);
+      await r.get_user('not_an_aardvark').fetch();
+      await r.get_user('actually_an_aardvark').fetch();
+      assert.strictEqual(timer.isFulfilled(), true);
     });
   });
 });
