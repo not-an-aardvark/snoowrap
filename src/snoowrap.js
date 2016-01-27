@@ -40,6 +40,9 @@ let snoowrap = class AuthenticatedClient {
   get_subreddit (display_name) {
     return new objects.Subreddit({display_name: display_name}, this);
   }
+  get_submission (submission_id) {
+    return new objects.Submission({name: `t3_${submission_id}`}, this);
+  }
   async _update_access_token () {
     let token_response = await request.post({
       url: `https://www.${this.config.ENDPOINT_DOMAIN}/api/v1/access_token`,
@@ -141,7 +144,7 @@ objects.RedditContent = class RedditContent {
       }));
     });
     return new Proxy(this, {get: (target, key) => {
-      if (key in target || key in Promise.prototype || target.has_fetched) {
+      if (key in target || key === 'length' || key in Promise.prototype || target.has_fetched) {
         return target[key];
       }
       return this.fetch()[key];
@@ -186,6 +189,13 @@ objects.Submission = class Submission extends objects.RedditContent {
   }
   get _uri () {
     return `/api/info?id=${this.name}`;
+  }
+  //TODO: Use a mixin for 'replyable' things, since the code will pretty much be the same for all of them
+  reply (text) {
+    return this._fetcher.post({uri: '/api/comment', formData: {api_type: 'json', text: text, thing_id: this.name}});
+  }
+  _transform_api_response (response_object) {
+    return response_object.children[0];
   }
 };
 
