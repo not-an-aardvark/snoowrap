@@ -45,7 +45,7 @@ let snoowrap = class AuthenticatedClient {
   }
   async _update_access_token () {
     let token_response = await request.post({
-      url: `https://www.${this.config.ENDPOINT_DOMAIN}/api/v1/access_token`,
+      url: `https://www.${this.config.endpoint_domain}/api/v1/access_token`,
       headers: {
         Authorization: `Basic ${Buffer(`${this.client_id}:${this.client_secret}`).toString('base64')}`,
         'User-Agent': this.user_agent
@@ -60,7 +60,7 @@ let snoowrap = class AuthenticatedClient {
   get _oauth_requester () {
     let default_requester = request.defaults({
       headers: {'User-Agent': this.user_agent},
-      baseUrl: `https://oauth.${this.config.ENDPOINT_DOMAIN}`,
+      baseUrl: `https://oauth.${this.config.endpoint_domain}`,
       qs: {raw_json: 1}, // This tells reddit to unescape html characters, e.g. it will send '<' instead of '&lt;'
       resolveWithFullResponse: true,
       transform: (body, response) => {
