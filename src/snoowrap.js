@@ -132,12 +132,12 @@ let snoowrap = class AuthenticatedClient {
 };
 
 objects.RedditContent = class RedditContent {
-  constructor(options, _fetcher, has_fetched) {
-    this._fetcher = _fetcher;
+  constructor(options, _ac, has_fetched) {
+    this._ac = _ac;
     this.has_fetched = !!has_fetched;
     _.assign(this, options);
     this.fetch = _.once(() => {
-      return promise_wrap(this._fetcher.get({uri: this._uri}).then(this._transform_api_response).then(response => {
+      return promise_wrap(this._ac.get({uri: this._uri}).then(this._transform_api_response).then(response => {
         _.assign(this, response);
         this.has_fetched = true;
         return this;
@@ -151,7 +151,7 @@ objects.RedditContent = class RedditContent {
     }});
   }
   inspect () {
-    let public_properties = _.pickBy(this, (value, key) => (key.charAt(0) !== '_' && typeof value !== 'function'));
+    let public_properties = _.omitBy(this, (value, key) => (key.startsWith('_') || typeof value === 'function'));
     return `<${constants.MODULE_NAME}.objects.${this.constructor.name}> ${util.inspect(public_properties)}`;
   }
   _transform_api_response (response_obj) {
@@ -160,8 +160,8 @@ objects.RedditContent = class RedditContent {
 };
 
 objects.Comment = class Comment extends objects.RedditContent {
-  constructor (options, _fetcher, has_fetched) {
-    super(options, _fetcher, has_fetched);
+  constructor (options, _ac, has_fetched) {
+    super(options, _ac, has_fetched);
   }
   _transform_api_response (response_object) {
     return response_object.children[0];
@@ -172,8 +172,8 @@ objects.Comment = class Comment extends objects.RedditContent {
 };
 
 objects.RedditUser = class RedditUser extends objects.RedditContent {
-  constructor (options, _fetcher, has_fetched) {
-    super(options, _fetcher, has_fetched);
+  constructor (options, _ac, has_fetched) {
+    super(options, _ac, has_fetched);
   }
   get _uri () {
     if (typeof this.name !== 'string' || !constants.username_regex.test(this.name)) {
@@ -184,24 +184,21 @@ objects.RedditUser = class RedditUser extends objects.RedditContent {
 };
 
 objects.Submission = class Submission extends objects.RedditContent {
-  constructor (options, _fetcher, has_fetched) {
-    super(options, _fetcher, has_fetched);
+  constructor (options, _ac, has_fetched) {
+    super(options, _ac, has_fetched);
   }
   get _uri () {
     return `/api/info?id=${this.name}`;
   }
-  //TODO: Use a mixin for 'replyable' things, since the code will pretty much be the same for all of them
-  reply (text) {
-    return this._fetcher.post({uri: '/api/comment', formData: {api_type: 'json', text: text, thing_id: this.name}});
-  }
+
   _transform_api_response (response_object) {
     return response_object.children[0];
   }
 };
 
 objects.PrivateMessage = class PrivateMessage extends objects.RedditContent {
-  constructor (options, _fetcher, has_fetched) {
-    super(options, _fetcher, has_fetched);
+  constructor (options, _ac, has_fetched) {
+    super(options, _ac, has_fetched);
   }
   get _uri () {
     return `/message/messages/${this.id}`;
@@ -209,60 +206,60 @@ objects.PrivateMessage = class PrivateMessage extends objects.RedditContent {
 };
 
 objects.Subreddit = class Subreddit extends objects.RedditContent {
-  constructor (options, _fetcher, has_fetched) {
-    super(options, _fetcher, has_fetched);
+  constructor (options, _ac, has_fetched) {
+    super(options, _ac, has_fetched);
   }
   get _uri () {
     return `/r/${this.display_name}/about`;
   }
   get_moderators () {
-    return this._fetcher.get(`/r/${this.display_name}/about/moderators`);
+    return this._ac.get(`/r/${this.display_name}/about/moderators`);
   }
 };
 
 objects.Trophy = class Trophy extends objects.RedditContent {
-  constructor (options, _fetcher, has_fetched) {
-    super(options, _fetcher, has_fetched);
+  constructor (options, _ac, has_fetched) {
+    super(options, _ac, has_fetched);
   }
 };
 
 objects.PromoCampaign = class PromoCampaign extends objects.RedditContent {
-  constructor (options, _fetcher, has_fetched) {
-    super(options, _fetcher, has_fetched);
+  constructor (options, _ac, has_fetched) {
+    super(options, _ac, has_fetched);
   }
 };
 
 objects.Listing = class Listing extends objects.RedditContent {
-  constructor(options, _fetcher, has_fetched) {
-    super(options, _fetcher, has_fetched);
+  constructor(options, _ac, has_fetched) {
+    super(options, _ac, has_fetched);
   }
 };
 
 objects.UserList = class UserList extends objects.RedditContent {
-  constructor(options, _fetcher) {
+  constructor(options, _ac) {
     return options.children.map(user => {
-      return new objects.RedditUser(user, _fetcher);
+      return new objects.RedditUser(user, _ac);
     });
   }
 };
 
-helpers._populate = (response_tree, _fetcher) => {
+helpers._populate = (response_tree, _ac) => {
   if (typeof response_tree === 'object' && response_tree !== null) {
     // Map {kind: 't2', data: {name: 'some_username', ... }} to a RedditUser (e.g.) with the same properties
     if (_.keys(response_tree).length === 2 && response_tree.kind && constants.KINDS[response_tree.kind]) {
-      let remainder_of_tree = helpers._populate(response_tree.data, _fetcher);
-      return new objects[constants.KINDS[response_tree.kind]](remainder_of_tree, _fetcher, true);
+      let remainder_of_tree = helpers._populate(response_tree.data, _ac);
+      return new objects[constants.KINDS[response_tree.kind]](remainder_of_tree, _ac, true);
     }
     let mapFunction = Array.isArray(response_tree) ? _.map : _.mapValues;
     return mapFunction(response_tree, (value, key) => {
       // Map {..., author: 'some_username', ...} to {..., author: RedditUser {}, ... } (e.g.)
       if (_.includes(constants.USER_KEYS, key)) {
-        return new objects.RedditUser({name: value}, _fetcher);
+        return new objects.RedditUser({name: value}, _ac);
       }
       if (_.includes(constants.SUBREDDIT_KEYS, key)) {
-        return new objects.Subreddit({display_name: value}, _fetcher);
+        return new objects.Subreddit({display_name: value}, _ac);
       }
-      return helpers._populate(value, _fetcher);
+      return helpers._populate(value, _ac);
     });
   }
   return response_tree;

@@ -2,7 +2,6 @@
 let expect = require('chai').use(require('chai-as-promised')).expect;
 let Promise = require('bluebird');
 let snoowrap = require('..');
-let errors = require('../src/errors');
 describe('snoowrap', function () {
   this.timeout(10000);
   // oauth_info.json has the properties `user_agent`, `client_id`, `client_secret`, and `refresh_token`.
