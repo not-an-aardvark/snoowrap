@@ -1,5 +1,5 @@
 module.exports = {
-  parser: "babel-eslint",
+  parser: 'babel-eslint',
   rules: {
     quotes: [2, 'single'],
     'linebreak-style': [2, 'unix'],

@@ -9,6 +9,7 @@ let util = require('util');
 let constants = require('./constants');
 let errors = require('./errors');
 let default_config = require('./default_config');
+let actions = require('./actions');
 let objects = {};
 let helpers = {};
 
@@ -32,29 +33,27 @@ let snoowrap = class AuthenticatedClient {
     });
   }
   get_user (name) {
-    return new objects.RedditUser({name: name}, this);
+    return new objects.RedditUser({name}, this);
   }
   get_comment (comment_id) {
     return new objects.Comment({name: `t1_${comment_id}`}, this);
   }
   get_subreddit (display_name) {
-    return new objects.Subreddit({display_name: display_name}, this);
+    return new objects.Subreddit({display_name}, this);
   }
   get_submission (submission_id) {
     return new objects.Submission({name: `t3_${submission_id}`}, this);
   }
   async _update_access_token () {
-    let token_response = await request.post({
+    let token_info = await request.post({
       url: `https://www.${this.config.endpoint_domain}/api/v1/access_token`,
-      headers: {
-        Authorization: `Basic ${Buffer(`${this.client_id}:${this.client_secret}`).toString('base64')}`,
-        'User-Agent': this.user_agent
-      },
+      auth: {user: this.client_id, pass: this.client_secret},
+      headers: {'User-Agent': this.user_agent},
       form: {grant_type: 'refresh_token', refresh_token: this.refresh_token}
     });
-    this.access_token = token_response.access_token;
-    this.token_expiration = moment().add(token_response.expires_in, 'seconds');
-    this.scopes = token_response.scope.split(' ');
+    this.access_token = token_info.access_token;
+    this.token_expiration = moment().add(token_info.expires_in, 'seconds');
+    this.scopes = token_info.scope.split(' ');
   }
 
   get _oauth_requester () {
@@ -72,10 +71,7 @@ let snoowrap = class AuthenticatedClient {
     let handle_request = async (requester, self, args, attempts = 0) => {
       if (this.ratelimit_remaining < 1 && this.ratelimit_reset_point.isAfter()) {
         if (this.config.continue_after_ratelimit_error) {
-          this.warn(`Warning: ${constants.MODULE_NAME} temporarily stopped sending requests because${
-          ''} reddit's ratelimit was exceeded. The request you attempted to send was queued, and will be${
-          ''} sent to reddit when the current ratelimit period expires in${
-          ''} ${this.ratelimit_reset_point.diff(moment(), 'seconds')} seconds.`);
+          this.warn(errors.RateLimitWarning);
           await Promise.delay(this.ratelimit_reset_point.diff());
         } else {
           throw new errors.RateLimitError();
@@ -83,17 +79,21 @@ let snoowrap = class AuthenticatedClient {
       }
 
       /* this.throttle is a timer that gets reset to this.config.request_delay whenever a request is sent.
-      This ensures that requests are ratelimited and that no requests are lost. */
-      await this.throttle;
+      This ensures that requests are ratelimited and that no requests are lost. The await statement is wrapped
+      in a loop to make sure that if the throttle promise resolves while multiple requests are pending, only
+      one of the requests will be sent, and the others will await the throttle again. (The loop is non-blocking
+      due to its await statement.) */
+      while (!this.throttle.isFulfilled()) {
+        await this.throttle;
+      }
       this.throttle = Promise.delay(this.config.request_delay);
 
       // If the access token has expired (or will expire in the next 10 seconds), refresh it.
       if (!this.token_expiration || moment(this.token_expiration).subtract(10, 'seconds').isBefore()) {
         await this._update_access_token();
       }
-      let requester_with_access_token = requester.defaults({headers: {Authorization: `bearer ${this.access_token}`}});
       // Send the request and return the response.
-      return await requester_with_access_token.apply(self, args).catch(err => {
+      return await requester.defaults({auth: {bearer: this.access_token}}).apply(self, args).catch(err => {
         if (attempts < this.config.max_retry_attempts && _.includes(this.config.retry_error_codes, err.statusCode)) {
           return handle_request(requester, self, args, attempts + 1);
         }
@@ -116,7 +116,7 @@ let snoowrap = class AuthenticatedClient {
       }
       return value;
     }).value());
-    return `<${constants.MODULE_NAME} AuthenticatedClient> ${formatted}`;
+    return `<${constants.MODULE_NAME}.objects.${this.constructor.name}> ${formatted}`;
   }
   /*gotta*/ get get () {
     return this._oauth_requester.defaults({method: 'get'});
@@ -124,6 +124,16 @@ let snoowrap = class AuthenticatedClient {
   get post () {
     return this._oauth_requester.defaults({method: 'post'});
   }
+  get patch () {
+    return this._oauth_requester.defaults({method: 'patch'});
+  }
+  get put () {
+    return this._oauth_requester.defaults({method: 'put'});
+  }
+  get delete () {
+    return this._oauth_requester.defaults({method: 'delete'});
+  }
+  // TODO: probably combine the above getters to avoid repetition, though that would require deleting the 'get get' joke :\
   warn (...args) {
     if (!this.config.suppress_warnings) {
       console.warn(...args);
@@ -136,9 +146,12 @@ objects.RedditContent = class RedditContent {
     this._ac = _ac;
     this.has_fetched = !!has_fetched;
     _.assign(this, options);
-    this.fetch = _.once(() => {
-      return promise_wrap(this._ac.get({uri: this._uri}).then(this._transform_api_response).then(response => {
-        _.assign(this, response);
+    this.fetch = this.fetch || _.once(() => {
+      return promise_wrap(this._ac.get({uri: this._uri}).then(this._transform_api_response.bind(this)).then(response => {
+        /* The line below is equivalent to _.assign(this, response);, but _.assign ends up triggering warning messages when
+        used on Proxies, since the patched globals from harmony-reflect aren't applied to lodash. This won't be a problem once
+        Proxies are correctly implemented natively. https://github.com/tvcutsem/harmony-reflect#dependencies */
+        _.forIn(response, (value, key) => {this[key] = value;});
         this.has_fetched = true;
         return this;
       }));
@@ -147,6 +160,9 @@ objects.RedditContent = class RedditContent {
       if (key in target || key === 'length' || key in Promise.prototype || target.has_fetched) {
         return target[key];
       }
+      if (key === '_raw') {
+        return target;
+      }
       return this.fetch()[key];
     }});
   }
@@ -154,8 +170,8 @@ objects.RedditContent = class RedditContent {
     let public_properties = _.omitBy(this, (value, key) => (key.startsWith('_') || typeof value === 'function'));
     return `<${constants.MODULE_NAME}.objects.${this.constructor.name}> ${util.inspect(public_properties)}`;
   }
-  _transform_api_response (response_obj) {
-    return response_obj;
+  _transform_api_response (response_object) {
+    return response_object;
   }
 };
 
@@ -169,6 +185,9 @@ objects.Comment = class Comment extends objects.RedditContent {
   get _uri () {
     return `/api/info?id=${this.name}`;
   }
+  static get inherited_action_categories () {
+    return ['reply', 'vote', 'moderate', 'more_comments'];
+  }
 };
 
 objects.RedditUser = class RedditUser extends objects.RedditContent {
@@ -181,18 +200,24 @@ objects.RedditUser = class RedditUser extends objects.RedditContent {
     }
     return `/user/${this.name}/about`;
   }
+  static get inherited_action_categories () {
+    return [];
+  }
 };
 
 objects.Submission = class Submission extends objects.RedditContent {
   constructor (options, _ac, has_fetched) {
     super(options, _ac, has_fetched);
+    this.comments = new objects.Listing(undefined, _ac, {uri: this._uri, transform: response => (response[1])});
   }
   get _uri () {
-    return `/api/info?id=${this.name}`;
+    return `/comments/${this.name.slice(3)}`;
   }
-
   _transform_api_response (response_object) {
-    return response_object.children[0];
+    return response_object[0].children[0];
+  }
+  static get inherited_action_categories () {
+    return ['reply', 'vote', 'moderate', 'more_comments'];
   }
 };
 
@@ -202,6 +227,9 @@ objects.PrivateMessage = class PrivateMessage extends objects.RedditContent {
   }
   get _uri () {
     return `/message/messages/${this.id}`;
+  }
+  static get inherited_action_categories () {
+    return ['reply', 'moderate']; // more_comments? Need to check whether this ever applies with PMs
   }
 };
 
@@ -214,6 +242,9 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   }
   get_moderators () {
     return this._ac.get(`/r/${this.display_name}/about/moderators`);
+  }
+  static get inherited_action_categories () {
+    return [];
   }
 };
 
@@ -230,12 +261,76 @@ objects.PromoCampaign = class PromoCampaign extends objects.RedditContent {
 };
 
 objects.Listing = class Listing extends objects.RedditContent {
-  constructor(options, _ac, has_fetched) {
-    super(options, _ac, has_fetched);
+  constructor (info = {children: []}, _ac,
+      {query = {}, show_all = true, limit = 0, transform = _.identity, uri, method, is_comment_listing = false}) {
+    super(info, _ac, true);
+    let constant_params = _.assign(query, {show: show_all ? 'all' : undefined, limit});
+    this.requester = _ac._oauth_requester.defaults({uri, method, qs: constant_params});
+    this.transform = transform;
+    this.limit = limit;
+    this.is_comment_listing = is_comment_listing;
+    _.assign(this, info);
+    this.uri = uri;
+  }
+  get is_finished () {
+    if (this.is_comment_listing) {
+      return !this._more || !this._more.children.length;
+    }
+    return !!this.uri && this.after === null && this.before === null;
+  }
+  fetch ({amount}) {
+    if (typeof amount !== 'number') {
+      throw new errors.InvalidMethodCallError('Failed to fetch listing. (`amount` must be a Number.)');
+    }
+    if (amount <= 0 || this.is_finished) {
+      return [];
+    }
+    if (!this.is_comment_listing) {
+      return promise_wrap(this._fetch_more_regular({amount}));
+    }
+    return promise_wrap(this._fetch_more_comments({amount}));
+  }
+  async _fetch_more_regular ({amount}) {
+    let limit_for_request = Math.min(amount, this.limit || 0);
+    let request_params = {qs: {after: this.after, before: this.before, limit: limit_for_request}, uri: this.uri};
+    let response = await this.requester(request_params).then(this.transform);
+    if (this.children.length === 0 && _.last(response.children) instanceof objects.more) {
+      this._more = response.children.pop();
+      this.is_comment_listing = true;
+    }
+    this.children.push(...(response.children || []));
+    this.before = response.before;
+    this.after = response.after;
+    return this.children.slice(0, amount).concat(await this.fetch({amount: amount - response.children.length}));
+  }
+  async _fetch_more_comments (...args) {
+    let new_comments = this._more ? await this._more.fetch(...args) : [];
+    this.children.push(...new_comments);
+    return new_comments;
+  }
+  fetch_all () {
+    return this.fetch({amount: Infinity});
   }
 };
 
-objects.UserList = class UserList extends objects.RedditContent {
+objects.more = class more extends objects.RedditContent {
+  constructor (properties, _ac) {
+    super(properties, _ac);
+  }
+  async fetch ({amount = Infinity}) {
+    if (typeof amount !== 'number') {
+      throw new errors.InvalidMethodCallError('Failed to fetch listing. (`amount` must be a Number.)');
+    }
+    if (amount <= 0 || this.children.length === 0) {
+      return [];
+    }
+    let ids_for_this_request = this.children.splice(0, Math.min(amount, 100));
+    let response = await this._ac.get({uri: '/api/info', qs: {id: ids_for_this_request.map(id => (`t1_${id}`)).join(',')}});
+    return response.children.concat(await this.fetch({amount: amount - ids_for_this_request.length}));
+  }
+};
+
+objects.UserList = class UserList {
   constructor(options, _ac) {
     return options.children.map(user => {
       return new objects.RedditUser(user, _ac);
@@ -246,9 +341,12 @@ objects.UserList = class UserList extends objects.RedditContent {
 helpers._populate = (response_tree, _ac) => {
   if (typeof response_tree === 'object' && response_tree !== null) {
     // Map {kind: 't2', data: {name: 'some_username', ... }} to a RedditUser (e.g.) with the same properties
-    if (_.keys(response_tree).length === 2 && response_tree.kind && constants.KINDS[response_tree.kind]) {
+    if (_.keys(response_tree).length === 2 && response_tree.kind) {
       let remainder_of_tree = helpers._populate(response_tree.data, _ac);
-      return new objects[constants.KINDS[response_tree.kind]](remainder_of_tree, _ac, true);
+      if (constants.KINDS[response_tree.kind]) {
+        return new objects[constants.KINDS[response_tree.kind]](remainder_of_tree, _ac, true);
+      }
+      _ac.warn(`Unknown type ${response_tree.kind}. This may be a bug; please report it at ${constants.ISSUE_REPORT_LINK}.`);
     }
     let mapFunction = Array.isArray(response_tree) ? _.map : _.mapValues;
     return mapFunction(response_tree, (value, key) => {
@@ -264,6 +362,15 @@ helpers._populate = (response_tree, _ac) => {
   }
   return response_tree;
 };
+
+/* Assign all the action functions to the class prototypes. Actions are split into categories (moderation, voting, etc.),
+which are defined in actions.js. Each class should have the inherited_action_categories property, which is a list of strings
+corresponding to the action categories which apply to objects of that class. */
+_(objects).forOwn(object_class => {
+  _(actions).pick(object_class.inherited_action_categories || []).forOwn(action_category => {
+    _.assign(object_class.prototype, action_category);
+  });
+});
 
 snoowrap.objects = objects;
 snoowrap.helpers = helpers;

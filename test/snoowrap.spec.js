@@ -1,11 +1,15 @@
 'use strict';
 let expect = require('chai').use(require('chai-as-promised')).expect;
 let Promise = require('bluebird');
+let _ = require('lodash');
 let snoowrap = require('..');
 describe('snoowrap', function () {
   this.timeout(10000);
-  // oauth_info.json has the properties `user_agent`, `client_id`, `client_secret`, and `refresh_token`.
-  let r = new snoowrap(require('../oauth_info.json'));
+  let r;
+  before(() => {
+    // oauth_info.json has the properties `user_agent`, `client_id`, `client_secret`, and `refresh_token`.
+    r = new snoowrap(require('../oauth_info.json'));
+  });
 
   describe('getting a user profile', () => {
     let user;
@@ -24,10 +28,10 @@ describe('snoowrap', function () {
       expect(me.name).to.be.a('string');
     });
     it('returns individual properties as Promises', async () => {
-      expect(await user.has_verified_email).to.equal(true);
+      expect(await user.has_verified_email).to.be.true;
     });
     it('ensures that someone keeps buying me reddit gold so that the tests will pass', async () => { // :D
-      expect(await user.is_gold).to.equal(true);
+      expect(await user.is_gold).to.be.true;
     });
     it('returns a promise that resolves as undefined when fetching a nonexistent property', async () => {
       expect(await user.nonexistent_property).to.equal(undefined);
@@ -48,7 +52,7 @@ describe('snoowrap', function () {
       expect(await comment.body).to.equal('`RuntimeError: maximum humor depth exceeded`');
     });
     it('should convert the comment author to a RedditUser object and be able to get its properties', async () => {
-      expect(await comment.author.has_verified_email).to.equal(true);
+      expect(await comment.author.has_verified_email).to.be.true;
     });
   });
 
@@ -59,6 +63,28 @@ describe('snoowrap', function () {
     });
     it('can fetch information directly from a subreddit\'s info page', async () => {
       expect(await subreddit.created_utc).to.equal(1201233135);
+    });
+  });
+
+  describe('getting a submission', function () {
+    this.timeout(30000);
+    let submission;
+    beforeEach(() => {
+      submission = r.get_submission('2np694');
+    });
+    it('can get details on a submission', async () => {
+      expect(await submission.title).to.equal('What tasty food would be distusting if eaten over rice?');
+      expect(submission.author.name).to.equal('DO_U_EVN_SPAGHETTI');
+    });
+    it('can get comments on a post', async () => {
+      expect(submission.comments.is_finished).to.be.false;
+      expect(await submission.comments.fetch({amount: 5})).to.have.length(5);
+      expect(submission.comments.children).to.have.length.above(5);
+      expect(submission.comments.children[0]).to.be.an.instanceof(snoowrap.objects.Comment);
+      expect(_.last(submission.comments.children)).to.be.an.instanceof(snoowrap.objects.Comment);
+      await submission.comments.fetch_all();
+      expect(submission.comments.children).to.have.length.above(1000);
+      expect(submission.comments.is_finished).to.be.true;
     });
   });
 
@@ -74,7 +100,7 @@ describe('snoowrap', function () {
       let timer = Promise.delay(1999);
       await r.get_user('not_an_aardvark').fetch();
       await r.get_user('actually_an_aardvark').fetch();
-      expect(timer.isFulfilled()).to.equal(true);
+      expect(timer.isFulfilled()).to.be.true;
     });
   });
 });
