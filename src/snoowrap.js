@@ -27,7 +27,7 @@ let snoowrap = class AuthenticatedClient {
     this.throttle = Promise.resolve();
   }
   get_me () {
-    return this.get('/api/v1/me').then(result => {
+    return this.get('api/v1/me').then(result => {
       this.own_user_info = new objects.RedditUser(result, this, true);
       return this.own_user_info;
     });
@@ -69,11 +69,12 @@ let snoowrap = class AuthenticatedClient {
     });
     let handle_request = async (requester, self, args, attempts = 0) => {
       if (this.ratelimit_remaining < 1 && this.ratelimit_reset_point.isAfter()) {
+        let seconds_until_expiry = this.ratelimit_reset_point.diff(moment(), 'seconds');
         if (this.config.continue_after_ratelimit_error) {
-          this.warn(errors.RateLimitWarning);
+          this.warn(errors.RateLimitWarning(seconds_until_expiry));
           await Promise.delay(this.ratelimit_reset_point.diff());
         } else {
-          throw new errors.RateLimitError();
+          throw new errors.RateLimitError(seconds_until_expiry);
         }
       }
       /* this.throttle is a timer that gets reset to this.config.request_delay whenever a request is sent.
@@ -180,7 +181,7 @@ objects.Comment = class Comment extends objects.RedditContent {
     return response_object[0];
   }
   get _uri () {
-    return `/api/info?id=${this.name}`;
+    return `api/info?id=${this.name}`;
   }
   static get inherited_action_categories () {
     return ['reply', 'vote', 'moderate', 'more_comments'];
@@ -195,7 +196,7 @@ objects.RedditUser = class RedditUser extends objects.RedditContent {
     if (typeof this.name !== 'string' || !constants.USERNAME_REGEX.test(this.name)) {
       throw new errors.InvalidUserError(this.name);
     }
-    return `/user/${this.name}/about`;
+    return `user/${this.name}/about`;
   }
   static get inherited_action_categories () {
     return [];
@@ -206,10 +207,10 @@ objects.Submission = class Submission extends objects.RedditContent {
   constructor (options, _ac, has_fetched) {
     super(options, _ac, has_fetched);
     let _transform = response => (response[1]);
-    this.comments = new objects.Listing(undefined, _ac, {_uri: `/comments/${this.name.slice(3)}`, _transform});
+    this.comments = new objects.Listing(undefined, _ac, {_uri: `comments/${this.name.slice(3)}`, _transform});
   }
   get _uri () {
-    return `/api/info?id=${this.name}`;
+    return `api/info?id=${this.name}`;
   }
   _transform_api_response (response_object) {
     return response_object[0];
@@ -224,7 +225,7 @@ objects.PrivateMessage = class PrivateMessage extends objects.RedditContent {
     super(options, _ac, has_fetched);
   }
   get _uri () {
-    return `/message/messages/${this.id}`;
+    return `message/messages/${this.id}`;
   }
   static get inherited_action_categories () {
     return ['reply', 'moderate']; // more_comments? Need to check whether this ever applies with PMs
@@ -236,10 +237,10 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
     super(options, _ac, has_fetched);
   }
   get _uri () {
-    return `/r/${this.display_name}/about`;
+    return `r/${this.display_name}/about`;
   }
   get_moderators () {
-    return this._ac.get(`/r/${this.display_name}/about/moderators`);
+    return this._ac.get(`r/${this.display_name}/about/moderators`);
   }
   static get inherited_action_categories () {
     return [];
@@ -334,7 +335,7 @@ objects.more = class more extends objects.RedditContent {
     /* Requests to /api/morechildren are capped at 20 comments at a time, but requests to /api/info are capped at 100, so
     it's easier to send to the latter. The disadvantage is that comment replies are not automatically sent from requests
     to /api/info. */
-    let response = await this._ac.get({uri: '/api/info', qs: {id: ids_for_this_request}});
+    let response = await this._ac.get({uri: 'api/info', qs: {id: ids_for_this_request}});
     return response.concat(await this.fetch({amount: amount - ids_for_this_request.length}));
   }
 };

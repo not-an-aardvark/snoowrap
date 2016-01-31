@@ -1,6 +1,7 @@
 module.exports = {
   MODULE_NAME: 'snoowrap',
   ISSUE_REPORT_LINK: require('../package.json').bugs.url,
+  API_RULES_LINK: 'https://github.com/reddit/reddit/wiki/API',
   USER_KEYS: ['author', 'approved_by', 'banned_by'],
   SUBREDDIT_KEYS: ['subreddit'],
   KINDS: {

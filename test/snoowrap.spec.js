@@ -75,9 +75,9 @@ describe('snoowrap', function () {
     });
     it('can get comments on a submission', async () => {
       expect(submission.comments.is_finished).to.be.false;
+      //expect(submission.comments).to.have.length.within(1, 100);
       expect(await submission.comments.fetch({amount: 5})).to.have.length(5);
-      expect(submission.comments).to.have.length.above(5);
-      expect(submission.comments).to.have.length.below(1000);
+      expect(submission.comments).to.have.length.within(6, 100);
       expect(submission.comments[0]).to.be.an.instanceof(snoowrap.objects.Comment);
       expect(_.last(submission.comments)).to.be.an.instanceof(snoowrap.objects.Comment);
       await submission.comments.fetch_all();
