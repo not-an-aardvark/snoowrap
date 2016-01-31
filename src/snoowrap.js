@@ -1,7 +1,6 @@
 'use strict';
 require('harmony-reflect'); // temp dependency until v8 implements Proxies properly
 let Promise = require('bluebird');
-Promise.config({longStackTraces: true});
 let _ = require('lodash');
 let request = require('request-promise').defaults({json: true});
 let moment = require('moment');

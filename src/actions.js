@@ -18,6 +18,12 @@ module.exports = {
     },
     unvote () {
       return this.vote(0);
+    },
+    save () {
+      return this._ac.post({uri: 'api/save', form: {id: this.name}});
+    },
+    unsave () {
+      return this._ac.post({uri: 'api/unsave', form: {id: this.name}});
     }
   },
   moderate: {
