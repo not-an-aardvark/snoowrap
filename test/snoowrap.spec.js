@@ -70,8 +70,7 @@ describe('snoowrap', function () {
     });
   });
 
-  describe('getting a submission', function () {
-    this.timeout(30000);
+  describe('getting a submission', () => {
     let submission;
     beforeEach(() => {
       submission = r.get_submission('2np694');
@@ -92,6 +91,28 @@ describe('snoowrap', function () {
     });
     it('can get comments by index before they\'re fetched', async () => {
       expect(await submission.comments[6].body).to.equal('pumpkin pie');
+    });
+  });
+
+  describe('getting a list of posts', () => {
+    it('can get posts from the front page', async () => {
+      let posts = r.get_hot();
+      expect(posts).to.have.length(0);
+      await posts.fetch({amount: 101});
+      expect(posts).to.have.length.of.at.least(101);
+    });
+  });
+
+  describe('actions', () => {
+    it('can remove and approve posts', async () => {
+      if (!r.own_user_info) {
+        await r.get_me();
+      }
+      let submission = r.get_submission('43kfuy');
+      await submission.remove();
+      expect(await submission.banned_by.name).to.equal(r.own_user_info.name);
+      await submission.approve();
+      expect(await submission.refresh().approved_by.name).to.equal(r.own_user_info.name);
     });
   });
 

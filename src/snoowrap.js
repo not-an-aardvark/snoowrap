@@ -27,24 +27,6 @@ let snoowrap = class AuthenticatedClient {
     this.config = default_config;
     this.throttle = Promise.resolve();
   }
-  get_me () {
-    return this.get('api/v1/me').then(result => {
-      this.own_user_info = new objects.RedditUser(result, this, true);
-      return this.own_user_info;
-    });
-  }
-  get_user (name) {
-    return new objects.RedditUser({name}, this);
-  }
-  get_comment (comment_id) {
-    return new objects.Comment({name: `t1_${comment_id}`}, this);
-  }
-  get_subreddit (display_name) {
-    return new objects.Subreddit({display_name}, this);
-  }
-  get_submission (submission_id) {
-    return new objects.Submission({name: `t3_${submission_id}`}, this);
-  }
   async _update_access_token () {
     let token_info = await request.post({
       url: `https://www.${this.config.endpoint_domain}/api/v1/access_token`,
@@ -138,6 +120,27 @@ let snoowrap = class AuthenticatedClient {
       console.warn(...args);
     }
   }
+  get_me () {
+    return this.get('api/v1/me').then(result => {
+      this.own_user_info = new objects.RedditUser(result, this, true);
+      return this.own_user_info;
+    });
+  }
+  get_user (name) {
+    return new objects.RedditUser({name}, this);
+  }
+  get_comment (comment_id) {
+    return new objects.Comment({name: `t1_${comment_id}`}, this);
+  }
+  get_subreddit (display_name) {
+    return new objects.Subreddit({display_name}, this);
+  }
+  get_submission (submission_id) {
+    return new objects.Submission({name: `t3_${submission_id}`}, this);
+  }
+  get_hot ({subreddit_name} = {}) {
+    return new objects.Listing({uri: (subreddit_name ? `r/${subreddit_name}/` : '') + 'hot'}, this);
+  }
 };
 
 objects.RedditContent = class RedditContent {
@@ -145,6 +148,18 @@ objects.RedditContent = class RedditContent {
     this._ac = _ac;
     this.has_fetched = !!has_fetched;
     _.assignIn(this, options);
+    this._initialize_fetch_function();
+    return new Proxy(this, {get: (target, key) => {
+      if (key in target || key === 'length' || key in Promise.prototype || target.has_fetched) {
+        return target[key];
+      }
+      if (key === '_raw') {
+        return target;
+      }
+      return this.fetch()[key];
+    }});
+  }
+  _initialize_fetch_function () {
     this.fetch = this.fetch || _.once(() => {
       return promise_wrap(this._ac.get({uri: this._uri}).then(this._transform_api_response.bind(this)).then(response => {
         /* The line below is equivalent to _.assign(this, response);, but _.assign ends up triggering warning messages when
@@ -155,15 +170,11 @@ objects.RedditContent = class RedditContent {
         return this;
       }));
     });
-    return new Proxy(this, {get: (target, key) => {
-      if (key in target || key === 'length' || key in Promise.prototype || target.has_fetched) {
-        return target[key];
-      }
-      if (key === '_raw') {
-        return target;
-      }
-      return this.fetch()[key];
-    }});
+  }
+  refresh (...args) {
+    delete this.fetch;
+    this._initialize_fetch_function();
+    return this.fetch(...args);
   }
   inspect () {
     let public_properties = _.omitBy(this, (value, key) => (key.startsWith('_') || typeof value === 'function'));
@@ -182,14 +193,14 @@ objects.Comment = class Comment extends objects.RedditContent {
     let replies_uri = `comments/${response_obj[0].link_id.slice(3)}`;
     let replies_query = {comment: this.name.slice(3)};
     let _transform = item => (item[1][0].replies);
-    response_obj[0].replies = new objects.Listing({_uri: replies_uri, query: replies_query, _transform}, this._ac);
+    response_obj[0].replies = new objects.Listing({uri: replies_uri, query: replies_query, _transform}, this._ac);
     return response_obj[0];
   }
   get _uri () {
     return `api/info?id=${this.name}`;
   }
   static get inherited_action_categories () {
-    return ['reply', 'vote', 'moderate', 'more_comments'];
+    return ['reply', 'vote', 'moderate'];
   }
 };
 
@@ -212,7 +223,7 @@ objects.Submission = class Submission extends objects.RedditContent {
   constructor (options, _ac, has_fetched) {
     super(options, _ac, has_fetched);
     let _transform = response => (response[1]);
-    this.comments = new objects.Listing({_uri: `comments/${this.name.slice(3)}`, _transform}, _ac);
+    this.comments = new objects.Listing({uri: `comments/${this.name.slice(3)}`, _transform}, _ac);
   }
   get _uri () {
     return `api/info?id=${this.name}`;
@@ -221,7 +232,7 @@ objects.Submission = class Submission extends objects.RedditContent {
     return response_object[0];
   }
   static get inherited_action_categories () {
-    return ['reply', 'vote', 'moderate', 'more_comments'];
+    return ['reply', 'vote', 'moderate'];
   }
 };
 
@@ -233,7 +244,7 @@ objects.PrivateMessage = class PrivateMessage extends objects.RedditContent {
     return `message/messages/${this.id}`;
   }
   static get inherited_action_categories () {
-    return ['reply', 'moderate']; // more_comments? Need to check whether this ever applies with PMs
+    return ['reply', 'moderate'];
   }
 };
 
@@ -266,12 +277,12 @@ objects.PromoCampaign = class PromoCampaign extends objects.RedditContent {
 
 objects.Listing = class Listing extends Array {
   constructor ({children = [], query = {}, show_all = true, limit, _transform = _.identity,
-      _uri, method, after, before, _is_comment_list = false} = {}, _ac) {
+      uri, method, after, before, _is_comment_list = false} = {}, _ac) {
     super();
     _.assign(this, children);
     let constant_params = _.assign(query, {show: show_all ? 'all' : undefined, limit});
     this._ac = _ac;
-    this._requester = _ac._oauth_requester.defaults({uri: _uri, method, qs: constant_params});
+    this._requester = _ac._oauth_requester.defaults({uri, method, qs: constant_params});
     this._transform = _transform;
     this.limit = limit;
     this.after = after;
@@ -303,7 +314,7 @@ objects.Listing = class Listing extends Array {
     return promise_wrap(this._fetch_more_regular({amount}));
   }
   async _fetch_more_regular ({amount}) {
-    let limit_for_request = Math.min(amount, this.limit || 0);
+    let limit_for_request = Math.min(amount, this.limit) || this.limit;
     let request_params = {qs: {after: this.after, before: this.before, limit: limit_for_request}};
     let response = await this._requester(request_params).then(this._transform);
     if (this.length === 0 && _.last(response) instanceof objects.more) {
@@ -327,7 +338,7 @@ objects.Listing = class Listing extends Array {
     return this.fetch({amount: Infinity});
   }
   inspect () {
-    return util.inspect(_.omitBy(this, (value, key) => (key.startsWith('_'))));
+    return _.toArray(this);
   }
 };
 
