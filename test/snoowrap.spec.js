@@ -2,7 +2,8 @@
 let expect = require('chai').use(require('chai-as-promised')).expect;
 let Promise = require('bluebird');
 let _ = require('lodash');
-let snoowrap = require('..');
+let snoowrap = require('../src/snoowrap');
+let errors = require('../src/errors');
 describe('snoowrap', function () {
   this.timeout(10000);
   let r;
@@ -34,9 +35,8 @@ describe('snoowrap', function () {
       expect(await user.nonexistent_property).to.be.undefined;
     });
     it('throws an error if it tries to fetch the profile of a deleted/invalid account', () => {
-      let deleted_account = r.get_user('[deleted]');
-      // Ideally this would just be expect(...).to.throw(errors.InvalidUserError), but that fails due to a bug in chai
-      expect(deleted_account.fetch.bind(deleted_account)).to.throw(Error, /Cannot fetch information on/);
+      expect(r.get_user('[deleted]').fetch).to.throw(errors.InvalidUserError);
+      expect(r.get_user(null).fetch).to.throw(errors.InvalidUserError);
     });
   });
 
