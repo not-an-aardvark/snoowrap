@@ -1,6 +1,7 @@
 'use strict';
 require('harmony-reflect'); // temp dependency until v8 implements Proxies properly
 let Promise = require('bluebird');
+Promise.config({longStackTraces: true});
 let _ = require('lodash');
 let request = require('request-promise').defaults({json: true});
 let moment = require('moment');
@@ -177,8 +178,12 @@ objects.Comment = class Comment extends objects.RedditContent {
   constructor (options, _ac, has_fetched) {
     super(options, _ac, has_fetched);
   }
-  _transform_api_response (response_object) {
-    return response_object[0];
+  _transform_api_response (response_obj) {
+    let replies_uri = `comments/${response_obj[0].link_id.slice(3)}`;
+    let replies_query = {comment: this.name.slice(3)};
+    let _transform = item => (item[1][0].replies);
+    response_obj[0].replies = new objects.Listing({_uri: replies_uri, query: replies_query, _transform}, this._ac);
+    return response_obj[0];
   }
   get _uri () {
     return `api/info?id=${this.name}`;
@@ -207,7 +212,7 @@ objects.Submission = class Submission extends objects.RedditContent {
   constructor (options, _ac, has_fetched) {
     super(options, _ac, has_fetched);
     let _transform = response => (response[1]);
-    this.comments = new objects.Listing(undefined, _ac, {_uri: `comments/${this.name.slice(3)}`, _transform});
+    this.comments = new objects.Listing({_uri: `comments/${this.name.slice(3)}`, _transform}, _ac);
   }
   get _uri () {
     return `api/info?id=${this.name}`;
@@ -260,8 +265,8 @@ objects.PromoCampaign = class PromoCampaign extends objects.RedditContent {
 };
 
 objects.Listing = class Listing extends Array {
-  constructor ({children = []} = {}, _ac,
-      {query = {}, show_all = true, limit, _transform = _.identity, _uri, method, after, before, _is_comment_list = false}) {
+  constructor ({children = [], query = {}, show_all = true, limit, _transform = _.identity,
+      _uri, method, after, before, _is_comment_list = false} = {}, _ac) {
     super();
     _.assign(this, children);
     let constant_params = _.assign(query, {show: show_all ? 'all' : undefined, limit});
@@ -272,6 +277,12 @@ objects.Listing = class Listing extends Array {
     this.after = after;
     this.before = before;
     this._is_comment_list = _is_comment_list;
+    return new Proxy(this, {get: (target, key, thisArg) => {
+      if (!isNaN(key) && key >= target.length) {
+        return promise_wrap(target.fetch({amount: key - target.length + 1}).then(_.last));
+      }
+      return Reflect.get(target, key, thisArg);
+    }});
   }
   get is_finished () {
     if (this._is_comment_list) {
@@ -279,9 +290,9 @@ objects.Listing = class Listing extends Array {
     }
     return !!this.uri && this.after === null && this.before === null;
   }
-  fetch ({amount}) {
+  fetch ({amount = this.limit}) {
     if (typeof amount !== 'number') {
-      throw new errors.InvalidMethodCallError('Failed to fetch listing. (`amount` must be a Number.)');
+      throw new errors.InvalidMethodCallError('Failed to fetch listing. (amount must be a Number.)');
     }
     if (amount <= 0 || this.is_finished) {
       return [];
@@ -299,7 +310,7 @@ objects.Listing = class Listing extends Array {
       this._more = response.pop();
       this._is_comment_list = true;
     }
-    this.push(...response);
+    this.push(..._.toArray(response));
     this.before = response.before;
     this.after = response.after;
     return this.slice(0, amount).concat(await this.fetch({amount: amount - response.length}));
@@ -309,7 +320,7 @@ objects.Listing = class Listing extends Array {
   in the thread. */
   async _fetch_more_comments (...args) {
     let new_comments = this._more ? await this._more.fetch(...args) : [];
-    this.push(...new_comments);
+    this.push(..._.toArray(new_comments));
     return new_comments;
   }
   fetch_all () {
@@ -324,19 +335,22 @@ objects.more = class more extends objects.RedditContent {
   constructor (properties, _ac) {
     super(properties, _ac);
   }
+  /* Requests to /api/morechildren are capped at 20 comments at a time, but requests to /api/info are capped at 100, so
+  it's easier to send to the latter. The disadvantage is that comment replies are not automatically sent from requests
+  to /api/info. */
   async fetch ({amount = Infinity}) {
-    if (typeof amount !== 'number') {
+    if (isNaN(amount)) {
       throw new errors.InvalidMethodCallError('Failed to fetch listing. (`amount` must be a Number.)');
     }
     if (amount <= 0 || this.children.length === 0) {
       return [];
     }
-    let ids_for_this_request = this.children.splice(0, Math.min(amount, 100)).map(id => (`t1_${id}`)).join(',');
-    /* Requests to /api/morechildren are capped at 20 comments at a time, but requests to /api/info are capped at 100, so
-    it's easier to send to the latter. The disadvantage is that comment replies are not automatically sent from requests
-    to /api/info. */
-    let response = await this._ac.get({uri: 'api/info', qs: {id: ids_for_this_request}});
-    return response.concat(await this.fetch({amount: amount - ids_for_this_request.length}));
+    let ids_for_this_request = this.children.splice(0, Math.min(amount, 100)).map(id => (`t1_${id}`));
+    // Requests are capped at 100 comments. Send lots of requests recursively to get the comments, then concatenate them.
+    // (This speed-requesting is only possible with comment listings since the entire list of ids is present initially.)
+    let promise_for_this_batch = this._ac.get({uri: 'api/info', qs: {id: ids_for_this_request.join(',')}});
+    let promise_for_remaining_items = this.fetch({amount: amount - ids_for_this_request.length});
+    return _.toArray(await promise_for_this_batch).concat(await promise_for_remaining_items);
   }
 };
 

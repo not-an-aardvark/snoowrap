@@ -51,6 +51,13 @@ describe('snoowrap', function () {
     it('should convert the comment author to a RedditUser object and be able to get its properties', async () => {
       expect(await comment.author.has_verified_email).to.be.true;
     });
+    it('should be able to fetch replies to comments', async () => {
+      await comment.replies.fetch({amount: 5});
+      expect(comment.replies[0].body).to.equal('Let\'s knock the humor down to 65%.');
+    });
+    it('should be able to get promise for listing items before they\'re fetched', async () => {
+      expect(await comment.replies[0].body).to.equal('Let\'s knock the humor down to 65%.');
+    });
   });
 
   describe('getting a subreddit', () => {
@@ -75,7 +82,6 @@ describe('snoowrap', function () {
     });
     it('can get comments on a submission', async () => {
       expect(submission.comments.is_finished).to.be.false;
-      //expect(submission.comments).to.have.length.within(1, 100);
       expect(await submission.comments.fetch({amount: 5})).to.have.length(5);
       expect(submission.comments).to.have.length.within(6, 100);
       expect(submission.comments[0]).to.be.an.instanceof(snoowrap.objects.Comment);
@@ -83,6 +89,9 @@ describe('snoowrap', function () {
       await submission.comments.fetch_all();
       expect(submission.comments).to.have.length.above(1000);
       expect(submission.comments.is_finished).to.be.true;
+    });
+    it('can get comments by index before they\'re fetched', async () => {
+      expect(await submission.comments[6].body).to.equal('pumpkin pie');
     });
   });
 
