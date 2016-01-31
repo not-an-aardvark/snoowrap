@@ -14,7 +14,13 @@
     "type": "git",
     "url": "https://github.com/not-an-aardvark/snoowrap.git"
   },
-  "keywords": [],
+  "keywords": [
+    "reddit",
+    "api",
+    "wrapper",
+    "praw",
+    "snoo"
+  ],
   "author": "not-an-aardvark <not-an-aardvark@users.noreply.github.com>",
   "bugs": {
     "url": "https://github.com/not-an-aardvark/snoowrap/issues"
@@ -28,22 +34,22 @@
   },
   "homepage": "https://github.com/not-an-aardvark/snoowrap",
   "dependencies": {
-    "bluebird": "^3.1.1",
+    "bluebird": "^3.1.5",
     "harmony-reflect": "^1.4.2",
-    "lodash": "^4.0.1",
+    "lodash": "^4.1.0",
     "moment": "^2.11.1",
     "promise-chains": "^0.1.2",
     "request-promise": "^2.0.0"
   },
   "devDependencies": {
-    "babel-cli": "^6.4.0",
-    "babel-core": "^6.4.0",
-    "babel-eslint": "^4.1.6",
-    "babel-plugin-transform-async-to-generator": "^6.4.0",
+    "babel-cli": "^6.4.5",
+    "babel-core": "^6.4.5",
+    "babel-eslint": "^5.0.0-beta8",
+    "babel-plugin-transform-async-to-generator": "^6.4.6",
     "babel-plugin-transform-es2015-destructuring": "^6.4.0",
     "babel-plugin-transform-es2015-parameters": "^6.4.5",
-    "chai": "^3.4.1",
+    "chai": "^3.5.0",
     "chai-as-promised": "^5.2.0",
-    "mocha": "^2.3.4"
+    "mocha": "^2.4.5"
   }
 }

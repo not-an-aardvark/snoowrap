@@ -1,5 +1,5 @@
 'use strict';
-require('harmony-reflect'); // temp dependency until node implements Proxies properly
+require('harmony-reflect'); // temp dependency until v8 implements Proxies properly
 let Promise = require('bluebird');
 let _ = require('lodash');
 let request = require('request-promise').defaults({json: true});
@@ -48,17 +48,16 @@ let snoowrap = class AuthenticatedClient {
     let token_info = await request.post({
       url: `https://www.${this.config.endpoint_domain}/api/v1/access_token`,
       auth: {user: this.client_id, pass: this.client_secret},
-      headers: {'User-Agent': this.user_agent},
+      headers: {'user-agent': this.user_agent},
       form: {grant_type: 'refresh_token', refresh_token: this.refresh_token}
     });
     this.access_token = token_info.access_token;
     this.token_expiration = moment().add(token_info.expires_in, 'seconds');
     this.scopes = token_info.scope.split(' ');
   }
-
   get _oauth_requester () {
     let default_requester = request.defaults({
-      headers: {'User-Agent': this.user_agent},
+      headers: {'user-agent': this.user_agent},
       baseUrl: `https://oauth.${this.config.endpoint_domain}`,
       qs: {raw_json: 1}, // This tells reddit to unescape html characters, e.g. it will send '<' instead of '&lt;'
       resolveWithFullResponse: true,
@@ -77,7 +76,6 @@ let snoowrap = class AuthenticatedClient {
           throw new errors.RateLimitError();
         }
       }
-
       /* this.throttle is a timer that gets reset to this.config.request_delay whenever a request is sent.
       This ensures that requests are ratelimited and that no requests are lost. The await statement is wrapped
       in a loop to make sure that if the throttle promise resolves while multiple requests are pending, only
@@ -87,7 +85,6 @@ let snoowrap = class AuthenticatedClient {
         await this.throttle;
       }
       this.throttle = Promise.delay(this.config.request_delay);
-
       // If the access token has expired (or will expire in the next 10 seconds), refresh it.
       if (!this.token_expiration || moment(this.token_expiration).subtract(10, 'seconds').isBefore()) {
         await this._update_access_token();
@@ -145,7 +142,7 @@ objects.RedditContent = class RedditContent {
   constructor(options, _ac, has_fetched) {
     this._ac = _ac;
     this.has_fetched = !!has_fetched;
-    _.assign(this, options);
+    _.assignIn(this, options);
     this.fetch = this.fetch || _.once(() => {
       return promise_wrap(this._ac.get({uri: this._uri}).then(this._transform_api_response.bind(this)).then(response => {
         /* The line below is equivalent to _.assign(this, response);, but _.assign ends up triggering warning messages when
@@ -180,7 +177,7 @@ objects.Comment = class Comment extends objects.RedditContent {
     super(options, _ac, has_fetched);
   }
   _transform_api_response (response_object) {
-    return response_object.children[0];
+    return response_object[0];
   }
   get _uri () {
     return `/api/info?id=${this.name}`;
@@ -195,7 +192,7 @@ objects.RedditUser = class RedditUser extends objects.RedditContent {
     super(options, _ac, has_fetched);
   }
   get _uri () {
-    if (typeof this.name !== 'string' || !constants.username_regex.test(this.name)) {
+    if (typeof this.name !== 'string' || !constants.USERNAME_REGEX.test(this.name)) {
       throw new errors.InvalidUserError(this.name);
     }
     return `/user/${this.name}/about`;
@@ -208,13 +205,14 @@ objects.RedditUser = class RedditUser extends objects.RedditContent {
 objects.Submission = class Submission extends objects.RedditContent {
   constructor (options, _ac, has_fetched) {
     super(options, _ac, has_fetched);
-    this.comments = new objects.Listing(undefined, _ac, {uri: this._uri, transform: response => (response[1])});
+    let _transform = response => (response[1]);
+    this.comments = new objects.Listing(undefined, _ac, {_uri: `/comments/${this.name.slice(3)}`, _transform});
   }
   get _uri () {
-    return `/comments/${this.name.slice(3)}`;
+    return `/api/info?id=${this.name}`;
   }
   _transform_api_response (response_object) {
-    return response_object[0].children[0];
+    return response_object[0];
   }
   static get inherited_action_categories () {
     return ['reply', 'vote', 'moderate', 'more_comments'];
@@ -260,20 +258,22 @@ objects.PromoCampaign = class PromoCampaign extends objects.RedditContent {
   }
 };
 
-objects.Listing = class Listing extends objects.RedditContent {
-  constructor (info = {children: []}, _ac,
-      {query = {}, show_all = true, limit = 0, transform = _.identity, uri, method, is_comment_listing = false}) {
-    super(info, _ac, true);
+objects.Listing = class Listing extends Array {
+  constructor ({children = []} = {}, _ac,
+      {query = {}, show_all = true, limit, _transform = _.identity, _uri, method, after, before, _is_comment_list = false}) {
+    super();
+    _.assign(this, children);
     let constant_params = _.assign(query, {show: show_all ? 'all' : undefined, limit});
-    this.requester = _ac._oauth_requester.defaults({uri, method, qs: constant_params});
-    this.transform = transform;
+    this._ac = _ac;
+    this._requester = _ac._oauth_requester.defaults({uri: _uri, method, qs: constant_params});
+    this._transform = _transform;
     this.limit = limit;
-    this.is_comment_listing = is_comment_listing;
-    _.assign(this, info);
-    this.uri = uri;
+    this.after = after;
+    this.before = before;
+    this._is_comment_list = _is_comment_list;
   }
   get is_finished () {
-    if (this.is_comment_listing) {
+    if (this._is_comment_list) {
       return !this._more || !this._more.children.length;
     }
     return !!this.uri && this.after === null && this.before === null;
@@ -285,31 +285,37 @@ objects.Listing = class Listing extends objects.RedditContent {
     if (amount <= 0 || this.is_finished) {
       return [];
     }
-    if (!this.is_comment_listing) {
-      return promise_wrap(this._fetch_more_regular({amount}));
+    if (this._is_comment_list) {
+      return promise_wrap(this._fetch_more_comments({amount}));
     }
-    return promise_wrap(this._fetch_more_comments({amount}));
+    return promise_wrap(this._fetch_more_regular({amount}));
   }
   async _fetch_more_regular ({amount}) {
     let limit_for_request = Math.min(amount, this.limit || 0);
-    let request_params = {qs: {after: this.after, before: this.before, limit: limit_for_request}, uri: this.uri};
-    let response = await this.requester(request_params).then(this.transform);
-    if (this.children.length === 0 && _.last(response.children) instanceof objects.more) {
-      this._more = response.children.pop();
-      this.is_comment_listing = true;
+    let request_params = {qs: {after: this.after, before: this.before, limit: limit_for_request}};
+    let response = await this._requester(request_params).then(this._transform);
+    if (this.length === 0 && _.last(response) instanceof objects.more) {
+      this._more = response.pop();
+      this._is_comment_list = true;
     }
-    this.children.push(...(response.children || []));
+    this.push(...response);
     this.before = response.before;
     this.after = response.after;
-    return this.children.slice(0, amount).concat(await this.fetch({amount: amount - response.children.length}));
+    return this.slice(0, amount).concat(await this.fetch({amount: amount - response.length}));
   }
+  /* Pagination for comments works differently than it does for most other things; rather than sending a link to the next page
+  within a listing, reddit sends the last comment in the list as as a `more` object, with links to all the remaining comments
+  in the thread. */
   async _fetch_more_comments (...args) {
     let new_comments = this._more ? await this._more.fetch(...args) : [];
-    this.children.push(...new_comments);
+    this.push(...new_comments);
     return new_comments;
   }
   fetch_all () {
     return this.fetch({amount: Infinity});
+  }
+  inspect () {
+    return util.inspect(_.omitBy(this, (value, key) => (key.startsWith('_'))));
   }
 };
 
@@ -324,9 +330,12 @@ objects.more = class more extends objects.RedditContent {
     if (amount <= 0 || this.children.length === 0) {
       return [];
     }
-    let ids_for_this_request = this.children.splice(0, Math.min(amount, 100));
-    let response = await this._ac.get({uri: '/api/info', qs: {id: ids_for_this_request.map(id => (`t1_${id}`)).join(',')}});
-    return response.children.concat(await this.fetch({amount: amount - ids_for_this_request.length}));
+    let ids_for_this_request = this.children.splice(0, Math.min(amount, 100)).map(id => (`t1_${id}`)).join(',');
+    /* Requests to /api/morechildren are capped at 20 comments at a time, but requests to /api/info are capped at 100, so
+    it's easier to send to the latter. The disadvantage is that comment replies are not automatically sent from requests
+    to /api/info. */
+    let response = await this._ac.get({uri: '/api/info', qs: {id: ids_for_this_request}});
+    return response.concat(await this.fetch({amount: amount - ids_for_this_request.length}));
   }
 };
 

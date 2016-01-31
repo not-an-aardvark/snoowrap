@@ -15,5 +15,5 @@ module.exports = {
     more: 'more',
     UserList: 'UserList'
   },
-  username_regex: /^[\w-]{1,20}$/
+  USERNAME_REGEX: /^[\w-]{1,20}$/
 };
