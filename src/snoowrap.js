@@ -80,7 +80,7 @@ let snoowrap = class AuthenticatedClient {
         throw err;
       });
     };
-    return new Proxy(default_requester, {apply: handle_request});
+    return new Proxy(default_requester, {apply: (...args) => (promise_wrap(handle_request(...args)))});
   }
   inspect () {
     // Hide confidential information (tokens, client IDs, etc.) from the console.log output.
@@ -142,6 +142,8 @@ let snoowrap = class AuthenticatedClient {
   }
 };
 
+_.assign(snoowrap.prototype, actions.self_getters);
+
 objects.RedditContent = class RedditContent {
   constructor(options, _ac, has_fetched) {
     this._ac = _ac;
@@ -154,6 +156,9 @@ objects.RedditContent = class RedditContent {
       }
       if (key === '_raw') {
         return target;
+      }
+      if (_.includes(constants.REQUEST_TYPES, key)) {
+        return target._ac[key];
       }
       return this.fetch()[key];
     }});
@@ -182,6 +187,7 @@ objects.RedditContent = class RedditContent {
   _transform_api_response (response_object) {
     return response_object;
   }
+
 };
 
 objects.Comment = class Comment extends objects.RedditContent {
@@ -199,7 +205,7 @@ objects.Comment = class Comment extends objects.RedditContent {
     return `api/info?id=${this.name}`;
   }
   static get inherited_action_categories () {
-    return ['reply', 'vote', 'moderate'];
+    return ['reply', 'vote', 'moderate_posts'];
   }
 };
 
@@ -231,7 +237,7 @@ objects.Submission = class Submission extends objects.RedditContent {
     return response_object[0];
   }
   static get inherited_action_categories () {
-    return ['reply', 'vote', 'moderate'];
+    return ['reply', 'vote', 'moderate_posts'];
   }
 };
 
@@ -243,7 +249,7 @@ objects.PrivateMessage = class PrivateMessage extends objects.RedditContent {
     return `message/messages/${this.id}`;
   }
   static get inherited_action_categories () {
-    return ['reply', 'moderate'];
+    return ['reply', 'moderate_posts'];
   }
 };
 
@@ -258,7 +264,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
     return this._ac.get(`r/${this.display_name}/about/moderators`);
   }
   static get inherited_action_categories () {
-    return [];
+    return ['subreddit_config'];
   }
 };
 
@@ -365,10 +371,22 @@ objects.more = class more extends objects.RedditContent {
 };
 
 objects.UserList = class UserList {
-  constructor(options, _ac) {
+  constructor (options, _ac) {
     return options.children.map(user => {
       return new objects.RedditUser(user, _ac);
     });
+  }
+};
+
+objects.KarmaList = class KarmaList extends objects.RedditContent {
+  constructor (options, _ac) {
+    super(options, _ac);
+  }
+};
+
+objects.TrophyList = class TrophyList extends objects.RedditContent {
+  constructor (options, _ac) {
+    super(options, _ac);
   }
 };
 

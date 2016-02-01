@@ -23,11 +23,6 @@ describe('snoowrap', function () {
       expect(user.created_utc).to.equal(1419104352);
       expect(user.nonexistent_property).to.be.undefined;
     });
-    it('gets information from the requester\'s own profile', async () => {
-      let me = await r.get_me();
-      expect(me.name).to.equal(r.own_user_info.name); // (this doesn't necessarily mean that the name is correct)
-      expect(me.name).to.be.a('string');
-    });
     it('returns individual properties as Promises', async () => {
       expect(await user.has_verified_email).to.be.true;
     });
@@ -103,7 +98,47 @@ describe('snoowrap', function () {
     });
   });
 
-  describe('actions', () => {
+  describe('self-property fetching', () => {
+    it('gets information from the requester\'s own profile', async () => {
+      let me = await r.get_me();
+      expect(me.name).to.equal(r.own_user_info.name); // (this doesn't necessarily mean that the name is correct)
+      expect(me.name).to.be.a('string');
+    });
+    it('gets the requester\'s karma', async () => {
+      expect(await r.get_karma()).to.be.an.instanceof(snoowrap.objects.KarmaList);
+    });
+    it('gets current preferences', async () => {
+      let prefs = await r.get_preferences();
+      expect(prefs.lang).to.be.a('string');
+    });
+    it('modifies current preferences', async () => {
+      let current_prefs = await r.get_preferences().min_link_score;
+      await r.update_preferences({min_link_score: current_prefs - 1});
+      let fixed_prefs = await r.get_preferences().min_link_score;
+      expect(fixed_prefs).not.to.equal(current_prefs);
+      // (Fix the preferences afterwards, since I'd rather this value not decrease every time I run these tests)
+      await r.update_preferences({min_link_score: current_prefs});
+    });
+    it('gets the current user\'s trophies', async () => {
+      expect(await r.get_trophies()).to.be.an.instanceof(snoowrap.objects.TrophyList);
+    });
+    it('gets the user\'s friends', async () => {
+      expect(await r.get_friends()).to.be.an.instanceof(Array);
+    });
+    it('gets a list of blocked users', async () => {
+      expect(await r.get_blocked()).to.be.an.instanceof(Array);
+    });
+    it('checks whether the current account needs to fill out a captcha to post', async () => {
+      expect(await r.needs_captcha()).to.be.a('boolean');
+    });
+    it('can fetch a new captcha on request', async () => {
+      let iden = await r.get_new_captcha();
+      let image = await r.get_captcha_image(iden.jquery[0]);
+      expect(image).to.be.ok;
+    });
+  });
+
+  describe('moderation actions', () => {
     it('can remove and approve posts', async () => {
       if (!r.own_user_info) {
         await r.get_me();

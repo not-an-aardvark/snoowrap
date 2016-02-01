@@ -14,7 +14,10 @@ module.exports = {
     t8: 'PromoCampaign',
     Listing: 'Listing',
     more: 'more',
-    UserList: 'UserList'
+    UserList: 'UserList',
+    KarmaList: 'KarmaList',
+    TrophyList: 'TrophyList'
   },
-  USERNAME_REGEX: /^[\w-]{1,20}$/
+  USERNAME_REGEX: /^[\w-]{1,20}$/,
+  REQUEST_TYPES: ['get', 'head', 'post', 'put', 'delete', 'trace', 'options', 'connect', 'patch']
 };
