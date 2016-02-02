@@ -9,11 +9,11 @@ let util = require('util');
 let constants = require('./constants');
 let errors = require('./errors');
 let default_config = require('./default_config');
-let actions = require('./actions');
+let assign_mixins = require('./assign_mixins.js');
 let objects = {};
 let helpers = {};
 
-let snoowrap = class AuthenticatedClient {
+let snoowrap = class snoowrap {
   constructor (options) {
     this.client_id = options.client_id;
     this.client_secret = options.client_secret;
@@ -107,30 +107,7 @@ let snoowrap = class AuthenticatedClient {
       console.warn(...args);
     }
   }
-  get_me () {
-    return this.get('api/v1/me').then(result => {
-      this.own_user_info = new objects.RedditUser(result, this, true);
-      return this.own_user_info;
-    });
-  }
-  get_user (name) {
-    return new objects.RedditUser({name}, this);
-  }
-  get_comment (comment_id) {
-    return new objects.Comment({name: `t1_${comment_id}`}, this);
-  }
-  get_subreddit (display_name) {
-    return new objects.Subreddit({display_name}, this);
-  }
-  get_submission (submission_id) {
-    return new objects.Submission({name: `t3_${submission_id}`}, this);
-  }
-  get_hot ({subreddit_name} = {}) {
-    return new objects.Listing({uri: (subreddit_name ? `r/${subreddit_name}/` : '') + 'hot'}, this);
-  }
 };
-
-_.assign(snoowrap.prototype, actions.self_getters);
 
 objects.RedditContent = class RedditContent {
   constructor(options, _ac, has_fetched) {
@@ -195,9 +172,6 @@ objects.Comment = class Comment extends objects.RedditContent {
   get _uri () {
     return `api/info?id=${this.name}`;
   }
-  static get inherited_action_categories () {
-    return ['reply', 'vote', 'moderate_posts'];
-  }
 };
 
 objects.RedditUser = class RedditUser extends objects.RedditContent {
@@ -209,9 +183,6 @@ objects.RedditUser = class RedditUser extends objects.RedditContent {
       throw new errors.InvalidUserError(this.name);
     }
     return `user/${this.name}/about`;
-  }
-  static get inherited_action_categories () {
-    return [];
   }
 };
 
@@ -227,9 +198,6 @@ objects.Submission = class Submission extends objects.RedditContent {
   _transform_api_response (response_object) {
     return response_object[0];
   }
-  static get inherited_action_categories () {
-    return ['reply', 'vote', 'moderate_posts'];
-  }
 };
 
 objects.PrivateMessage = class PrivateMessage extends objects.RedditContent {
@@ -239,9 +207,6 @@ objects.PrivateMessage = class PrivateMessage extends objects.RedditContent {
   get _uri () {
     return `message/messages/${this.id}`;
   }
-  static get inherited_action_categories () {
-    return ['reply', 'moderate_posts'];
-  }
 };
 
 objects.Subreddit = class Subreddit extends objects.RedditContent {
@@ -250,12 +215,6 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   }
   get _uri () {
     return `r/${this.display_name}/about`;
-  }
-  get_moderators () {
-    return this._ac.get(`r/${this.display_name}/about/moderators`);
-  }
-  static get inherited_action_categories () {
-    return ['subreddit_flair'];
   }
 };
 
@@ -407,15 +366,7 @@ helpers._populate = (response_tree, _ac) => {
   return response_tree;
 };
 
-/* Assign all the action functions to the class prototypes. Actions are split into categories (moderation, voting, etc.),
-which are defined in actions.js. Each class should have the inherited_action_categories property, which is a list of strings
-corresponding to the action categories which apply to objects of that class. */
-_(objects).forOwn(object_class => {
-  _(actions).pick(object_class.inherited_action_categories || []).forOwn(action_category => {
-    _.assign(object_class.prototype, action_category);
-  });
-});
-
 snoowrap.objects = objects;
 snoowrap.helpers = helpers;
+assign_mixins(snoowrap);
 module.exports = snoowrap;
