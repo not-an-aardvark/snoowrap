@@ -2,6 +2,7 @@
 let expect = require('chai').use(require('chai-as-promised')).expect;
 let Promise = require('bluebird');
 let _ = require('lodash');
+let moment = require('moment');
 let snoowrap = require('../src/snoowrap');
 let errors = require('../src/errors');
 describe('snoowrap', function () {
@@ -132,9 +133,65 @@ describe('snoowrap', function () {
       expect(await r.needs_captcha()).to.be.a('boolean');
     });
     it('can fetch a new captcha on request', async () => {
-      let iden = await r.get_new_captcha();
-      let image = await r.get_captcha_image(iden.jquery[0]);
+      let iden = await r.get_new_captcha_identifier();
+      expect(iden).to.be.a('string');
+      let image = await r.get_captcha_image(iden);
       expect(image).to.be.ok;
+    });
+  });
+
+  describe('subreddit flair', () => {
+    let sub;
+    before(() => {
+      sub = r.get_subreddit('snoowrap_testing');
+    });
+    it('can add/delete/fetch user flair templates', async () => {
+      let text = moment().format(); // Use the current timestamp as the flair text to make it easy to distinguish from others
+      await sub.create_user_flair_template({text, css_class: ''});
+      let added_flair = _.last(await sub.get_user_flair_templates());
+      expect(added_flair.flair_text).to.equal(text);
+      await sub.delete_flair_template(added_flair);
+      let user_flairs_afterwards = await sub.get_user_flair_templates();
+      expect(user_flairs_afterwards.length === 0 || _.last(user_flairs_afterwards).flair_text !== text).to.be.true;
+    });
+    it('can add/delete/fetch link flair templates', async () => {
+      let text = moment().format();
+      await sub.create_link_flair_template({text, css_class: '', text_editable: true});
+      // Use a random link on the sub -- it doesn't seem to be possible to get the link flair options without providing a link
+      let added_flair = _.last(await sub.get_flair_options({link: 't3_43qlu8'}).choices);
+      expect(added_flair.flair_text).to.equal(text);
+      await sub.delete_flair_template(added_flair);
+      let link_flairs_afterwards= await sub.get_flair_options({link: 't3_43qlu8'}).choices;
+      expect(link_flairs_afterwards.length === 0 || _.last(link_flairs_afterwards).flair_text !== text).to.be.true;
+    });
+    it('can delete all user flair templates', async () => {
+      await Promise.all([
+        sub.create_user_flair_template({text: 'some user flair text'}),
+        sub.create_user_flair_template({text: 'some user other flair text'})
+      ]);
+      await sub.delete_all_user_flair_templates();
+      expect(await sub.get_user_flair_templates()).to.eql([]);
+    });
+    it('can delete all link flair templates', async () => {
+      await Promise.all([
+        sub.create_link_flair_template({text: 'some link flair text'}),
+        sub.create_link_flair_template({text: 'some other link flair text'})
+      ]);
+      await sub.delete_all_link_flair_templates();
+      expect(await await sub.get_flair_options({link: 't3_43qlu8'}).choices).to.eql([]);
+    });
+    it('can add, delete, and fetch user flair', async () => {
+      let text = moment().format();
+      let test_username = 'not_an_aardvark';
+      await sub.assign_flair({name: test_username, text, css_class: ''});
+      expect(await sub.get_user_flair({name: test_username}).flair_text).to.equal(text);
+      let current_list = await sub.get_user_flair_list();
+      expect(current_list.filter(result => (result.user === test_username))[0].flair_text).to.equal(text);
+      await sub.delete_user_flair({name: test_username});
+      expect(await sub.get_user_flair({name: 'not_an_aardvark'}).flair_text).to.be.null;
+    });
+    it('can modify the subreddit\'s flair configuration', async () => {
+      expect(true).equal(true);
     });
   });
 

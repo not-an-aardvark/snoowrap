@@ -25,6 +25,9 @@ let snoowrap = class AuthenticatedClient {
     this.ratelimit_reset_point = options.ratelimit_reset_point;
     this.config = default_config;
     this.throttle = Promise.resolve();
+    constants.REQUEST_TYPES.forEach(type => {
+      Object.defineProperty(this, type, {get: () => (this._oauth_requester.defaults({method: type}))});
+    });
   }
   async _update_access_token () {
     let token_info = await request.post({
@@ -75,6 +78,7 @@ let snoowrap = class AuthenticatedClient {
       // Send the request and return the response.
       return await requester.defaults({auth: {bearer: this.access_token}}).apply(self, args).catch(err => {
         if (attempts < this.config.max_retry_attempts && _.includes(this.config.retry_error_codes, err.statusCode)) {
+          this.warn(`Warning: Received status code ${err.statusCode} from reddit. Retrying request...`);
           return handle_request(requester, self, args, attempts + 1);
         }
         throw err;
@@ -98,22 +102,6 @@ let snoowrap = class AuthenticatedClient {
     }).value());
     return `<${constants.MODULE_NAME}.objects.${this.constructor.name}> ${formatted}`;
   }
-  /*gotta*/ get get () {
-    return this._oauth_requester.defaults({method: 'get'});
-  }
-  get post () {
-    return this._oauth_requester.defaults({method: 'post'});
-  }
-  get patch () {
-    return this._oauth_requester.defaults({method: 'patch'});
-  }
-  get put () {
-    return this._oauth_requester.defaults({method: 'put'});
-  }
-  get delete () {
-    return this._oauth_requester.defaults({method: 'delete'});
-  }
-  // TODO: probably combine the above getters to avoid repetition, though that would require deleting the 'get get' joke :\
   warn (...args) {
     if (!this.config.suppress_warnings) {
       console.warn(...args);
@@ -150,6 +138,9 @@ objects.RedditContent = class RedditContent {
     this.has_fetched = !!has_fetched;
     _.assignIn(this, options);
     this._initialize_fetch_function();
+    constants.REQUEST_TYPES.forEach(type => {
+      Object.defineProperty(this, type, {get: () => (this._ac[type])});
+    });
     return new Proxy(this, {get: (target, key) => {
       if (key in target || key === 'length' || key in Promise.prototype || target.has_fetched) {
         return target[key];
@@ -264,7 +255,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
     return this._ac.get(`r/${this.display_name}/about/moderators`);
   }
   static get inherited_action_categories () {
-    return ['subreddit_config'];
+    return ['subreddit_flair'];
   }
 };
 
@@ -343,7 +334,7 @@ objects.Listing = class Listing extends Array {
     return this.fetch({amount: Infinity});
   }
   inspect () {
-    return _.toArray(this);
+    return `<${constants.MODULE_NAME}.objects.${this.constructor.name}> ${util.inspect(_.toArray(this))}`;
   }
 };
 
