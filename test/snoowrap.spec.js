@@ -190,8 +190,15 @@ describe('snoowrap', function () {
       await sub.delete_user_flair({name: test_username});
       expect(await sub.get_user_flair({name: 'not_an_aardvark'}).flair_text).to.be.null;
     });
-    it('can modify the subreddit\'s flair configuration', async () => {
-      expect(true).equal(true);
+    it.only('can change multiple user flairs at once', async () => {
+      let naa_flair = 'not_an_aardvark\'s flair';
+      let aaa_flair = 'actually_an_aardvark\'s flair';
+      await sub.assign_multiple_user_flairs([
+        {name: 'not_an_aardvark', text: naa_flair},
+        {name: 'actually_an_aardvark', text: aaa_flair}
+      ]);
+      expect(await sub.get_user_flair({name: 'not_an_aardvark'}).flair_text).to.equal(naa_flair);
+      expect(await sub.get_user_flair({name: 'actually_an_aardvark'}).flair_text).to.equal(aaa_flair);
     });
   });
 

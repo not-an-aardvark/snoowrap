@@ -1,5 +1,6 @@
 'use strict';
 let _ = require('lodash');
+let promise_wrap = require('promise-chains');
 module.exports = {
   self_getters: {
     get_karma () {
@@ -71,8 +72,16 @@ module.exports = {
     get_user_flair ({name}) {
       return this.get_flair_options({name}).current;
     },
-    assign_flair_from_csv ({flair_csv}) { // TODO: Add a shortcut here to assign multiple flairs from javascript objects
+    _assign_flair_from_csv (flair_csv) {
       return this.post({uri: `r/${this.display_name}/api/flaircsv`, form: {flair_csv}});
+    },
+    assign_multiple_user_flairs (flair_array) { // Each entry of flair_array has the properties {name, text, css_class}
+      let requests = [];
+      while (flair_array.length > 0) {
+        // The endpoint only accepts at most 100 lines of csv at a time, so split the array into chunks of 100.
+        requests.push(this._assign_flair_from_csv(flair_array.splice(0, 100).map(item => (`${item.name},${item.text || ''},${item.css_class || ''}`)).join('\n')));
+      }
+      return promise_wrap(Promise.all(requests));
     },
     get_user_flair_list () {
       return this.get({uri: `r/${this.display_name}/api/flairlist`}).users;
