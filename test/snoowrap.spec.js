@@ -190,7 +190,7 @@ describe('snoowrap', function () {
       await sub.delete_user_flair({name: test_username});
       expect(await sub.get_user_flair({name: 'not_an_aardvark'}).flair_text).to.be.null;
     });
-    it.only('can change multiple user flairs at once', async () => {
+    it('can change multiple user flairs at once', async () => {
       let naa_flair = 'not_an_aardvark\'s flair';
       let aaa_flair = 'actually_an_aardvark\'s flair';
       await sub.assign_multiple_user_flairs([

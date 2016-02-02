@@ -38,7 +38,7 @@ let snoowrap = class AuthenticatedClient {
     });
     this.access_token = token_info.access_token;
     this.token_expiration = moment().add(token_info.expires_in, 'seconds');
-    this.scopes = token_info.scope.split(' ');
+    this.scope = token_info.scope.split(' ');
   }
   get _oauth_requester () {
     let default_requester = request.defaults({
@@ -390,6 +390,7 @@ helpers._populate = (response_tree, _ac) => {
         return new objects[constants.KINDS[response_tree.kind]](remainder_of_tree, _ac, true);
       }
       _ac.warn(`Unknown type ${response_tree.kind}. This may be a bug; please report it at ${constants.ISSUE_REPORT_LINK}.`);
+      return remainder_of_tree;
     }
     let mapFunction = Array.isArray(response_tree) ? _.map : _.mapValues;
     return mapFunction(response_tree, (value, key) => {
