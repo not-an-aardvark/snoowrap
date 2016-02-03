@@ -155,6 +155,22 @@ let snoowrap = class snoowrap {
   get_captcha_image ({identifier}) {
     return this.get({uri: `captcha/${identifier}`});
   }
+  get_saved_categories () {
+    return this.get({uri: 'api/saved_categories'});
+  }
+  mark_as_visited (links) {
+    return this.post({uri: 'api/store_visits', links: links.join(',')});
+  }
+  _submit ({captcha_response, captcha_iden, kind, resubmit = true, send_replies = true, text, title, url, subreddit_name}) {
+    return this.post({uri: 'api/submit', form: {captcha: captcha_response, iden: captcha_iden, sendreplies: send_replies,
+      sr: subreddit_name, kind, resubmit, text, title, url}});
+  }
+  submit_selfpost (options) {
+    return this._submit(_.assign(options, {kind: 'self'}));
+  }
+  submit_link (options) {
+    return this._submit(_.assign(options, {kind: 'link'}));
+  }
 };
 
 objects.RedditContent = class RedditContent {
@@ -163,7 +179,9 @@ objects.RedditContent = class RedditContent {
     this.has_fetched = !!has_fetched;
     _.assignIn(this, options);
     this._initialize_fetch_function();
-    constants.REQUEST_TYPES.forEach(type => {
+    /* Omit the 'delete' shortcut since that property name is used by Comments and Submissions. To send an HTTP DELETE
+    request, use `this._ac.delete` rather than the shortcut `this.delete`. */
+    _.without(constants.REQUEST_TYPES, 'delete').forEach(type => {
       Object.defineProperty(this, type, {get: () => (this._ac[type])});
     });
     return new Proxy(this, {get: (target, key) => {
@@ -232,6 +250,14 @@ objects.RedditUser = class RedditUser extends objects.RedditContent {
     }
     return `user/${this.name}/about`;
   }
+  give_gold({months}) {
+    /* Ideally this would allow for more than 36 months by sending multiple requests, but I wouldn't have the resources to test
+    that code, and it's probably better that such a big investment be deliberate anyway. */
+    if (typeof months !== 'number' || months < 1 || months > 36) {
+      throw new errors.InvalidMethodCallError('Invalid argument to RedditUser.give_gold; `months` must be between 1 and 36.');
+    }
+    return this.post({uri: `api/v1/gold/give/${this.name}`});
+  }
 };
 
 objects.Submission = class Submission extends objects.RedditContent {
@@ -245,6 +271,46 @@ objects.Submission = class Submission extends objects.RedditContent {
   }
   _transform_api_response (response_object) {
     return response_object[0];
+  }
+  // TODO: Get rid of the repeated {id: this.name} form parameters
+  hide () {
+    return this.post({uri: 'api/hide', form: {id: this.name}});
+  }
+  unhide () {
+    return this.post({uri: 'api/unhide', form: {id: this.name}});
+  }
+  lock () {
+    return this.post({uri: 'api/lock', form: {id: this.name}});
+  }
+  unlock () {
+    return this.post({uri: 'api/unlock', form: {id: this.name}});
+  }
+  mark_nsfw () {
+    return this.post({uri: 'api/marknsfw', form: {id: this.name}});
+  }
+  unmark_nsfw () {
+    return this.post({uri: 'api/unmarknsfw', form: {id: this.name}});
+  }
+  set_contest_mode_enabled (state) {
+    return this.post({uri: 'api/set_contest_mode', form: {state, id: this.name}});
+  }
+  _set_stickied({state, num}) {
+    return this.post({uri: 'api/set_subreddit_sticky', form: {state, num, id: this.name}});
+  }
+  sticky ({num} = {}) {
+    return this._set_stickied({state: true, num});
+  }
+  unsticky () {
+    return this._set_stickied({state: false});
+  }
+  set_suggested_sort (sort) {
+    if (typeof sort !== 'string') {
+      throw new errors.InvalidMethodCallError('`sort` must be a string (such as "best" or "new") for set_suggested_sort');
+    }
+    return this.post({uri: 'api/set_suggested_sort', form: {api_type: 'json', id: this.name, sort}});
+  }
+  mark_as_read () { // Requires reddit gold
+    return this.post({uri: 'api/store_visits', form: {links: this.name}});
   }
 };
 
@@ -337,6 +403,24 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
         link_flair_position, link_flair_self_assign_enabled
       }
     });
+  }
+  _set_my_flair_visibility (flair_enabled) {
+    return this.post({uri: `r/${this.display_name}/api/setflairenabled`, form: {api_type: 'json', flair_enabled}});
+  }
+  show_my_flair () {
+    return this._set_my_flair_visibility(true);
+  }
+  hide_my_flair () {
+    return this._set_my_flair_visibility(false);
+  }
+  _submit (options) {
+    return this._ac._submit(_.assign(options, {subreddit_name: this.display_name}));
+  }
+  _submit_selfpost (options) {
+    return this._ac._submit_selfpost(_.assign(options, {subreddit_name: this.display_name}));
+  }
+  _submit_link (options) {
+    return this._ac._submit_link(_.assign(options, {subreddit_name: this.display_name}));
   }
 };
 

@@ -55,6 +55,21 @@ module.exports = snoowrap => {
     },
     edit (updated_text) {
       return this.post({uri: 'api/editusertext', text: updated_text, thing_id: this.name});
+    },
+    gild () {
+      return this.post({uri: `api/v1/gold/gild/${this.name}`});
+    },
+    delete () {
+      return this.post({uri: 'api/del', id: this.name});
+    },
+    set_inbox_replies_enabled(state) {
+      return this.post({uri: 'api/sendreplies', state, id: this.name});
+    },
+    enable_inbox_replies () {
+      return this.set_inbox_replies_enabled(true);
+    },
+    disable_inbox_replies () {
+      return this.set_inbox_replies_enabled(false);
     }
   });
   assign([snoowrap.objects.Comment, snoowrap.objects.PrivateMessage, snoowrap.objects.Submission], {
