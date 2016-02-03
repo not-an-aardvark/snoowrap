@@ -183,7 +183,7 @@ describe('snoowrap', function () {
     it('can add, delete, and fetch user flair', async () => {
       let text = moment().format();
       let test_username = 'not_an_aardvark';
-      await sub.assign_flair({name: test_username, text, css_class: ''});
+      await sub.set_flair({name: test_username, text, css_class: ''});
       expect(await sub.get_user_flair({name: test_username}).flair_text).to.equal(text);
       let current_list = await sub.get_user_flair_list();
       expect(current_list.filter(result => (result.user === test_username))[0].flair_text).to.equal(text);
@@ -193,12 +193,21 @@ describe('snoowrap', function () {
     it('can change multiple user flairs at once', async () => {
       let naa_flair = 'not_an_aardvark\'s flair';
       let aaa_flair = 'actually_an_aardvark\'s flair';
-      await sub.assign_multiple_user_flairs([
+      await sub.set_multiple_user_flairs([
         {name: 'not_an_aardvark', text: naa_flair},
         {name: 'actually_an_aardvark', text: aaa_flair}
       ]);
       expect(await sub.get_user_flair({name: 'not_an_aardvark'}).flair_text).to.equal(naa_flair);
       expect(await sub.get_user_flair({name: 'actually_an_aardvark'}).flair_text).to.equal(aaa_flair);
+    });
+    it('can change flair from a RedditUser object', async () => {
+      let user1 = r.get_user('not_an_aardvark');
+      let user2 = r.get_user('actually_an_aardvark');
+      let flair_text = moment().format();
+      await user1.set_flair({subreddit: sub, text: flair_text});
+      expect(await sub.get_user_flair(user1).flair_text).to.equal(flair_text);
+      await user2.set_flair({subreddit: sub, text: flair_text});
+      expect(await sub.get_user_flair(user2).flair_text).to.equal(flair_text);
     });
   });
 
