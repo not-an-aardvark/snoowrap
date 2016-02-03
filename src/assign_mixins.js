@@ -5,7 +5,9 @@ let promise_wrap = require('promise-chains');
 /* Given `objects` (an array of classes), and `mixin_methods` (an object containing multiple functions),
 * assign all of the functions in `mixin_methods` to the prototype of each class in `objects`. */
 let assign_to_prototypes = (objects, mixin_methods) => {
-  _.map(objects, 'prototype').forEach(_(_.assign).partialRight(mixin_methods).unary().value());
+  objects.forEach(obj => {
+    _.assign(obj.prototype, mixin_methods);
+  });
 };
 
 /* Many actions (e.g. replying) are applicable to multiple classes (e.g. Comments, Submissions, PrivateMessages).
@@ -32,7 +34,7 @@ module.exports = snoowrap => {
     get_submission (submission_id) {
       return new snoowrap.objects.Submission({name: `t3_${submission_id}`}, this);
     },
-    get_hot ({subreddit_name} = {}) {
+    get_hot (subreddit_name) {
       return new snoowrap.objects.Listing({uri: (subreddit_name ? `r/${subreddit_name}/` : '') + 'hot'}, this);
     },
     get_karma () {
@@ -65,63 +67,6 @@ module.exports = snoowrap => {
     },
     get_captcha_image ({identifier}) {
       return this.get({uri: `captcha/${identifier}`});
-    }
-  });
-
-  assign_to_prototypes([snoowrap.objects.Comment, snoowrap.objects.Submission], {
-    _vote (direction) {
-      return this.post({uri: 'api/vote', form: {dir: direction, id: this.name}});
-    },
-    upvote () {
-      return this._vote(1);
-    },
-    downvote () {
-      return this._vote(-1);
-    },
-    unvote () {
-      return this._vote(0);
-    },
-    save () {
-      return this.post({uri: 'api/save', form: {id: this.name}});
-    },
-    unsave () {
-      return this.post({uri: 'api/unsave', form: {id: this.name}});
-    },
-    distinguish ({status = true, sticky = false}) {
-      return this._ac.post({
-        uri: 'api/distinguish',
-        form: {how: status === true ? 'yes' : status === false ? 'no' : status, sticky, id: this.name}
-      });
-    },
-    undistinguish () {
-      return this.distinguish({type: false, sticky: false, id: this.name});
-    }
-  });
-
-  assign_to_prototypes([snoowrap.objects.PrivateMessage, snoowrap.objects.Comment, snoowrap.objects.Submission], {
-    remove ({spam: is_spam = false} = {}) {
-      return this.post({uri: 'api/remove', form: {spam: is_spam, id: this.name}});
-    },
-    mark_as_spam () {
-      return this.remove({spam: true, id: this.name});
-    },
-    approve () {
-      return this.post({uri: 'api/approve', form: {id: this.name}});
-    },
-    report ({reason, other_reason, site_reason}) {
-      return this.post({
-        uri: 'api/report',
-        form: {api_type: 'json', reason, other_reason, site_reason, thing_id: this.name}
-      });
-    },
-    ignore_reports () {
-      return this.post({uri: 'api/ignore_reports', form: {id: this.name}});
-    },
-    unignore_reports () {
-      return this.post({uri: 'api/unignore_reports', form: {id: this.name}});
-    },
-    reply (text) {
-      return this.post({uri: 'api/comment', form: {api_type: 'json', text, thing_id: this.name}});
     }
   });
 
@@ -199,6 +144,66 @@ module.exports = snoowrap => {
           link_flair_position, link_flair_self_assign_enabled
         }
       });
+    }
+  });
+
+  assign_to_prototypes([snoowrap.objects.Comment, snoowrap.objects.Submission], {
+    _vote (direction) {
+      return this.post({uri: 'api/vote', form: {dir: direction, id: this.name}});
+    },
+    upvote () {
+      return this._vote(1);
+    },
+    downvote () {
+      return this._vote(-1);
+    },
+    unvote () {
+      return this._vote(0);
+    },
+    save () {
+      return this.post({uri: 'api/save', form: {id: this.name}});
+    },
+    unsave () {
+      return this.post({uri: 'api/unsave', form: {id: this.name}});
+    },
+    distinguish ({status = true, sticky = false}) {
+      return this._ac.post({
+        uri: 'api/distinguish',
+        form: {how: status === true ? 'yes' : status === false ? 'no' : status, sticky, id: this.name}
+      });
+    },
+    undistinguish () {
+      return this.distinguish({type: false, sticky: false, id: this.name});
+    },
+    edit (updated_text) {
+      return this.post({uri: 'api/editusertext', text: updated_text, thing_id: this.name});
+    }
+  });
+
+  assign_to_prototypes([snoowrap.objects.Comment, snoowrap.objects.PrivateMessage, snoowrap.objects.Submission], {
+    remove ({spam: is_spam = false} = {}) {
+      return this.post({uri: 'api/remove', form: {spam: is_spam, id: this.name}});
+    },
+    mark_as_spam () {
+      return this.remove({spam: true, id: this.name});
+    },
+    approve () {
+      return this.post({uri: 'api/approve', form: {id: this.name}});
+    },
+    report ({reason, other_reason, site_reason}) {
+      return this.post({
+        uri: 'api/report',
+        form: {api_type: 'json', reason, other_reason, site_reason, thing_id: this.name}
+      });
+    },
+    ignore_reports () {
+      return this.post({uri: 'api/ignore_reports', form: {id: this.name}});
+    },
+    unignore_reports () {
+      return this.post({uri: 'api/unignore_reports', form: {id: this.name}});
+    },
+    reply (text) {
+      return this.post({uri: 'api/comment', form: {api_type: 'json', text, thing_id: this.name}});
     }
   });
 };

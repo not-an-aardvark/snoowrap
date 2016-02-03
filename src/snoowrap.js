@@ -9,20 +9,16 @@ let util = require('util');
 let constants = require('./constants');
 let errors = require('./errors');
 let default_config = require('./default_config');
-let assign_mixins = require('./assign_mixins.js');
+let assign_mixins = require('./assign_mixins');
 let objects = {};
 let helpers = {};
 
 let snoowrap = class snoowrap {
-  constructor (options) {
-    this.client_id = options.client_id;
-    this.client_secret = options.client_secret;
-    this.refresh_token = options.refresh_token;
-    this.user_agent = options.user_agent;
-    this.access_token = options.access_token;
-    this.token_expiration = options.token_expiration;
-    this.ratelimit_remaining = options.ratelimit_remaining;
-    this.ratelimit_reset_point = options.ratelimit_reset_point;
+  constructor ({client_id, client_secret, refresh_token, user_agent}) {
+    this.client_id = client_id;
+    this.client_secret = client_secret;
+    this.refresh_token = refresh_token;
+    this.user_agent = user_agent;
     this.config = default_config;
     this.throttle = Promise.resolve();
     constants.REQUEST_TYPES.forEach(type => {
