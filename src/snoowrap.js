@@ -75,17 +75,18 @@ let snoowrap = class snoowrap {
         await this.throttle;
       }
       this.throttle = Promise.delay(this.config.request_delay);
+
       // If the access token has expired (or will expire in the next 10 seconds), refresh it.
-      if (!this.access_token || !this.token_expiration || moment(this.token_expiration).subtract(10, 'seconds').isBefore()) {
-        await this._update_access_token();
-      }
+      let update = (!this.access_token || this.token_expiration.isBefore()) ? this._update_access_token() : Promise.resolve();
+
       // Send the request and return the response.
-      return await requester.defaults({auth: {bearer: this.access_token}}).apply(self, args).catch(err => {
-        if (attempts < this.config.max_retry_attempts && _.includes(this.config.retry_error_codes, err.statusCode)) {
-          this.warn(`Warning: Received status code ${err.statusCode} from reddit. Retrying request...`);
+      return await update.then(() => (requester.defaults({auth: {bearer: this.access_token}}).apply(self, args))).catch(e => {
+        // If there was an error on reddit's end, retry the request up to a maximum of this.config.max_retry_attempts times.
+        if (attempts + 1 < this.config.max_retry_attempts && _.includes(this.config.retry_error_codes, e.statusCode)) {
+          this.warn(`Warning: Received status code ${e.statusCode} from reddit. Retrying request...`);
           return handle_request(requester, self, args, attempts + 1);
         }
-        throw err;
+        throw e;
       });
     };
     return new Proxy(default_requester, {apply: (...args) => (promise_wrap(handle_request(...args)))});
