@@ -521,7 +521,7 @@ objects.Listing = class Listing extends Array {
     }
     return new Proxy(this, {get: (target, key, thisArg) => {
       if (!isNaN(key) && key >= target.length) {
-        return promise_wrap(target.fetch(key - target.length + 1).then(_.last));
+        return promise_wrap(target.fetch_more(key - target.length + 1).get(key));
       }
       return Reflect.get(target, key, thisArg);
     }});
@@ -535,7 +535,7 @@ objects.Listing = class Listing extends Array {
     }
     return !!this.uri && this.after === null && this.before === null;
   }
-  fetch (amount = this.limit) {
+  fetch_more (amount = this.limit) {
     if (typeof amount !== 'number') {
       throw new errors.InvalidMethodCallError('Failed to fetch listing. (amount must be a Number.)');
     }
@@ -543,12 +543,12 @@ objects.Listing = class Listing extends Array {
       return [];
     }
     if (this._is_comment_list) {
-      return promise_wrap(this._fetch_more_comments(amount));
+      return this._fetch_more_comments(amount).return(this);
     }
     if (!this.uri) {
       return [];
     }
-    return promise_wrap(this._fetch_more_regular(amount));
+    return this._fetch_more_regular(amount).return(this);
   }
   async _fetch_more_regular (amount) {
     let limit_for_request = Math.min(amount, this.limit) || this.limit;
@@ -557,18 +557,18 @@ objects.Listing = class Listing extends Array {
     this.push(..._.toArray(response));
     this.before = response.before;
     this.after = response.after;
-    return response.slice(0, amount).concat(await this.fetch(amount - response.length));
+    return response.slice(0, amount).concat(await this.fetch_more(amount - response.length));
   }
   /* Pagination for comments works differently than it does for most other things; rather than sending a link to the next page
   within a listing, reddit sends the last comment in the list as as a `more` object, with links to all the remaining comments
   in the thread. */
   async _fetch_more_comments (...args) {
-    let new_comments = this._more ? await this._more.fetch(...args) : [];
+    let new_comments = this._more ? await this._more.fetch_more(...args) : [];
     this.push(..._.toArray(new_comments));
     return new_comments;
   }
   fetch_all () {
-    return this.fetch(Infinity);
+    return this.fetch_more(Infinity);
   }
   inspect () {
     return `<${constants.MODULE_NAME}.objects.${this.constructor.name}> ${util.inspect(_.toArray(this))}`;
@@ -582,7 +582,7 @@ objects.more = class more extends objects.RedditContent {
   /* Requests to /api/morechildren are capped at 20 comments at a time, but requests to /api/info are capped at 100, so
   it's easier to send to the latter. The disadvantage is that comment replies are not automatically sent from requests
   to /api/info. */
-  async fetch (amount) {
+  async fetch_more (amount) {
     if (isNaN(amount)) {
       throw new errors.InvalidMethodCallError('Failed to fetch listing. (`amount` must be a Number.)');
     }
@@ -593,7 +593,7 @@ objects.more = class more extends objects.RedditContent {
     // Requests are capped at 100 comments. Send lots of requests recursively to get the comments, then concatenate them.
     // (This speed-requesting is only possible with comment listings since the entire list of ids is present initially.)
     let promise_for_this_batch = this.get({uri: 'api/info', qs: {id: ids_for_this_request.join(',')}});
-    let promise_for_remaining_items = this.fetch(amount - ids_for_this_request.length);
+    let promise_for_remaining_items = this.fetch_more(amount - ids_for_this_request.length);
     return _.toArray(await promise_for_this_batch).concat(await promise_for_remaining_items);
   }
 };

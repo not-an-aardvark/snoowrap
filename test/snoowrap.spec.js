@@ -48,7 +48,7 @@ describe('snoowrap', function () {
       expect(await comment.author.has_verified_email).to.be.true;
     });
     it('should be able to fetch replies to comments', async () => {
-      await comment.replies.fetch(5);
+      await comment.replies.fetch_more(5);
       expect(comment.replies[0].body).to.equal('Let\'s knock the humor down to 65%.');
     });
     it('should be able to get promise for listing items before they\'re fetched', async () => {
@@ -77,8 +77,7 @@ describe('snoowrap', function () {
     });
     it('can get comments on a submission', async () => {
       expect(await submission.comments.is_finished).to.be.false;
-      expect(await submission.comments.fetch(5)).to.have.length(5);
-      expect(submission.comments).to.have.length.within(6, 100);
+      expect(await submission.comments.fetch_more(5)).to.have.length.within(6, 100);
       expect(submission.comments[0]).to.be.an.instanceof(snoowrap.objects.Comment);
       expect(_.last(submission.comments)).to.be.an.instanceof(snoowrap.objects.Comment);
       await submission.comments.fetch_all();
@@ -104,7 +103,7 @@ describe('snoowrap', function () {
       let posts = await r.get_hot();
       expect(posts).to.be.an.instanceof(snoowrap.objects.Listing);
       expect(posts).to.have.length.above(0).and.at.most(100);
-      await posts.fetch(101);
+      await posts.fetch_more(101);
       expect(posts).to.have.length.above(100);
     });
     it('can get new posts from the front page', async () => {
