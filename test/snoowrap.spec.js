@@ -91,11 +91,25 @@ describe('snoowrap', function () {
   });
 
   describe('getting a list of posts', () => {
-    it('can get posts from the front page', async () => {
+    it('can get hot posts from the front page', async () => {
       let posts = await r.get_hot();
-      expect(posts).to.have.length.above(0).and.below(101);
+      expect(posts).to.be.an.instanceof(snoowrap.objects.Listing);
+      expect(posts).to.have.length.above(0).and.at.most(100);
       await posts.fetch(101);
-      expect(posts).to.have.length.of.at.least(101);
+      expect(posts).to.have.length.above(100);
+    });
+    it('can get new posts from the front page', async () => {
+      let posts = await r.get_new();
+      expect(moment.unix(posts[0].created_utc).add(30, 'minutes').isAfter()).to.be.true;
+      // i.e. the first post should be newer than 1 hour old, to be sure that this is actually the 'new' listing
+    });
+    it('can get top posts from the front page or a subreddit given a certain timespan', async () => {
+      let top_alltime = await r.get_subreddit('all').get_top({time: 'all'})[0];
+      let top_alltime_v2 = await r.get_top('all', {time: 'all'})[0];
+      expect(top_alltime.name).to.eql(top_alltime_v2.name);
+      expect(top_alltime.ups).to.be.above(50000);
+      let top_in_last_day = await r.get_top({time: 'day'})[0];
+      expect(moment.unix(top_in_last_day.created_utc).add(24, 'hours').isAfter()).to.be.true;
     });
   });
 
@@ -211,16 +225,63 @@ describe('snoowrap', function () {
     });
   });
 
-  describe('moderation actions', () => {
-    it('can remove and approve posts', async () => {
-      if (!r.own_user_info) {
-        await r.get_me();
-      }
-      let submission = r.get_submission('43kfuy');
-      await submission.remove();
-      expect(await submission.banned_by.name).to.equal(r.own_user_info.name);
-      await submission.approve();
-      expect(await submission.refresh().approved_by.name).to.equal(r.own_user_info.name);
+  describe('comment/post actions', () => {
+    let post, comment;
+    beforeEach(() => {
+      post = r.get_submission('43qlu8');
+      comment = r.get_comment('czn0rpn');
+    });
+    it('can edit a selfpost', async () => {
+      let new_text = moment().format();
+      await post.edit(new_text);
+      expect(post.selftext).to.equal(new_text);
+    });
+    it('can edit a comment', async () => {
+      let new_text = moment().format();
+      await comment.edit(new_text);
+      expect(comment.body).to.equal(new_text);
+    });
+    it('can distinguish/undistinguish/sticky a comment', async () => {
+      await comment.distinguish();
+      expect(comment.distinguished).to.equal('moderator');
+      expect(comment.stickied).to.be.false;
+      await comment.distinguish({sticky: true});
+      expect(comment.distinguished).to.equal('moderator');
+      expect(comment.stickied).to.be.true;
+      await comment.undistinguish();
+      expect(comment.distinguished).to.be.null;
+    });
+    it('can save/unsave a post', async () => {
+      await post.save();
+      expect(await post.refresh().saved).to.be.true;
+      await post.unsave();
+      expect(await post.refresh().saved).to.be.false;
+    });
+    it('can save/unsave a comment', async () => {
+      await comment.save();
+      expect(await comment.refresh().saved).to.be.true;
+      await comment.unsave();
+      expect(await comment.refresh().saved).to.be.false;
+    });
+    it('can remove/approve a post', async () => {
+      await post.remove();
+      await post.refresh();
+      expect(post.banned_by).to.not.be.null;
+      expect(post.approved_by).to.be.null;
+      await post.approve();
+      await post.refresh();
+      expect(post.banned_by).to.be.null;
+      expect(await post.refresh().approved_by).to.not.be.null;
+    });
+    it('can remove/approve a comment', async () => {
+      await comment.remove();
+      await comment.refresh();
+      expect(comment.banned_by).to.not.be.null;
+      expect(comment.approved_by).to.be.null;
+      await comment.approve();
+      await comment.refresh();
+      expect(comment.banned_by).to.be.null;
+      expect(await comment.refresh().approved_by).to.not.be.null;
     });
   });
 

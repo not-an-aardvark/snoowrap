@@ -1,6 +1,7 @@
 'use strict';
 let _ = require('lodash');
 let errors = require('./errors');
+let promise_wrap = require('promise-chains');
 
 /* Given `objects` (an array of classes), and `mixin_methods` (an object containing multiple functions),
 * assign all of the functions in `mixin_methods` to the prototype of each class in `objects`. */
@@ -39,31 +40,46 @@ module.exports = snoowrap => {
       return this._vote(0);
     },
     save () {
-      return this.post({uri: 'api/save', form: {id: this.name}});
+      return promise_wrap(this.post({uri: 'api/save', form: {id: this.name}}).then(() => {
+        this.saved = true;
+        return this;
+      }));
     },
     unsave () {
-      return this.post({uri: 'api/unsave', form: {id: this.name}});
+      return promise_wrap(this.post({uri: 'api/unsave', form: {id: this.name}}).then(() => {
+        this.saved = false;
+        return this;
+      }));
     },
-    distinguish ({status = true, sticky = false}) {
-      return this._ac.post({
+    distinguish ({status = true, sticky = false} = {}) {
+      return promise_wrap(this._ac.post({
         uri: 'api/distinguish',
-        form: {how: status === true ? 'yes' : status === false ? 'no' : status, sticky, id: this.name}
-      });
+        form: {api_type: 'json', how: status === true ? 'yes' : status === false ? 'no' : status, sticky, id: this.name}
+      }).then(response => {
+        snoowrap.helpers._assign_proxy(this, response.json.data.things[0]);
+        return this;
+      }));
     },
     undistinguish () {
-      return this.distinguish({type: false, sticky: false, id: this.name});
+      return this.distinguish({status: false, sticky: false, id: this.name});
     },
     edit (updated_text) {
-      return this.post({uri: 'api/editusertext', text: updated_text, thing_id: this.name});
+      return promise_wrap(this.post({
+        uri: 'api/editusertext',
+        form: {api_type: 'json', text: updated_text, thing_id: this.name}
+      }).then(response => {
+        snoowrap.helpers._assign_proxy(this, response.json.data.things[0]);
+        return this;
+      }));
     },
     gild () {
       return this.post({uri: `api/v1/gold/gild/${this.name}`});
     },
     delete () {
-      return this.post({uri: 'api/del', id: this.name});
+      return this.post({uri: 'api/del', form: {id: this.name}});
     },
     set_inbox_replies_enabled(state) {
-      return this.post({uri: 'api/sendreplies', state, id: this.name});
+      return this.post({uri: 'api/sendreplies', form: {state, id: this.name}});
     },
     enable_inbox_replies () {
       return this.set_inbox_replies_enabled(true);
@@ -82,20 +98,20 @@ module.exports = snoowrap => {
     approve () {
       return this.post({uri: 'api/approve', form: {id: this.name}});
     },
-    report ({reason, other_reason, site_reason}) {
+    report ({reason, other_reason, site_reason} = {}) {
       return this.post({
         uri: 'api/report',
         form: {api_type: 'json', reason, other_reason, site_reason, thing_id: this.name}
       });
     },
     ignore_reports () {
-      return this.post({uri: 'api/ignore_reports', form: {id: this.name}});
+      return promise_wrap(this.post({uri: 'api/ignore_reports', form: {id: this.name}}).return(this));
     },
     unignore_reports () {
-      return this.post({uri: 'api/unignore_reports', form: {id: this.name}});
+      return promise_wrap(this.post({uri: 'api/unignore_reports', form: {id: this.name}}).return(this));
     },
     reply (text) {
-      return this.post({uri: 'api/comment', form: {api_type: 'json', text, thing_id: this.name}});
+      return this.post({uri: 'api/comment',form: {api_type: 'json', text, thing_id: this.name}}).json.data.things[0];
     }
   });
 };

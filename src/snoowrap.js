@@ -25,11 +25,15 @@ let snoowrap = class snoowrap {
       Object.defineProperty(this, type, {get: () => (this._oauth_requester.defaults({method: type}))});
     });
   }
-  async _update_access_token () {
-    let token_info = await request.post({
-      url: `https://www.${this.config.endpoint_domain}/api/v1/access_token`,
+  get _base_client_requester () {
+    return request.defaults({
       auth: {user: this.client_id, pass: this.client_secret},
-      headers: {'user-agent': this.user_agent},
+      headers: {'user-agent': this.user_agent}
+    });
+  }
+  async _update_access_token () {
+    let token_info = await this._base_client_requester.post({
+      url: `https://www.${this.config.endpoint_domain}/api/v1/access_token`,
       form: {grant_type: 'refresh_token', refresh_token: this.refresh_token}
     });
     this.access_token = token_info.access_token;
@@ -72,7 +76,7 @@ let snoowrap = class snoowrap {
       }
       this.throttle = Promise.delay(this.config.request_delay);
       // If the access token has expired (or will expire in the next 10 seconds), refresh it.
-      if (!this.token_expiration || moment(this.token_expiration).subtract(10, 'seconds').isBefore()) {
+      if (!this.access_token || !this.token_expiration || moment(this.token_expiration).subtract(10, 'seconds').isBefore()) {
         await this._update_access_token();
       }
       // Send the request and return the response.
@@ -85,6 +89,22 @@ let snoowrap = class snoowrap {
       });
     };
     return new Proxy(default_requester, {apply: (...args) => (promise_wrap(handle_request(...args)))});
+  }
+  _revoke_token (token) {
+    return this._base_client_requester.post({
+      url: `https://www.${this.config.endpoint_domain}/api/v1/revoke_token`,
+      form: {token}
+    });
+  }
+  revoke_access_token () {
+    return this._revoke_token(this.access_token).then(() => {
+      this.access_token = undefined;
+    });
+  }
+  revoke_refresh_token () {
+    return this._revoke_token(this.refresh_token).then(() => {
+      this.refresh_token = undefined;
+    });
   }
   inspect () {
     // Hide confidential information (tokens, client IDs, etc.) from the console.log output.
@@ -100,7 +120,7 @@ let snoowrap = class snoowrap {
       }
       return value;
     }).value());
-    return `<${constants.MODULE_NAME}.objects.${this.constructor.name}> ${formatted}`;
+    return `<${constants.MODULE_NAME} authenticated client> ${formatted}`;
   }
   warn (...args) {
     if (!this.config.suppress_warnings) {
@@ -109,7 +129,7 @@ let snoowrap = class snoowrap {
   }
   get_me () {
     return this.get('api/v1/me').then(result => {
-      this.own_user_info = new snoowrap.objects.RedditUser(result, this, true);
+      this.own_user_info = new objects.RedditUser(result, this, true);
       return this.own_user_info;
     });
   }
@@ -163,8 +183,10 @@ let snoowrap = class snoowrap {
     return this.post({uri: 'api/store_visits', links: links.join(',')});
   }
   _submit ({captcha_response, captcha_iden, kind, resubmit = true, send_replies = true, text, title, url, subreddit_name}) {
-    return this.post({uri: 'api/submit', form: {captcha: captcha_response, iden: captcha_iden, sendreplies: send_replies,
-      sr: subreddit_name, kind, resubmit, text, title, url}});
+    return promise_wrap(this.post({uri: 'api/submit', form: {captcha: captcha_response, iden: captcha_iden,
+        sendreplies: send_replies, sr: subreddit_name, kind, resubmit, text, title, url}}).then(response => {
+      return response.json.data.things[0];
+    }));
   }
   submit_selfpost (options) {
     return this._submit(_.assign(options, {kind: 'self'}));
@@ -174,7 +196,7 @@ let snoowrap = class snoowrap {
   }
   _get_sorted_frontpage (sort_type, subreddit_name, options = {}) {
     // Handle things properly if only a time parameter is provided but not the subreddit name
-    if (typeof subreddit_name === 'object' && !options) {
+    if (typeof subreddit_name === 'object' && _(options).omitBy(_.isUndefined).isEmpty()) {
       /* In this case, "subreddit_name" ends up referring to the second argument, which is not actually a name since the user
       decided to omit that parameter. */
       options = subreddit_name;
@@ -223,11 +245,9 @@ objects.RedditContent = class RedditContent {
     }});
   }
   _initialize_fetch_function () {
-    this.fetch = this.fetch || _.once(() => {
+    this.fetch = 'fetch' in this ? this.fetch : _.once(() => {
       return promise_wrap(this._ac.get({uri: this._uri}).then(this._transform_api_response.bind(this)).then(response => {
-        /* The line below is equivalent to _.assign(this, response);, but _.assign ends up triggering warning messages when
-        used on Proxies, since the patched globals from harmony-reflect aren't applied to lodash. This won't be a problem once
-        Proxies are correctly implemented natively. https://github.com/tvcutsem/harmony-reflect#dependencies */
+        helpers._assign_proxy(this, response);
         _.forIn(response, (value, key) => {this[key] = value;});
         this.has_fetched = true;
         return this;
@@ -444,14 +464,11 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   hide_my_flair () {
     return this._set_my_flair_visibility(false);
   }
-  _submit (options) {
-    return this._ac._submit(_.assign(options, {subreddit_name: this.display_name}));
+  submit_selfpost (options) {
+    return this._ac.submit_selfpost(_.assign(options, {subreddit_name: this.display_name}));
   }
-  _submit_selfpost (options) {
-    return this._ac._submit_selfpost(_.assign(options, {subreddit_name: this.display_name}));
-  }
-  _submit_link (options) {
-    return this._ac._submit_link(_.assign(options, {subreddit_name: this.display_name}));
+  submit_link (options) {
+    return this._ac.submit_link(_.assign(options, {subreddit_name: this.display_name}));
   }
   get_hot () {
     return this._ac.get_hot(this.display_name);
@@ -611,16 +628,22 @@ helpers._populate = (response_tree, _ac) => {
     let mapFunction = Array.isArray(response_tree) ? _.map : _.mapValues;
     return mapFunction(response_tree, (value, key) => {
       // Map {..., author: 'some_username', ...} to {..., author: RedditUser {}, ... } (e.g.)
-      if (_.includes(constants.USER_KEYS, key)) {
+      if (_.includes(constants.USER_KEYS, key) && value !== null) {
         return new objects.RedditUser({name: value}, _ac);
       }
-      if (_.includes(constants.SUBREDDIT_KEYS, key)) {
+      if (_.includes(constants.SUBREDDIT_KEYS, key) && value !== null) {
         return new objects.Subreddit({display_name: value}, _ac);
       }
       return helpers._populate(value, _ac);
     });
   }
   return response_tree;
+};
+helpers._assign_proxy = (proxied_object, values) => {
+  /* The line below is equivalent to _.assign(this, response);, but _.assign ends up triggering warning messages when
+  used on Proxies, since the patched globals from harmony-reflect aren't applied to lodash. This won't be a problem once
+  Proxies are correctly implemented natively. https://github.com/tvcutsem/harmony-reflect#dependencies */
+  _.forIn(values, (value, key) => {proxied_object[key] = value;});
 };
 
 snoowrap.objects = objects;
