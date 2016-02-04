@@ -45,7 +45,11 @@ let snoowrap = class snoowrap {
       transform: (body, response) => {
         this.ratelimit_remaining = response.headers['x-ratelimit-remaining'];
         this.ratelimit_reset_point = moment().add(response.headers['x-ratelimit-reset'], 'seconds');
-        return helpers._populate(body, this);
+        let populated = helpers._populate(body, this);
+        if (populated instanceof objects.Listing) {
+          populated.uri = response.request.uri.path;
+        }
+        return populated;
       }
     });
     let handle_request = async (requester, self, args, attempts = 0) => {
@@ -121,9 +125,6 @@ let snoowrap = class snoowrap {
   get_submission (submission_id) {
     return new snoowrap.objects.Submission({name: `t3_${submission_id}`}, this);
   }
-  get_hot (subreddit_name) {
-    return new snoowrap.objects.Listing({uri: (subreddit_name ? `r/${subreddit_name}/` : '') + 'hot'}, this);
-  }
   get_karma () {
     return this.get({uri: 'api/v1/me/karma'});
   }
@@ -171,15 +172,39 @@ let snoowrap = class snoowrap {
   submit_link (options) {
     return this._submit(_.assign(options, {kind: 'link'}));
   }
+  _get_sorted_frontpage (sort_type, subreddit_name, options = {}) {
+    // Handle things properly if only a time parameter is provided but not the subreddit name
+    if (typeof subreddit_name === 'object' && !options) {
+      /* In this case, "subreddit_name" ends up referring to the second argument, which is not actually a name since the user
+      decided to omit that parameter. */
+      options = subreddit_name;
+      subreddit_name = undefined;
+    }
+    return this.get({uri: (subreddit_name ? `r/${subreddit_name}/` : '') + sort_type, qs: {t: options.time}});
+  }
+  get_hot (subreddit_name) {
+    return this._get_sorted_frontpage('hot', subreddit_name);
+  }
+  get_new (subreddit_name) {
+    return this._get_sorted_frontpage('new', subreddit_name);
+  }
+  get_top (subreddit_name, {time} = {}) {
+    return this._get_sorted_frontpage('top', subreddit_name, {time});
+  }
+  get_controversial (subreddit_name, {time} = {}) {
+    return this._get_sorted_frontpage('controversial', subreddit_name, {time});
+  }
 };
 
 objects.RedditContent = class RedditContent {
   constructor(options, _ac, has_fetched) {
+    /* `_ac` stands for `Authenticated Client`; it refers to the snoowrap requester that this object is tied to (which is
+    also used to make future requests if necessary). */
     this._ac = _ac;
     this.has_fetched = !!has_fetched;
     _.assignIn(this, options);
     this._initialize_fetch_function();
-    /* Omit the 'delete' shortcut since that property name is used by Comments and Submissions. To send an HTTP DELETE
+    /* Omit the 'delete' request shortcut, since that property name is used by Comments and Submissions. To send an HTTP DELETE
     request, use `this._ac.delete` rather than the shortcut `this.delete`. */
     _.without(constants.REQUEST_TYPES, 'delete').forEach(type => {
       Object.defineProperty(this, type, {get: () => (this._ac[type])});
@@ -312,6 +337,12 @@ objects.Submission = class Submission extends objects.RedditContent {
   mark_as_read () { // Requires reddit gold
     return this.post({uri: 'api/store_visits', form: {links: this.name}});
   }
+  get_duplicates () {
+    return this.get({uri: `duplicates/${this.name}`});
+  }
+  get_related () {
+    return this.get({uri: `related/${this.name}`});
+  }
 };
 
 objects.PrivateMessage = class PrivateMessage extends objects.RedditContent {
@@ -422,6 +453,21 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   _submit_link (options) {
     return this._ac._submit_link(_.assign(options, {subreddit_name: this.display_name}));
   }
+  get_hot () {
+    return this._ac.get_hot(this.display_name);
+  }
+  get_new () {
+    return this._ac.get_new(this.display_name);
+  }
+  get_comments () {
+    return this._ac.get_comments(this.display_name);
+  }
+  get_top ({time} = {}) {
+    return this._ac.get_top(this.display_name, {time});
+  }
+  get_controversial ({time} = {}) {
+    return this._ac.get_controversial(this.display_name, {time});
+  }
 };
 
 objects.Trophy = class Trophy extends objects.RedditContent {
@@ -443,7 +489,9 @@ objects.Listing = class Listing extends Array {
     _.assign(this, children);
     let constant_params = _.assign(query, {show: show_all ? 'all' : undefined, limit});
     this._ac = _ac;
-    this._requester = _ac._oauth_requester.defaults({uri, method, qs: constant_params});
+    this.uri = uri;
+    this.method = method;
+    this.constant_params = constant_params;
     this._transform = _transform;
     this.limit = limit;
     this.after = after;
@@ -451,10 +499,13 @@ objects.Listing = class Listing extends Array {
     this._is_comment_list = _is_comment_list;
     return new Proxy(this, {get: (target, key, thisArg) => {
       if (!isNaN(key) && key >= target.length) {
-        return promise_wrap(target.fetch({amount: key - target.length + 1}).then(_.last));
+        return promise_wrap(target.fetch(key - target.length + 1).then(_.last));
       }
       return Reflect.get(target, key, thisArg);
     }});
+  }
+  get _requester () {
+    return this._ac._oauth_requester.defaults({uri: this.uri, method: this.method, qs: this.constant_params});
   }
   get is_finished () {
     if (this._is_comment_list) {
@@ -462,7 +513,7 @@ objects.Listing = class Listing extends Array {
     }
     return !!this.uri && this.after === null && this.before === null;
   }
-  fetch ({amount = this.limit}) {
+  fetch (amount = this.limit) {
     if (typeof amount !== 'number') {
       throw new errors.InvalidMethodCallError('Failed to fetch listing. (amount must be a Number.)');
     }
@@ -470,11 +521,11 @@ objects.Listing = class Listing extends Array {
       return [];
     }
     if (this._is_comment_list) {
-      return promise_wrap(this._fetch_more_comments({amount}));
+      return promise_wrap(this._fetch_more_comments(amount));
     }
-    return promise_wrap(this._fetch_more_regular({amount}));
+    return promise_wrap(this._fetch_more_regular(amount));
   }
-  async _fetch_more_regular ({amount}) {
+  async _fetch_more_regular (amount) {
     let limit_for_request = Math.min(amount, this.limit) || this.limit;
     let request_params = {qs: {after: this.after, before: this.before, limit: limit_for_request}};
     let response = await this._requester(request_params).then(this._transform);
@@ -485,7 +536,7 @@ objects.Listing = class Listing extends Array {
     this.push(..._.toArray(response));
     this.before = response.before;
     this.after = response.after;
-    return this.slice(0, amount).concat(await this.fetch({amount: amount - response.length}));
+    return response.slice(0, amount).concat(await this.fetch(amount - response.length));
   }
   /* Pagination for comments works differently than it does for most other things; rather than sending a link to the next page
   within a listing, reddit sends the last comment in the list as as a `more` object, with links to all the remaining comments
@@ -496,7 +547,7 @@ objects.Listing = class Listing extends Array {
     return new_comments;
   }
   fetch_all () {
-    return this.fetch({amount: Infinity});
+    return this.fetch(Infinity);
   }
   inspect () {
     return `<${constants.MODULE_NAME}.objects.${this.constructor.name}> ${util.inspect(_.toArray(this))}`;
@@ -510,7 +561,7 @@ objects.more = class more extends objects.RedditContent {
   /* Requests to /api/morechildren are capped at 20 comments at a time, but requests to /api/info are capped at 100, so
   it's easier to send to the latter. The disadvantage is that comment replies are not automatically sent from requests
   to /api/info. */
-  async fetch ({amount = Infinity}) {
+  async fetch (amount) {
     if (isNaN(amount)) {
       throw new errors.InvalidMethodCallError('Failed to fetch listing. (`amount` must be a Number.)');
     }
@@ -520,8 +571,8 @@ objects.more = class more extends objects.RedditContent {
     let ids_for_this_request = this.children.splice(0, Math.min(amount, 100)).map(id => (`t1_${id}`));
     // Requests are capped at 100 comments. Send lots of requests recursively to get the comments, then concatenate them.
     // (This speed-requesting is only possible with comment listings since the entire list of ids is present initially.)
-    let promise_for_this_batch = this._ac.get({uri: 'api/info', qs: {id: ids_for_this_request.join(',')}});
-    let promise_for_remaining_items = this.fetch({amount: amount - ids_for_this_request.length});
+    let promise_for_this_batch = this.get({uri: 'api/info', qs: {id: ids_for_this_request.join(',')}});
+    let promise_for_remaining_items = this.fetch(amount - ids_for_this_request.length);
     return _.toArray(await promise_for_this_batch).concat(await promise_for_remaining_items);
   }
 };
