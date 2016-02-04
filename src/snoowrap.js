@@ -211,6 +211,9 @@ let snoowrap = class snoowrap {
   get_new (subreddit_name) {
     return this._get_sorted_frontpage('new', subreddit_name);
   }
+  get_random_submission (subreddit_name) {
+    return this._get_sorted_frontpage('random', subreddit_name);
+  }
   get_top (subreddit_name, {time} = {}) {
     return this._get_sorted_frontpage('top', subreddit_name, {time});
   }
@@ -277,7 +280,7 @@ objects.Comment = class Comment extends objects.RedditContent {
   _transform_api_response (response_obj) {
     let replies_uri = `comments/${response_obj[0].link_id.slice(3)}`;
     let replies_query = {comment: this.name.slice(3)};
-    let _transform = item => (item[1][0].replies);
+    let _transform = item => (item.comments[0].replies);
     response_obj[0].replies = new objects.Listing({uri: replies_uri, query: replies_query, _transform}, this._ac);
     return response_obj[0];
   }
@@ -309,14 +312,9 @@ objects.RedditUser = class RedditUser extends objects.RedditContent {
 objects.Submission = class Submission extends objects.RedditContent {
   constructor (options, _ac, has_fetched) {
     super(options, _ac, has_fetched);
-    let _transform = response => (response[1]);
-    this.comments = new objects.Listing({uri: `comments/${this.name.slice(3)}`, _transform}, _ac);
   }
   get _uri () {
-    return `api/info?id=${this.name}`;
-  }
-  _transform_api_response (response_object) {
-    return response_object[0];
+    return `comments/${this.name.slice(3)}`;
   }
   // TODO: Get rid of the repeated {id: this.name} form parameters
   hide () {
@@ -480,6 +478,9 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   get_comments () {
     return this._ac.get_comments(this.display_name);
   }
+  get_random_submission () {
+    return this._ac.get_random_submission(this.display_name);
+  }
   get_top ({time} = {}) {
     return this._ac.get_top(this.display_name, {time});
   }
@@ -514,7 +515,10 @@ objects.Listing = class Listing extends Array {
     this.limit = limit;
     this.after = after;
     this.before = before;
-    this._is_comment_list = _is_comment_list;
+    if (_.last(children) instanceof objects.more) {
+      this._more = this.pop();
+      this._is_comment_list = true;
+    }
     return new Proxy(this, {get: (target, key, thisArg) => {
       if (!isNaN(key) && key >= target.length) {
         return promise_wrap(target.fetch(key - target.length + 1).then(_.last));
@@ -541,16 +545,15 @@ objects.Listing = class Listing extends Array {
     if (this._is_comment_list) {
       return promise_wrap(this._fetch_more_comments(amount));
     }
+    if (!this.uri) {
+      return [];
+    }
     return promise_wrap(this._fetch_more_regular(amount));
   }
   async _fetch_more_regular (amount) {
     let limit_for_request = Math.min(amount, this.limit) || this.limit;
     let request_params = {qs: {after: this.after, before: this.before, limit: limit_for_request}};
     let response = await this._requester(request_params).then(this._transform);
-    if (this.length === 0 && _.last(response) instanceof objects.more) {
-      this._more = response.pop();
-      this._is_comment_list = true;
-    }
     this.push(..._.toArray(response));
     this.before = response.before;
     this.after = response.after;
@@ -627,7 +630,7 @@ helpers._populate = (response_tree, _ac) => {
       return remainder_of_tree;
     }
     let mapFunction = Array.isArray(response_tree) ? _.map : _.mapValues;
-    return mapFunction(response_tree, (value, key) => {
+    let result = mapFunction(response_tree, (value, key) => {
       // Map {..., author: 'some_username', ...} to {..., author: RedditUser {}, ... } (e.g.)
       if (_.includes(constants.USER_KEYS, key) && value !== null) {
         return new objects.RedditUser({name: value}, _ac);
@@ -637,6 +640,12 @@ helpers._populate = (response_tree, _ac) => {
       }
       return helpers._populate(value, _ac);
     });
+    if (result.length === 2 && result[0] instanceof objects.Listing && result[0][0] instanceof objects.Submission &&
+        result[1] instanceof objects.Listing) {
+      helpers._assign_proxy(result[0][0], {comments: result[1]});
+      return result[0][0];
+    }
+    return result;
   }
   return response_tree;
 };

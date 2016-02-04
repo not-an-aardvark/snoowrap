@@ -76,7 +76,7 @@ describe('snoowrap', function () {
       expect(submission.author.name).to.equal('DO_U_EVN_SPAGHETTI');
     });
     it('can get comments on a submission', async () => {
-      expect(submission.comments.is_finished).to.be.false;
+      expect(await submission.comments.is_finished).to.be.false;
       expect(await submission.comments.fetch(5)).to.have.length(5);
       expect(submission.comments).to.have.length.within(6, 100);
       expect(submission.comments[0]).to.be.an.instanceof(snoowrap.objects.Comment);
@@ -87,6 +87,15 @@ describe('snoowrap', function () {
     });
     it('can get comments by index before they\'re fetched', async () => {
       expect(await submission.comments[6].body).to.equal('pumpkin pie');
+    });
+    it('can get a random submission from a particular subreddit', async () => {
+      let random_post = await r.get_subreddit('gifs').get_random_submission();
+      expect(random_post).to.be.an.instanceof(snoowrap.objects.Submission);
+      expect(random_post.subreddit.display_name).to.equal('gifs');
+    });
+    it('can get a random submission from any subreddit', async () => {
+      let random_post = await r.get_random_submission();
+      expect(random_post).to.be.an.instanceof(snoowrap.objects.Submission);
     });
   });
 
