@@ -5,8 +5,8 @@
   "description": "A Node.js wrapper for the reddit API",
   "main": "lib/snoowrap.js",
   "scripts": {
-    "compile": "babel -d lib/ src/",
-    "pretest": "eslint --ignore-path .gitignore . && npm run compile",
+    "compile": "babel -d lib/ src/ && documentation build src/snoowrap.js --shallow -o doc/ -f html",
+    "pretest": "eslint . && npm run compile",
     "test": "mocha --harmony_proxies --compilers js:babel-core/register",
     "prepublish": "npm run compile"
   },
@@ -36,7 +36,7 @@
   "dependencies": {
     "bluebird": "^3.1.5",
     "harmony-reflect": "^1.4.2",
-    "lodash": "^4.2.0",
+    "lodash": "^4.2.1",
     "moment": "^2.11.1",
     "promise-chains": "^0.1.3",
     "request-promise": "^2.0.0"
@@ -50,6 +50,7 @@
     "babel-plugin-transform-es2015-parameters": "^6.4.5",
     "chai": "^3.5.0",
     "chai-as-promised": "^5.2.0",
+    "documentation": "^4.0.0-beta",
     "mocha": "^2.4.5"
   }
 }

@@ -149,10 +149,10 @@ describe('snoowrap', function () {
       expect(await r.get_friends()).to.be.an.instanceof(Array);
     });
     it('gets a list of blocked users', async () => {
-      expect(await r.get_blocked()).to.be.an.instanceof(Array);
+      expect(await r.get_blocked_users()).to.be.an.instanceof(Array);
     });
     it('checks whether the current account needs to fill out a captcha to post', async () => {
-      expect(await r.needs_captcha()).to.be.a('boolean');
+      expect(await r.check_captcha_requirement()).to.be.a('boolean');
     });
     it('can fetch a new captcha on request', async () => {
       let iden = await r.get_new_captcha_identifier();
@@ -180,10 +180,10 @@ describe('snoowrap', function () {
       let text = moment().format();
       await sub.create_link_flair_template({text, css_class: '', text_editable: true});
       // Use a random link on the sub -- it doesn't seem to be possible to get the link flair options without providing a link
-      let added_flair = _.last(await sub.get_flair_options({link: 't3_43qlu8'}).choices);
+      let added_flair = _.last(await sub._get_flair_options({link: 't3_43qlu8'}).choices);
       expect(added_flair.flair_text).to.equal(text);
       await sub.delete_flair_template(added_flair);
-      let link_flairs_afterwards= await sub.get_flair_options({link: 't3_43qlu8'}).choices;
+      let link_flairs_afterwards= await sub._get_flair_options({link: 't3_43qlu8'}).choices;
       expect(link_flairs_afterwards.length === 0 || _.last(link_flairs_afterwards).flair_text !== text).to.be.true;
     });
     it('can delete all user flair templates', async () => {
@@ -200,17 +200,17 @@ describe('snoowrap', function () {
         sub.create_link_flair_template({text: 'some other link flair text'})
       ]);
       await sub.delete_all_link_flair_templates();
-      expect(await await sub.get_flair_options({link: 't3_43qlu8'}).choices).to.eql([]);
+      expect(await await sub._get_flair_options({link: 't3_43qlu8'}).choices).to.eql([]);
     });
     it('can add, delete, and fetch user flair', async () => {
       let text = moment().format();
       let test_username = 'not_an_aardvark';
       await sub.set_flair({name: test_username, text, css_class: ''});
-      expect(await sub.get_user_flair({name: test_username}).flair_text).to.equal(text);
+      expect(await sub.get_user_flair(test_username).flair_text).to.equal(text);
       let current_list = await sub.get_user_flair_list();
       expect(current_list.filter(result => (result.user === test_username))[0].flair_text).to.equal(text);
-      await sub.delete_user_flair({name: test_username});
-      expect(await sub.get_user_flair({name: 'not_an_aardvark'}).flair_text).to.be.null;
+      await sub.delete_user_flair(test_username);
+      expect(await sub.get_user_flair('not_an_aardvark').flair_text).to.be.null;
     });
     it('can change multiple user flairs at once', async () => {
       let naa_flair = 'not_an_aardvark\'s flair';
@@ -219,17 +219,17 @@ describe('snoowrap', function () {
         {name: 'not_an_aardvark', text: naa_flair},
         {name: 'actually_an_aardvark', text: aaa_flair}
       ]);
-      expect(await sub.get_user_flair({name: 'not_an_aardvark'}).flair_text).to.equal(naa_flair);
-      expect(await sub.get_user_flair({name: 'actually_an_aardvark'}).flair_text).to.equal(aaa_flair);
+      expect(await sub.get_user_flair('not_an_aardvark').flair_text).to.equal(naa_flair);
+      expect(await sub.get_user_flair('actually_an_aardvark').flair_text).to.equal(aaa_flair);
     });
     it('can change flair from a RedditUser object', async () => {
       let user1 = r.get_user('not_an_aardvark');
       let user2 = r.get_user('actually_an_aardvark');
       let flair_text = moment().format();
       await user1.set_flair({subreddit: sub, text: flair_text});
-      expect(await sub.get_user_flair(user1).flair_text).to.equal(flair_text);
+      expect(await sub.get_user_flair(user1.name).flair_text).to.equal(flair_text);
       await user2.set_flair({subreddit: sub, text: flair_text});
-      expect(await sub.get_user_flair(user2).flair_text).to.equal(flair_text);
+      expect(await sub.get_user_flair(user2.name).flair_text).to.equal(flair_text);
     });
   });
 
