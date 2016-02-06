@@ -202,16 +202,6 @@ describe('snoowrap', function () {
       await sub.delete_all_link_flair_templates();
       expect(await await sub._get_flair_options({link: 't3_43qlu8'}).choices).to.eql([]);
     });
-    it('can add, delete, and fetch user flair', async () => {
-      let text = moment().format();
-      let test_username = 'not_an_aardvark';
-      await sub.set_flair({name: test_username, text, css_class: ''});
-      expect(await sub.get_user_flair(test_username).flair_text).to.equal(text);
-      let current_list = await sub.get_user_flair_list();
-      expect(current_list.filter(result => (result.user === test_username))[0].flair_text).to.equal(text);
-      await sub.delete_user_flair(test_username);
-      expect(await sub.get_user_flair('not_an_aardvark').flair_text).to.be.null;
-    });
     it('can change multiple user flairs at once', async () => {
       let naa_flair = 'not_an_aardvark\'s flair';
       let aaa_flair = 'actually_an_aardvark\'s flair';
@@ -222,14 +212,37 @@ describe('snoowrap', function () {
       expect(await sub.get_user_flair('not_an_aardvark').flair_text).to.equal(naa_flair);
       expect(await sub.get_user_flair('actually_an_aardvark').flair_text).to.equal(aaa_flair);
     });
-    it('can change flair from a RedditUser object', async () => {
+    it('can assign flair to a user', async () => {
       let user1 = r.get_user('not_an_aardvark');
       let user2 = r.get_user('actually_an_aardvark');
       let flair_text = moment().format();
-      await user1.set_flair({subreddit: sub, text: flair_text});
+      await user1.assign_user_flair({subreddit_name: sub.display_name, text: flair_text});
       expect(await sub.get_user_flair(user1.name).flair_text).to.equal(flair_text);
-      await user2.set_flair({subreddit: sub, text: flair_text});
+      await user2.assign_user_flair({subreddit_name: sub.display_name, text: flair_text});
       expect(await sub.get_user_flair(user2.name).flair_text).to.equal(flair_text);
+    });
+    it('can assign flair to a submission', async () => {
+      /* The submission's flair is cached by reddit for a few minutes, so there's not really any reliable way to verify that
+      the flair text was set successfully while still having the tests run in a reasonable amount of time. If nothing else,
+      send the request and make sure no error is returned. */
+      await r.get_submission('443bn7').assign_link_flair({text: moment().format()});
+    });
+    it('can select its own user flair', async () => {
+      let text = moment().format();
+      await sub.create_user_flair_template({text});
+      let flair_template_id = _.last(await sub.get_user_flair_templates()).flair_template_id;
+      await sub.select_my_flair({flair_template_id});
+      expect(await sub.get_my_flair().flair_text).to.equal(text);
+      await sub.delete_all_user_flair_templates();
+    });
+    it('can select link flair for its post', async () => {
+      let text = moment().format() + ' (self-selected)';
+      await sub.create_link_flair_template({text});
+      let submission = r.get_submission('443bn7');
+      let flair_template_id = _.last(await submission.get_link_flair_templates()).flair_template_id;
+      await submission.select_link_flair({flair_template_id});
+      expect(await submission.refresh().link_flair_text).to.equal(text);
+      await sub.delete_all_link_flair_templates();
     });
   });
 

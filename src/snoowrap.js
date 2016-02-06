@@ -9,9 +9,10 @@ let util = require('util');
 let constants = require('./constants');
 let errors = require('./errors');
 let default_config = require('./default_config');
-let assign_mixins = require('./assign_mixins');
+const api_type = 'json';
 let objects = {};
 let helpers = {};
+
 
 /** The class for a snoowrap requester */
 let snoowrap = class snoowrap {
@@ -59,7 +60,7 @@ let snoowrap = class snoowrap {
       transform: (body, response) => {
         this.ratelimit_remaining = response.headers['x-ratelimit-remaining'];
         this.ratelimit_reset_point = moment().add(response.headers['x-ratelimit-reset'], 'seconds');
-        let populated = helpers._populate(body, this);
+        let populated = populate(body, this);
         if (populated instanceof objects.Listing) {
           populated.uri = response.request.uri.path;
         }
@@ -260,7 +261,7 @@ let snoowrap = class snoowrap {
   * @instance
   */
   get_new_captcha_identifier () {
-    return this.post({uri: 'api/new_captcha', form: {api_type: 'json'}}).json.data.iden;
+    return this.post({uri: 'api/new_captcha', form: {api_type}}).json.data.iden;
   }
   /**
   * Gets an image for a given captcha identifier.
@@ -416,6 +417,17 @@ let snoowrap = class snoowrap {
   get_controversial (subreddit_name, options) {
     return this._get_sorted_frontpage('controversial', subreddit_name, {time: options.time});
   }
+  async _select_flair ({flair_template_id, link, name, text, subreddit_name}) {
+    if (!flair_template_id) {
+      throw new errors.InvalidMethodCallError('Error: No flair template ID provided');
+    }
+    return await this.post({uri: `r/${await subreddit_name}/api/selectflair`, form: {
+      api_type, flair_template_id, link, name, text}
+    });
+  }
+  async _assign_flair ({css_class, link, name, text, subreddit_name}) {
+    return await this.post({uri: `r/${await subreddit_name}/api/flair`, form: {api_type, name, text, link, css_class}});
+  }
 };
 /** A base class for content from reddit. With the expection of Listings, all content types extend this class. */
 objects.RedditContent = class RedditContent {
@@ -462,7 +474,7 @@ objects.RedditContent = class RedditContent {
     */
     this.fetch = 'fetch' in this ? this.fetch : _.once(() => {
       return promise_wrap(this._ac.get({uri: this._uri}).then(this._transform_api_response.bind(this)).then(response => {
-        helpers._assign_proxy(this, response);
+        assign_to_proxy(this, response);
         _.forIn(response, (value, key) => {this[key] = value;});
         this.has_fetched = true;
         return this;
@@ -472,8 +484,6 @@ objects.RedditContent = class RedditContent {
   /**
   * Refreshes this content.
   * @returns {Promise} A newly-fetched version of this content
-  * @memberof objects.RedditContent
-  * @instance
   */
   refresh () {
     delete this.fetch;
@@ -505,6 +515,10 @@ objects.Comment = class Comment extends objects.RedditContent {
   }
 };
 
+/**
+* A class representing a reddit user
+* @extends RedditContent
+*/
 objects.RedditUser = class RedditUser extends objects.RedditContent {
   constructor (options, _ac, has_fetched) {
     super(options, _ac, has_fetched);
@@ -515,13 +529,28 @@ objects.RedditUser = class RedditUser extends objects.RedditContent {
     }
     return `user/${this.name}/about`;
   }
-  give_gold({months}) {
+  /**
+  * Gives reddit gold to a user
+  * @param {number} months The number of months of gold to give. This must be a number between 1 and 36.
+  * @returns {Promise} A Promise that fulfills when the request is complete
+  */
+  give_gold(months) {
     /* Ideally this would allow for more than 36 months by sending multiple requests, but I don't have the resources to test
     that code, and it's probably better that such a big investment be deliberate anyway. */
     if (typeof months !== 'number' || months < 1 || months > 36) {
       throw new errors.InvalidMethodCallError('Invalid argument to RedditUser.give_gold; `months` must be between 1 and 36.');
     }
-    return this.post({uri: `api/v1/gold/give/${this.name}`});
+    return this.post({uri: `api/v1/gold/give/${this.name}`, form: {months}});
+  }
+  /** Assigns flair to this user on a given subreddit (as a moderator).
+  * @param {object} options
+  * @param {string} options.subreddit_name The subreddit that flair should be assigned on
+  * @param {string} [options.text=""] The text that the user's flair should have
+  * @param {string} [options.css_class=""] The CSS class that the user's flair should have
+  * @returns {Promise} A Promise that fulfills with the current user after the request is complete
+  */
+  assign_user_flair (options) {
+    return promise_wrap(this._ac._assign_flair(_.assign(options, {name: this.name})).return(this));
   }
 };
 
@@ -540,8 +569,6 @@ objects.Submission = class Submission extends objects.RedditContent {
   /**
   * Hides this Submission, preventing it from appearing on most Listings.
   * @returns {Promise} The updated version of this Submission
-  * @memberof objects.Submission
-  * @instance
   */
   hide () {
     return promise_wrap(this.post({uri: 'api/hide', form: {id: this.name}}).then(() => {
@@ -552,8 +579,6 @@ objects.Submission = class Submission extends objects.RedditContent {
   /**
   * Unhides this Submission, allowing it to reappear on most Listings.
   * @returns {Promise} The updated version of this Submission
-  * @memberof objects.Submission
-  * @instance
   */
   unhide () {
     return promise_wrap(this.post({uri: 'api/unhide', form: {id: this.name}}).then(() => {
@@ -564,8 +589,6 @@ objects.Submission = class Submission extends objects.RedditContent {
   /**
   * Locks this Submission, preventing new comments from being posted on it.
   * @returns {Promise} The updated version of this Submission
-  * @memberof objects.Submission
-  * @instance
   */
   lock () {
     return promise_wrap(this.post({uri: 'api/lock', form: {id: this.name}}).then(() => {
@@ -576,8 +599,6 @@ objects.Submission = class Submission extends objects.RedditContent {
   /**
   * Unlocks this Submission, allowing comments to be posted on it again.
   * @returns {Promise} The updated version of this Submission
-  * @memberof objects.Submission
-  * @instance
   */
   unlock () {
     return promise_wrap(this.post({uri: 'api/unlock', form: {id: this.name}}).then(() => {
@@ -587,8 +608,6 @@ objects.Submission = class Submission extends objects.RedditContent {
   /**
   * Marks this Submission as NSFW (Not Safe For Work).
   * @returns {Promise} The updated version of this Submission
-  * @memberof objects.Submission
-  * @instance
   */
   mark_nsfw () {
     return promise_wrap(this.post({uri: 'api/marknsfw', form: {id: this.name}}).then(() => {
@@ -598,8 +617,6 @@ objects.Submission = class Submission extends objects.RedditContent {
   /**
   * Unmarks this Submission as NSFW (Not Safe For Work).
   * @returns {Promise} The updated version of this Submission
-  * @memberof objects.Submission
-  * @instance
   */
   unmark_nsfw () {
     return promise_wrap(this.post({uri: 'api/unmarknsfw', form: {id: this.name}}).then(() => {
@@ -615,14 +632,12 @@ objects.Submission = class Submission extends objects.RedditContent {
   _set_contest_mode_enabled (state) {
     return promise_wrap(this.post({
       uri: 'api/set_contest_mode',
-      form: {api_type: 'json', state, id: this.name}
+      form: {api_type, state, id: this.name}
     }).return(this));
   }
   /**
   * Enables contest mode for this Submission.
   * @returns {Promise} The updated version of this Submission
-  * @memberof objects.Submission
-  * @instance
   */
   enable_contest_mode () {
     return this._set_contest_mode_enabled(true);
@@ -630,8 +645,6 @@ objects.Submission = class Submission extends objects.RedditContent {
   /**
   * Disables contest mode for this Submission.
   * @returns {Promise} The updated version of this Submission
-  * @memberof objects.Submission
-  * @instance
   */
   disable_contest_mode () {
     return this._set_contest_mode_enabled(false);
@@ -639,7 +652,7 @@ objects.Submission = class Submission extends objects.RedditContent {
   _set_stickied({state, num}) {
     return promise_wrap(this.post({
       uri: 'api/set_subreddit_sticky',
-      form: {api_type: 'json', state, num, id: this.name}
+      form: {api_type, state, num, id: this.name}
     }).then(() => {
       this.stickied = state;
     }).return(this));
@@ -649,8 +662,6 @@ objects.Submission = class Submission extends objects.RedditContent {
   * @param {object} [options]
   * @param {number} [options.num=1] The sticky slot to put this submission in; this should be either 1 or 2.
   * @returns {Promise} The updated version of this Submission
-  * @memberof objects.Submission
-  * @instance
   */
   sticky (options = {num: 1}) {
     return this._set_stickied({state: true, num: options.num});
@@ -658,8 +669,6 @@ objects.Submission = class Submission extends objects.RedditContent {
   /**
   * Unstickies this Submission.
   * @returns {Promise} The updated version of this Submission
-  * @memberof objects.Submission
-  * @instance
   */
   unsticky () {
     return this._set_stickied({state: false});
@@ -669,19 +678,15 @@ objects.Submission = class Submission extends objects.RedditContent {
   * @param {string} sort The suggested sort method. This should be one of
   <pre><code>confidence, top, new, controversial, old, random, qa, blank</code></pre>
   * @returns {Promise} The updated version of this Submission
-  * @memberof objects.Submission
-  * @instance
   */
   set_suggested_sort (sort) {
-    return promise_wrap(this.post({uri: 'api/set_suggested_sort', form: {api_type: 'json', id: this.name, sort}}).then(() => {
+    return promise_wrap(this.post({uri: 'api/set_suggested_sort', form: {api_type, id: this.name, sort}}).then(() => {
       this.suggested_sort = sort;
     }).return(this));
   }
   /**
   * Marks this submission as 'visited'.
   * @returns {Promise} The updated version of this Submission
-  * @memberof objects.Submission
-  * @instance
   */
   mark_as_read () { // Requires reddit gold
     return promise_wrap(this.post({uri: 'api/store_visits', form: {links: this.name}}).return(this));
@@ -689,8 +694,6 @@ objects.Submission = class Submission extends objects.RedditContent {
   /**
   * Gets a Listing of other submissions on reddit that had the same link as this one.
   * @returns {Promise} A Listing of other Submission objects
-  * @memberof objects.Submission
-  * @instance
   */
   get_duplicates () {
     return this.get({uri: `duplicates/${this.name}`});
@@ -698,11 +701,46 @@ objects.Submission = class Submission extends objects.RedditContent {
   /**
   * Gets a Listing of Submissions that are related to this one.
   * @returns {Promise} A Listing of other Submission objects
-  * @memberof objects.Submission
-  * @instance
   */
   get_related () {
     return this.get({uri: `related/${this.name}`});
+  }
+  /**
+  * Gets a list of flair template options for this post.
+  * @returns {Promise} An Array of flair templates
+  */
+  get_link_flair_templates () {
+    return this.subreddit.get_link_flair_templates(this.name);
+  }
+  /**
+  * Assigns flair on this Submission (as a moderator; also see select_link_flair)
+  * @param {object} options
+  * @param {string} options.text The text that this link's flair should have
+  * @param {string} options.css_class The CSS class that the link's flair should have
+  * @returns {Promise} A Promise that fulfills with an updated version of this Submission
+  */
+  assign_link_flair (options) {
+    return promise_wrap(this._ac._assign_flair(_.assign(options, {
+      link: this.name, subreddit_name: this.subreddit.display_name
+    })).then(() => {
+      this.link_flair_text = options.text || null;
+      this.link_flair_css_class = options.css_class || null;
+    }).return(this));
+  }
+
+  /**
+  * Selects a flair for this Submission (as the OP; also see assign_link_flair)
+  * @param {object} options
+  * @param {string} options.flair_template_id A flair template ID to use for this Submission. (This should be obtained
+  beforehand using {@link get_link_flair_templates}.)
+  * @param {string} [options.text] The flair text to use for the submission. (This is only necessary/useful if the given flair
+  template has the <pre><code>text_editable</code></pre> property set to <pre><code>true</code></pre>.)
+  * @returns {Promise} A Promise that fulfills with this objects after the request is complete
+  */
+  select_link_flair (options) {
+    return promise_wrap(this._ac._select_flair(_.assign(options, {
+      link: this.name, subreddit_name: this.subreddit.display_name
+    })).return(this));
   }
 };
 
@@ -729,20 +767,16 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   /**
   * Gets the list of moderators on this subreddit.
   * @returns {Promise} An Array of RedditUsers representing the moderators of this subreddit
-  * @memberof objects.Subreddit
-  * @instance
   */
   get_moderators () {
     return this._ac.get(`r/${this.display_name}/about/moderators`);
   }
   _delete_flair_templates ({flair_type}) {
-    return this.post({uri: `r/${this.display_name}/api/clearflairtemplates`, form: {api_type: 'json', flair_type}});
+    return this.post({uri: `r/${this.display_name}/api/clearflairtemplates`, form: {api_type, flair_type}});
   }
   /**
   * Deletes all of this subreddit's user flair templates
   * @returns {Promise} A Promise that fulfills when the request is complete
-  * @memberof objects.Subreddit
-  * @instance
   */
   delete_all_user_flair_templates () {
     return this._delete_flair_templates({flair_type: 'USER_FLAIR'});
@@ -750,8 +784,6 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   /**
   * Deletes all of this subreddit's link flair templates
   * @returns {Promise} A Promise that fulfills when the request is complete
-  * @memberof objects.Subreddit
-  * @instance
   */
   delete_all_link_flair_templates () {
     return this._delete_flair_templates({flair_type: 'LINK_FLAIR'});
@@ -761,19 +793,17 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @param {object} options
   * @param {string} options.flair_template_id The ID of the template that should be deleted
   * @returns {Promise} A Promise that fulfills when the request is complete
-  * @memberof objects.Subreddit
-  * @instance
   */
   delete_flair_template (options) {
     return this.post({
       uri: `r/${this.display_name}/api/deleteflairtemplate`,
-      form: {api_type: 'json', flair_template_id: options.flair_template_id}
+      form: {api_type, flair_template_id: options.flair_template_id}
     });
   }
   _create_flair_template ({text, css_class, flair_type, text_editable = false}) {
     return this.post({
       uri: `r/${this.display_name}/api/flairtemplate`,
-      form: {api_type: 'json', text, css_class, flair_type, text_editable}
+      form: {api_type, text, css_class, flair_type, text_editable}
     });
   }
   /**
@@ -783,8 +813,6 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @param {string} [options.css_class=''] The CSS class for this template
   * @param {boolean} [options.text_editable=false] Determines whether users should be able to edit their flair text
   when it has this template
-  * @memberof objects.Subreddit
-  * @instance
   */
   create_user_flair_template (options) {
     return this._create_flair_template(_.assign(options, {flair_type: 'USER_FLAIR'}));
@@ -796,8 +824,6 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @param {string} [options.css_class=''] The CSS class for this template
   * @param {boolean} [options.text_editable=false] Determines whether users should be able to edit the flair text of their
   links when it has this template
-  * @memberof objects.Subreddit
-  * @instance
   */
   create_link_flair_template (options) {
     return this._create_flair_template(_.assign(options, {flair_type: 'LINK_FLAIR'}));
@@ -809,58 +835,29 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * Gets the flair templates for a given link.
   * @param {string} link_id The link's base36 ID
   * @returns {Promise} An Array of flair template options
-  * @memberof objects.Subreddit
-  * @instance
   */
-  get_link_flair_options (link_id) {
-    return this._get_flair_options({link: link_id});
+  get_link_flair_templates (link_id) {
+    return this._get_flair_options({link: link_id}).choices;
   }
   /**
   * Gets the list of user flair templates on this subreddit.
   * @returns {Promise} An Array of user flair templates
-  * @memberof objects.Subreddit
-  * @instance
   */
   get_user_flair_templates () {
     return this._get_flair_options().choices;
   }
   /**
-  * Assigns flair to a user or submission.
-  * @param {object} options
-  * @param {string} [options.link_id] The base36 ID of the submisison. (Omit this parameter if assigning flair to a user.)
-  * @param {string} [options.name] The name of the user whose flair is being assigned. (Omit this parameter if assigning
-  flair to a submission.)
-  * @param {string} [options.text=""] The flair text that should be assigned
-  * @param {string} [options.css_class=""] The flair CSS class that should be assigned
-  * @returns {Promise} A Promise that fulfills when this request is complete
-  * @memberof objects.Subreddit
-  * @instance
-  */
-  set_flair (options) {
-    return this.post({uri: `r/${this.display_name}/api/flair`, form: {
-      api_type: 'json',
-      link: options.link_id,
-      name: options.name,
-      text: options.text || '',
-      css_class: options.css_class || ''
-    }});
-  }
-  /**
   * Clears a user's flair on this subreddit.
   * @param {string} name The user's name
   * @returns {Promise} A Promise that fulfills when the request is complete
-  * @memberof objects.Subreddit
-  * @instance
   */
   delete_user_flair (name) {
-    return this.post({uri: `r/${this.display_name}/api/deleteflair`, form: {api_type: 'json', name}});
+    return this.post({uri: `r/${this.display_name}/api/deleteflair`, form: {api_type, name}});
   }
   /**
   * Gets a user's flair on this subreddit.
   * @param {string} name The user's name
   * @returns {Promise} An object representing the user's flair
-  * @memberof objects.Subreddit
-  * @instance
   */
   get_user_flair (name) {
     return this._get_flair_options({name}).current;
@@ -875,8 +872,6 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @param {string} flair_array[].text The flair text to assign to this user
   * @param {string} flair_array[].css_class The flair CSS class to assign to this user
   * @returns {Promise} A Promise that fulfills when the request is complete
-  * @memberof objects.Subreddit
-  * @instance
   */
   set_multiple_user_flairs (flair_array) {
     let requests = [];
@@ -891,8 +886,6 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   /**
   * Gets a Listing of all user flairs on this subreddit.
   * @returns {Promise} A Listing containing user flairs
-  * @memberof objects.Subreddit
-  * @instance
   */
   get_user_flair_list () {
     return this.get({uri: `r/${this.display_name}/api/flairlist`}).users;
@@ -909,14 +902,12 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @param {boolean} options.link_flair_self_assign_enabled Determines whether users should be able to edit the flair of their
   submissions.
   * @returns {Promise} A Promise that fulfills when the request is complete
-  * @memberof objects.Subreddit
-  * @instance
   */
   configure_flair (options) {
     return this.post({
       uri: `r/${this.display_name}/api/flairconfig`,
       form: {
-        api_type: 'json',
+        api_type,
         flair_enabled: options.user_flair_enabled,
         flair_position: options.user_flair_position,
         flair_self_assign_enabled: options.user_flair_self_assign_enabled,
@@ -925,14 +916,38 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
       }
     });
   }
+  /**
+  * Gets the requester's flair on this subreddit.
+  * @returns {Promise} An object representing the requester's current flair
+  */
+  get_my_flair () {
+    return this._get_flair_options().current;
+  }
+  /**
+  * Sets the requester's flair on this subreddit.
+  * @param {object} options
+  * @param {string} options.flair_template_id A flair template ID to use. (This should be obtained beforehand using
+  {@link get_user_flair_templates}.)
+  * @param {string} [options.text=] The flair text to use. (This is only necessary/useful if the given flair
+  template has the <pre><code>text_editable</code></pre> property set to <pre><code>true</code></pre>.)
+  * @returns {Promise} A Promise that fulfills when the request is complete
+  */
+  async select_my_flair (options) {
+    /* NOTE: This requires `identity` scope in addition to `flair` scope, since the reddit api needs to be passed a username.
+    I'm not sure if there's a way to do this without requiring additional scope. */
+    if (!this._ac.own_user_info) {
+      await this._ac.get_me();
+    }
+    return await this._ac._select_flair(_.assign(options, {
+      subreddit_name: this.display_name, name: this._ac.own_user_info.name
+    }));
+  }
   _set_my_flair_visibility (flair_enabled) {
-    return this.post({uri: `r/${this.display_name}/api/setflairenabled`, form: {api_type: 'json', flair_enabled}});
+    return this.post({uri: `r/${this.display_name}/api/setflairenabled`, form: {api_type, flair_enabled}});
   }
   /**
   * Makes the requester's flair visible on this subreddit.
   * @returns {Promise} A Promise that will resolve when the request is complete
-  * @memberof objects.Subreddit
-  * @instance
   */
   show_my_flair () {
     return this._set_my_flair_visibility(true);
@@ -940,8 +955,6 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   /**
   * Makes the requester's flair invisible on this subreddit.
   * @returns {Promise} A Promise that will resolve when the request is complete
-  * @memberof objects.Subreddit
-  * @instance
   */
   hide_my_flair () {
     return this._set_my_flair_visibility(false);
@@ -956,8 +969,6 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   requires a captcha to submit posts and comments.
   * @param {string} [options.captcha_response] The response to the captcha with the given identifier
   * @returns {Promise} The newly-created Submission object
-  * @memberof objects.Subreddit
-  * @instance
   */
   submit_selfpost (options) {
     return this._ac.submit_selfpost(_.assign(options, {subreddit_name: this.display_name}));
@@ -974,8 +985,6 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   requires a captcha to submit posts and comments.
   * @param {string} [options.captcha_response] The response to the captcha with the given identifier
   * @returns {Promise} The newly-created Submission object
-  * @memberof objects.Subreddit
-  * @instance
   */
   submit_link (options) {
     return this._ac.submit_link(_.assign(options, {subreddit_name: this.display_name}));
@@ -983,8 +992,6 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   /**
   * Gets a Listing of hot posts on this subreddit.
   * @returns {Promise} A Listing containing the retrieved submissions
-  * @memberof objects.Subreddit
-  * @instance
   */
   get_hot () {
     return this._ac.get_hot(this.display_name);
@@ -992,8 +999,6 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   /**
   * Gets a Listing of new posts on this subreddit.
   * @returns {Promise} A Listing containing the retrieved submissions
-  * @memberof objects.Subreddit
-  * @instance
   */
   get_new () {
     return this._ac.get_new(this.display_name);
@@ -1001,8 +1006,6 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   /**
   * Gets a Listing of new comments on this subreddit.
   * @returns {Promise} A Listing containing the retrieved comments
-  * @memberof objects.Subreddit
-  * @instance
   */
   get_new_comments () {
     return this._ac.get_new_comments(this.display_name);
@@ -1010,8 +1013,6 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   /**
   * Gets a single random Submission from this subreddit.
   * @returns {Promise} The retrieved Submission object
-  * @memberof objects.Subreddit
-  * @instance
   */
   get_random_submission () {
     return this._ac.get_random_submission(this.display_name);
@@ -1022,8 +1023,6 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @param {string} [options.time] Describes the timespan that posts should be retrieved from. Should be one of
   <pre><code>hour, day, week, month, year, all</code></pre>
   * @returns {Promise} A Listing containing the retrieved submissions
-  * @memberof objects.Subreddit
-  * @instance
   */
   get_top (options) {
     return this._ac.get_top(this.display_name, options);
@@ -1093,8 +1092,6 @@ objects.Listing = class Listing extends Array {
   /**
   * This is a getter that is true if there are no more items left to fetch, and false otherwise.
   * @type {number}
-  * @memberof objects.Listing
-  * @instance
   */
   get is_finished () {
     if (this._is_comment_list) {
@@ -1107,8 +1104,6 @@ objects.Listing = class Listing extends Array {
   * @param {number} [amount] The number of items to fetch. If this is not defined, one more "batch" of items is fetched;
   the size of a batch depends on the type of Listing this is, as well as the requester's reddit preferences.
   * @returns {Promise} An updated version of this listing with <pre><code>amount</code></pre> items added on.
-  * @memberof objects.Listing
-  * @instance
   */
   fetch_more (amount = this.limit) {
     if (typeof amount !== 'number') {
@@ -1146,8 +1141,6 @@ objects.Listing = class Listing extends Array {
   * Fetches all of the items in this Listing, only stopping when there are none left.
   * @returns {Promise} The updated version of this Listing. Keep in mind that this method has the potential to exhaust your
   ratelimit quickly if the Listing doesn't have a clear end (e.g. with posts on the front page), so use it with discretion.
-  * @memberof objects.Listing
-  * @instance
   */
   fetch_all () {
     return this.fetch_more(Infinity);
@@ -1200,11 +1193,11 @@ objects.TrophyList = class TrophyList extends objects.RedditContent {
   }
 };
 
-helpers._populate = (response_tree, _ac) => {
+let populate = (response_tree, _ac) => {
   if (typeof response_tree === 'object' && response_tree !== null) {
     // Map {kind: 't2', data: {name: 'some_username', ... }} to a RedditUser (e.g.) with the same properties
     if (_.keys(response_tree).length === 2 && response_tree.kind) {
-      let remainder_of_tree = helpers._populate(response_tree.data, _ac);
+      let remainder_of_tree = populate(response_tree.data, _ac);
       if (constants.KINDS[response_tree.kind]) {
         return new objects[constants.KINDS[response_tree.kind]](remainder_of_tree, _ac, true);
       }
@@ -1220,25 +1213,118 @@ helpers._populate = (response_tree, _ac) => {
       if (_.includes(constants.SUBREDDIT_KEYS, key) && value !== null) {
         return new objects.Subreddit({display_name: value}, _ac);
       }
-      return helpers._populate(value, _ac);
+      return populate(value, _ac);
     });
     if (result.length === 2 && result[0] instanceof objects.Listing && result[0][0] instanceof objects.Submission &&
         result[1] instanceof objects.Listing) {
-      helpers._assign_proxy(result[0][0], {comments: result[1]});
+      assign_to_proxy(result[0][0], {comments: result[1]});
       return result[0][0];
     }
     return result;
   }
   return response_tree;
 };
-helpers._assign_proxy = (proxied_object, values) => {
+let assign_to_proxy = (proxied_object, values) => {
   /* The line below is equivalent to _.assign(this, response);, but _.assign ends up triggering warning messages when
   used on Proxies, since the patched globals from harmony-reflect aren't applied to lodash. This won't be a problem once
   Proxies are correctly implemented natively. https://github.com/tvcutsem/harmony-reflect#dependencies */
   _.forIn(values, (value, key) => {proxied_object[key] = value;});
 };
 
+let mix = (objects, mixin_methods) => {
+  objects.forEach(obj => {
+    _.assign(obj.prototype, mixin_methods);
+  });
+};
+mix([objects.Comment, objects.Submission], {
+  _vote (direction) {
+    return this.post({uri: 'api/vote', form: {dir: direction, id: this.name}});
+  },
+  upvote () {
+    return this._vote(1);
+  },
+  downvote () {
+    return this._vote(-1);
+  },
+  unvote () {
+    return this._vote(0);
+  },
+  save () {
+    return promise_wrap(this.post({uri: 'api/save', form: {id: this.name}}).then(() => {
+      this.saved = true;
+      return this;
+    }));
+  },
+  unsave () {
+    return promise_wrap(this.post({uri: 'api/unsave', form: {id: this.name}}).then(() => {
+      this.saved = false;
+      return this;
+    }));
+  },
+  distinguish ({status = true, sticky = false} = {}) {
+    return promise_wrap(this._ac.post({
+      uri: 'api/distinguish',
+      form: {api_type, how: status === true ? 'yes' : status === false ? 'no' : status, sticky, id: this.name}
+    }).then(response => {
+      assign_to_proxy(this, response.json.data.things[0]);
+      return this;
+    }));
+  },
+  undistinguish () {
+    return this.distinguish({status: false, sticky: false, id: this.name});
+  },
+  edit (updated_text) {
+    return promise_wrap(this.post({
+      uri: 'api/editusertext',
+      form: {api_type, text: updated_text, thing_id: this.name}
+    }).then(response => {
+      assign_to_proxy(this, response.json.data.things[0]);
+      return this;
+    }));
+  },
+  gild () {
+    return this.post({uri: `api/v1/gold/gild/${this.name}`});
+  },
+  delete () {
+    return this.post({uri: 'api/del', form: {id: this.name}});
+  },
+  set_inbox_replies_enabled(state) {
+    return this.post({uri: 'api/sendreplies', form: {state, id: this.name}});
+  },
+  enable_inbox_replies () {
+    return this.set_inbox_replies_enabled(true);
+  },
+  disable_inbox_replies () {
+    return this.set_inbox_replies_enabled(false);
+  }
+});
+mix([objects.Comment, objects.PrivateMessage, objects.Submission], {
+  remove ({spam: is_spam = false} = {}) {
+    return this.post({uri: 'api/remove', form: {spam: is_spam, id: this.name}});
+  },
+  mark_as_spam () {
+    return this.remove({spam: true, id: this.name});
+  },
+  approve () {
+    return this.post({uri: 'api/approve', form: {id: this.name}});
+  },
+  report ({reason, other_reason, site_reason} = {}) {
+    return this.post({
+      uri: 'api/report',
+      form: {api_type, reason, other_reason, site_reason, thing_id: this.name}
+    });
+  },
+  ignore_reports () {
+    return promise_wrap(this.post({uri: 'api/ignore_reports', form: {id: this.name}}).return(this));
+  },
+  unignore_reports () {
+    return promise_wrap(this.post({uri: 'api/unignore_reports', form: {id: this.name}}).return(this));
+  },
+  reply (text) {
+    return this.post({uri: 'api/comment',form: {api_type, text, thing_id: this.name}}).json.data.things[0];
+  }
+});
+
 snoowrap.objects = objects;
 snoowrap.helpers = helpers;
-assign_mixins(snoowrap);
 module.exports = snoowrap;

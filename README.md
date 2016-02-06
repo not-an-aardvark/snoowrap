@@ -8,7 +8,7 @@ A simple Node.js wrapper for the reddit API.
 
 Note: snoowrap uses the `Proxy` object introduced in ES6. Since Node has not yet deployed this as a default feature, you will need to run your project with the `--harmony-proxies` flag. E.g. `node --harmony-proxies yourProject.js`
 
-snoowrap is currently in development and is far from feature-complete.
+snoowrap is currently in development and is not yet feature-complete. See [here](https://not-an-aardvark.github.io/snoowrap) for full documentation.
 
 ### Features
 
@@ -72,7 +72,7 @@ async function do_example_things () {
 }
 ```
 
-For more examples of what can be done with snoowrap, take a look at the [test file](/not-an-aardvark/snoowrap/blob/master/test/snoowrap.spec.js).
+For more examples of what can be done with snoowrap, take a look at the [test file](https://github.com/not-an-aardvark/snoowrap/blob/master/test/snoowrap.spec.js).
 
 ___
 ### To build/run the tests independently:
