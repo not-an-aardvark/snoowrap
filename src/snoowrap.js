@@ -139,6 +139,12 @@ let snoowrap = class snoowrap {
       console.warn(...args);
     }
   }
+  /**
+  * Gets information on the requester's own user profile.
+  * @returns {objects.RedditUser} A RedditUser object corresponding to the requester's profile
+  * @memberof snoowrap
+  * @instance
+  */
   get_me () {
     return this.get('api/v1/me').then(result => {
       this.own_user_info = new objects.RedditUser(result, this, true);
@@ -395,7 +401,7 @@ let snoowrap = class snoowrap {
   the front page of reddit.
   * @param {object} [options={}]
   * @param {string} [options.time] Describes the timespan that posts should be retrieved from. Should be one of
-  <pre><code>hour, day, week, month, year, all</code></pre>
+  <code>hour, day, week, month, year, all</code>
   * @returns {Promise} A Listing containing the retrieved submissions
   * @memberof snoowrap
   * @instance
@@ -409,7 +415,7 @@ let snoowrap = class snoowrap {
   the front page of reddit.
   * @param {object} [options={}]
   * @param {string} [options.time] Describes the timespan that posts should be retrieved from. Should be one of
-  <pre><code>hour, day, week, month, year, all</code></pre>
+  <code>hour, day, week, month, year, all</code>
   * @returns {Promise} A Listing containing the retrieved submissions
   * @memberof snoowrap
   * @instance
@@ -467,8 +473,8 @@ objects.RedditContent = class RedditContent {
     * @function fetch
     * @returns {Promise} The updated version of this object with all of its fetched properties. This will update the object
     with all of its properties from reddit, and set has_fetched property to true. Once an object has been fetched, any
-    reference to an unknown property will simply return <pre><code>undefined</code></pre> instead of a Promise. Calling this
-    on an already-fetched object will have no effect; to refresh an object, use <pre><code>refresh()</code></pre> instead.
+    reference to an unknown property will simply return <code>undefined</code> instead of a Promise. Calling this
+    on an already-fetched object will have no effect; to refresh an object, use <code>refresh()</code> instead.
     * @memberof objects.RedditContent
     * @instance
     */
@@ -499,6 +505,11 @@ objects.RedditContent = class RedditContent {
   }
 };
 
+/**
+* A class representing a reddit comment
+* @extends RedditContent
+* @mixes CommentSubmissionMixin
+*/
 objects.Comment = class Comment extends objects.RedditContent {
   constructor (options, _ac, has_fetched) {
     super(options, _ac, has_fetched);
@@ -676,7 +687,7 @@ objects.Submission = class Submission extends objects.RedditContent {
   /**
   * Sets the suggested comment sort method on this Submission
   * @param {string} sort The suggested sort method. This should be one of
-  <pre><code>confidence, top, new, controversial, old, random, qa, blank</code></pre>
+  <code>confidence, top, new, controversial, old, random, qa, blank</code>
   * @returns {Promise} The updated version of this Submission
   */
   set_suggested_sort (sort) {
@@ -734,7 +745,7 @@ objects.Submission = class Submission extends objects.RedditContent {
   * @param {string} options.flair_template_id A flair template ID to use for this Submission. (This should be obtained
   beforehand using {@link get_link_flair_templates}.)
   * @param {string} [options.text] The flair text to use for the submission. (This is only necessary/useful if the given flair
-  template has the <pre><code>text_editable</code></pre> property set to <pre><code>true</code></pre>.)
+  template has the <code>text_editable</code> property set to <code>true</code>.)
   * @returns {Promise} A Promise that fulfills with this objects after the request is complete
   */
   select_link_flair (options) {
@@ -929,7 +940,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @param {string} options.flair_template_id A flair template ID to use. (This should be obtained beforehand using
   {@link get_user_flair_templates}.)
   * @param {string} [options.text=] The flair text to use. (This is only necessary/useful if the given flair
-  template has the <pre><code>text_editable</code></pre> property set to <pre><code>true</code></pre>.)
+  template has the <code>text_editable</code> property set to <code>true</code>.)
   * @returns {Promise} A Promise that fulfills when the request is complete
   */
   async select_my_flair (options) {
@@ -1021,7 +1032,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * Gets a Listing of top posts on this subreddit.
   * @param {object} [options={}]
   * @param {string} [options.time] Describes the timespan that posts should be retrieved from. Should be one of
-  <pre><code>hour, day, week, month, year, all</code></pre>
+  <code>hour, day, week, month, year, all</code>
   * @returns {Promise} A Listing containing the retrieved submissions
   */
   get_top (options) {
@@ -1031,7 +1042,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * Gets a Listing of controversial posts on this subreddit.
   * @param {object} [options={}]
   * @param {string} [options.time] Describes the timespan that posts should be retrieved from. Should be one of
-  <pre><code>hour, day, week, month, year, all</code></pre>
+  <code>hour, day, week, month, year, all</code>
   * @returns {Promise} A Listing containing the retrieved submissions
   * @memberof snoowrap
   * @instance
@@ -1057,7 +1068,7 @@ objects.PromoCampaign = class PromoCampaign extends objects.RedditContent {
 * A class representing a list of content. This is a subclass of the native Array object, so it has all the properties of
 an Array (length, forEach, etc.) in addition to some added methods. At any given time, each Listing has fetched a specific
 number of items, and that number will be its length. However, if a value greater than the length is accessed (e.g. with
-<pre><code>some_listing[very_high_index]</code></pre>), then the Listing will automatically fetch more items until either
+<code>some_listing[very_high_index]</code>), then the Listing will automatically fetch more items until either
 (a) it has an item at the requested index, or (b) it runs out of items to fetch. In the meantime, the expression that
 referenced the high index will return a Promise for that value, which will get resolved after the entries are fetched.
 */
@@ -1103,7 +1114,7 @@ objects.Listing = class Listing extends Array {
   * Fetches some more items and adds them to this Listing.
   * @param {number} [amount] The number of items to fetch. If this is not defined, one more "batch" of items is fetched;
   the size of a batch depends on the type of Listing this is, as well as the requester's reddit preferences.
-  * @returns {Promise} An updated version of this listing with <pre><code>amount</code></pre> items added on.
+  * @returns {Promise} An updated version of this listing with <code>amount</code> items added on.
   */
   fetch_more (amount = this.limit) {
     if (typeof amount !== 'number') {
@@ -1236,43 +1247,103 @@ let mix = (objects, mixin_methods) => {
     _.assign(obj.prototype, mixin_methods);
   });
 };
-mix([objects.Comment, objects.Submission], {
+mix([objects.Comment, objects.Submission], /** @mixin @namespace CommentSubmissionMixin */{
+  /**
+  * Casts a vote on this Comment or Submission.
+  * @private
+  * @param {number} direction The direction of the vote. (1 for an upvote, -1 for a downvote, 0 to remove a vote)
+  * @returns {Promise} A Promise that fulfills when the request is complete.
+  */
   _vote (direction) {
     return this.post({uri: 'api/vote', form: {dir: direction, id: this.name}});
   },
+  /**
+  * Upvotes this Comment or Submission.
+  * @returns {Promise} A Promise that fulfills when the request is complete.<br>
+  <strong>Note: votes must be cast by humans.</strong> That is, API clients proxying a human's action one-for-one are OK, but
+  bots deciding how to vote on content or amplifying a human's vote are not. See the
+  <a href="https://reddit.com/rules">reddit rules</a> for more details on what constitutes vote cheating. (This guideline
+  is quoted from <a href="https://www.reddit.com/dev/api#POST_api_vote">the official reddit API documentation page</a>.)
+  * @instance
+  */
   upvote () {
     return this._vote(1);
   },
+  /**
+  * Downvotes this Comment or Submission.
+  * @returns {Promise} A Promise that fulfills when the request is complete.<br>
+  <strong>Note: votes must be cast by humans.</strong> That is, API clients proxying a human's action one-for-one are OK, but
+  bots deciding how to vote on content or amplifying a human's vote are not. See the
+  <a href="https://reddit.com/rules">reddit rules</a> for more details on what constitutes vote cheating. (This guideline
+  is quoted from <a href="https://www.reddit.com/dev/api#POST_api_vote">the official reddit API documentation page</a>.)
+  */
   downvote () {
     return this._vote(-1);
   },
+  /**
+  * Removes any existing vote on this Comment or Submission.
+  * @returns {Promise} A Promise that fulfills when the request is complete.<br>
+  <strong>Note: votes must be cast by humans.</strong> That is, API clients proxying a human's action one-for-one are OK, but
+  bots deciding how to vote on content or amplifying a human's vote are not. See the
+  <a href="https://reddit.com/rules">reddit rules</a> for more details on what constitutes vote cheating. (This guideline
+  is quoted from <a href="https://www.reddit.com/dev/api#POST_api_vote">the official reddit API documentation page</a>.)
+  */
   unvote () {
     return this._vote(0);
   },
+  /**
+  * Saves this Comment or Submission (i.e. adds it to the list at reddit.com/saved)
+  * @returns {Promise} A Promise that fulfills when the request is complete
+  */
   save () {
     return promise_wrap(this.post({uri: 'api/save', form: {id: this.name}}).then(() => {
       this.saved = true;
       return this;
     }));
   },
+  /**
+  * Unsaves this item
+  * @returns {Promise} A Promise that fulfills when the request is complete
+  */
   unsave () {
     return promise_wrap(this.post({uri: 'api/unsave', form: {id: this.name}}).then(() => {
       this.saved = false;
       return this;
     }));
   },
+  /**
+  * Distinguishes this Comment or Submission with a sigil.
+  * @param {boolean|string} [$0.status=true] Determines how the item should be distinguished.
+  <code>true</code> (default) signifies that the item should be moderator-distinguished, and
+  <code>false</code> signifies that the item should not be distinguished. Passing a string (e.g.
+  <code>admin</code>) will cause the item to get distinguished with that string, if possible.
+  * @param {boolean} [$0.sticky=false] Determines whether this item should be stickied in addition to being
+  distinguished. (This only applies to comments; to sticky a submission, use the {@link objects.Submission.sticky} method.)
+  * @returns {Promise} A Promise that fulfills when the request is complete.
+  */
   distinguish ({status = true, sticky = false} = {}) {
-    return promise_wrap(this._ac.post({
-      uri: 'api/distinguish',
-      form: {api_type, how: status === true ? 'yes' : status === false ? 'no' : status, sticky, id: this.name}
-    }).then(response => {
+    return promise_wrap(this._ac.post({uri: 'api/distinguish', form: {
+        api_type,
+        how: status === true ? 'yes' : status === false ? 'no' : status,
+        sticky: sticky,
+        id: this.name
+    }}).then(response => {
       assign_to_proxy(this, response.json.data.things[0]);
       return this;
     }));
   },
+  /**
+  * Undistinguishes this Comment or Submission. Alias for distinguish({status: false})
+  * @returns {Promise} A Promise that fulfills when the request is complete.
+  */
   undistinguish () {
-    return this.distinguish({status: false, sticky: false, id: this.name});
+    return this.distinguish({status: false, sticky: false});
   },
+  /**
+  * Edits this Comment or Submission.
+  * @param {string} updated_text The updated markdown text to use
+  * @returns {Promise} A Promise that fulfills when this request is complete.
+  */
   edit (updated_text) {
     return promise_wrap(this.post({
       uri: 'api/editusertext',
