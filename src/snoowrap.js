@@ -192,6 +192,16 @@ let snoowrap = class snoowrap {
     return new snoowrap.objects.Submission({name: `t3_${submission_id}`}, this);
   }
   /**
+  * Gets a private message by ID
+  * @param {string} message_id The base36 ID of the message
+  * @returns {PrivateMessage} An unfetched PrivateMessage object for the requested message
+  * @memberof snoowrap
+  * @instance
+  */
+  get_message (message_id) {
+    return new snoowrap.objects.PrivateMessage({name: `t4_${message_id}`}, this);
+  }
+  /**
   * Gets a distribution of the requester's own karma distribution by subreddit.
   * @returns {Promise} A Promise for an object with karma information
   * @memberof snoowrap
@@ -433,6 +443,139 @@ let snoowrap = class snoowrap {
   }
   async _assign_flair ({css_class, link, name, text, subreddit_name}) {
     return await this.post({uri: `r/${await subreddit_name}/api/flair`, form: {api_type, name, text, link, css_class}});
+  }
+  get_unread_messages ({mark = false} = {}) {
+    return this.get({uri: 'message/unread', qs: {mark}});
+  }
+  get_inbox ({mark = false} = {}) {
+    return this.get({uri: 'message/inbox', qs: {mark}});
+  }
+  get_modmail ({mark = false} = {}) {
+    return this.get({uri: 'message/moderator', qs: {mark}});
+  }
+  get_sent_messages () {
+    return this.get({uri: 'message/sent'});
+  }
+  read_all_messages () {
+    return this.post({uri: 'api/read_all_messages'});
+  }
+  compose_message ({captcha, from_subreddit, captcha_iden, subject, text, to} = {}) {
+    if (to instanceof objects.RedditUser) {
+      to = to.name;
+    } else if (to instanceof objects.Subreddit) {
+      to = `/r/${to.display_name}`;
+    }
+    if (from_subreddit instanceof objects.Subreddit) {
+      from_subreddit = from_subreddit.display_name;
+    }
+    return this.post({uri: 'api/compose', form: {
+      api_type, captcha, iden: captcha_iden, from_sr: from_subreddit, subject, text, to
+    }});
+  }
+  get_oauth_scope_list () {
+    return this.get({uri: 'api/v1/scopes'});
+  }
+  search ({query, restrict_sr = true, sort, time, sr_detail, include_facets, type, syntax, subreddit}) {
+    if (subreddit instanceof objects.Subreddit) {
+      subreddit = subreddit.display_name;
+    }
+    return this.get({uri: `${subreddit ? `r/${subreddit}/` : ''}search`, qs: {
+      include_facets, q: query, restrict_sr, sort, sr_detail, syntax, t: time, type
+    }});
+  }
+  get_recommended_subreddits ({sr_names, omit_names}) {
+    return this.get({uri: `api/recommend/sr/${sr_names.join(',')}`, qs: {omit: omit_names.join(',')}});
+  }
+  search_subreddits ({exact = false, include_nsfw = true, query}) {
+    return this.post({uri: `api/search_reddit_names`, qs: {exact, include_over_18: include_nsfw, query}});
+  }
+  _create_or_edit_subreddit ({
+    allow_top = true,
+    captcha,
+    captcha_iden,
+    collapse_deleted_comments = false,
+    comment_score_hide_mins = 0,
+    description,
+    exclude_banned_modqueue = false,
+    'header-title': header_title,
+    hide_ads = true, // Only allowed for gold-exclusive subreddits
+    lang = 'en',
+    link_type = 'any',
+    name,
+    over_18 = false,
+    public_description,
+    public_traffic = false,
+    show_media = false,
+    spam_comments = 'high',
+    spam_links = 'high',
+    spam_selfposts = 'high',
+    sr,
+    submit_link_label = '',
+    submit_text_label = '',
+    submit_text = '',
+    suggested_comment_sort = 'confidence',
+    title,
+    type = 'public',
+    wiki_edit_age,
+    wiki_edit_karma,
+    wikimode = 'modonly'
+  }) {
+    return this.post({uri: 'api/siteadmin', form: {
+      allow_top, api_type, captcha, collapse_deleted_comments, comment_score_hide_mins, description, exclude_banned_modqueue,
+      'header-title': header_title, hide_ads, iden: captcha_iden, lang, link_type, name, over_18, public_description,
+      public_traffic, show_media, spam_comments, spam_links, spam_selfposts, sr, submit_link_label, submit_text,
+      submit_text_label, suggested_comment_sort, title, type, wiki_edit_age, wiki_edit_karma, wikimode
+    }});
+  }
+  /**
+  * Creates a new subreddit.
+  * @param {object} options
+  * @param {string} options.name The name of the new subreddit
+  * @param {string} options.title The text that should appear in the new header of the subreddit
+  * @param {string} options.public_description The text that appears with this subreddit on the search page, or on the
+  blocked-access page if this subreddit is private. (500 characters max)
+  * @param {string} options.description The sidebar text for the subreddit. (5120 characters max)
+  * @param {string} [options.submit_text=''] The text to show below the submission page (1024 characters max)
+  * @param {string} [options.lang='en'] The language of the subreddit (represented as an IETF language tag)
+  * @param {string} [options.type='public'] Determines who should be able to access the subreddit. This should be one of
+  <code>public, private, restricted, gold_restricted, gold_only, archived, employees_only</code>.
+  * @param {string} [options.link_type='any'] Determines what types of submissions are allowed on the subreddit. This should
+  be one of <code>any, link, self</code>.
+  * @param {string} [options.submit_link_label=undefined] Custom text to display on the button that submits a link. If
+  this is omitted, the default text will be displayed.
+  * @param {string} [options.submit_text_label=undefined] Custom text to display on the button that submits a selfpost. If
+  this is omitted, the default text will be displayed.
+  * @param {string} [options.wikimode='modonly'] Determines who can edit wiki pages on the subreddit. This should be one of
+  <code>modonly, anyone, disabled</code>.
+  * @param {number} [options.wiki_edit_karma=0] The minimum amount of subreddit karma needed for someone to edit this
+  subreddit's wiki. (This is only relevant if <code>options.wikimode</code> is set to <code>anyone</code>.)
+  * @param {number} [options.wiki_edit_age=0] The minimum account age (in days) needed for someone to edit this subreddit's
+  wiki. (This is only relevant if <code>options.wikimode</code> is set to <code>anyone</code>.)
+  * @param {string} [options.spam_links='high'] The spam filter strength for links on this subreddit. This should be one of
+  <code>low, high, all</code>.
+  * @param {string} [options.spam_selfposts='high'] The spam filter strength for selfposts on this subreddit. This should be
+  one of <code>low, high, all</code>.
+  * @param {string} [options.spam_comments='high'] The spam filter strength for comments on this subreddit. This should be one
+  of <code>low, high, all</code>.
+  * @param {boolean} [options.over_18=false] Determines whether this subreddit should be classified as NSFW
+  * @param {boolean} [options.allow_top=true] Determines whether the new subreddit should be able to appear in /r/all and
+  trending subreddits
+  * @param {boolean} [options.show_media=false] Determines whether image thumbnails should be enabled on this subreddit
+  * @param {boolean} [options.exclude_banned_modqueue=false] Determines whether posts by site-wide banned users should be
+  excluded from the modqueue.
+  * @param {boolean} [options.public_traffic=false] Determines whether the /about/traffic page for this subreddit should be
+  viewable by anyone.
+  * @param {boolean} [options.collapse_deleted_comments=false] Determines whether deleted and removed comments should be
+  collapsed by default
+  * @param {string} [options.suggested_comment_sort=undefined] The suggested comment sort for the subreddit. This should be
+  one of <code>confidence, top, new, controversial, old, random, qa</code>.If left blank, there will be no suggested sort,
+  which means that users will see the sort method that is set in their own preferences (usually <code>confidence</code>.)
+  * @returns {Promise} A Promise for the newly-created subreddit object.
+  * @memberof snoowrap
+  * @instance
+  */
+  create_subreddit (options) {
+    return this._create_or_edit_subreddit(options);
   }
 };
 /** A base class for content from reddit. With the expection of Listings, all content types extend this class. */
@@ -755,12 +898,61 @@ objects.Submission = class Submission extends objects.RedditContent {
   }
 };
 
+/**
+* A class representing a private message or a modmail.
+* @extends RedditContent
+*/
 objects.PrivateMessage = class PrivateMessage extends objects.RedditContent {
   constructor (options, _ac, has_fetched) {
     super(options, _ac, has_fetched);
   }
   get _uri () {
-    return `message/messages/${this.id}`;
+    return `message/messages/${this.name.slice(3)}`;
+  }
+  _transform_api_response (response_obj) {
+    return _.assign(helpers.find_message_in_tree(this.name, response_obj[0]), {full_message_tree: response_obj});
+  }
+  //TODO: Get rid of the repeated code here, most of these methods are exactly the same with the exception of the URIs
+  /**
+  * Blocks the author of this private message.
+  * @returns {Promise} A Promise that fulfills with this message after the request is complete
+  */
+  block_author () {
+    return promise_wrap(this.post({uri: 'api/block', form: {id: this.name}}).return(this));
+  }
+  /**
+  * Collapses this message (i.e. make it appear smaller when the HTML page is viewed).
+  * @returns {Promise} A Promise that fulfills with this message after the request is complete
+  */
+  collapse () {
+    return promise_wrap(this.post({uri: 'api/collapse_message', form: {id: this.name}}).return(this));
+  }
+  /**
+  * Unollapses this message (i.e. make it appear larger when the HTML page is viewed).
+  * @returns {Promise} A Promise that fulfills with this message after the request is complete
+  */
+  uncollapse () {
+    return promise_wrap(this.post({uri: 'api/uncollapse_message', form: {id: this.name}}).return(this));
+  }
+  /**
+  * Marks this message as read.
+  * @returns {Promise} A Promise that fulfills with this message after the request is complete
+  */
+  mark_as_read () {
+    return promise_wrap(this.post({uri: 'api/read_message', form: {id: this.name}}).return(this));
+  }
+  /**
+  * Marks this message as unread.
+  * @returns {Promise} A Promise that fulfills with this message after the request is complete
+  */
+  mark_as_unread () {
+    return promise_wrap(this.post({uri: 'api/unread_message', form: {id: this.name}}).return(this));
+  }
+  mute_author () {
+    return promise_wrap(this.post({uri: 'api/mute_message_author', form: {id: this.name}}).return(this));
+  }
+  unmute_author () {
+    return promise_wrap(this.post({uri: 'api/unmute_message_author', form: {id: this.name}}).return(this));
   }
 };
 
@@ -774,13 +966,6 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   }
   get _uri () {
     return `r/${this.display_name}/about`;
-  }
-  /**
-  * Gets the list of moderators on this subreddit.
-  * @returns {Promise} An Array of RedditUsers representing the moderators of this subreddit
-  */
-  get_moderators () {
-    return this._ac.get(`r/${this.display_name}/about/moderators`);
   }
   _delete_flair_templates ({flair_type}) {
     return this.post({uri: `r/${this.display_name}/api/clearflairtemplates`, form: {api_type, flair_type}});
@@ -898,8 +1083,8 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * Gets a Listing of all user flairs on this subreddit.
   * @returns {Promise} A Listing containing user flairs
   */
-  get_user_flair_list () {
-    return this.get({uri: `r/${this.display_name}/api/flairlist`}).users;
+  get_user_flair_list ({user}) {
+    return this.get({uri: `r/${this.display_name}/api/flairlist`, qs: {name: user}}).users;
   }
   /**
   * Configures the flair settings for this subreddit.
@@ -1050,6 +1235,81 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   get_controversial (options) {
     return this._ac.get_controversial(this.display_name, options);
   }
+  get_moderation_log ({mod, type} = {}) {
+    return this.get({uri: `r/${this.display_name}/about/log`, qs: {mod, type}});
+  }
+  get_reports ({only} = {}) {
+    return this.get({uri: `r/${this.display_name}/about/reports`, qs: {only}});
+  }
+  get_spam ({only} = {}) {
+    return this.get({uri: `r/${this.display_name}/about/spam`, qs: {only}});
+  }
+  get_modqueue ({only} = {}) {
+    return this.get({uri: `r/${this.display_name}/about/modqueue`, qs: {only}});
+  }
+  get_unmoderated ({only} = {}) {
+    return this.get({uri: `r/${this.display_name}/about/unmoderated`, qs: {only}});
+  }
+  get_edited ({only} = {}) {
+    return this.get({uri: `r/${this.display_name}/about/edited`, qs: {only}});
+  }
+  accept_moderator_invite () {
+    return this.post({uri: `r/${this.display_name}/api/accept_moderator_invite`, form: {api_type}});
+  }
+  async leave_contributor () {
+    return await this.post({uri: `api/leavecontributor`, form: {id: await this.name}});
+  }
+  async leave_moderator () {
+    return await this.post({uri: `api/leavemoderator`, form: {id: await this.name}});
+  }
+  get_subreddit_stylesheet () {
+    return this.get({uri: `r/${this.display_name}/stylesheet`, json: false, transform: _.identity});
+  }
+  search (options) {
+    return this._ac.search(_.assign(options, {subreddit: this, restrict_sr: true}));
+  }
+  get_banned_users ({user} = {}) {
+    return this.get({uri: `r/${this.display_name}/about/banned`, qs: {user}});
+  }
+  get_muted_users ({user} = {}) {
+    return this.get({uri: `r/${this.display_name}/about/muted`, qs: {user}});
+  }
+  get_wikibanned_users ({user} = {}) {
+    return this.get({uri: `r/${this.display_name}/about/wikibanned`, qs: {user}});
+  }
+  get_contributors ({user} = {}) {
+    return this.get({uri: `r/${this.display_name}/about/contributors`, qs: {user}});
+  }
+  get_wiki_contributors ({user} = {}) {
+    return this.get({uri: `r/${this.display_name}/about/wikicontributors`, qs: {user}});
+  }
+  /**
+  * Gets the list of moderators on this subreddit.
+  * @param {string} [$0.user=] The name of a user to find in the list
+  * @returns {Promise} An Array of RedditUsers representing the moderators of this subreddit
+  */
+  get_moderators ({user} = {}) {
+    return this.get({uri: `r/${this.display_name}/about/moderators`, qs: {user}});
+  }
+  delete_banner () {
+    return this.post({uri: `r/${this.display_name}/api/delete_sr_banner`, form: {api_type}});
+  }
+  delete_header () {
+    return this.post({uri: `r/${this.display_name}/api/delete_sr_header`, form: {api_type}});
+  }
+  delete_icon () {
+    return this.post({uri: `r/${this.display_name}/api/delete_sr_icon`, form: {api_type}});
+  }
+  delete_image ({image_name}) {
+    return this.post({uri: `r/${this.display_name}/api/delete_sr_image`, form: {api_type, img_name: image_name}});
+  }
+  get_subreddit_settings () {
+    return this.get({uri: `r/${this.display_name}/about/edit`});
+  }
+  async edit_settings (options) {
+    let current_settings = await this.get_subreddit_settings();
+    return this._ac._create_or_edit_subreddit(_.assign(current_settings, options, {sr: this.display_name}));
+  }
 };
 
 objects.Trophy = class Trophy extends objects.RedditContent {
@@ -1108,7 +1368,7 @@ objects.Listing = class Listing extends Array {
     if (this._is_comment_list) {
       return !this._more || !this._more.children.length;
     }
-    return !!this.uri && this.after === null && this.before === null;
+    return !this.uri || this.after === null && this.before === null;
   }
   /**
   * Fetches some more items and adds them to this Listing.
@@ -1192,17 +1452,9 @@ objects.UserList = class UserList {
   }
 };
 
-objects.KarmaList = class KarmaList extends objects.RedditContent {
-  constructor (options, _ac) {
-    super(options, _ac);
-  }
-};
-
-objects.TrophyList = class TrophyList extends objects.RedditContent {
-  constructor (options, _ac) {
-    super(options, _ac);
-  }
-};
+objects.KarmaList = class KarmaList extends objects.RedditContent {};
+objects.TrophyList = class TrophyList extends objects.RedditContent {};
+objects.SubredditSettings = class SubredditSettings extends objects.RedditContent {};
 
 let populate = (response_tree, _ac) => {
   if (typeof response_tree === 'object' && response_tree !== null) {
@@ -1396,6 +1648,15 @@ mix([objects.Comment, objects.PrivateMessage, objects.Submission], {
     return this.post({uri: 'api/comment',form: {api_type, text, thing_id: this.name}}).json.data.things[0];
   }
 });
+
+helpers.find_message_in_tree = (desired_message_name, current_message) => {
+  if (current_message.name === desired_message_name) {
+    return current_message;
+  }
+  if (current_message.replies) {
+    return _.find(current_message.replies.map(_.partial(helpers.find_message_in_tree, desired_message_name)));
+  }
+};
 
 snoowrap.objects = objects;
 snoowrap.helpers = helpers;
