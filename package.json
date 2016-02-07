@@ -51,6 +51,8 @@
     "chai": "^3.5.0",
     "chai-as-promised": "^5.2.0",
     "documentation": "^4.0.0-beta",
+    "ink-docstrap": "^1.1.1",
+    "jsdoc": "^3.4.0",
     "mocha": "^2.4.5"
   }
 }

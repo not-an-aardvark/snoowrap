@@ -510,7 +510,7 @@ objects.RedditContent = class RedditContent {
 * @extends RedditContent
 * @mixes CommentSubmissionMixin
 */
-objects.Comment = class Comment extends objects.RedditContent {
+objects.Comment = class Comment extends objects.RedditContent /** @borrows SubredditContent */{
   constructor (options, _ac, has_fetched) {
     super(options, _ac, has_fetched);
   }
@@ -1247,7 +1247,7 @@ let mix = (objects, mixin_methods) => {
     _.assign(obj.prototype, mixin_methods);
   });
 };
-mix([objects.Comment, objects.Submission], /** @mixin @namespace CommentSubmissionMixin */{
+mix([objects.Comment, objects.Submission], /** @namespace SubredditContent */ {
   /**
   * Casts a vote on this Comment or Submission.
   * @private
@@ -1259,11 +1259,12 @@ mix([objects.Comment, objects.Submission], /** @mixin @namespace CommentSubmissi
   },
   /**
   * Upvotes this Comment or Submission.
-  * @returns {Promise} A Promise that fulfills when the request is complete.<br>
+  * @returns {Promise} A Promise that fulfills when the request is complete.<br><br>
   <strong>Note: votes must be cast by humans.</strong> That is, API clients proxying a human's action one-for-one are OK, but
   bots deciding how to vote on content or amplifying a human's vote are not. See the
   <a href="https://reddit.com/rules">reddit rules</a> for more details on what constitutes vote cheating. (This guideline
   is quoted from <a href="https://www.reddit.com/dev/api#POST_api_vote">the official reddit API documentation page</a>.)
+  * @memberof SubredditContent
   * @instance
   */
   upvote () {
@@ -1271,7 +1272,7 @@ mix([objects.Comment, objects.Submission], /** @mixin @namespace CommentSubmissi
   },
   /**
   * Downvotes this Comment or Submission.
-  * @returns {Promise} A Promise that fulfills when the request is complete.<br>
+  * @returns {Promise} A Promise that fulfills when the request is complete.<br><br>
   <strong>Note: votes must be cast by humans.</strong> That is, API clients proxying a human's action one-for-one are OK, but
   bots deciding how to vote on content or amplifying a human's vote are not. See the
   <a href="https://reddit.com/rules">reddit rules</a> for more details on what constitutes vote cheating. (This guideline
@@ -1282,7 +1283,8 @@ mix([objects.Comment, objects.Submission], /** @mixin @namespace CommentSubmissi
   },
   /**
   * Removes any existing vote on this Comment or Submission.
-  * @returns {Promise} A Promise that fulfills when the request is complete.<br>
+  * @mixes CommentSubmissionMixin
+  * @returns {Promise} A Promise that fulfills when the request is complete.<br><br>
   <strong>Note: votes must be cast by humans.</strong> That is, API clients proxying a human's action one-for-one are OK, but
   bots deciding how to vote on content or amplifying a human's vote are not. See the
   <a href="https://reddit.com/rules">reddit rules</a> for more details on what constitutes vote cheating. (This guideline
@@ -1370,20 +1372,19 @@ mix([objects.Comment, objects.Submission], /** @mixin @namespace CommentSubmissi
   }
 });
 mix([objects.Comment, objects.PrivateMessage, objects.Submission], {
-  remove ({spam: is_spam = false} = {}) {
-    return this.post({uri: 'api/remove', form: {spam: is_spam, id: this.name}});
+  remove ({spam = false} = {}) {
+    return promise_wrap(this.post({uri: 'api/remove', form: {spam, id: this.name}}).return(this));
   },
   mark_as_spam () {
-    return this.remove({spam: true, id: this.name});
+    return promise_wrap(this.remove({spam: true, id: this.name}).return(this));
   },
   approve () {
-    return this.post({uri: 'api/approve', form: {id: this.name}});
+    return promise_wrap(this.post({uri: 'api/approve', form: {id: this.name}}).return(this));
   },
   report ({reason, other_reason, site_reason} = {}) {
-    return this.post({
-      uri: 'api/report',
-      form: {api_type, reason, other_reason, site_reason, thing_id: this.name}
-    });
+    return promise_wrap(this.post({uri: 'api/report',form: {
+      api_type, reason, other_reason, site_reason, thing_id: this.name
+    }}).return(this));
   },
   ignore_reports () {
     return promise_wrap(this.post({uri: 'api/ignore_reports', form: {id: this.name}}).return(this));

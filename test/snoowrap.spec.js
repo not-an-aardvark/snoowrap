@@ -273,36 +273,32 @@ describe('snoowrap', function () {
       expect(comment.distinguished).to.be.null;
     });
     it('can save/unsave a post', async () => {
-      await post.save();
-      expect(await post.refresh().saved).to.be.true;
-      await post.unsave();
-      expect(await post.refresh().saved).to.be.false;
+      await post.save().refresh();
+      expect(post.saved).to.be.true;
+      await post.unsave().refresh();
+      expect(post.saved).to.be.false;
     });
     it('can save/unsave a comment', async () => {
-      await comment.save();
-      expect(await comment.refresh().saved).to.be.true;
-      await comment.unsave();
-      expect(await comment.refresh().saved).to.be.false;
+      await comment.save().refresh();
+      expect(comment.saved).to.be.true;
+      await comment.unsave().refresh();
+      expect(await comment.saved).to.be.false;
     });
     it('can remove/approve a post', async () => {
-      await post.remove();
-      await post.refresh();
+      await post.remove().refresh();
       expect(post.banned_by).to.not.be.null;
       expect(post.approved_by).to.be.null;
-      await post.approve();
-      await post.refresh();
+      await post.approve().refresh();
       expect(post.banned_by).to.be.null;
-      expect(await post.refresh().approved_by).to.not.be.null;
+      expect(post.approved_by).to.not.be.null;
     });
     it('can remove/approve a comment', async () => {
-      await comment.remove();
-      await comment.refresh();
+      await comment.remove().refresh();
       expect(comment.banned_by).to.not.be.null;
       expect(comment.approved_by).to.be.null;
-      await comment.approve();
-      await comment.refresh();
+      await comment.approve().refresh();
       expect(comment.banned_by).to.be.null;
-      expect(await comment.refresh().approved_by).to.not.be.null;
+      expect(comment.approved_by).to.not.be.null;
     });
   });
 
