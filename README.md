@@ -65,14 +65,14 @@ async function do_example_things () {
   // snoowrap will also handle comment tree pagination for you, so you can almost just access them as if they were regular objects. In this example, it is used to moderate comments
   example_post = r.get_submission('2np694');
   for (let comment in (await comments.fetch_all())) { // iterate over all the top-level comments
-    if (comment.body.match(/bannedword1|bannedord2|bannedword3/)) {
+    if (comment.body.match(/bannedword1|bannedword2|bannedword3/)) {
       comment.remove(); // As a moderator, remove any comments that contain selected bad words
     }
   }
 }
 ```
 
-For more examples of what can be done with snoowrap, take a look at the [test file](https://github.com/not-an-aardvark/snoowrap/blob/master/test/snoowrap.spec.js).
+For more examples of what can be done with snoowrap, take a look at the [documentation](https://not-an-aardvark.github.io/snoowrap) or the [test file](https://github.com/not-an-aardvark/snoowrap/blob/master/test/snoowrap.spec.js).
 
 ___
 ### To build/run the tests independently:
