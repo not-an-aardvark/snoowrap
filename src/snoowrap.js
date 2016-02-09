@@ -1,21 +1,21 @@
 'use strict';
 require('harmony-reflect'); // temp dependency until v8 implements Proxies properly
-let Promise = require('bluebird');
-let _ = require('lodash');
-let request = require('request-promise').defaults({json: true});
-let moment = require('moment');
-let promise_wrap = require('promise-chains');
-let util = require('util');
-let constants = require('./constants');
-let errors = require('./errors');
-let default_config = require('./default_config');
+const Promise = require('bluebird');
+const _ = require('lodash');
+const request = require('request-promise').defaults({json: true});
+const moment = require('moment');
+const promise_wrap = require('promise-chains');
+const util = require('util');
+const constants = require('./constants');
+const errors = require('./errors');
+const default_config = require('./default_config');
 const api_type = 'json';
-let objects = {};
-let helpers = {};
+const objects = {};
+const helpers = require('./helpers');
 
 
 /** The class for a snoowrap requester */
-let snoowrap = class snoowrap {
+const snoowrap = class snoowrap {
   /**
   * Constructs a new requester. This will be necessary if you want to do anything.
   * @param {object} options A set of credentials to authenticate with
@@ -43,7 +43,7 @@ let snoowrap = class snoowrap {
     });
   }
   async _update_access_token () {
-    let token_info = await this._base_client_requester.post({
+    const token_info = await this._base_client_requester.post({
       url: `https://www.${this.config.endpoint_domain}/api/v1/access_token`,
       form: {grant_type: 'refresh_token', refresh_token: this.refresh_token}
     });
@@ -52,7 +52,7 @@ let snoowrap = class snoowrap {
     this.scope = token_info.scope.split(' ');
   }
   get _oauth_requester () {
-    let default_requester = request.defaults({
+    const default_requester = request.defaults({
       headers: {'user-agent': this.user_agent},
       baseUrl: `https://oauth.${this.config.endpoint_domain}`,
       qs: {raw_json: 1}, // This tells reddit to unescape html characters, e.g. it will send '<' instead of '&lt;'
@@ -60,16 +60,16 @@ let snoowrap = class snoowrap {
       transform: (body, response) => {
         this.ratelimit_remaining = response.headers['x-ratelimit-remaining'];
         this.ratelimit_reset_point = moment().add(response.headers['x-ratelimit-reset'], 'seconds');
-        let populated = populate(body, this);
+        const populated = helpers._populate(body, this);
         if (populated instanceof objects.Listing) {
           populated.uri = response.request.uri.path;
         }
         return populated;
       }
     });
-    let handle_request = async (requester, self, args, attempts = 0) => {
+    const handle_request = async (requester, self, args, attempts = 0) => {
       if (this.ratelimit_remaining < 1 && this.ratelimit_reset_point.isAfter()) {
-        let seconds_until_expiry = this.ratelimit_reset_point.diff(moment(), 'seconds');
+        const seconds_until_expiry = this.ratelimit_reset_point.diff(moment(), 'seconds');
         if (this.config.continue_after_ratelimit_error) {
           this.warn(errors.RateLimitWarning(seconds_until_expiry));
           await Promise.delay(this.ratelimit_reset_point.diff());
@@ -87,8 +87,10 @@ let snoowrap = class snoowrap {
       }
       this.throttle = Promise.delay(this.config.request_delay);
 
-      // If the access token has expired (or will expire in the next 10 seconds), refresh it.
-      let update = (!this.access_token || this.token_expiration.isBefore()) ? this._update_access_token() : Promise.resolve();
+      /* If the access token has expired (or will expire in the next 10 seconds), refresh it.
+      An `update` Promise is created instead of just awaiting the update because if reddit throws an error, it usually needs
+      to get handled the same way as a normaly request. */
+      const update = !this.access_token || this.token_expiration.isBefore() ? this._update_access_token() : Promise.resolve();
 
       // Send the request and return the response.
       return await update.then(() => (requester.defaults({auth: {bearer: this.access_token}}).apply(self, args))).catch(e => {
@@ -101,6 +103,9 @@ let snoowrap = class snoowrap {
       });
     };
     return new Proxy(default_requester, {apply: (...args) => (promise_wrap(handle_request(...args)))});
+  }
+  _new_object(object_type, content, has_fetched) {
+    return new objects[object_type](content, this, has_fetched);
   }
   _revoke_token (token) {
     return this._base_client_requester.post({
@@ -121,9 +126,9 @@ let snoowrap = class snoowrap {
   inspect () {
     // Hide confidential information (tokens, client IDs, etc.) from the console.log output.
     // Also, hide some things that aren't converted to text well.
-    let keys_for_hidden_values = ['client_secret', 'refresh_token', 'access_token'];
-    let hidden_keys = ['throttle'];
-    let formatted = util.inspect(_(this).omit(hidden_keys).mapValues((value, key) => {
+    const keys_for_hidden_values = ['client_secret', 'refresh_token', 'access_token'];
+    const hidden_keys = ['throttle'];
+    const formatted = util.inspect(_(this).omit(hidden_keys).mapValues((value, key) => {
       if (_.includes(keys_for_hidden_values, key)) {
         return value && '(redacted)';
       }
@@ -159,7 +164,7 @@ let snoowrap = class snoowrap {
   * @instance
   */
   get_user (name) {
-    return new snoowrap.objects.RedditUser({name}, this);
+    return this._new_object('RedditUser', {name});
   }
   /**
   * Gets information on a comment with a given id.
@@ -169,17 +174,17 @@ let snoowrap = class snoowrap {
   * @instance
   */
   get_comment (comment_id) {
-    return new snoowrap.objects.Comment({name: `t1_${comment_id}`}, this);
+    return this._new_object('Comment', {name: `t1_${comment_id}`});
   }
   /**
   * Gets information on a given subreddit.
-  * @param {string} name - The name of the subreddit (e.g. 'AskReddit')
+  * @param {string} display_name - The name of the subreddit (e.g. 'AskReddit')
   * @returns {Subreddit} An unfetched Subreddit object for the requested subreddit
   * @memberof snoowrap
   * @instance
   */
-  get_subreddit (name) {
-    return new snoowrap.objects.Subreddit({display_name: name}, this);
+  get_subreddit (display_name) {
+    return this._new_object('Subreddit', {display_name});
   }
   /**
   * Gets information on a given submission.
@@ -189,7 +194,7 @@ let snoowrap = class snoowrap {
   * @instance
   */
   get_submission (submission_id) {
-    return new snoowrap.objects.Submission({name: `t3_${submission_id}`}, this);
+    return this._new_object('Submission', {name: `t3_${submission_id}`});
   }
   /**
   * Gets a private message by ID
@@ -199,7 +204,7 @@ let snoowrap = class snoowrap {
   * @instance
   */
   get_message (message_id) {
-    return new snoowrap.objects.PrivateMessage({name: `t4_${message_id}`}, this);
+    return this._new_object('PrivateMessage', {name: `t4_${message_id}`});
   }
   /**
   * Gets a distribution of the requester's own karma distribution by subreddit.
@@ -640,7 +645,7 @@ objects.RedditContent = class RedditContent {
     return this.fetch();
   }
   inspect () {
-    let public_properties = _.omitBy(this, (value, key) => (key.startsWith('_') || typeof value === 'function'));
+    const public_properties = _.omitBy(this, (value, key) => (key.startsWith('_') || typeof value === 'function'));
     return `<${constants.MODULE_NAME}.objects.${this.constructor.name}> ${util.inspect(public_properties)}`;
   }
   _transform_api_response (response_object) {
@@ -658,9 +663,9 @@ objects.Comment = class Comment extends objects.RedditContent /** @borrows Subre
     super(options, _ac, has_fetched);
   }
   _transform_api_response (response_obj) {
-    let replies_uri = `comments/${response_obj[0].link_id.slice(3)}`;
-    let replies_query = {comment: this.name.slice(3)};
-    let _transform = item => (item.comments[0].replies);
+    const replies_uri = `comments/${response_obj[0].link_id.slice(3)}`;
+    const replies_query = {comment: this.name.slice(3)};
+    const _transform = item => (item.comments[0].replies);
     response_obj[0].replies = new objects.Listing({uri: replies_uri, query: replies_query, _transform}, this._ac);
     return response_obj[0];
   }
@@ -1070,7 +1075,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @returns {Promise} A Promise that fulfills when the request is complete
   */
   set_multiple_user_flairs (flair_array) {
-    let requests = [];
+    const requests = [];
     while (flair_array.length > 0) {
       // The endpoint only accepts at most 100 lines of csv at a time, so split the array into chunks of 100.
       requests.push(this._set_flair_from_csv(flair_array.splice(0, 100).map(item =>
@@ -1307,7 +1312,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
     return this.get({uri: `r/${this.display_name}/about/edit`});
   }
   async edit_settings (options) {
-    let current_settings = await this.get_subreddit_settings();
+    const current_settings = await this.get_subreddit_settings();
     return this._ac._create_or_edit_subreddit(_.assign(current_settings, options, {sr: this.display_name}));
   }
 };
@@ -1337,7 +1342,7 @@ objects.Listing = class Listing extends Array {
       uri, method, after, before, _is_comment_list = false} = {}, _ac) {
     super();
     _.assign(this, children);
-    let constant_params = _.assign(query, {show: show_all ? 'all' : undefined, limit});
+    const constant_params = _.assign(query, {show: show_all ? 'all' : undefined, limit});
     this._ac = _ac;
     this.uri = uri;
     this.method = method;
@@ -1392,9 +1397,9 @@ objects.Listing = class Listing extends Array {
     return this._fetch_more_regular(amount).return(this);
   }
   async _fetch_more_regular (amount) {
-    let limit_for_request = Math.min(amount, this.limit) || this.limit;
-    let request_params = {qs: {after: this.after, before: this.before, limit: limit_for_request}};
-    let response = await this._requester(request_params).then(this._transform);
+    const limit_for_request = Math.min(amount, this.limit) || this.limit;
+    const request_params = {qs: {after: this.after, before: this.before, limit: limit_for_request}};
+    const response = await this._requester(request_params).then(this._transform);
     this.push(..._.toArray(response));
     this.before = response.before;
     this.after = response.after;
@@ -1404,7 +1409,7 @@ objects.Listing = class Listing extends Array {
   within a listing, reddit sends the last comment in the list as as a `more` object, with links to all the remaining comments
   in the thread. */
   async _fetch_more_comments (...args) {
-    let new_comments = this._more ? await this._more.fetch_more(...args) : [];
+    const new_comments = this._more ? await this._more.fetch_more(...args) : [];
     this.push(..._.toArray(new_comments));
     return new_comments;
   }
@@ -1435,11 +1440,11 @@ objects.more = class more extends objects.RedditContent {
     if (amount <= 0 || this.children.length === 0) {
       return [];
     }
-    let ids_for_this_request = this.children.splice(0, Math.min(amount, 100)).map(id => (`t1_${id}`));
+    const ids_for_this_request = this.children.splice(0, Math.min(amount, 100)).map(id => (`t1_${id}`));
     // Requests are capped at 100 comments. Send lots of requests recursively to get the comments, then concatenate them.
     // (This speed-requesting is only possible with comment listings since the entire list of ids is present initially.)
-    let promise_for_this_batch = this.get({uri: 'api/info', qs: {id: ids_for_this_request.join(',')}});
-    let promise_for_remaining_items = this.fetch_more(amount - ids_for_this_request.length);
+    const promise_for_this_batch = this.get({uri: 'api/info', qs: {id: ids_for_this_request.join(',')}});
+    const promise_for_remaining_items = this.fetch_more(amount - ids_for_this_request.length);
     return _.toArray(await promise_for_this_batch).concat(await promise_for_remaining_items);
   }
 };
@@ -1456,45 +1461,14 @@ objects.KarmaList = class KarmaList extends objects.RedditContent {};
 objects.TrophyList = class TrophyList extends objects.RedditContent {};
 objects.SubredditSettings = class SubredditSettings extends objects.RedditContent {};
 
-let populate = (response_tree, _ac) => {
-  if (typeof response_tree === 'object' && response_tree !== null) {
-    // Map {kind: 't2', data: {name: 'some_username', ... }} to a RedditUser (e.g.) with the same properties
-    if (_.keys(response_tree).length === 2 && response_tree.kind) {
-      let remainder_of_tree = populate(response_tree.data, _ac);
-      if (constants.KINDS[response_tree.kind]) {
-        return new objects[constants.KINDS[response_tree.kind]](remainder_of_tree, _ac, true);
-      }
-      _ac.warn(`Unknown type ${response_tree.kind}. This may be a bug; please report it at ${constants.ISSUE_REPORT_LINK}.`);
-      return remainder_of_tree;
-    }
-    let mapFunction = Array.isArray(response_tree) ? _.map : _.mapValues;
-    let result = mapFunction(response_tree, (value, key) => {
-      // Map {..., author: 'some_username', ...} to {..., author: RedditUser {}, ... } (e.g.)
-      if (_.includes(constants.USER_KEYS, key) && value !== null) {
-        return new objects.RedditUser({name: value}, _ac);
-      }
-      if (_.includes(constants.SUBREDDIT_KEYS, key) && value !== null) {
-        return new objects.Subreddit({display_name: value}, _ac);
-      }
-      return populate(value, _ac);
-    });
-    if (result.length === 2 && result[0] instanceof objects.Listing && result[0][0] instanceof objects.Submission &&
-        result[1] instanceof objects.Listing) {
-      assign_to_proxy(result[0][0], {comments: result[1]});
-      return result[0][0];
-    }
-    return result;
-  }
-  return response_tree;
-};
-let assign_to_proxy = (proxied_object, values) => {
+const assign_to_proxy = (proxied_object, values) => {
   /* The line below is equivalent to _.assign(this, response);, but _.assign ends up triggering warning messages when
   used on Proxies, since the patched globals from harmony-reflect aren't applied to lodash. This won't be a problem once
   Proxies are correctly implemented natively. https://github.com/tvcutsem/harmony-reflect#dependencies */
   _.forIn(values, (value, key) => {proxied_object[key] = value;});
 };
 
-let mix = (objects, mixin_methods) => {
+const mix = (objects, mixin_methods) => {
   objects.forEach(obj => {
     _.assign(obj.prototype, mixin_methods);
   });
@@ -1648,15 +1622,6 @@ mix([objects.Comment, objects.PrivateMessage, objects.Submission], {
     return this.post({uri: 'api/comment',form: {api_type, text, thing_id: this.name}}).json.data.things[0];
   }
 });
-
-helpers.find_message_in_tree = (desired_message_name, current_message) => {
-  if (current_message.name === desired_message_name) {
-    return current_message;
-  }
-  if (current_message.replies) {
-    return _.find(current_message.replies.map(_.partial(helpers.find_message_in_tree, desired_message_name)));
-  }
-};
 
 snoowrap.objects = objects;
 snoowrap.helpers = helpers;
