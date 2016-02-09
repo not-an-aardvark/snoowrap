@@ -1,4 +1,5 @@
 module.exports = {
+  // SCREAMING_SNAKE_CASE MAKES EVERYTHING SEEM I'M SHOUTING AAAAAAAA
   MODULE_NAME: 'snoowrap',
   ISSUE_REPORT_LINK: require('../package.json').bugs.url,
   API_RULES_LINK: 'https://github.com/reddit/reddit/wiki/API',

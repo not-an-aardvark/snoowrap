@@ -1,10 +1,10 @@
 'use strict';
-let expect = require('chai').use(require('chai-as-promised')).expect;
-let Promise = require('bluebird');
-let _ = require('lodash');
-let moment = require('moment');
-let snoowrap = require('../src/snoowrap');
-let errors = require('../src/errors');
+const expect = require('chai').use(require('chai-as-promised')).expect;
+const Promise = require('bluebird');
+const _ = require('lodash');
+const moment = require('moment');
+const snoowrap = require('../src/snoowrap');
+const errors = require('../src/errors');
 describe('snoowrap', function () {
   this.timeout(10000);
   let r;
@@ -88,42 +88,42 @@ describe('snoowrap', function () {
       expect(await submission.comments[6].body).to.equal('pumpkin pie');
     });
     it('can get a random submission from a particular subreddit', async () => {
-      let random_post = await r.get_subreddit('gifs').get_random_submission();
+      const random_post = await r.get_subreddit('gifs').get_random_submission();
       expect(random_post).to.be.an.instanceof(snoowrap.objects.Submission);
       expect(random_post.subreddit.display_name).to.equal('gifs');
     });
     it('can get a random submission from any subreddit', async () => {
-      let random_post = await r.get_random_submission();
+      const random_post = await r.get_random_submission();
       expect(random_post).to.be.an.instanceof(snoowrap.objects.Submission);
     });
   });
 
   describe('getting a list of posts', () => {
     it('can get hot posts from the front page', async () => {
-      let posts = await r.get_hot();
+      const posts = await r.get_hot();
       expect(posts).to.be.an.instanceof(snoowrap.objects.Listing);
       expect(posts).to.have.length.above(0).and.at.most(100);
       await posts.fetch_more(101);
       expect(posts).to.have.length.above(100);
     });
     it('can get new posts from the front page', async () => {
-      let posts = await r.get_new();
+      const posts = await r.get_new();
       expect(moment.unix(posts[0].created_utc).add(30, 'minutes').isAfter()).to.be.true;
       // i.e. the first post should be newer than 1 hour old, to be sure that this is actually the 'new' listing
     });
     it('can get top posts from the front page or a subreddit given a certain timespan', async () => {
-      let top_alltime = await r.get_subreddit('all').get_top({time: 'all'})[0];
-      let top_alltime_v2 = await r.get_top('all', {time: 'all'})[0];
+      const top_alltime = await r.get_subreddit('all').get_top({time: 'all'})[0];
+      const top_alltime_v2 = await r.get_top('all', {time: 'all'})[0];
       expect(top_alltime.name).to.eql(top_alltime_v2.name);
       expect(top_alltime.ups).to.be.above(50000);
-      let top_in_last_day = await r.get_top({time: 'day'})[0];
+      const top_in_last_day = await r.get_top({time: 'day'})[0];
       expect(moment.unix(top_in_last_day.created_utc).add(24, 'hours').isAfter()).to.be.true;
     });
   });
 
   describe('self-property fetching', () => {
     it('gets information from the requester\'s own profile', async () => {
-      let me = await r.get_me();
+      const me = await r.get_me();
       expect(me.name).to.equal(r.own_user_info.name); // (this doesn't necessarily mean that the name is correct)
       expect(me.name).to.be.a('string');
     });
@@ -131,13 +131,13 @@ describe('snoowrap', function () {
       expect(await r.get_karma()).to.be.an.instanceof(snoowrap.objects.KarmaList);
     });
     it('gets current preferences', async () => {
-      let prefs = await r.get_preferences();
+      const prefs = await r.get_preferences();
       expect(prefs.lang).to.be.a('string');
     });
     it('modifies current preferences', async () => {
-      let current_prefs = await r.get_preferences().min_link_score;
+      const current_prefs = await r.get_preferences().min_link_score;
       await r.update_preferences({min_link_score: current_prefs - 1});
-      let fixed_prefs = await r.get_preferences().min_link_score;
+      const fixed_prefs = await r.get_preferences().min_link_score;
       expect(fixed_prefs).not.to.equal(current_prefs);
       // (Fix the preferences afterwards, since I'd rather this value not decrease every time I run these tests)
       await r.update_preferences({min_link_score: current_prefs});
@@ -155,9 +155,9 @@ describe('snoowrap', function () {
       expect(await r.check_captcha_requirement()).to.be.a('boolean');
     });
     it('can fetch a new captcha on request', async () => {
-      let iden = await r.get_new_captcha_identifier();
+      const iden = await r.get_new_captcha_identifier();
       expect(iden).to.be.a('string');
-      let image = await r.get_captcha_image(iden);
+      const image = await r.get_captcha_image(iden);
       expect(image).to.be.ok;
     });
   });
@@ -168,22 +168,22 @@ describe('snoowrap', function () {
       sub = r.get_subreddit('snoowrap_testing');
     });
     it('can add/delete/fetch user flair templates', async () => {
-      let text = moment().format(); // Use the current timestamp as the flair text to make it easy to distinguish from others
+      const text = moment().format(); // Use the current timestamp as the flair text to make it easy to distinguish from others
       await sub.create_user_flair_template({text, css_class: ''});
-      let added_flair = _.last(await sub.get_user_flair_templates());
+      const added_flair = _.last(await sub.get_user_flair_templates());
       expect(added_flair.flair_text).to.equal(text);
       await sub.delete_flair_template(added_flair);
-      let user_flairs_afterwards = await sub.get_user_flair_templates();
+      const user_flairs_afterwards = await sub.get_user_flair_templates();
       expect(user_flairs_afterwards.length === 0 || _.last(user_flairs_afterwards).flair_text !== text).to.be.true;
     });
     it('can add/delete/fetch link flair templates', async () => {
-      let text = moment().format();
+      const text = moment().format();
       await sub.create_link_flair_template({text, css_class: '', text_editable: true});
       // Use a random link on the sub -- it doesn't seem to be possible to get the link flair options without providing a link
-      let added_flair = _.last(await sub._get_flair_options({link: 't3_43qlu8'}).choices);
+      const added_flair = _.last(await sub._get_flair_options({link: 't3_43qlu8'}).choices);
       expect(added_flair.flair_text).to.equal(text);
       await sub.delete_flair_template(added_flair);
-      let link_flairs_afterwards= await sub._get_flair_options({link: 't3_43qlu8'}).choices;
+      const link_flairs_afterwards= await sub._get_flair_options({link: 't3_43qlu8'}).choices;
       expect(link_flairs_afterwards.length === 0 || _.last(link_flairs_afterwards).flair_text !== text).to.be.true;
     });
     it('can delete all user flair templates', async () => {
@@ -203,8 +203,8 @@ describe('snoowrap', function () {
       expect(await await sub._get_flair_options({link: 't3_43qlu8'}).choices).to.eql([]);
     });
     it('can change multiple user flairs at once', async () => {
-      let naa_flair = 'not_an_aardvark\'s flair';
-      let aaa_flair = 'actually_an_aardvark\'s flair';
+      const naa_flair = 'not_an_aardvark\'s flair';
+      const aaa_flair = 'actually_an_aardvark\'s flair';
       await sub.set_multiple_user_flairs([
         {name: 'not_an_aardvark', text: naa_flair},
         {name: 'actually_an_aardvark', text: aaa_flair}
@@ -213,9 +213,9 @@ describe('snoowrap', function () {
       expect(await sub.get_user_flair('actually_an_aardvark').flair_text).to.equal(aaa_flair);
     });
     it('can assign flair to a user', async () => {
-      let user1 = r.get_user('not_an_aardvark');
-      let user2 = r.get_user('actually_an_aardvark');
-      let flair_text = moment().format();
+      const user1 = r.get_user('not_an_aardvark');
+      const user2 = r.get_user('actually_an_aardvark');
+      const flair_text = moment().format();
       await user1.assign_user_flair({subreddit_name: sub.display_name, text: flair_text});
       expect(await sub.get_user_flair(user1.name).flair_text).to.equal(flair_text);
       await user2.assign_user_flair({subreddit_name: sub.display_name, text: flair_text});
@@ -228,18 +228,18 @@ describe('snoowrap', function () {
       await r.get_submission('443bn7').assign_link_flair({text: moment().format()});
     });
     it('can select its own user flair', async () => {
-      let text = moment().format();
+      const text = moment().format();
       await sub.create_user_flair_template({text});
-      let flair_template_id = _.last(await sub.get_user_flair_templates()).flair_template_id;
+      const flair_template_id = _.last(await sub.get_user_flair_templates()).flair_template_id;
       await sub.select_my_flair({flair_template_id});
       expect(await sub.get_my_flair().flair_text).to.equal(text);
       await sub.delete_all_user_flair_templates();
     });
     it('can select link flair for its post', async () => {
-      let text = moment().format() + ' (self-selected)';
+      const text = moment().format() + ' (self-selected)';
       await sub.create_link_flair_template({text});
-      let submission = r.get_submission('443bn7');
-      let flair_template_id = _.last(await submission.get_link_flair_templates()).flair_template_id;
+      const submission = r.get_submission('443bn7');
+      const flair_template_id = _.last(await submission.get_link_flair_templates()).flair_template_id;
       await submission.select_link_flair({flair_template_id});
       expect(await submission.refresh().link_flair_text).to.equal(text);
       await sub.delete_all_link_flair_templates();
@@ -253,12 +253,12 @@ describe('snoowrap', function () {
       comment = r.get_comment('czn0rpn');
     });
     it('can edit a selfpost', async () => {
-      let new_text = moment().format();
+      const new_text = moment().format();
       await post.edit(new_text);
       expect(post.selftext).to.equal(new_text);
     });
     it('can edit a comment', async () => {
-      let new_text = moment().format();
+      const new_text = moment().format();
       await comment.edit(new_text);
       expect(comment.body).to.equal(new_text);
     });
@@ -304,14 +304,14 @@ describe('snoowrap', function () {
 
   describe('misc/general behavior', () => {
     it('can chain properties together before they get resolved', async () => {
-      let comment = r.get_comment('coip909');
-      let first_mod_of_that_subreddit = await comment.subreddit.get_moderators()[0];
+      const comment = r.get_comment('coip909');
+      const first_mod_of_that_subreddit = await comment.subreddit.get_moderators()[0];
       expect(first_mod_of_that_subreddit.name).to.equal('krispykrackers');
       expect(await first_mod_of_that_subreddit.created_utc).to.equal(1211483632);
     });
     it('throttles requests as specified by the config parameters', async () => {
       r.config.request_delay = 2000;
-      let timer = Promise.delay(1999);
+      const timer = Promise.delay(1999);
       await r.get_user('not_an_aardvark').fetch();
       await r.get_user('actually_an_aardvark').fetch();
       expect(timer.isFulfilled()).to.be.true;
