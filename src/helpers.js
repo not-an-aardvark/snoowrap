@@ -42,3 +42,10 @@ exports.find_message_in_tree = (desired_message_name, current_message) => {
     return _.find(current_message.replies.map(_.partial(exports.find_message_in_tree, desired_message_name)));
   }
 };
+
+exports.assign_to_proxy = (proxied_object, values) => {
+  /* This is basically the same as _.assign(this, response), but _.assign ends up triggering warning messages when
+  used on Proxies, since the patched globals from harmony-reflect aren't applied to lodash. This won't be a problem once
+  Proxies are correctly implemented natively. https://github.com/tvcutsem/harmony-reflect#dependencies */
+  _.forIn(values, (value, key) => {proxied_object[key] = value;});
+};

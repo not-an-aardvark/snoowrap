@@ -302,6 +302,44 @@ describe('snoowrap', function () {
     });
   });
 
+  describe('private messages', () => {
+    // Threads used for these tests:
+    // PMs: https://i.gyazo.com/d05f5cf5999e270b64c389984bc06f3e.png
+    // Modmails: https://i.gyazo.com/f0e6de4190c7eef5368f9d12c25bacc7.png
+    let message1, message2, message3, modmail2;
+    beforeEach(() => {
+      message1 = r.get_message('4wwx80');
+      message2 = r.get_message('4wwxe3');
+      message3 = r.get_message('4wwxhp');
+      modmail2 = r.get_message('4zop6r');
+    });
+    it('can get the contents of the first message in a chain', async () => {
+      expect(await message1.body).to.equal('PM 1: not_an_aardvark --> actually_an_aardvark');
+    });
+    it('can get the contents of a message later in a chain', async () => {
+      expect(await message2.body).to.equal('PM 2 (re: PM 1): actually_an_aardvark --> not_an_aardvark');
+    });
+    it('can get replies to a message', async () => {
+      expect(await message1.replies[0].name).to.equal(message2.name);
+    });
+    it('can mark a message as unread', async () => {
+      expect(await message3.mark_as_unread().refresh().new).to.be.true;
+    });
+    it('can mark a message as read', async () => {
+      expect(await message3.mark_as_read().refresh().new).to.be.false;
+    });
+    it('can mute the author of a modmail', async () => {
+      await modmail2.mute_author();
+      let mute_list = await modmail2.subreddit.get_muted_users();
+      expect(_.find(mute_list, {name: await modmail2.author.name})).to.be.defined;
+    });
+    it('can unmute the author of a modmail', async () => {
+      await modmail2.unmute_author();
+      let mute_list = await modmail2.subreddit.get_muted_users();
+      expect(_.find(mute_list, {name: await modmail2.author.name})).to.be.undefined;
+    });
+  });
+
   describe('misc/general behavior', () => {
     it('can chain properties together before they get resolved', async () => {
       const comment = r.get_comment('coip909');

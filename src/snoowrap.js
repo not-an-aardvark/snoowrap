@@ -1,6 +1,7 @@
 'use strict';
 require('harmony-reflect'); // temp dependency until v8 implements Proxies properly
 const Promise = require('bluebird');
+Promise.config({longStackTraces: true});
 const _ = require('lodash');
 const request = require('request-promise').defaults({json: true});
 const moment = require('moment');
@@ -626,7 +627,7 @@ objects.RedditContent = class RedditContent {
     */
     this.fetch = 'fetch' in this ? this.fetch : _.once(() => {
       return promise_wrap(this._ac.get({uri: this._uri}).then(this._transform_api_response.bind(this)).then(response => {
-        assign_to_proxy(this, response);
+        helpers.assign_to_proxy(this, response);
         _.forIn(response, (value, key) => {this[key] = value;});
         this.has_fetched = true;
         return this;
@@ -642,9 +643,16 @@ objects.RedditContent = class RedditContent {
     this._initialize_fetch_function();
     return this.fetch();
   }
+  /**
+  * Returns a stringifyable version of this object.
+  * @returns {object} A version of this object with all the private properties stripped. Note that it is usually not
+  necessary to call this method directly; simply running JSON.stringify(some_object) will strip the private properties anyway.
+  */
+  toJSON () {
+    return _.omitBy(this, (value, key) => key.startsWith('_'));
+  }
   inspect () {
-    const public_properties = _.omitBy(this, (value, key) => (key.startsWith('_') || typeof value === 'function'));
-    return `<${constants.MODULE_NAME}.objects.${this.constructor.name}> ${util.inspect(public_properties)}`;
+    return `<${constants.MODULE_NAME}.objects.${this.constructor.name}> ${util.inspect(this.toJSON())}`;
   }
   _transform_api_response (response_object) {
     return response_object;
@@ -913,7 +921,7 @@ objects.PrivateMessage = class PrivateMessage extends objects.RedditContent {
     return `message/messages/${this.name.slice(3)}`;
   }
   _transform_api_response (response_obj) {
-    return _.assign(helpers.find_message_in_tree(this.name, response_obj[0]), {full_message_tree: response_obj});
+    return helpers.find_message_in_tree(this.name, response_obj[0]);
   }
   //TODO: Get rid of the repeated code here, most of these methods are exactly the same with the exception of the URIs
   /**
@@ -922,20 +930,6 @@ objects.PrivateMessage = class PrivateMessage extends objects.RedditContent {
   */
   block_author () {
     return promise_wrap(this.post({uri: 'api/block', form: {id: this.name}}).return(this));
-  }
-  /**
-  * Collapses this message (i.e. make it appear smaller when the HTML page is viewed).
-  * @returns {Promise} A Promise that fulfills with this message after the request is complete
-  */
-  collapse () {
-    return promise_wrap(this.post({uri: 'api/collapse_message', form: {id: this.name}}).return(this));
-  }
-  /**
-  * Unollapses this message (i.e. make it appear larger when the HTML page is viewed).
-  * @returns {Promise} A Promise that fulfills with this message after the request is complete
-  */
-  uncollapse () {
-    return promise_wrap(this.post({uri: 'api/uncollapse_message', form: {id: this.name}}).return(this));
   }
   /**
   * Marks this message as read.
@@ -951,9 +945,17 @@ objects.PrivateMessage = class PrivateMessage extends objects.RedditContent {
   mark_as_unread () {
     return promise_wrap(this.post({uri: 'api/unread_message', form: {id: this.name}}).return(this));
   }
+  /**
+  * Mutes the author of this message for 72 hours. This should only be used on moderator mail.
+  * @returns {Promise} A Promise that fulfills with this message after the request is complete
+  */
   mute_author () {
     return promise_wrap(this.post({uri: 'api/mute_message_author', form: {id: this.name}}).return(this));
   }
+  /**
+  * Unmutes the author of this message.
+  * @returns {Promise} A Promise that fulfills with this message after the request is complete
+  */
   unmute_author () {
     return promise_wrap(this.post({uri: 'api/unmute_message_author', form: {id: this.name}}).return(this));
   }
@@ -1313,6 +1315,9 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
     const current_settings = await this.get_subreddit_settings();
     return this._ac._create_or_edit_subreddit(_.assign(current_settings, options, {sr: this.display_name}));
   }
+  get_muted_users () {
+    return this.get({uri: `r/${this.display_name}/about/muted`});
+  }
 };
 
 objects.Trophy = class Trophy extends objects.RedditContent {
@@ -1459,13 +1464,6 @@ objects.KarmaList = class KarmaList extends objects.RedditContent {};
 objects.TrophyList = class TrophyList extends objects.RedditContent {};
 objects.SubredditSettings = class SubredditSettings extends objects.RedditContent {};
 
-const assign_to_proxy = (proxied_object, values) => {
-  /* The line below is equivalent to _.assign(this, response);, but _.assign ends up triggering warning messages when
-  used on Proxies, since the patched globals from harmony-reflect aren't applied to lodash. This won't be a problem once
-  Proxies are correctly implemented natively. https://github.com/tvcutsem/harmony-reflect#dependencies */
-  _.forIn(values, (value, key) => {proxied_object[key] = value;});
-};
-
 const mix = (objects, mixin_methods) => {
   objects.forEach(obj => {
     _.assign(obj.prototype, mixin_methods);
@@ -1554,7 +1552,7 @@ mix([objects.Comment, objects.Submission], /** @namespace SubredditContent */ {
         sticky: sticky,
         id: this.name
     }}).then(response => {
-      assign_to_proxy(this, response.json.data.things[0]);
+      helpers.assign_to_proxy(this, response.json.data.things[0]);
       return this;
     }));
   },
@@ -1575,7 +1573,7 @@ mix([objects.Comment, objects.Submission], /** @namespace SubredditContent */ {
       uri: 'api/editusertext',
       form: {api_type, text: updated_text, thing_id: this.name}
     }).then(response => {
-      assign_to_proxy(this, response.json.data.things[0]);
+      helpers.assign_to_proxy(this, response.json.data.things[0]);
       return this;
     }));
   },
