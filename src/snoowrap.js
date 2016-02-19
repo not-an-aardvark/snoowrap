@@ -31,7 +31,7 @@ const snoowrap = class snoowrap {
     this.refresh_token = options.refresh_token;
     this.user_agent = options.user_agent;
     this.config = default_config;
-    this.throttle = Promise.resolve();
+    this._throttle = Promise.resolve();
     constants.REQUEST_TYPES.forEach(type => {
       Object.defineProperty(this, type, {get: () => (this._oauth_requester.defaults({method: type}))});
     });
@@ -77,15 +77,15 @@ const snoowrap = class snoowrap {
           throw new errors.RateLimitError(seconds_until_expiry);
         }
       }
-      /* this.throttle is a timer that gets reset to this.config.request_delay whenever a request is sent.
+      /* this._throttle is a timer that gets reset to this.config.request_delay whenever a request is sent.
       This ensures that requests are ratelimited and that no requests are lost. The await statement is wrapped
       in a loop to make sure that if the throttle promise resolves while multiple requests are pending, only
       one of the requests will be sent, and the others will await the throttle again. (The loop is non-blocking
       due to its await statement.) */
-      while (!this.throttle.isFulfilled()) {
-        await this.throttle;
+      while (!this._throttle.isFulfilled()) {
+        await this._throttle;
       }
-      this.throttle = Promise.delay(this.config.request_delay);
+      this._throttle = Promise.delay(this.config.request_delay);
 
       /* If the access token has expired (or will expire in the next 10 seconds), refresh it.
       An `update` Promise is created instead of just awaiting the update because if reddit throws an error, it usually needs
@@ -125,10 +125,8 @@ const snoowrap = class snoowrap {
   }
   inspect () {
     // Hide confidential information (tokens, client IDs, etc.) from the console.log output.
-    // Also, hide some things that aren't converted to text well.
     const keys_for_hidden_values = ['client_secret', 'refresh_token', 'access_token'];
-    const hidden_keys = ['throttle'];
-    const formatted = util.inspect(_(this).omit(hidden_keys).mapValues((value, key) => {
+    const formatted = _.mapValues(this, (value, key) => {
       if (_.includes(keys_for_hidden_values, key)) {
         return value && '(redacted)';
       }
@@ -136,8 +134,8 @@ const snoowrap = class snoowrap {
         return value.format();
       }
       return value;
-    }).value());
-    return `<${constants.MODULE_NAME} authenticated client> ${formatted}`;
+    });
+    return `<${constants.MODULE_NAME} authenticated client> ${util.inspect(formatted)}`;
   }
   warn (...args) {
     if (!this.config.suppress_warnings) {
