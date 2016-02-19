@@ -34,7 +34,7 @@ const snoowrap = class snoowrap {
     this.config = default_config;
     this._throttle = Promise.resolve();
     constants.REQUEST_TYPES.forEach(type => {
-      Object.defineProperty(this, type, {get: () => (this._oauth_requester.defaults({method: type}))});
+      Object.defineProperty(this, type, {get: () => this._oauth_requester.defaults({method: type})});
     });
   }
   get _base_client_requester () {
@@ -103,7 +103,7 @@ const snoowrap = class snoowrap {
         throw e;
       });
     };
-    return new Proxy(default_requester, {apply: (...args) => (promise_wrap(handle_request(...args)))});
+    return new Proxy(default_requester, {apply: (...args) => promise_wrap(handle_request(...args))});
   }
   _new_object(object_type, content, has_fetched) {
     return new objects[object_type](content, this, has_fetched);
@@ -599,7 +599,7 @@ objects.RedditContent = class RedditContent {
     /* Omit the 'delete' request shortcut, since the property name is used by Comments and Submissions. To send an HTTP DELETE
     request, use `this._ac.delete` rather than the shortcut `this.delete`. */
     _.without(constants.REQUEST_TYPES, 'delete').forEach(type => {
-      Object.defineProperty(this, type, {get: () => (this._ac[type])});
+      Object.defineProperty(this, type, {get: () => this._ac[type]});
     });
     return new Proxy(this, {get: (target, key) => {
       if (key in target || key === 'length' || key in Promise.prototype || target.has_fetched) {
@@ -628,7 +628,6 @@ objects.RedditContent = class RedditContent {
     this.fetch = 'fetch' in this ? this.fetch : _.once(() => {
       return promise_wrap(this._ac.get({uri: this._uri}).then(this._transform_api_response.bind(this)).then(response => {
         helpers.assign_to_proxy(this, response);
-        _.forIn(response, (value, key) => {this[key] = value;});
         this.has_fetched = true;
         return this;
       }));
@@ -671,7 +670,7 @@ objects.Comment = class Comment extends objects.RedditContent /** @borrows Subre
   _transform_api_response (response_obj) {
     const replies_uri = `comments/${response_obj[0].link_id.slice(3)}`;
     const replies_query = {comment: this.name.slice(3)};
-    const _transform = item => (item.comments[0].replies);
+    const _transform = item => item.comments[0].replies;
     response_obj[0].replies = new objects.Listing({uri: replies_uri, query: replies_query, _transform}, this._ac);
     return response_obj[0];
   }
@@ -1079,7 +1078,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
     while (flair_array.length > 0) {
       // The endpoint only accepts at most 100 lines of csv at a time, so split the array into chunks of 100.
       requests.push(this._set_flair_from_csv(flair_array.splice(0, 100).map(item =>
-        (`${item.name},${item.text || ''},${item.css_class || ''}`)).join('\n')
+        `${item.name},${item.text || ''},${item.css_class || ''}`).join('\n')
       ));
     }
     return promise_wrap(Promise.all(requests));
@@ -1443,7 +1442,7 @@ objects.more = class more extends objects.RedditContent {
     if (amount <= 0 || this.children.length === 0) {
       return [];
     }
-    const ids_for_this_request = this.children.splice(0, Math.min(amount, 100)).map(id => (`t1_${id}`));
+    const ids_for_this_request = this.children.splice(0, Math.min(amount, 100)).map(id => `t1_${id}`);
     // Requests are capped at 100 comments. Send lots of requests recursively to get the comments, then concatenate them.
     // (This speed-requesting is only possible with comment listings since the entire list of ids is present initially.)
     const promise_for_this_batch = this.get({uri: 'api/info', qs: {id: ids_for_this_request.join(',')}});
