@@ -1515,12 +1515,6 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   }
 };
 
-objects.Trophy = class Trophy extends objects.RedditContent {
-};
-
-objects.PromoCampaign = class PromoCampaign extends objects.RedditContent {
-};
-
 /**
 * A class representing a list of content. This is a subclass of the native Array object, so it has all the properties of
 an Array (length, forEach, etc.) in addition to some added methods. At any given time, each Listing has fetched a specific
@@ -1646,6 +1640,8 @@ objects.UserList = class UserList {
   }
 };
 
+objects.Trophy = class Trophy extends objects.RedditContent {};
+objects.PromoCampaign = class PromoCampaign extends objects.RedditContent {};
 objects.KarmaList = class KarmaList extends objects.RedditContent {};
 objects.TrophyList = class TrophyList extends objects.RedditContent {};
 objects.SubredditSettings = class SubredditSettings extends objects.RedditContent {};
