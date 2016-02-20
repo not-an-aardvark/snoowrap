@@ -22,5 +22,5 @@ module.exports = {
     subreddit_settings: 'SubredditSettings'
   },
   USERNAME_REGEX: /^[\w-]{1,20}$/,
-  REQUEST_TYPES: ['get', 'head', 'post', 'put', 'delete', 'trace', 'options', 'connect', 'patch']
+  HTTP_VERBS: ['get', 'head', 'post', 'put', 'delete', 'trace', 'options', 'connect', 'patch']
 };

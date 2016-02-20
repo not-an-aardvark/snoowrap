@@ -42,7 +42,7 @@ const snoowrap = class snoowrap {
     this.refresh_token = refresh_token;
     this.config = require('./default_config');
     this._throttle = Promise.resolve();
-    constants.REQUEST_TYPES.forEach(type => {
+    constants.HTTP_VERBS.forEach(type => {
       Object.defineProperty(this, type, {get: () => this._oauth_requester.defaults({method: type})});
     });
   }
@@ -324,9 +324,7 @@ const snoowrap = class snoowrap {
   }
   _submit ({captcha_response, captcha_iden, kind, resubmit = true, send_replies = true, text, title, url, subreddit_name}) {
     return promise_wrap(this.post({uri: 'api/submit', form: {captcha: captcha_response, iden: captcha_iden,
-        sendreplies: send_replies, sr: subreddit_name, kind, resubmit, text, title, url}}).then(response => {
-      return response.json.data.things[0];
-    }));
+      sendreplies: send_replies, sr: subreddit_name, kind, resubmit, text, title, url}})).json.data.things[0];
   }
   /**
   * Creates a new selfpost on the given subreddit.
@@ -607,7 +605,7 @@ objects.RedditContent = class RedditContent {
     this._initialize_fetch_function();
     /* Omit the 'delete' request shortcut, since the property name is used by Comments and Submissions. To send an HTTP DELETE
     request, use `this._ac.delete` rather than the shortcut `this.delete`. */
-    _.without(constants.REQUEST_TYPES, 'delete').forEach(type => {
+    _.without(constants.HTTP_VERBS, 'delete').forEach(type => {
       Object.defineProperty(this, type, {get: () => this._ac[type]});
     });
     return new Proxy(this, {get: (target, key) => {
@@ -617,7 +615,7 @@ objects.RedditContent = class RedditContent {
       if (key === '_raw') {
         return target;
       }
-      if (_.includes(constants.REQUEST_TYPES, key)) {
+      if (_.includes(constants.HTTP_VERBS, key)) {
         return target._ac[key];
       }
       return this.fetch()[key];
