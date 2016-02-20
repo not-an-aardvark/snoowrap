@@ -25,8 +25,8 @@ const snoowrap = class snoowrap {
   * @param {string} [$0.client_secret] The client secret of your app (assigned by reddit)
   * @param {string} [$0.refresh_token] A refresh token for your app. You will need to get this from reddit beforehand.
   * @param {string} [$0.access_token] An access token for your app. If this is provided, then the
-  client ID/client secret/refresh token are not required. However, since all access tokens expire one hour after being
-  generated,  but this is not recommended because all access tokens expire after an hour.
+  client ID/client secret/refresh token are not required. Note that all access tokens expire one hour after being
+  generated; if you want to retain access for longer than that, provide the other credentials instead.
   * @memberof snoowrap
   */
   constructor({user_agent, client_id, client_secret, refresh_token, access_token}) {
@@ -284,7 +284,7 @@ const snoowrap = class snoowrap {
     return this.get({uri: 'api/needs_captcha'});
   }
   /**
-  * Gets the identifier (which takes the form of a hex string) for a new captcha image.
+  * Gets the identifier (a hex string) for a new captcha image.
   * @returns {Promise} A Promise that resolves with a string
   * @memberof snoowrap
   * @instance
@@ -303,8 +303,7 @@ const snoowrap = class snoowrap {
     return this.get({uri: `captcha/${identifier}`});
   }
   /**
-  * Gets an array of categories that items can be saved it.
-  * Note: This feature is only enabled on reddit for accounts that have reddit gold.
+  * Gets an array of categories that items can be saved it. (Requires reddit gold)
   * @returns {Promise} An array of categories
   * @memberof snoowrap
   * @instance
@@ -665,16 +664,220 @@ objects.RedditContent = class RedditContent {
   }
 };
 
+/**
+* A set of mixin functions that applies to Submissions, Comments, and PrivateMessages
+* @extends objects.RedditContent
+*/
 objects.CreatableContent = class CreatableClass extends objects.RedditContent {
+  constructor (options, _ac, has_fetched) {
+    super(options, _ac, has_fetched);
+  }
+  /**
+  * Removes this Comment, Submission or PrivateMessage from public listings. Also see: #delete()
+  * @param {boolean} [$0.spam=false] Determines whether this should be marked as spam
+  * @returns {Promise} A Promise that fulfills with this content when the request is complete
+  */
+  remove ({spam = false} = {}) {
+    return promise_wrap(this.post({uri: 'api/remove', form: {spam, id: this.name}}).return(this));
+  }
+  /**
+  * Removes this Comment, Submission, or PrivateMessage and marks it as spam. Equivalent to #remove({spam: true})
+  * @returns {Promise} A Promise that fulfills with this content when the request is complete
+  */
+  mark_as_spam () {
+    return promise_wrap(this.remove({spam: true, id: this.name}).return(this));
+  }
+  /**
+  * Approves this Comment, Submission, or PrivateMessage, re-adding it to public listings if it had been removed
+  * @returns {Promise} A Promise that fulfills with this content when the request is complete
+  */
+  approve () {
+    return promise_wrap(this.post({uri: 'api/approve', form: {id: this.name}}).return(this));
+  }
+  /**
+  * Reports this content anonymously to subreddit moderators (for Comments and Submissions)
+  or to the reddit admins (for PrivateMessages)
+  * @param {string} [$0.reason=] The reason for the report
+  * @returns {Promise} A Promise that fulfills with this content when the request is complete
+  */
+  report ({reason} = {}) {
+    return promise_wrap(this.post({uri: 'api/report', form: {
+      api_type, reason: 'other', other_reason: reason, thing_id: this.name
+    }}).return(this));
+  }
+  /**
+  * Ignores reports on this Comment, Submission, or PrivateMessage
+  * @returns {Promise} A Promise that fulfills with this content when the request is complete
+  */
+  ignore_reports () {
+    return promise_wrap(this.post({uri: 'api/ignore_reports', form: {id: this.name}}).return(this));
+  }
+  /**
+  * Unignores reports on this Comment, Submission, or PrivateMessages
+  * @returns {Promise} A Promise that fulfills with this content when the request is complete
+  */
+  unignore_reports () {
+    return promise_wrap(this.post({uri: 'api/unignore_reports', form: {id: this.name}}).return(this));
+  }
+  /**
+  * Submits a new reply to this object. (This takes the form of a new Comment if this object is a Submission/Comment, or a
+  new PrivateMessage if this object is a PrivateMessage.)
+  * @param {string} text The content of the reply, in raw markdown text
+  * @returns {Promise} A Promise that fulfills with the newly-created reply
+  */
+  reply (text) {
+    return this.post({uri: 'api/comment',form: {api_type, text, thing_id: this.name}}).json.data.things[0];
+  }
+};
 
-}
+/**
+* A set of mixin functions that apply to Submissions and Comments.
+* @extends objects.CreatableContent
+*/
+objects.VoteableContent = class VoteableContent extends objects.CreatableContent {
+  /**
+  * Casts a vote on this Comment or Submission.
+  * @private
+  * @param {number} direction The direction of the vote. (1 for an upvote, -1 for a downvote, 0 to remove a vote)
+  * @returns {Promise} A Promise that fulfills when the request is complete.
+  */
+  _vote (direction) {
+    return this.post({uri: 'api/vote', form: {dir: direction, id: this.name}});
+  }
+  /**
+  * Upvotes this Comment or Submission.
+  * @returns {Promise} A Promise that fulfills when the request is complete.<br><br>
+  <strong>Note: votes must be cast by humans.</strong> That is, API clients proxying a human's action one-for-one are OK, but
+  bots deciding how to vote on content or amplifying a human's vote are not. See the
+  <a href="https://reddit.com/rules">reddit rules</a> for more details on what constitutes vote cheating. (This guideline
+  is quoted from <a href="https://www.reddit.com/dev/api#POST_api_vote">the official reddit API documentation page</a>.)
+  */
+  upvote () {
+    return this._vote(1);
+  }
+  /**
+  * Downvotes this Comment or Submission.
+  * @returns {Promise} A Promise that fulfills when the request is complete.<br><br>
+  <strong>Note: votes must be cast by humans.</strong> That is, API clients proxying a human's action one-for-one are OK, but
+  bots deciding how to vote on content or amplifying a human's vote are not. See the
+  <a href="https://reddit.com/rules">reddit rules</a> for more details on what constitutes vote cheating. (This guideline
+  is quoted from <a href="https://www.reddit.com/dev/api#POST_api_vote">the official reddit API documentation page</a>.)
+  */
+  downvote () {
+    return this._vote(-1);
+  }
+  /**
+  * Removes any existing vote on this Comment or Submission.
+  * @returns {Promise} A Promise that fulfills when the request is complete.<br><br>
+  <strong>Note: votes must be cast by humans.</strong> That is, API clients proxying a human's action one-for-one are OK, but
+  bots deciding how to vote on content or amplifying a human's vote are not. See the
+  <a href="https://reddit.com/rules">reddit rules</a> for more details on what constitutes vote cheating. (This guideline
+  is quoted from <a href="https://www.reddit.com/dev/api#POST_api_vote">the official reddit API documentation page</a>.)
+  */
+  unvote () {
+    return this._vote(0);
+  }
+  /**
+  * Saves this Comment or Submission (i.e. adds it to the list at reddit.com/saved)
+  * @returns {Promise} A Promise that fulfills when the request is complete
+  */
+  save () {
+    return promise_wrap(this.post({uri: 'api/save', form: {id: this.name}}).then(() => {
+      this.saved = true;
+      return this;
+    }));
+  }
+  /**
+  * Unsaves this item
+  * @returns {Promise} A Promise that fulfills when the request is complete
+  */
+  unsave () {
+    return promise_wrap(this.post({uri: 'api/unsave', form: {id: this.name}}).then(() => {
+      this.saved = false;
+      return this;
+    }));
+  }
+  /**
+  * Distinguishes this Comment or Submission with a sigil.
+  * @param {boolean|string} [$0.status=true] Determines how the item should be distinguished.
+  <code>true</code> (default) signifies that the item should be moderator-distinguished, and
+  <code>false</code> signifies that the item should not be distinguished. Passing a string (e.g.
+  <code>admin</code>) will cause the item to get distinguished with that string, if possible.
+  * @param {boolean} [$0.sticky=false] Determines whether this item should be stickied in addition to being
+  distinguished. (This only applies to comments; to sticky a submission, use the {@link objects.Submission.sticky} method.)
+  * @returns {Promise} A Promise that fulfills when the request is complete.
+  */
+  distinguish ({status = true, sticky = false} = {}) {
+    return promise_wrap(this._ac.post({uri: 'api/distinguish', form: {
+      api_type,
+      how: status === true ? 'yes' : status === false ? 'no' : status,
+      sticky: sticky,
+      id: this.name
+    }}).then(response => {
+      helpers.assign_to_proxy(this, response.json.data.things[0]);
+      return this;
+    }));
+  }
+  /**
+  * Undistinguishes this Comment or Submission. Alias for distinguish({status: false})
+  * @function undistinguish
+  * @returns {Promise} A Promise that fulfills when the request is complete.
+  */
+  undistinguish () {
+    return this.distinguish({status: false, sticky: false});
+  }
+  /**
+  * Edits this Comment or Submission.
+  * @param {string} updated_text The updated markdown text to use
+  * @returns {Promise} A Promise that fulfills when this request is complete.
+  */
+  edit (updated_text) {
+    return promise_wrap(this.post({
+      uri: 'api/editusertext',
+      form: {api_type, text: updated_text, thing_id: this.name}
+    }).then(response => {
+      helpers.assign_to_proxy(this, response.json.data.things[0]);
+      return this;
+    }));
+  }
+  /**
+  * Gives reddit gold to the author of this Comment or Submission.
+  * @returns {Promise} A Promise that fullfills with this Comment/Submission when this request is complete
+  */
+  gild () {
+    return promise_wrap(this.post({uri: `api/v1/gold/gild/${this.name}`}).return(this));
+  }
+  /**
+  * Deletes this Comment or Submission
+  * @returns {Promise} A Promise that fulfills with this Comment/Submission when this request is complete
+  */
+  delete () {
+    return promise_wrap(this.post({uri: 'api/del', form: {id: this.name}}).return(this));
+  }
+  _set_inbox_replies_enabled(state) {
+    return this.post({uri: 'api/sendreplies', form: {state, id: this.name}});
+  }
+  /**
+  * Enables inbox replies on this Comment or Submission
+  * @returns {Promise} A Promise that fulfills with this content when the request is complete
+  */
+  enable_inbox_replies () {
+    return promise_wrap(this._set_inbox_replies_enabled(true).return(this));
+  }
+  /**
+  * Disables inbox replies on this Comment or Submission
+  * @returns {Promise} A Promise that fulfills with this content when the request is complete
+  */
+  disable_inbox_replies () {
+    return promise_wrap(this._set_inbox_replies_enabled(false).return(this));
+  }
+};
 
 /**
 * A class representing a reddit comment
-* @extends RedditContent
-* @mixes CommentSubmissionMixin
+* @extends CreatableContent
 */
-objects.Comment = class Comment extends objects.RedditContent {
+objects.Comment = class Comment extends objects.VoteableContent {
   constructor (options, _ac, has_fetched) {
     super(options, _ac, has_fetched);
   }
@@ -692,7 +895,7 @@ objects.Comment = class Comment extends objects.RedditContent {
 
 /**
 * A class representing a reddit user
-* @extends RedditContent
+* @extends CreatableContent
 */
 objects.RedditUser = class RedditUser extends objects.RedditContent {
   constructor (options, _ac, has_fetched) {
@@ -731,9 +934,9 @@ objects.RedditUser = class RedditUser extends objects.RedditContent {
 
 /**
 * A class representing a reddit submission
-* @extends RedditContent
+* @extends CreatableContent
 */
-objects.Submission = class Submission extends objects.RedditContent {
+objects.Submission = class Submission extends objects.VoteableContent {
   constructor (options, _ac, has_fetched) {
     super(options, _ac, has_fetched);
   }
@@ -921,9 +1124,9 @@ objects.Submission = class Submission extends objects.RedditContent {
 
 /**
 * A class representing a private message or a modmail.
-* @extends RedditContent
+* @extends CreatableContent
 */
-objects.PrivateMessage = class PrivateMessage extends objects.RedditContent {
+objects.PrivateMessage = class PrivateMessage extends objects.CreatableContent {
   constructor (options, _ac, has_fetched) {
     super(options, _ac, has_fetched);
   }
@@ -1473,224 +1676,6 @@ objects.UserList = class UserList {
 objects.KarmaList = class KarmaList extends objects.RedditContent {};
 objects.TrophyList = class TrophyList extends objects.RedditContent {};
 objects.SubredditSettings = class SubredditSettings extends objects.RedditContent {};
-
-const mix = (objects, mixin_methods) => {
-  objects.forEach(obj => {
-    _.assign(obj.prototype, mixin_methods);
-  });
-};
-mix([objects.Comment, objects.Submission], {
-  /**
-  * Casts a vote on this Comment or Submission.
-  * @private
-  * @param {number} direction The direction of the vote. (1 for an upvote, -1 for a downvote, 0 to remove a vote)
-  * @returns {Promise} A Promise that fulfills when the request is complete.
-  */
-  _vote (direction) {
-    return this.post({uri: 'api/vote', form: {dir: direction, id: this.name}});
-  },
-  /**
-  * Upvotes this Comment or Submission.
-  * @memberof objects.RedditContent
-  * @returns {Promise} A Promise that fulfills when the request is complete.<br><br>
-  <strong>Note: votes must be cast by humans.</strong> That is, API clients proxying a human's action one-for-one are OK, but
-  bots deciding how to vote on content or amplifying a human's vote are not. See the
-  <a href="https://reddit.com/rules">reddit rules</a> for more details on what constitutes vote cheating. (This guideline
-  is quoted from <a href="https://www.reddit.com/dev/api#POST_api_vote">the official reddit API documentation page</a>.)
-  * @memberof objects.RedditContent
-  * @instance
-  */
-  upvote () {
-    return this._vote(1);
-  },
-  /**
-  * Downvotes this Comment or Submission.
-  * @returns {Promise} A Promise that fulfills when the request is complete.<br><br>
-  <strong>Note: votes must be cast by humans.</strong> That is, API clients proxying a human's action one-for-one are OK, but
-  bots deciding how to vote on content or amplifying a human's vote are not. See the
-  <a href="https://reddit.com/rules">reddit rules</a> for more details on what constitutes vote cheating. (This guideline
-  is quoted from <a href="https://www.reddit.com/dev/api#POST_api_vote">the official reddit API documentation page</a>.)
-  * @memberof objects.RedditContent
-  * @instance
-  */
-  downvote () {
-    return this._vote(-1);
-  },
-  /**
-  * Removes any existing vote on this Comment or Submission.
-  * @mixes CommentSubmissionMixin
-  * @returns {Promise} A Promise that fulfills when the request is complete.<br><br>
-  <strong>Note: votes must be cast by humans.</strong> That is, API clients proxying a human's action one-for-one are OK, but
-  bots deciding how to vote on content or amplifying a human's vote are not. See the
-  <a href="https://reddit.com/rules">reddit rules</a> for more details on what constitutes vote cheating. (This guideline
-  is quoted from <a href="https://www.reddit.com/dev/api#POST_api_vote">the official reddit API documentation page</a>.)
-  * @memberof objects.RedditContent
-  * @instance
-  */
-  unvote () {
-    return this._vote(0);
-  },
-  /**
-  * Saves this Comment or Submission (i.e. adds it to the list at reddit.com/saved)
-  * @returns {Promise} A Promise that fulfills when the request is complete
-  * @memberof objects.RedditContent
-  * @instance
-  */
-  save () {
-    return promise_wrap(this.post({uri: 'api/save', form: {id: this.name}}).then(() => {
-      this.saved = true;
-      return this;
-    }));
-  },
-  /**
-  * Unsaves this item
-  * @returns {Promise} A Promise that fulfills when the request is complete
-  * @memberof objects.RedditContent
-  * @instance
-  */
-  unsave () {
-    return promise_wrap(this.post({uri: 'api/unsave', form: {id: this.name}}).then(() => {
-      this.saved = false;
-      return this;
-    }));
-  },
-  /**
-  * Distinguishes this Comment or Submission with a sigil.
-  * @param {boolean|string} [$0.status=true] Determines how the item should be distinguished.
-  <code>true</code> (default) signifies that the item should be moderator-distinguished, and
-  <code>false</code> signifies that the item should not be distinguished. Passing a string (e.g.
-  <code>admin</code>) will cause the item to get distinguished with that string, if possible.
-  * @param {boolean} [$0.sticky=false] Determines whether this item should be stickied in addition to being
-  distinguished. (This only applies to comments; to sticky a submission, use the {@link objects.Submission.sticky} method.)
-  * @returns {Promise} A Promise that fulfills when the request is complete.
-  * @memberof objects.RedditContent
-  * @instance
-  */
-  distinguish ({status = true, sticky = false} = {}) {
-    return promise_wrap(this._ac.post({uri: 'api/distinguish', form: {
-      api_type,
-      how: status === true ? 'yes' : status === false ? 'no' : status,
-      sticky: sticky,
-      id: this.name
-    }}).then(response => {
-      helpers.assign_to_proxy(this, response.json.data.things[0]);
-      return this;
-    }));
-  },
-  /**
-  * Undistinguishes this Comment or Submission. Alias for distinguish({status: false})
-  * @function undistinguish
-  * @returns {Promise} A Promise that fulfills when the request is complete.
-  * @memberof objects.RedditContent
-  * @instance
-  */
-  undistinguish () {
-    return this.distinguish({status: false, sticky: false});
-  },
-  /**
-  * Edits this Comment or Submission.
-  * @param {string} updated_text The updated markdown text to use
-  * @returns {Promise} A Promise that fulfills when this request is complete.
-  */
-  edit (updated_text) {
-    return promise_wrap(this.post({
-      uri: 'api/editusertext',
-      form: {api_type, text: updated_text, thing_id: this.name}
-    }).then(response => {
-      helpers.assign_to_proxy(this, response.json.data.things[0]);
-      return this;
-    }));
-  },
-  /**
-  * Gives reddit gold to the author of this Comment or Submission.
-  * @returns {Promise} A Promise that fullfills with this Comment/Submission when this request is complete
-  */
-  gild () {
-    return promise_wrap(this.post({uri: `api/v1/gold/gild/${this.name}`}).return(this));
-  },
-  /**
-  * Deletes this Comment or Submission
-  * @returns {Promise} A Promise that fulfills with this Comment/Submission when this request is complete
-  */
-  delete () {
-    return promise_wrap(this.post({uri: 'api/del', form: {id: this.name}}).return(this));
-  },
-  _set_inbox_replies_enabled(state) {
-    return this.post({uri: 'api/sendreplies', form: {state, id: this.name}});
-  },
-  /**
-  * Enables inbox replies on this Comment or Submission
-  * @returns {Promise} A Promise that fulfills with this content when the request is complete
-  */
-  enable_inbox_replies () {
-    return promise_wrap(this._set_inbox_replies_enabled(true).return(this));
-  },
-  /**
-  * Disables inbox replies on this Comment or Submission
-  * @returns {Promise} A Promise that fulfills with this content when the request is complete
-  */
-  disable_inbox_replies () {
-    return promise_wrap(this._set_inbox_replies_enabled(false).return(this));
-  }
-});
-mix([objects.Comment, objects.PrivateMessage, objects.Submission], {
-  /**
-  * Removes this Comment, Submission or PrivateMessage from public listings. Also see: #delete()
-  * @param {boolean} [$0.spam=false] Determines whether this should be marked as spam
-  * @returns {Promise} A Promise that fulfills with this content when the request is complete
-  */
-  remove ({spam = false} = {}) {
-    return promise_wrap(this.post({uri: 'api/remove', form: {spam, id: this.name}}).return(this));
-  },
-  /**
-  * Removes this Comment, Submission, or PrivateMessage and marks it as spam. Equivalent to #remove({spam: true})
-  * @returns {Promise} A Promise that fulfills with this content when the request is complete
-  */
-  mark_as_spam () {
-    return promise_wrap(this.remove({spam: true, id: this.name}).return(this));
-  },
-  /**
-  * Approves this Comment, Submission, or PrivateMessage, re-adding it to public listings if it had been removed
-  * @returns {Promise} A Promise that fulfills with this content when the request is complete
-  */
-  approve () {
-    return promise_wrap(this.post({uri: 'api/approve', form: {id: this.name}}).return(this));
-  },
-  /**
-  * Reports this content anonymously to subreddit moderators (for Comments and Submissions)
-  or to the reddit admins (for PrivateMessages)
-  * @param {string} [$0.reason=] The reason for the report
-  * @returns {Promise} A Promise that fulfills with this content when the request is complete
-  */
-  report ({reason} = {}) {
-    return promise_wrap(this.post({uri: 'api/report', form: {
-      api_type, reason: 'other', other_reason: reason, thing_id: this.name
-    }}).return(this));
-  },
-  /**
-  * Ignores reports on this Comment, Submission, or PrivateMessage
-  * @returns {Promise} A Promise that fulfills with this content when the request is complete
-  */
-  ignore_reports () {
-    return promise_wrap(this.post({uri: 'api/ignore_reports', form: {id: this.name}}).return(this));
-  },
-  /**
-  * Unignores reports on this Comment, Submission, or PrivateMessages
-  * @returns {Promise} A Promise that fulfills with this content when the request is complete
-  */
-  unignore_reports () {
-    return promise_wrap(this.post({uri: 'api/unignore_reports', form: {id: this.name}}).return(this));
-  },
-  /**
-  * Submits a new reply to this object. (This takes the form of a new Comment if this object is a Submission/Comment, or a
-  new PrivateMessage if this object is a PrivateMessage.)
-  * @param {string} text The content of the reply, in raw markdown text
-  * @returns {Promise} A Promise that fulfills with the newly-created reply
-  */
-  reply (text) {
-    return this.post({uri: 'api/comment',form: {api_type, text, thing_id: this.name}}).json.data.things[0];
-  }
-});
 
 snoowrap.objects = objects;
 snoowrap.helpers = helpers;
