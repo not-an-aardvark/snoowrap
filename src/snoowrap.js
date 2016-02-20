@@ -669,9 +669,6 @@ objects.RedditContent = class RedditContent {
 * @extends objects.RedditContent
 */
 objects.CreatableContent = class CreatableClass extends objects.RedditContent {
-  constructor (options, _ac, has_fetched) {
-    super(options, _ac, has_fetched);
-  }
   /**
   * Removes this Comment, Submission or PrivateMessage from public listings. Also see: #delete()
   * @param {boolean} [$0.spam=false] Determines whether this should be marked as spam
@@ -878,9 +875,6 @@ objects.VoteableContent = class VoteableContent extends objects.CreatableContent
 * @extends CreatableContent
 */
 objects.Comment = class Comment extends objects.VoteableContent {
-  constructor (options, _ac, has_fetched) {
-    super(options, _ac, has_fetched);
-  }
   _transform_api_response (response_obj) {
     const replies_uri = `comments/${response_obj[0].link_id.slice(3)}`;
     const replies_query = {comment: this.name.slice(3)};
@@ -898,9 +892,6 @@ objects.Comment = class Comment extends objects.VoteableContent {
 * @extends CreatableContent
 */
 objects.RedditUser = class RedditUser extends objects.RedditContent {
-  constructor (options, _ac, has_fetched) {
-    super(options, _ac, has_fetched);
-  }
   get _uri () {
     if (typeof this.name !== 'string' || !constants.USERNAME_REGEX.test(this.name)) {
       throw new errors.InvalidUserError(this.name);
@@ -937,9 +928,6 @@ objects.RedditUser = class RedditUser extends objects.RedditContent {
 * @extends CreatableContent
 */
 objects.Submission = class Submission extends objects.VoteableContent {
-  constructor (options, _ac, has_fetched) {
-    super(options, _ac, has_fetched);
-  }
   get _uri () {
     return `comments/${this.name.slice(3)}`;
   }
@@ -1127,9 +1115,6 @@ objects.Submission = class Submission extends objects.VoteableContent {
 * @extends CreatableContent
 */
 objects.PrivateMessage = class PrivateMessage extends objects.CreatableContent {
-  constructor (options, _ac, has_fetched) {
-    super(options, _ac, has_fetched);
-  }
   get _uri () {
     return `message/messages/${this.name.slice(3)}`;
   }
@@ -1179,9 +1164,6 @@ objects.PrivateMessage = class PrivateMessage extends objects.CreatableContent {
 * @extends RedditContent
 */
 objects.Subreddit = class Subreddit extends objects.RedditContent {
-  constructor (options, _ac, has_fetched) {
-    super(options, _ac, has_fetched);
-  }
   get _uri () {
     return `r/${this.display_name}/about`;
   }
@@ -1534,15 +1516,9 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
 };
 
 objects.Trophy = class Trophy extends objects.RedditContent {
-  constructor (options, _ac, has_fetched) {
-    super(options, _ac, has_fetched);
-  }
 };
 
 objects.PromoCampaign = class PromoCampaign extends objects.RedditContent {
-  constructor (options, _ac, has_fetched) {
-    super(options, _ac, has_fetched);
-  }
 };
 
 /**
@@ -1643,9 +1619,6 @@ objects.Listing = class Listing extends Array {
 };
 
 objects.more = class more extends objects.RedditContent {
-  constructor (properties, _ac) {
-    super(properties, _ac);
-  }
   /* Requests to /api/morechildren are capped at 20 comments at a time, but requests to /api/info are capped at 100, so
   it's easier to send to the latter. The disadvantage is that comment replies are not automatically sent from requests
   to /api/info. */
