@@ -8,7 +8,6 @@ const promise_wrap = require('promise-chains');
 const util = require('util');
 const constants = require('./constants');
 const errors = require('./errors');
-const default_config = require('./default_config');
 const api_type = 'json';
 const objects = {};
 const helpers = require('./helpers');
@@ -19,18 +18,25 @@ const snoowrap = class snoowrap {
   /**
   * Constructs a new requester. This will be necessary if you want to do anything.
   * @param {object} options A set of credentials to authenticate with
-  * @param {string} options.client_id The client ID of your app (assigned by reddit)
-  * @param {string} options.client_secret The client secret of your app (assigned by reddit)
-  * @param {string} options.refresh_token A refresh token for your app. You will need to get this from reddit beforehand.
-  * @param {string} options.user_agent A unique description of what your app does
+  * @param {string} $0.user_agent A unique description of what your app does
+  * @param {string} [$0.client_id] The client ID of your app (assigned by reddit)
+  * @param {string} [$0.client_secret] The client secret of your app (assigned by reddit)
+  * @param {string} [$0.refresh_token] A refresh token for your app. You will need to get this from reddit beforehand.
+  * @param {string} [$0.access_token] A refresh token for your app
   * @memberof snoowrap
   */
-  constructor(options) {
-    this.client_id = options.client_id;
-    this.client_secret = options.client_secret;
-    this.refresh_token = options.refresh_token;
-    this.user_agent = options.user_agent;
-    this.config = default_config;
+  constructor({user_agent, client_id, client_secret, refresh_token, access_token} = {}) {
+    if (!access_token && !(client_id && client_secret && refresh_token)) {
+      throw new errors.MissingCredentialsError();
+    }
+    if (!user_agent) {
+      throw new errors.MissingUserAgentError();
+    }
+    this.user_agent = user_agent;
+    this.client_id = client_id;
+    this.client_secret = client_secret;
+    this.refresh_token = refresh_token;
+    this.config = require('./default_config');
     this._throttle = Promise.resolve();
     constants.REQUEST_TYPES.forEach(type => {
       Object.defineProperty(this, type, {get: () => this._oauth_requester.defaults({method: type})});
@@ -87,20 +93,20 @@ const snoowrap = class snoowrap {
       }
       this._throttle = Promise.delay(this.config.request_delay);
 
-      /* If the access token has expired (or will expire in the next 10 seconds), refresh it.
-      An `update` Promise is created instead of just awaiting the update because if reddit throws an error, it usually needs
-      to get handled the same way as a normaly request. */
-      const update = !this.access_token || this.token_expiration.isBefore() ? this._update_access_token() : Promise.resolve();
-
-      // Send the request and return the response.
-      return await update.then(() => requester.defaults({auth: {bearer: this.access_token}})(...args)).catch(err => {
-        // If there was an error on reddit's end, retry the request up to a maximum of this.config.max_retry_attempts times.
+      try {
+        // If the access token has expired (or will expire in the next 10 seconds), refresh it.
+        if (this.refresh_token && (!this.access_token || this.token_expiration.isBefore())) {
+          await this._update_access_token();
+        }
+        // Send the request and return the response.
+        return await requester.defaults({auth: {bearer: this.access_token}})(...args);
+      } catch (err) {
         if (attempts + 1 < this.config.max_retry_attempts && _.includes(this.config.retry_error_codes, err.statusCode)) {
           this.warn(`Warning: Received status code ${err.statusCode} from reddit. Retrying request...`);
           return handle_request(requester, self, args, attempts + 1);
         }
         throw err;
-      });
+      }
     };
     return new Proxy(default_requester, {apply: (...args) => promise_wrap(handle_request(...args))});
   }

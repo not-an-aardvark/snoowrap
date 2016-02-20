@@ -3,8 +3,8 @@ const expect = require('chai').expect;
 const Promise = require('bluebird');
 const _ = require('lodash');
 const moment = require('moment');
-const snoowrap = require('../src/snoowrap');
-const errors = require('../src/errors');
+const snoowrap = require('..');
+const errors = require('../lib/errors');
 describe('snoowrap', function () {
   this.timeout(10000);
   let r;
