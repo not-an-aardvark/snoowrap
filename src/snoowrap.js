@@ -17,20 +17,24 @@ const helpers = require('./helpers');
 const snoowrap = class snoowrap {
   /**
   * Constructs a new requester. This will be necessary if you want to do anything.
-  * @param {object} options A set of credentials to authenticate with
+  * @param {object} $0 An Object containing credentials.  This should have the properties (a) <code>user_agent</code>,
+  <code>client_id</code>, <code>client_secret</code>, and <code>refresh_token</code>, <strong>or</strong>
+  (b) <code>user_agent</code> and <code>access_token</code>.
   * @param {string} $0.user_agent A unique description of what your app does
   * @param {string} [$0.client_id] The client ID of your app (assigned by reddit)
   * @param {string} [$0.client_secret] The client secret of your app (assigned by reddit)
   * @param {string} [$0.refresh_token] A refresh token for your app. You will need to get this from reddit beforehand.
-  * @param {string} [$0.access_token] A refresh token for your app
+  * @param {string} [$0.access_token] An access token for your app. If this is provided, then the
+  client ID/client secret/refresh token are not required. However, since all access tokens expire one hour after being
+  generated,  but this is not recommended because all access tokens expire after an hour.
   * @memberof snoowrap
   */
-  constructor({user_agent, client_id, client_secret, refresh_token, access_token} = {}) {
-    if (!access_token && !(client_id && client_secret && refresh_token)) {
-      throw new errors.MissingCredentialsError();
-    }
+  constructor({user_agent, client_id, client_secret, refresh_token, access_token}) {
     if (!user_agent) {
       throw new errors.MissingUserAgentError();
+    }
+    if (!access_token && !(client_id && client_secret && refresh_token)) {
+      throw new errors.NoCredentialsError();
     }
     this.user_agent = user_agent;
     this.client_id = client_id;
