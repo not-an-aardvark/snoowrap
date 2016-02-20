@@ -1553,10 +1553,10 @@ mix([objects.Comment, objects.Submission], /** @namespace SubredditContent */ {
   */
   distinguish ({status = true, sticky = false} = {}) {
     return promise_wrap(this._ac.post({uri: 'api/distinguish', form: {
-        api_type,
-        how: status === true ? 'yes' : status === false ? 'no' : status,
-        sticky: sticky,
-        id: this.name
+      api_type,
+      how: status === true ? 'yes' : status === false ? 'no' : status,
+      sticky: sticky,
+      id: this.name
     }}).then(response => {
       helpers.assign_to_proxy(this, response.json.data.things[0]);
       return this;
