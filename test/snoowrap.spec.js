@@ -105,6 +105,8 @@ describe('snoowrap', function () {
       const random_post = await r.get_random_submission();
       expect(random_post).to.be.an.instanceof(snoowrap.objects.Submission);
     });
+    it('can enable inbox replies on a submission');
+    it('can disable inbox replies on a submission');
   });
 
   describe('getting a list of posts', () => {
@@ -300,6 +302,8 @@ describe('snoowrap', function () {
       await post.approve().refresh();
       expect(post.banned_by).to.be.null;
       expect(post.approved_by).to.not.be.null;
+      // There's no way to differentiate posts marked as spam with the API, but make sure the function doesn't throw an error.
+      await post.mark_as_spam().approve();
     });
     it('can remove/approve a comment', async () => {
       await comment.remove().refresh();
@@ -315,12 +319,11 @@ describe('snoowrap', function () {
     // Threads used for these tests:
     // PMs: https://i.gyazo.com/d05f5cf5999e270b64c389984bc06f3e.png
     // Modmails: https://i.gyazo.com/f0e6de4190c7eef5368f9d12c25bacc7.png
-    let message1, message2, message3, modmail2;
+    let message1, message2, message3;
     beforeEach(() => {
       message1 = r.get_message('4wwx80');
       message2 = r.get_message('4wwxe3');
       message3 = r.get_message('4wwxhp');
-      modmail2 = r.get_message('4zop6r');
     });
     it('can get the contents of the first message in a chain', async () => {
       expect(await message1.body).to.equal('PM 1: not_an_aardvark --> actually_an_aardvark');
@@ -337,19 +340,26 @@ describe('snoowrap', function () {
     it('can mark a message as read', async () => {
       expect(await message3.mark_as_read().refresh().new).to.be.false;
     });
-    it.skip('can mute the author of a modmail', async () => {
-      await modmail2.mute_author();
-      const mute_list = await modmail2.subreddit.get_muted_users();
-      expect(_.find(mute_list, {name: await modmail2.author.name})).to.be.defined;
-    });
-    it.skip('can unmute the author of a modmail', async () => {
-      await modmail2.unmute_author();
-      const mute_list = await modmail2.subreddit.get_muted_users();
-      expect(_.find(mute_list, {name: await modmail2.author.name})).to.be.undefined;
-    });
   });
 
-  describe('misc/general behavior', () => {
+  describe('inbox operations', () => {
+    it('can get a list of messages in an inbox');
+    it('can get modmail for all moderated subs');
+    it('can get a list of sent messages');
+    it('can read all unread messages');
+  });
+
+  describe('search', () => {
+    it('can search for posts based on various parameters');
+    it('can get recommended subreddits');
+    it('can search for a list of subreddits');
+  });
+
+  describe('miscellaneous API calls', () => {
+    it('can get a list of oauth scopes');
+  });
+
+  describe('general snoowrap behavior', () => {
     it('can chain properties together before they get resolved', async () => {
       const comment = r.get_comment('coip909');
       const first_mod_of_that_subreddit = await comment.subreddit.get_moderators()[0];
@@ -363,5 +373,33 @@ describe('snoowrap', function () {
       await r.get_user('actually_an_aardvark').fetch();
       expect(timer.isFulfilled()).to.be.true;
     });
+  });
+  describe.skip('Creating new content', () => {
+    it('can create a selfpost given a subreddit object');
+    it('can create a linkpost given a subreddit object');
+    it('can create a selfpost on a particular subreddit');
+    it('can create a linkpost on a particular subreddit');
+    it('can create a subreddit');
+    it('can compose a message');
+    it('can mute the author of a modmail', async () => {
+      const modmail = r.get_message('4zop6r');
+      await modmail.mute_author();
+      const mute_list = await modmail.subreddit.get_muted_users();
+      expect(_.find(mute_list, {name: await modmail.author.name})).to.be.defined;
+    });
+    it('can unmute the author of a modmail', async () => {
+      const modmail = r.get_message('4zop6r');
+      await modmail.unmute_author();
+      const mute_list = await modmail.subreddit.get_muted_users();
+      expect(_.find(mute_list, {name: await modmail.author.name})).to.be.undefined;
+    });
+    it('can comment on a submission');
+    it('can reply to a comment');
+    it('can report a submission/comment');
+    it('can reply to a private message');
+    it('can delete a submission');
+    it('can delete a comment');
+    it.skip('can gild a submission/comment');
+    it('can delete a comment or submission');
   });
 });
