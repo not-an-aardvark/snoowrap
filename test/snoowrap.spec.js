@@ -330,12 +330,12 @@ describe('snoowrap', function () {
     });
     it('can mute the author of a modmail', async () => {
       await modmail2.mute_author();
-      let mute_list = await modmail2.subreddit.get_muted_users();
+      const mute_list = await modmail2.subreddit.get_muted_users();
       expect(_.find(mute_list, {name: await modmail2.author.name})).to.be.defined;
     });
     it('can unmute the author of a modmail', async () => {
       await modmail2.unmute_author();
-      let mute_list = await modmail2.subreddit.get_muted_users();
+      const mute_list = await modmail2.subreddit.get_muted_users();
       expect(_.find(mute_list, {name: await modmail2.author.name})).to.be.undefined;
     });
   });

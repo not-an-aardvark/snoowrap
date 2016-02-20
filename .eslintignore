@@ -1,3 +1,2 @@
-*
-!src/*
-!test/*
+lib/
+doc/

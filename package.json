@@ -6,7 +6,8 @@
   "main": "lib/snoowrap.js",
   "scripts": {
     "compile": "babel -d lib/ src/ && documentation build src/snoowrap.js --shallow -o doc/ -f html",
-    "pretest": "eslint . && npm run compile",
+    "lint": "eslint .",
+    "pretest": "npm run lint && npm run compile",
     "test": "mocha --harmony_proxies --compilers js:babel-core/register",
     "prepublish": "npm run compile"
   },

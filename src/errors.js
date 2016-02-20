@@ -1,6 +1,6 @@
 'use strict';
-let constants = require('./constants');
-let errors = {
+const constants = require('./constants');
+module.exports = {
   RateLimitError: class extends Error {
     constructor (expiry_time_from_now) {
       super();
@@ -24,4 +24,3 @@ let errors = {
   },
   RateLimitWarning: time_until_reset => `Warning: ${constants.MODULE_NAME} temporarily stopped sending requests because reddit's ratelimit was exceeded. The request you attempted to send was queued, and will be sent to reddit when the current ratelimit period expires in ${time_until_reset} seconds.`
 };
-module.exports = errors;
