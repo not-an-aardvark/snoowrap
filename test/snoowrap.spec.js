@@ -111,8 +111,10 @@ describe('snoowrap', function () {
       const random_post = await r.get_random_submission();
       expect(random_post).to.be.an.instanceof(snoowrap.objects.Submission);
     });
-    it('can enable inbox replies on a submission');
-    it('can disable inbox replies on a submission');
+    it('can enable/disable inbox replies on a submission', async () => {
+      // There's no way to tell whether inbox replies are enabled/disabled with the API, but make sure no errors are thrown
+      await r.get_submission('443v2b').enable_inbox_replies().disable_inbox_replies();
+    });
   });
 
   describe('getting a list of posts', () => {
