@@ -41,7 +41,7 @@ const snoowrap = class snoowrap {
     this.client_secret = client_secret;
     this.refresh_token = refresh_token;
     this.access_token = access_token;
-    this.config = require('./default_config');
+    this.config = require('./default_config'); // TODO: Make a snoowrap.prototype.config function that accepts an object
     this._throttle = Promise.resolve();
     constants.HTTP_VERBS.forEach(type => {
       Object.defineProperty(this, type, {get: () => this._oauth_requester.defaults({method: type})});
@@ -1468,9 +1468,12 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   wikibanned, wikicontributor, wikiunbanned, wikipagelisted, removewikicontributor, wikirevise, wikipermlevel,
   ignorereports, unignorereports, setpermissions, setsuggestedsort, sticky, unsticky, setcontestmode, unsetcontestmode,
   lock, unlock, muteuser, unmuteuser, createrule, editrule, deleterule`
+  * @returns {Listing} A listing containing moderation actions
+  * @memberof snoowrap
+  * @instance
   */
-  async get_moderation_log ({mods, type} = {}) {
-    return await this.get({uri: `r/${this.display_name}/about/log`, qs: {mod: mods.join(','), type}});
+  get_moderation_log ({mods, type} = {}) {
+    return this.get({uri: `r/${this.display_name}/about/log`, qs: {mod: mods && mods.join(','), type}});
   }
   get_reports ({only} = {}) {
     return this.get({uri: `r/${this.display_name}/about/reports`, qs: {only}});
@@ -1668,7 +1671,7 @@ objects.more = class more extends objects.RedditContent {
 
 objects.UserList = class UserList {
   constructor (options, _ac) {
-    return options.children.map(user => _ac._new_object('RedditUser', user, true));
+    return options.children.map(user => _ac._new_object('RedditUser', user, false));
   }
 };
 
@@ -1677,6 +1680,7 @@ objects.PromoCampaign = class PromoCampaign extends objects.RedditContent {};
 objects.KarmaList = class KarmaList extends objects.RedditContent {};
 objects.TrophyList = class TrophyList extends objects.RedditContent {};
 objects.SubredditSettings = class SubredditSettings extends objects.RedditContent {};
+objects.modaction = class modaction extends objects.RedditContent {};
 
 snoowrap.objects = objects;
 snoowrap.helpers = helpers;

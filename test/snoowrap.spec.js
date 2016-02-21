@@ -257,6 +257,33 @@ describe('snoowrap', function () {
     });
   });
 
+  describe('subreddit moderation lists', () => {
+    let sub;
+    before(() => {
+      sub = r.get_subreddit('snoowrap_testing');
+    });
+    describe('getting the moderation log', () => {
+      before(async () => {
+        await r.get_comment('czn0rpn').remove().approve(); // Adds some events to the modlog for easier confirmation tests
+      });
+      it('can get the full moderation log', async () => {
+        const log = await sub.get_moderation_log();
+        expect(log[0].action).to.equal('approvecomment');
+        expect(log[1].action).to.equal('removecomment');
+      });
+      it('can filter the log by event type', async () => {
+        const log = await sub.get_moderation_log({type: 'removecomment'});
+        expect(log[0].action).to.equal('removecomment');
+      });
+      it('can filter the log by moderator', async () => {
+        const log = await sub.get_moderation_log({mods: [await r.get_me().name]});
+        expect(log[0].action).to.equal('approvecomment');
+        const log2 = await sub.get_moderation_log({mods: ['not_a_mod']});
+        expect(log2).to.be.empty;
+      });
+    });
+  });
+
   describe('comment/post actions', () => {
     let post, comment;
     beforeEach(() => {
