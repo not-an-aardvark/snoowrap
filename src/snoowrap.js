@@ -1668,9 +1668,7 @@ objects.more = class more extends objects.RedditContent {
 
 objects.UserList = class UserList {
   constructor (options, _ac) {
-    return options.children.map(user => {
-      return new objects.RedditUser(user, _ac);
-    });
+    return options.children.map(user => _ac._new_object('RedditUser', user, true));
   }
 };
 
