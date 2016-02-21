@@ -39,7 +39,7 @@
     "harmony-reflect": "^1.4.2",
     "lodash": "^4.5.0",
     "moment": "^2.11.2",
-    "promise-chains": "^0.2.2",
+    "promise-chains": "^0.2.4",
     "request-promise": "^2.0.1"
   },
   "devDependencies": {

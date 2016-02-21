@@ -121,8 +121,8 @@ const snoowrap = class snoowrap {
     };
     return new Proxy(default_requester, {apply: (...args) => promise_wrap(handle_request(...args))});
   }
-  _new_object(object_type, content, has_fetched) {
-    return new objects[object_type](content, this, has_fetched);
+  _new_object(object_type, content, _has_fetched) {
+    return new objects[object_type](content, this, _has_fetched);
   }
   _revoke_token (token) {
     return this._base_client_requester.post({uri: 'revoke_token', form: {token}});
@@ -731,11 +731,12 @@ objects.RedditContent = class RedditContent {
   * @private
   * @param {object} options The properties that the RedditContent should be initialized with
   * @param {object} _ac The authenticated client (i.e. `snoowrap` instance) that is being used to fetch this object
-  * @param {boolean} has_fetched Determines whether this object was created fully-formed (as opposed to lacking information)
+  * @param {boolean} _has_fetched Determines whether this object was created fully-formed (as opposed to lacking information)
   */
-  constructor(options, _ac, has_fetched) {
+  constructor(options, _ac, _has_fetched) {
     this._ac = _ac;
-    this.has_fetched = !!has_fetched;
+    this._fetch = undefined;
+    this._has_fetched = !!_has_fetched;
     _.assignIn(this, options);
     /* Omit the 'delete' request shortcut, since the property name is used by Comments and Submissions. To send an HTTP DELETE
     request, use `this._ac.delete` rather than the shortcut `this.delete`. */
@@ -743,7 +744,7 @@ objects.RedditContent = class RedditContent {
       Object.defineProperty(this, type, {get: () => this._ac[type]});
     });
     return new Proxy(this, {get: (target, key) => {
-      if (key in target || key === 'length' || key in Promise.prototype || target.has_fetched) {
+      if (key in target || key === 'length' || key in Promise.prototype || target._has_fetched) {
         return target[key];
       }
       if (key === '_raw') {
@@ -757,18 +758,13 @@ objects.RedditContent = class RedditContent {
   }
   /**
   * Fetches this content from reddit.
-  * @returns {Promise} The updated version of this object with all of its fetched properties. This will update the object
-  with all of its properties from reddit, and set has_fetched property to `true`. Once an object has been fetched, any
-  reference to an unknown property will simply return `undefined` instead of a Promise. Calling this
-  on an already-fetched object will have no effect; to refresh an object, use `refresh()` instead.
+  * @returns {Promise} A version of this object with all of its fetched properties from reddit. This will **not** mutate the
+  object. and set _has_fetched property to `true`. Once an object has been fetched once, fetching it again will have no affect;
+  to refresh an object, use #refresh.
   */
   fetch () {
     if (!this._fetch) {
-      this._fetch = promise_wrap(this._ac.get({uri: this._uri}).bind(this).then(this._transform_api_response).then(res => {
-        helpers._assign_to_proxy(this, res);
-        this.has_fetched = true;
-        return this;
-      }));
+      this._fetch = promise_wrap(this._ac.get({uri: this._uri}).bind(this).then(this._transform_api_response));
     }
     return this._fetch;
   }
@@ -777,7 +773,7 @@ objects.RedditContent = class RedditContent {
   * @returns {Promise} A newly-fetched version of this content
   */
   refresh () {
-    delete this._fetch;
+    this._fetch = undefined;
     return this.fetch();
   }
   /**

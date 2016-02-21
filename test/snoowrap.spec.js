@@ -34,10 +34,10 @@ describe('snoowrap', function () {
       user = r.get_user('not_an_aardvark');
     });
     it('gets information from a user profile', async () => {
-      await user.fetch();
-      expect(user.name).to.equal('not_an_aardvark');
-      expect(user.created_utc).to.equal(1419104352);
-      expect(user.nonexistent_property).to.be.undefined;
+      const fetched_user = await user.fetch();
+      expect(fetched_user.name).to.equal('not_an_aardvark');
+      expect(fetched_user.created_utc).to.equal(1419104352);
+      expect(fetched_user.nonexistent_property).to.be.undefined;
     });
     it('returns individual properties as Promises', async () => {
       expect(await user.has_verified_email).to.be.true;
@@ -63,8 +63,7 @@ describe('snoowrap', function () {
       expect(await comment.author.has_verified_email).to.be.true;
     });
     it('should be able to fetch replies to comments', async () => {
-      await comment.replies.fetch_more(5);
-      expect(comment.replies[0].body).to.equal("Let's knock the humor down to 65%.");
+      expect(await comment.replies[0].body).to.equal("Let's knock the humor down to 65%.");
     });
     it("should be able to get promise for listing items before they're fetched", async () => {
       expect(await comment.replies[0].body).to.equal("Let's knock the humor down to 65%.");
@@ -88,16 +87,17 @@ describe('snoowrap', function () {
     });
     it('can get details on a submission', async () => {
       expect(await submission.title).to.equal('What tasty food would be distusting if eaten over rice?');
-      expect(submission.author.name).to.equal('DO_U_EVN_SPAGHETTI');
+      expect(submission.author.name.value()).to.equal('DO_U_EVN_SPAGHETTI');
     });
     it('can get comments on a submission', async () => {
-      expect(await submission.comments.is_finished).to.be.false;
-      expect(await submission.comments.fetch_more(5)).to.have.length.within(6, 100);
-      expect(submission.comments[0]).to.be.an.instanceof(snoowrap.objects.Comment);
-      expect(_.last(submission.comments)).to.be.an.instanceof(snoowrap.objects.Comment);
-      await submission.comments.fetch_all();
-      expect(submission.comments).to.have.length.above(1000);
-      expect(submission.comments.is_finished).to.be.true;
+      const comments = await submission.comments;
+      expect(comments.is_finished).to.be.false;
+      expect(await comments.fetch_more(5)).to.have.length.within(6, 100);
+      expect(comments[0]).to.be.an.instanceof(snoowrap.objects.Comment);
+      expect(_.last(await comments)).to.be.an.instanceof(snoowrap.objects.Comment);
+      await comments.fetch_all();
+      expect(comments).to.have.length.above(1000);
+      expect(comments.is_finished).to.be.true;
     });
     it("can get comments by index before they're fetched", async () => {
       expect(await submission.comments[6].body).to.equal('pumpkin pie');
@@ -343,21 +343,21 @@ describe('snoowrap', function () {
     });
     it('can remove/approve a post', async () => {
       await post.remove().refresh();
-      expect(post.banned_by).to.not.be.null;
-      expect(post.approved_by).to.be.null;
+      expect(post.banned_by.value()).to.not.be.null;
+      expect(post.approved_by.value()).to.be.null;
       await post.approve().refresh();
-      expect(post.banned_by).to.be.null;
-      expect(post.approved_by).to.not.be.null;
+      expect(post.banned_by.value()).to.be.null;
+      expect(post.approved_by.value()).to.not.be.null;
       // There's no way to differentiate posts marked as spam with the API, but make sure the function doesn't throw an error.
       await post.mark_as_spam().approve();
     });
     it('can remove/approve a comment', async () => {
       await comment.remove().refresh();
-      expect(comment.banned_by).to.not.be.null;
-      expect(comment.approved_by).to.be.null;
+      expect(comment.banned_by.value()).to.not.be.null;
+      expect(comment.approved_by.value()).to.be.null;
       await comment.approve().refresh();
-      expect(comment.banned_by).to.be.null;
-      expect(comment.approved_by).to.not.be.null;
+      expect(comment.banned_by.value()).to.be.null;
+      expect(comment.approved_by.value()).to.not.be.null;
     });
   });
 
