@@ -939,7 +939,7 @@ objects.VoteableContent = class VoteableContent extends objects.CreatableContent
       sticky: sticky,
       id: this.name
     }}).then(response => {
-      helpers._assign_to_proxy(this, response.json.data.things[0]);
+      this._fetch = response.json.data.things[0];
       return this;
     }));
   }
@@ -961,7 +961,7 @@ objects.VoteableContent = class VoteableContent extends objects.CreatableContent
       uri: 'api/editusertext',
       form: {api_type, text: updated_text, thing_id: this.name}
     }).then(response => {
-      helpers._assign_to_proxy(this, response.json.data.things[0]);
+      this._fetch = response.json.data.things[0];
       return this;
     }));
   }
