@@ -263,30 +263,41 @@ describe('snoowrap', function () {
     });
   });
 
-  describe('subreddit moderation lists', () => {
+  describe('getting subreddit mod listings', () => {
     let sub;
-    before(() => {
+    before(async () => {
       sub = r.get_subreddit('snoowrap_testing');
+      await r.get_comment('czn0rpn').remove().approve(); // Adds some events to the modlog for easier confirmation tests
     });
-    describe('getting the moderation log', () => {
-      before(async () => {
-        await r.get_comment('czn0rpn').remove().approve(); // Adds some events to the modlog for easier confirmation tests
-      });
-      it('can get the full moderation log', async () => {
-        const log = await sub.get_moderation_log();
-        expect(log[0].action).to.equal('approvecomment');
-        expect(log[1].action).to.equal('removecomment');
-      });
-      it('can filter the log by event type', async () => {
-        const log = await sub.get_moderation_log({type: 'removecomment'});
-        expect(log[0].action).to.equal('removecomment');
-      });
-      it('can filter the log by moderator', async () => {
-        const log = await sub.get_moderation_log({mods: [await r.get_me().name]});
-        expect(log[0].action).to.equal('approvecomment');
-        const log2 = await sub.get_moderation_log({mods: ['not_a_mod']});
-        expect(log2).to.be.empty;
-      });
+    it('can get the full modlog', async () => {
+      const log = await sub.get_moderation_log();
+      expect(log[0].action).to.equal('approvecomment');
+      expect(log[1].action).to.equal('removecomment');
+    });
+    it('can filter the modlog by event type', async () => {
+      const log = await sub.get_moderation_log({type: 'removecomment'});
+      expect(log[0].action).to.equal('removecomment');
+    });
+    it('can filter the modlog by moderator', async () => {
+      const log = await sub.get_moderation_log({mods: [await r.get_me().name]});
+      expect(log[0].action).to.equal('approvecomment');
+      const log2 = await sub.get_moderation_log({mods: ['not_a_mod']});
+      expect(log2).to.be.empty;
+    });
+    it('can get reported items', async () => {
+      expect(await sub.get_reports()).to.be.an.instanceof(snoowrap.objects.Listing);
+    });
+    it('can get removed items', async () => {
+      expect(await sub.get_spam()).to.be.an.instanceof(snoowrap.objects.Listing);
+    });
+    it('can get the modqueue', async () => {
+      expect(await sub.get_modqueue()).to.be.an.instanceof(snoowrap.objects.Listing);
+    });
+    it('can get unmoderated items', async () => {
+      expect(await sub.get_unmoderated()).to.be.an.instanceof(snoowrap.objects.Listing);
+    });
+    it('can get edited items', async () => {
+      expect(await sub.get_edited()).to.be.an.instanceof(snoowrap.objects.Listing);
     });
   });
 
@@ -453,7 +464,6 @@ describe('snoowrap', function () {
     it.skip('can create a linkpost on a particular subreddit');
     it.skip('can create a subreddit', async () => {
       const sub_name = moment().format().slice(0,19).replace(/[-:]/g,'_');
-      console.log(`SUB_NAME: ${sub_name}`);
       const new_sub = await r.create_subreddit({
         description: 'a test subreddit for snoowrap',
         name: sub_name,

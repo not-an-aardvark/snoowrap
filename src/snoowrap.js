@@ -1585,26 +1585,54 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   wikibanned, wikicontributor, wikiunbanned, wikipagelisted, removewikicontributor, wikirevise, wikipermlevel,
   ignorereports, unignorereports, setpermissions, setsuggestedsort, sticky, unsticky, setcontestmode, unsetcontestmode,
   lock, unlock, muteuser, unmuteuser, createrule, editrule, deleterule`
-  * @returns {Listing} A listing containing moderation actions
-  * @memberof snoowrap
-  * @instance
+  * @returns {Listing} A Listing containing moderation actions
   */
   get_moderation_log (options = {}) {
     const parsed_options = _(options).assign({mod: options.mods && options.mods.join(',')}).omit(['mods']).value();
     return this.get({uri: `r/${this.display_name}/about/log`, qs: parsed_options});
   }
+  /**
+  * Gets a list of reported items on this subreddit.
+  * @param {object} [options={}] Options for the resulting Listing
+  * @param {string} [options.only=] Restricts the Listing to the specified type of item. One of `links, comments`
+  * @returns {Promise} A Listing containing reported items
+  */
   get_reports (options = {}) {
     return this.get({uri: `r/${this.display_name}/about/reports`, qs: options});
   }
+  /**
+  * Gets a list of removed items on this subreddit.
+  * @param {object} [options={}] Options for the resulting Listing
+  * @param {string} [options.only=] Restricts the Listing to the specified type of item. One of `links, comments`
+  * @returns {Promise} A Listing containing removed items
+  */
   get_spam (options = {}) {
     return this.get({uri: `r/${this.display_name}/about/spam`, qs: options});
   }
+  /**
+  * Gets a list of items on the modqueue on this subreddit.
+  * @param {object} [options={}] Options for the resulting Listing
+  * @param {string} [options.only=] Restricts the Listing to the specified type of item. One of `links, comments`
+  * @returns {Promise} A Listing containing items on the modqueue
+  */
   get_modqueue (options = {}) {
     return this.get({uri: `r/${this.display_name}/about/modqueue`, qs: options});
   }
+  /**
+  * Gets a list of unmoderated items on this subreddit.
+  * @param {object} [options={}] Options for the resulting Listing
+  * @param {string} [options.only=] Restricts the Listing to the specified type of item. One of `links, comments`
+  * @returns {Promise} A Listing containing unmoderated items
+  */
   get_unmoderated (options = {}) {
     return this.get({uri: `r/${this.display_name}/about/unmoderated`, qs: options});
   }
+  /**
+  * Gets a list of edited items on this subreddit.
+  * @param {object} [options={}] Options for the resulting Listing
+  * @param {string} [options.only=] Restricts the Listing to the specified type of item. One of `links, comments`
+  * @returns {Promise} A Listing containing edited items
+  */
   get_edited (options = {}) {
     return this.get({uri: `r/${this.display_name}/about/edited`, qs: options});
   }
@@ -1730,7 +1758,7 @@ objects.Listing = class Listing extends Array {
   */
   fetch_more (amount = this.limit) {
     if (typeof amount !== 'number') {
-      throw new errors.InvalidMethodCallError('Failed to fetch listing. (amount must be a Number.)');
+      throw new errors.InvalidMethodCallError('Failed to fetch Listing. (amount must be a Number.)');
     }
     if (amount <= 0 || this.is_finished) {
       return [];
@@ -1753,7 +1781,7 @@ objects.Listing = class Listing extends Array {
     return response.slice(0, amount).concat(await this.fetch_more(amount - response.length));
   }
   /* Pagination for comments works differently than it does for most other things; rather than sending a link to the next page
-  within a listing, reddit sends the last comment in the list as as a `more` object, with links to all the remaining comments
+  within a Listing, reddit sends the last comment in the list as as a `more` object, with links to all the remaining comments
   in the thread. */
   async _fetch_more_comments (...args) {
     const new_comments = this._more ? await this._more.fetch_more(...args) : [];
@@ -1779,14 +1807,14 @@ objects.more = class more extends objects.RedditContent {
   to /api/info. */
   async fetch_more (amount) {
     if (isNaN(amount)) {
-      throw new errors.InvalidMethodCallError('Failed to fetch listing. (`amount` must be a Number.)');
+      throw new errors.InvalidMethodCallError('Failed to fetch Listing. (`amount` must be a Number.)');
     }
     if (amount <= 0 || this.children.length === 0) {
       return [];
     }
     const ids_for_this_request = this.children.splice(0, Math.min(amount, 100)).map(id => `t1_${id}`);
     // Requests are capped at 100 comments. Send lots of requests recursively to get the comments, then concatenate them.
-    // (This speed-requesting is only possible with comment listings since the entire list of ids is present initially.)
+    // (This speed-requesting is only possible with comment Listings since the entire list of ids is present initially.)
     const promise_for_this_batch = this.get({uri: 'api/info', qs: {id: ids_for_this_request.join(',')}});
     const promise_for_remaining_items = this.fetch_more(amount - ids_for_this_request.length);
     return _.toArray(await promise_for_this_batch).concat(await promise_for_remaining_items);

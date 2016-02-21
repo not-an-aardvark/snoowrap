@@ -26,8 +26,8 @@ exports._populate = (response_tree, _ac) => {
       }
       return exports._populate(value, _ac);
     });
-    if (result.length === 2 && result[0].constructor.name === 'Listing' && result[0][0].constructor.name === 'Submission' &&
-        result[1].constructor.name === 'Listing') {
+    if (result.length === 2 && result[0] && result[0].constructor.name === 'Listing' && result[0][0] &&
+        result[0][0].constructor.name === 'Submission' && result[1] && result[1].constructor.name === 'Listing') {
       result[0][0].comments = result[1];
       return result[0][0];
     }
