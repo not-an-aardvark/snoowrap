@@ -451,7 +451,18 @@ describe('snoowrap', function () {
     it.skip('can create a linkpost given a subreddit object');
     it.skip('can create a selfpost on a particular subreddit');
     it.skip('can create a linkpost on a particular subreddit');
-    it.skip('can create a subreddit');
+    it.skip('can create a subreddit', async () => {
+      const sub_name = moment().format().slice(0,19).replace(/[-:]/g,'_');
+      console.log(`SUB_NAME: ${sub_name}`);
+      const new_sub = await r.create_subreddit({
+        description: 'a test subreddit for snoowrap',
+        name: sub_name,
+        public_description: 'a test subreddit for snoowrap',
+        type: 'private',
+        title: 'yay another test sub'
+      });
+      expect(new_sub).to.be.an.instanceof(snoowrap.objects.Subreddit);
+    });
     it.skip('can compose a message', async () => {
       const timestamp = moment().format();
       await r.compose_message({

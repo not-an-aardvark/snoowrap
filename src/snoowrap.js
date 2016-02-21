@@ -637,7 +637,7 @@ const snoowrap = class snoowrap {
     description,
     exclude_banned_modqueue = false,
     'header-title': header_title,
-    hide_ads = true, // Only allowed for gold-exclusive subreddits
+    hide_ads = false,
     lang = 'en',
     link_type = 'any',
     name,
@@ -659,12 +659,17 @@ const snoowrap = class snoowrap {
     wiki_edit_karma,
     wikimode = 'modonly'
   }) {
-    return this.post({uri: 'api/siteadmin', form: {
+    return promise_wrap(this.post({uri: 'api/site_admin', form: {
       allow_top, api_type, captcha, collapse_deleted_comments, comment_score_hide_mins, description, exclude_banned_modqueue,
       'header-title': header_title, hide_ads, iden: captcha_iden, lang, link_type, name, over_18, public_description,
       public_traffic, show_media, spam_comments, spam_links, spam_selfposts, sr, submit_link_label, submit_text,
       submit_text_label, suggested_comment_sort, title, type, wiki_edit_age, wiki_edit_karma, wikimode
-    }});
+    }}).then(result => {
+      if (result.json.errors.length) {
+        throw result.json.errors[0];
+      }
+      return(this.get_subreddit(name));
+    }));
   }
   /**
   * Creates a new subreddit.
@@ -675,6 +680,8 @@ const snoowrap = class snoowrap {
   blocked-access page if this subreddit is private. (500 characters max)
   * @param {string} options.description The sidebar text for the subreddit. (5120 characters max)
   * @param {string} [options.submit_text=''] The text to show below the submission page (1024 characters max)
+  * @param {boolean} [options.hide_ads=false] Determines whether ads should be hidden on this subreddit. (This is only
+  allowed for gold-only subreddits.)
   * @param {string} [options.lang='en'] The language of the subreddit (represented as an IETF language tag)
   * @param {string} [options.type='public'] Determines who should be able to access the subreddit. This should be one of
   `public, private, restricted, gold_restricted, gold_only, archived, employees_only`.
