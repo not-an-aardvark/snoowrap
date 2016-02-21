@@ -394,7 +394,7 @@ describe('snoowrap', function () {
       expect(await first_mod_of_that_subreddit.created_utc).to.equal(1211483632);
     });
     it('throttles requests as specified by the config parameters', async () => {
-      r.config.request_delay = 2000;
+      r.config({request_delay: 2000});
       const timer = Promise.delay(1999);
       await r.get_user('not_an_aardvark').fetch();
       await r.get_user('actually_an_aardvark').fetch();

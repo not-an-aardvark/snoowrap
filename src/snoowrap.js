@@ -41,7 +41,7 @@ const snoowrap = class snoowrap {
     this.client_secret = client_secret;
     this.refresh_token = refresh_token;
     this.access_token = access_token;
-    this.config = require('./default_config'); // TODO: Make a snoowrap.prototype.config function that accepts an object
+    this._config = require('./default_config');
     this._throttle = Promise.resolve();
     constants.HTTP_VERBS.forEach(type => {
       Object.defineProperty(this, type, {get: () => this._oauth_requester.defaults({method: type})});
@@ -51,7 +51,7 @@ const snoowrap = class snoowrap {
     return request.defaults({
       auth: {user: this.client_id, pass: this.client_secret},
       headers: {'user-agent': this.user_agent},
-      baseUrl: `https://www.${this.config.endpoint_domain}/api/v1/`
+      baseUrl: `https://www.${this._config.endpoint_domain}/api/v1/`
     });
   }
   async _update_access_token () {
@@ -66,7 +66,7 @@ const snoowrap = class snoowrap {
   get _oauth_requester () {
     const default_requester = request.defaults({
       headers: {'user-agent': this.user_agent},
-      baseUrl: `https://oauth.${this.config.endpoint_domain}`,
+      baseUrl: `https://oauth.${this._config.endpoint_domain}`,
       qs: {raw_json: 1}, // This tells reddit to unescape html characters, e.g. it will send '<' instead of '&lt;'
       resolveWithFullResponse: true,
       transform: (body, response) => {
@@ -80,7 +80,7 @@ const snoowrap = class snoowrap {
       }
     });
     const handle_request = async (requester, self, args, attempts = 0) => {
-      /* this._throttle is a timer that gets reset to this.config.request_delay whenever a request is sent.
+      /* this._throttle is a timer that gets reset to this._config.request_delay whenever a request is sent.
       This ensures that requests are throttled correctly according to the user's config settings, and that no requests are
       lost. The await statement is wrapped in a loop to make sure that if the throttle promise resolves while multiple
       requests are pending, only one of the requests is sent, and the others await the throttle again. (The loop is
@@ -88,12 +88,12 @@ const snoowrap = class snoowrap {
       while (!this._throttle.isFulfilled()) {
         await this._throttle;
       }
-      this._throttle = Promise.delay(this.config.request_delay);
+      this._throttle = Promise.delay(this._config.request_delay);
 
       if (this.ratelimit_remaining < 1 && this.ratelimit_reset_point.isAfter()) {
         // If the ratelimit has been exceeded, delay or abort the request depending on the user's config.
         const seconds_until_expiry = this.ratelimit_reset_point.diff(moment(), 'seconds');
-        if (this.config.continue_after_ratelimit_error) {
+        if (this._config.continue_after_ratelimit_error) {
           /* If the `continue_after_ratelimit_error` setting is enabled, queue the request, wait until the next ratelimit
           period, and then send it. */
           this.warn(errors.RateLimitWarning(seconds_until_expiry));
@@ -112,7 +112,7 @@ const snoowrap = class snoowrap {
         // Send the request and return the response.
         return await requester.defaults({auth: {bearer: this.access_token}})(...args);
       } catch (err) {
-        if (attempts + 1 < this.config.max_retry_attempts && _.includes(this.config.retry_error_codes, err.statusCode)) {
+        if (attempts + 1 < this._config.max_retry_attempts && _.includes(this._config.retry_error_codes, err.statusCode)) {
           this.warn(`Warning: Received status code ${err.statusCode} from reddit. Retrying request...`);
           return handle_request(requester, self, args, attempts + 1);
         }
@@ -126,6 +126,36 @@ const snoowrap = class snoowrap {
   }
   _revoke_token (token) {
     return this._base_client_requester.post({uri: 'revoke_token', form: {token}});
+  }
+  /**
+  * Retrieves or modifies the configuration options for this requester.
+  * @param {object} [object] A map of {[config property name]: value}. Note that any omitted config properties will simply
+  retain whatever value they had previously (In other words, if you only want to change one property, you only need to put
+  that one property in this parameter. To get the current configuration without modifying anything, simply omit this
+  parameter.)
+  * @param {string} [options.endpoint_domain='reddit.com'] The endpoint where requests should be sent
+  * @param {string} [options.request_delay=0] A minimum delay, in milliseconds, to enforce between API calls. If multiple
+  api calls are requested during this timespan, they will be queued and sent one at a time. Setting this to more than 1 will
+  ensure that reddit's ratelimit is never reached, but it will make things run slower than necessary if only a few requests
+  are being sent. If this is set to zero, snoowrap will not enforce any delay between individual requests. However, it will
+  still refuse to continue if reddit's enforced ratelimit (600 requests per 10 minutes) is exceeded.
+  * @param {string} [options.continue_after_ratelimit_error=false] Determines whether snoowrap should queue API calls if
+  reddit's ratelimit is exceeded. If set to `true` when the ratelimit is exceeded, snoowrap will queue all further requests,
+  and will attempt to send them again after the current ratelimit period expires (which happens every 10 minutes). If set
+  to `false`, snoowrap will simply throw an error when reddit's ratelimit is exceeded.
+  * @param {Number[]} [options.retry_error_codes=[502, 503, 504]] If reddit responds to a request with one of these error
+  codes, snoowrap will retry the request, up to a maximum of `options.max_retry_attempts` requests in total. (These errors
+  usually indicate that there was an temporary issue on reddit's end, and retrying the request has a decent chance of
+  success.) This behavior can be disabled by simply setting this property to an empty array.
+  * @param {number} [options.max_retry_attempts=3] See `options.retry_error_codes`.
+  * @param {boolean} [options.suppress_warnings=false] snoowrap may occasionally log relevant warnings, such as deprecation
+  notices, to the console. These can be disabled by setting this to `true`.
+  * @returns {object} An updated Object containing all of the configuration values
+  * @memberof snoowrap
+  * @instance
+  */
+  config (options) {
+    return _.assign(this._config, options);
   }
   /**
   * Invalidates the current access token.
@@ -158,9 +188,9 @@ const snoowrap = class snoowrap {
     });
   }
   inspect () {
-    // Hide confidential information (tokens, client IDs, etc.) from the console.log output.
+    // Hide confidential information (tokens, client IDs, etc.), as well as private properties, from the console.log output.
     const keys_for_hidden_values = ['client_secret', 'refresh_token', 'access_token'];
-    const formatted = _.mapValues(this, (value, key) => {
+    const formatted = _(this).omitBy((value, key) => key.startsWith('_')).mapValues((value, key) => {
       if (_.includes(keys_for_hidden_values, key)) {
         return value && '(redacted)';
       }
@@ -168,11 +198,11 @@ const snoowrap = class snoowrap {
         return value.format();
       }
       return value;
-    });
+    }).value();
     return `<${constants.MODULE_NAME} authenticated client> ${util.inspect(formatted)}`;
   }
   warn (...args) {
-    if (!this.config.suppress_warnings) {
+    if (!this._config.suppress_warnings) {
       console.warn(...args);
     }
   }
