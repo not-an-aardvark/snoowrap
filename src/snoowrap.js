@@ -40,6 +40,7 @@ const snoowrap = class snoowrap {
     this.client_id = client_id;
     this.client_secret = client_secret;
     this.refresh_token = refresh_token;
+    this.access_token = access_token;
     this.config = require('./default_config');
     this._throttle = Promise.resolve();
     constants.HTTP_VERBS.forEach(type => {
@@ -49,14 +50,15 @@ const snoowrap = class snoowrap {
   get _base_client_requester () {
     return request.defaults({
       auth: {user: this.client_id, pass: this.client_secret},
-      headers: {'user-agent': this.user_agent}
+      headers: {'user-agent': this.user_agent},
+      baseUrl: `https://www.${this.config.endpoint_domain}/api/v1/`
     });
   }
   async _update_access_token () {
-    const token_info = await this._base_client_requester.post({
-      url: `https://www.${this.config.endpoint_domain}/api/v1/access_token`,
-      form: {grant_type: 'refresh_token', refresh_token: this.refresh_token}
-    });
+    const token_info = await this._base_client_requester.post({uri: 'access_token', form: {
+      grant_type: 'refresh_token',
+      refresh_token: this.refresh_token
+    }});
     this.access_token = token_info.access_token;
     this.token_expiration = moment().add(token_info.expires_in, 'seconds');
     this.scope = token_info.scope.split(' ');
@@ -78,24 +80,29 @@ const snoowrap = class snoowrap {
       }
     });
     const handle_request = async (requester, self, args, attempts = 0) => {
-      if (this.ratelimit_remaining < 1 && this.ratelimit_reset_point.isAfter()) {
-        const seconds_until_expiry = this.ratelimit_reset_point.diff(moment(), 'seconds');
-        if (this.config.continue_after_ratelimit_error) {
-          this.warn(errors.RateLimitWarning(seconds_until_expiry));
-          await Promise.delay(this.ratelimit_reset_point.diff());
-        } else {
-          throw new errors.RateLimitError(seconds_until_expiry);
-        }
-      }
       /* this._throttle is a timer that gets reset to this.config.request_delay whenever a request is sent.
-      This ensures that requests are ratelimited and that no requests are lost. The await statement is wrapped
-      in a loop to make sure that if the throttle promise resolves while multiple requests are pending, only
-      one of the requests will be sent, and the others will await the throttle again. (The loop is non-blocking
-      due to its await statement.) */
+      This ensures that requests are throttled correctly according to the user's config settings, and that no requests are
+      lost. The await statement is wrapped in a loop to make sure that if the throttle promise resolves while multiple
+      requests are pending, only one of the requests is sent, and the others await the throttle again. (The loop is
+      non-blocking due to its await statement.) */
       while (!this._throttle.isFulfilled()) {
         await this._throttle;
       }
       this._throttle = Promise.delay(this.config.request_delay);
+
+      if (this.ratelimit_remaining < 1 && this.ratelimit_reset_point.isAfter()) {
+        // If the ratelimit has been exceeded, delay or abort the request depending on the user's config.
+        const seconds_until_expiry = this.ratelimit_reset_point.diff(moment(), 'seconds');
+        if (this.config.continue_after_ratelimit_error) {
+          /* If the `continue_after_ratelimit_error` setting is enabled, queue the request, wait until the next ratelimit
+          period, and then send it. */
+          this.warn(errors.RateLimitWarning(seconds_until_expiry));
+          await Promise.delay(this.ratelimit_reset_point.diff());
+        } else {
+          // Otherwise, throw an error.
+          throw new errors.RateLimitError(seconds_until_expiry);
+        }
+      }
 
       try {
         // If the access token has expired (or will expire in the next 10 seconds), refresh it.
@@ -118,10 +125,7 @@ const snoowrap = class snoowrap {
     return new objects[object_type](content, this, has_fetched);
   }
   _revoke_token (token) {
-    return this._base_client_requester.post({
-      url: `https://www.${this.config.endpoint_domain}/api/v1/revoke_token`,
-      form: {token}
-    });
+    return this._base_client_requester.post({uri: 'revoke_token', form: {token}});
   }
   /**
   * Invalidates the current access token.
