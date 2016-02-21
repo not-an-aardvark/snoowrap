@@ -63,10 +63,7 @@ describe('snoowrap', function () {
       expect(await comment.author.has_verified_email).to.be.true;
     });
     it('should be able to fetch replies to comments', async () => {
-      expect(await comment.replies[0].body).to.equal("Let's knock the humor down to 65%.");
-    });
-    it("should be able to get promise for listing items before they're fetched", async () => {
-      expect(await comment.replies[0].body).to.equal("Let's knock the humor down to 65%.");
+      expect(await comment.replies.fetch_until({length: 1})[0].body).to.equal("Let's knock the humor down to 65%.");
     });
   });
 

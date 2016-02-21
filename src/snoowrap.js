@@ -759,8 +759,8 @@ objects.RedditContent = class RedditContent {
   /**
   * Fetches this content from reddit.
   * @returns {Promise} A version of this object with all of its fetched properties from reddit. This will **not** mutate the
-  object. and set _has_fetched property to `true`. Once an object has been fetched once, fetching it again will have no affect;
-  to refresh an object, use #refresh.
+  object. and set _has_fetched property to `true`. Once an object has been fetched once, fetching it again will have no
+  effect. To refresh an object, use #refresh.
   */
   fetch () {
     if (!this._fetch) {
@@ -1007,7 +1007,7 @@ objects.Comment = class Comment extends objects.VoteableContent {
     const replies_uri = `comments/${response_obj[0].link_id.slice(3)}`;
     const replies_query = {comment: this.name.slice(3)};
     const _transform = item => item.comments[0].replies;
-    response_obj[0].replies = new objects.Listing({uri: replies_uri, query: replies_query, _transform}, this._ac);
+    response_obj[0].replies = this._ac._new_object('Listing', {uri: replies_uri, query: replies_query, _transform});
     return response_obj[0];
   }
   get _uri () {
@@ -1700,11 +1700,8 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
 /**
 * A class representing a list of content. This is a subclass of the native Array object, so it has all the properties of
 an Array (length, forEach, etc.) in addition to some added methods. At any given time, each Listing has fetched a specific
-number of items, and that number will be its length. However, if a value greater than the length is accessed (e.g. with
-`some_listing[very_high_index]`), then the Listing will automatically fetch more items until either
-(a) it has an item at the requested index, or (b) it runs out of items to fetch. In the meantime, the expression that
-referenced the high index will return a Promise for that value, which will get resolved after the entries are fetched. In
-addition to this feature, all Listings also have a few convenience methods, described below.<br><br>
+number of items, and that number will be its length. The Listing  can be extended by using the #fetch_more(), #fetch_until,
+and #fetch_all() functions.
 
 Most methods that return Listings will also accept `limit`, `after`, `before`, `show`, and `count` properties.
 */
@@ -1726,12 +1723,6 @@ objects.Listing = class Listing extends Array {
       this._more = this.pop();
       this._is_comment_list = true;
     }
-    return new Proxy(this, {get: (target, key, thisArg) => {
-      if (!isNaN(key) && key >= target.length) {
-        return promise_wrap(target.fetch_more(key - target.length + 1).get(key));
-      }
-      return Reflect.get(target, key, thisArg);
-    }});
   }
   get _requester () {
     return this._ac._oauth_requester.defaults({uri: this.uri, method: this.method, qs: this.constant_params});
@@ -1760,12 +1751,12 @@ objects.Listing = class Listing extends Array {
       return [];
     }
     if (this._is_comment_list) {
-      return this._fetch_more_comments(amount).return(this);
+      return promise_wrap(this._fetch_more_comments(amount).then(() => this));
     }
     if (!this.uri) {
       return [];
     }
-    return this._fetch_more_regular(amount).return(this);
+    return promise_wrap(this._fetch_more_regular(amount).then(() => this));
   }
   async _fetch_more_regular (amount) {
     const limit_for_request = Math.min(amount, this.limit) || this.limit;
@@ -1791,6 +1782,16 @@ objects.Listing = class Listing extends Array {
   */
   fetch_all () {
     return this.fetch_more(Infinity);
+  }
+  /**
+  * Fetches items until a given length is reached.
+  * @param {object} $0
+  * @param {number} $0.length The maximum length that the Listing should have after completion. The length might end up
+  being less than this if the true number of available items in the Listing is less than `$0.length`. For example, this
+  can't fetch 200 comments on a Submission that only has 100 comments in total.
+  */
+  fetch_until ({length}) {
+    return this.fetch_more(length - this.length);
   }
   inspect () {
     return `<${constants.MODULE_NAME}.objects.${this.constructor.name}> ${util.inspect(_.toArray(this))}`;
