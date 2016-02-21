@@ -594,13 +594,23 @@ const snoowrap = class snoowrap {
   get_oauth_scope_list () {
     return promise_wrap(this.get({uri: 'api/v1/scopes'}));
   }
-  search ({query, restrict_sr = true, sort, time, sr_detail, include_facets, type, syntax, subreddit}) {
-    if (subreddit instanceof objects.Subreddit) {
-      subreddit = subreddit.display_name;
+  /**
+  * Conducts a search of reddit submissions.
+  * @param {object} options Search options. Can also contain options for the resulting Listing.
+  * @param {string} options.query The search query
+  * @param {string} [options.time=] Describes the timespan that posts should be retrieved frome. One of
+  `hour, day, week, month, year, all`
+  * @param {Subreddit|string} [options.subreddit=] The subreddit to conduct the search on.
+  * @param {boolean} [options.restrict_sr=true] Restricts search results to the given subreddit
+  * @param {string} [options.sort=] Determines how the results should be sorted. One of `relevance, hot, top, new, comments`
+  * @param {string} [options.syntax='plain'] Specifies a syntax for the search. One of `cloudsearch, lucene, plain`
+  */
+  search (options) {
+    if (options.subreddit instanceof objects.Subreddit) {
+      options.subreddit = options.subreddit.display_name;
     }
-    return this.get({uri: `${subreddit ? `r/${subreddit}/` : ''}search`, qs: {
-      include_facets, q: query, restrict_sr, sort, sr_detail, syntax, t: time, type
-    }});
+    const parsed_query = _(options).assign({t: options.time, q: options.query}).omit(['time', 'query']).value();
+    return this.get({uri: `${options.subreddit ? `r/${options.subreddit}/` : ''}search`, qs: parsed_query});
   }
   get_recommended_subreddits ({sr_names, omit_names}) {
     return this.get({uri: `api/recommend/sr/${sr_names.join(',')}`, qs: {omit: omit_names.join(',')}});

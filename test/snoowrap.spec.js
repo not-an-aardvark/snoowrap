@@ -398,7 +398,20 @@ describe('snoowrap', function () {
   });
 
   describe('search', () => {
-    it('can search for posts based on various parameters');
+    it.only('can search for posts based on various parameters', async () => {
+      const results = await r.search({
+        subreddit: 'AskReddit',
+        query: 'What tasty food would be distusting if eaten over rice?', // (sic)
+        sort: 'relevance',
+        time: 'all',
+        limit: 2
+      });
+      expect(results).to.have.lengthOf(2);
+      expect(results[0]).to.be.an.instanceof(snoowrap.objects.Submission);
+      expect(results[0].author.name).to.equal('DO_U_EVN_SPAGHETTI');
+      await results.fetch_more(2);
+      expect(results).to.have.lengthOf(4);
+    });
     it('can get recommended subreddits');
     it('can search for a list of subreddits');
   });
