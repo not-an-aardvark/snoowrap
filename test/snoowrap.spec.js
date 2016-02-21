@@ -6,7 +6,7 @@ const moment = require('moment');
 const snoowrap = require('..');
 const errors = require('../lib/errors');
 describe('snoowrap', function () {
-  this.timeout(10000);
+  this.timeout(20000);
   let r;
   before(() => {
     // oauth_info.json has the properties `user_agent`, `client_id`, `client_secret`, and `refresh_token`.
@@ -398,7 +398,7 @@ describe('snoowrap', function () {
   });
 
   describe('search', () => {
-    it.only('can search for posts based on various parameters', async () => {
+    it('can search for posts based on various parameters', async () => {
       const results = await r.search({
         subreddit: 'AskReddit',
         query: 'What tasty food would be distusting if eaten over rice?', // (sic)
@@ -412,8 +412,10 @@ describe('snoowrap', function () {
       await results.fetch_more(2);
       expect(results).to.have.lengthOf(4);
     });
-    it('can get recommended subreddits');
-    it('can search for a list of subreddits');
+    it('can search for a list of subreddits', async () => {
+      const results = await r.search_subreddits({query: 'AskReddit'});
+      expect(Array.isArray(results)).to.be.true;
+    });
   });
 
   describe('miscellaneous API calls', () => {

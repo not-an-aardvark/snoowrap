@@ -604,6 +604,9 @@ const snoowrap = class snoowrap {
   * @param {boolean} [options.restrict_sr=true] Restricts search results to the given subreddit
   * @param {string} [options.sort=] Determines how the results should be sorted. One of `relevance, hot, top, new, comments`
   * @param {string} [options.syntax='plain'] Specifies a syntax for the search. One of `cloudsearch, lucene, plain`
+  * @returns {Promise} A Listing containing the search results.
+  * @memberof snoowrap
+  * @instance
   */
   search (options) {
     if (options.subreddit instanceof objects.Subreddit) {
@@ -612,11 +615,18 @@ const snoowrap = class snoowrap {
     const parsed_query = _(options).assign({t: options.time, q: options.query}).omit(['time', 'query']).value();
     return this.get({uri: `${options.subreddit ? `r/${options.subreddit}/` : ''}search`, qs: parsed_query});
   }
-  get_recommended_subreddits ({sr_names, omit_names}) {
-    return this.get({uri: `api/recommend/sr/${sr_names.join(',')}`, qs: {omit: omit_names.join(',')}});
-  }
+  /**
+  * Searches for subreddits given a query.
+  * @param {object} $0
+  * @param {string} $0.query A search query (50 characters max)
+  * @param {boolean} [$0.exact=false] Determines whether the results shouldbe limited to exact matches.
+  * @param {boolean} [$0.include_nsfw=true] Determines whether the results should include NSFW subreddits.
+  * @returns {Promise} An Array containing subreddit names
+  * @memberof snoowrap
+  * @instance
+  */
   search_subreddits ({exact = false, include_nsfw = true, query}) {
-    return this.post({uri: `api/search_reddit_names`, qs: {exact, include_over_18: include_nsfw, query}});
+    return this.post({uri: `api/search_reddit_names`, qs: {exact, include_over_18: include_nsfw, query}}).names;
   }
   _create_or_edit_subreddit ({
     allow_top = true,
@@ -1654,6 +1664,9 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   }
   get_muted_users () {
     return this.get({uri: `r/${this.display_name}/about/muted`});
+  }
+  get_recommended_subreddits ({sr_names, omit}) {
+    return this.get({uri: `api/recommend/sr/${sr_names.join(',')}`, qs: {omit: omit && omit.join(',')}});
   }
 };
 
