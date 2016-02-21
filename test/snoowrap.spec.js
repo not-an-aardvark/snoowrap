@@ -392,8 +392,8 @@ describe('snoowrap', function () {
       expect(sent[0]).to.be.an.instanceof(snoowrap.objects.PrivateMessage);
       expect(sent[0].author.name).to.equal(await r.get_me().name);
     });
-    after(() => {
-      message.mark_as_read();
+    after(async () => {
+      await message.mark_as_read();
     });
   });
 
