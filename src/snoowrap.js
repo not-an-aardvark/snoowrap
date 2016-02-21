@@ -423,40 +423,44 @@ const snoowrap = class snoowrap {
       options = subreddit_name;
       subreddit_name = undefined;
     }
-    return this.get({uri: (subreddit_name ? `r/${subreddit_name}/` : '') + sort_type, qs: {t: options.time}});
+    const parsed_options = _(options).assign({t: options.time}).omit(['time']).value();
+    return this.get({uri: (subreddit_name ? `r/${subreddit_name}/` : '') + sort_type, qs: parsed_options});
   }
   /**
   * Gets a Listing of hot posts.
   * @param {string} [subreddit_name] The subreddit to get posts from. If not provided, posts are fetched from
   the front page of reddit.
+  * @param {object} [options={}] Options for the resulting Listing
   * @returns {Promise} A Listing containing the retrieved submissions
   * @memberof snoowrap
   * @instance
   */
-  get_hot (subreddit_name) {
-    return this._get_sorted_frontpage('hot', subreddit_name);
+  get_hot (subreddit_name, options) {
+    return this._get_sorted_frontpage('hot', subreddit_name, options);
   }
   /**
   * Gets a Listing of new posts.
   * @param {string} [subreddit_name] The subreddit to get posts from. If not provided, posts are fetched from
   the front page of reddit.
+  * @param {object} [options={}] Options for the resulting Listing
   * @returns {Promise} A Listing containing the retrieved submissions
   * @memberof snoowrap
   * @instance
   */
-  get_new (subreddit_name) {
-    return this._get_sorted_frontpage('new', subreddit_name);
+  get_new (subreddit_name, options) {
+    return this._get_sorted_frontpage('new', subreddit_name, options);
   }
   /**
   * Gets a Listing of new comments.
   * @param {string} [subreddit_name] The subreddit to get comments from. If not provided, posts are fetched from
   the front page of reddit.
+  * @param {object} [options={}] Options for the resulting Listing
   * @returns {Promise} A Listing containing the retrieved comments
   * @memberof snoowrap
   * @instance
   */
-  get_new_comments (subreddit_name) {
-    return this._get_sorted_frontpage('comments', subreddit_name);
+  get_new_comments (subreddit_name, options) {
+    return this._get_sorted_frontpage('comments', subreddit_name, options);
   }
   /**
   * Gets a single random Submission.
@@ -508,18 +512,49 @@ const snoowrap = class snoowrap {
   async _assign_flair ({css_class, link, name, text, subreddit_name}) {
     return await this.post({uri: `r/${await subreddit_name}/api/flair`, form: {api_type, name, text, link, css_class}});
   }
-  get_unread_messages ({mark = false} = {}) {
-    return this.get({uri: 'message/unread', qs: {mark}});
+  /**
+  * Gets the authenticated user's unread messages.
+  * @param {object} options
+  * @param {boolean} [options.mark=false] Determines whether the retrieved messages should be marked as read.
+  * @returns {Promise} A Listing containing unread items in the user's inbox
+  * @memberof snoowrap
+  * @instance
+  */
+  get_unread_messages (options = {mark: false}) {
+    return this.get({uri: 'message/unread', qs: options});
   }
-  get_inbox ({mark = false} = {}) {
-    return this.get({uri: 'message/inbox', qs: {mark}});
+  /**
+  * Gets the items in the authenticated user's inbox.
+  * @param {object} options
+  * @param {boolean} [options.mark=false]
+  * @returns {Promise} A Listing containing items in the user's inbox
+  * @memberof snoowrap
+  * @instance
+  */
+  get_inbox (options = {mark: false}) {
+    return this.get({uri: 'message/inbox', qs: options});
   }
-  get_modmail ({mark = false} = {}) {
-    return this.get({uri: 'message/moderator', qs: {mark}});
+  /**
+  * Gets the authenticated user's modmail.
+  * @param {object} options
+  * @param {boolean} [options.mark=false]
+  * @returns {Promise} A Listing of the user's modmail
+  */
+  get_modmail (options = {mark: false}) {
+    return this.get({uri: 'message/moderator', qs: options});
   }
-  get_sent_messages () {
-    return this.get({uri: 'message/sent'});
+  /**
+  * Gets the user's sent messages.
+  * @param {object} [options={}] options for the resulting Listing
+  * @returns {Promise} A Listing of the user's sent messages
+  */
+  get_sent_messages (options = {}) {
+    return this.get({uri: 'message/sent', qs: options});
   }
+  /**
+  * Marks all of the user's messages as read.
+  * @returns {Promise} A Promise that resolves when the request is complete
+  */
   read_all_messages () {
     return this.post({uri: 'api/read_all_messages'});
   }
@@ -1113,17 +1148,19 @@ objects.Submission = class Submission extends objects.VoteableContent {
   }
   /**
   * Gets a Listing of other submissions on reddit that had the same link as this one.
+  * @param {object} [options={}] Options for the resulting Listing
   * @returns {Promise} A Listing of other Submission objects
   */
-  get_duplicates () {
-    return this.get({uri: `duplicates/${this.name}`});
+  get_duplicates (options = {}) {
+    return this.get({uri: `duplicates/${this.name}`, qs: options});
   }
   /**
   * Gets a Listing of Submissions that are related to this one.
+  * @param {object} [options={}] Options for the resulting Listing
   * @returns {Promise} A Listing of other Submission objects
   */
-  get_related () {
-    return this.get({uri: `related/${this.name}`});
+  get_related (options = {}) {
+    return this.get({uri: `related/${this.name}`, qs: options});
   }
   /**
   * Gets a list of flair template options for this post.
@@ -1334,11 +1371,13 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
     return promise_wrap(Promise.all(requests));
   }
   /**
-  * Gets a Listing of all user flairs on this subreddit.
+  * Gets a Listing all user flairs on this subreddit.
+  * @param {object} [options={}] Options for the resulting Listing
+  * @param {string} [options.name] A specific username to jump to
   * @returns {Promise} A Listing containing user flairs
   */
-  get_user_flair_list ({user}) {
-    return this.get({uri: `r/${this.display_name}/api/flairlist`, qs: {name: user}}).users;
+  get_user_flair_list (options) {
+    return this.get({uri: `r/${this.display_name}/api/flairlist`, qs: options}).users;
   }
   /**
   * Configures the flair settings for this subreddit.
@@ -1441,27 +1480,31 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   }
   /**
   * Gets a Listing of hot posts on this subreddit.
+  * @param {object} [options={}] Options for the resulting Listing
   * @returns {Promise} A Listing containing the retrieved submissions
   */
-  get_hot () {
-    return this._ac.get_hot(this.display_name);
+  get_hot (options) {
+    return this._ac.get_hot(this.display_name, options);
   }
   /**
   * Gets a Listing of new posts on this subreddit.
+  * @param {object} [options={}] Options for the resulting Listing
   * @returns {Promise} A Listing containing the retrieved submissions
   */
-  get_new () {
-    return this._ac.get_new(this.display_name);
+  get_new (options) {
+    return this._ac.get_new(this.display_name, options);
   }
   /**
   * Gets a Listing of new comments on this subreddit.
+  * @param {object} [options={}] Options for the resulting Listing
   * @returns {Promise} A Listing containing the retrieved comments
   */
-  get_new_comments () {
-    return this._ac.get_new_comments(this.display_name);
+  get_new_comments (options) {
+    return this._ac.get_new_comments(this.display_name, options);
   }
   /**
   * Gets a single random Submission from this subreddit.
+  * @param {object} [options={}] Options for the resulting Listing
   * @returns {Promise} The retrieved Submission object
   */
   get_random_submission () {
@@ -1469,7 +1512,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   }
   /**
   * Gets a Listing of top posts on this subreddit.
-  * @param {object} [options={}]
+  * @param {object} [options={}] Options for the resulting Listing
   * @param {string} [options.time] Describes the timespan that posts should be retrieved from. Should be one of
   `hour, day, week, month, year, all`
   * @returns {Promise} A Listing containing the retrieved submissions
@@ -1479,7 +1522,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   }
   /**
   * Gets a Listing of controversial posts on this subreddit.
-  * @param {object} [options={}]
+  * @param {object} [options={}] Options for the resulting Listing
   * @param {string} [options.time] Describes the timespan that posts should be retrieved from. Should be one of
   `hour, day, week, month, year, all`
   * @returns {Promise} A Listing containing the retrieved submissions
@@ -1491,8 +1534,9 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   }
   /**
   * Gets the moderation log for this subreddit.
-  * @param {string[]} [$0.mods=] An array of moderator names that the results should be restricted to
-  * @param {string} [$0.type=] Restricts the results to the specified type. This should be one of `banuser, unbanuser,
+  * @param {object} [options={}] Options for the resulting Listing
+  * @param {string[]} [options.mods=] An array of moderator names that the results should be restricted to
+  * @param {string} [options.type=] Restricts the results to the specified type. This should be one of `banuser, unbanuser,
   removelink, approvelink, removecomment, approvecomment, addmoderator, invitemoderator, uninvitemoderator,
   acceptmoderatorinvite, removemoderator, addcontributor, removecontributor, editsettings, editflair, distinguish, marknsfw,
   wikibanned, wikicontributor, wikiunbanned, wikipagelisted, removewikicontributor, wikirevise, wikipermlevel,
@@ -1502,23 +1546,24 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @memberof snoowrap
   * @instance
   */
-  get_moderation_log ({mods, type} = {}) {
-    return this.get({uri: `r/${this.display_name}/about/log`, qs: {mod: mods && mods.join(','), type}});
+  get_moderation_log (options = {}) {
+    const parsed_options = _(options).assign({mod: options.mods && options.mods.join(',')}).omit(['mods']).value();
+    return this.get({uri: `r/${this.display_name}/about/log`, qs: parsed_options});
   }
-  get_reports ({only} = {}) {
-    return this.get({uri: `r/${this.display_name}/about/reports`, qs: {only}});
+  get_reports (options = {}) {
+    return this.get({uri: `r/${this.display_name}/about/reports`, qs: options});
   }
-  get_spam ({only} = {}) {
-    return this.get({uri: `r/${this.display_name}/about/spam`, qs: {only}});
+  get_spam (options = {}) {
+    return this.get({uri: `r/${this.display_name}/about/spam`, qs: options});
   }
-  get_modqueue ({only} = {}) {
-    return this.get({uri: `r/${this.display_name}/about/modqueue`, qs: {only}});
+  get_modqueue (options = {}) {
+    return this.get({uri: `r/${this.display_name}/about/modqueue`, qs: options});
   }
-  get_unmoderated ({only} = {}) {
-    return this.get({uri: `r/${this.display_name}/about/unmoderated`, qs: {only}});
+  get_unmoderated (options = {}) {
+    return this.get({uri: `r/${this.display_name}/about/unmoderated`, qs: options});
   }
-  get_edited ({only} = {}) {
-    return this.get({uri: `r/${this.display_name}/about/edited`, qs: {only}});
+  get_edited (options = {}) {
+    return this.get({uri: `r/${this.display_name}/about/edited`, qs: options});
   }
   accept_moderator_invite () {
     return this.post({uri: `r/${this.display_name}/api/accept_moderator_invite`, form: {api_type}});
@@ -1588,7 +1633,10 @@ an Array (length, forEach, etc.) in addition to some added methods. At any given
 number of items, and that number will be its length. However, if a value greater than the length is accessed (e.g. with
 `some_listing[very_high_index]`), then the Listing will automatically fetch more items until either
 (a) it has an item at the requested index, or (b) it runs out of items to fetch. In the meantime, the expression that
-referenced the high index will return a Promise for that value, which will get resolved after the entries are fetched.
+referenced the high index will return a Promise for that value, which will get resolved after the entries are fetched. In
+addition to this feature, all Listings also have a few convenience methods, described below.<br><br>
+
+Most methods that return Listings will also accept `limit`, `after`, `before`, `show`, and `count` properties.
 */
 objects.Listing = class Listing extends Array {
   constructor ({children = [], query = {}, show_all = true, limit, _transform = _.identity,
@@ -1620,7 +1668,7 @@ objects.Listing = class Listing extends Array {
   }
   /**
   * This is a getter that is true if there are no more items left to fetch, and false otherwise.
-  * @type {number}
+  * @type number
   */
   get is_finished () {
     if (this._is_comment_list) {
