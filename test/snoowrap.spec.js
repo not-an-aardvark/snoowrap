@@ -18,7 +18,13 @@ describe('snoowrap', function () {
       expect(() => new snoowrap({})).to.throw(errors.MissingUserAgentError);
     });
     it('throws an error if insufficient credentials are provided', () => {
-      expect(() => new snoowrap({user_agent: 'a', client_id: 'b', client_secret: 'c'})).throw(errors.NoCredentialsError);
+      expect(() => new snoowrap({user_agent: 'a', client_id: 'b', client_secret: 'c'})).to.throw(errors.NoCredentialsError);
+    });
+    it('does not throw an error if only an access token is provided', () => {
+      expect(() => new snoowrap({user_agent: 'a', access_token: 'blah'})).not.to.throw();
+    });
+    it('does not throw an error if a user_agent, client_id, client_secret, and refresh_token are provided', () => {
+      expect(() => new snoowrap({user_agent: 'a', client_id: 'b', client_secret: 'c', refresh_token: 'd'})).not.to.throw();
     });
   });
 
@@ -40,8 +46,8 @@ describe('snoowrap', function () {
       expect(await user.nonexistent_property).to.be.undefined;
     });
     it('throws an error if it tries to fetch the profile of a deleted/invalid account', () => {
-      expect(r.get_user('[deleted]').fetch).to.throw(errors.InvalidUserError);
-      expect(r.get_user(null).fetch).to.throw(errors.InvalidUserError);
+      expect(() => r.get_user('[deleted]').fetch()).to.throw(errors.InvalidUserError);
+      expect(() => r.get_user(null).fetch()).to.throw(errors.InvalidUserError);
     });
   });
 

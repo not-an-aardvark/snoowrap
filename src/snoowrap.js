@@ -730,7 +730,6 @@ objects.RedditContent = class RedditContent {
     this._ac = _ac;
     this.has_fetched = !!has_fetched;
     _.assignIn(this, options);
-    this._initialize_fetch_function();
     /* Omit the 'delete' request shortcut, since the property name is used by Comments and Submissions. To send an HTTP DELETE
     request, use `this._ac.delete` rather than the shortcut `this.delete`. */
     _.without(constants.HTTP_VERBS, 'delete').forEach(type => {
@@ -749,32 +748,29 @@ objects.RedditContent = class RedditContent {
       return this.fetch()[key];
     }});
   }
-  _initialize_fetch_function () {
-    /**
-    * Fetches this content from reddit.
-    * @function fetch
-    * @returns {Promise} The updated version of this object with all of its fetched properties. This will update the object
-    with all of its properties from reddit, and set has_fetched property to true. Once an object has been fetched, any
-    reference to an unknown property will simply return `undefined` instead of a Promise. Calling this
-    on an already-fetched object will have no effect; to refresh an object, use `refresh()` instead.
-    * @memberof objects.RedditContent
-    * @instance
-    */
-    this.fetch = 'fetch' in this ? this.fetch : _.once(() => {
-      return promise_wrap(this._ac.get({uri: this._uri}).then(this._transform_api_response.bind(this)).then(response => {
-        helpers.assign_to_proxy(this, response);
+  /**
+  * Fetches this content from reddit.
+  * @returns {Promise} The updated version of this object with all of its fetched properties. This will update the object
+  with all of its properties from reddit, and set has_fetched property to `true`. Once an object has been fetched, any
+  reference to an unknown property will simply return `undefined` instead of a Promise. Calling this
+  on an already-fetched object will have no effect; to refresh an object, use `refresh()` instead.
+  */
+  fetch () {
+    if (!this._fetch) {
+      this._fetch = promise_wrap(this._ac.get({uri: this._uri}).bind(this).then(this._transform_api_response).then(res => {
+        helpers._assign_to_proxy(this, res);
         this.has_fetched = true;
         return this;
       }));
-    });
+    }
+    return this._fetch;
   }
   /**
   * Refreshes this content.
   * @returns {Promise} A newly-fetched version of this content
   */
   refresh () {
-    delete this.fetch;
-    this._initialize_fetch_function();
+    delete this._fetch;
     return this.fetch();
   }
   /**
@@ -940,7 +936,7 @@ objects.VoteableContent = class VoteableContent extends objects.CreatableContent
       sticky: sticky,
       id: this.name
     }}).then(response => {
-      helpers.assign_to_proxy(this, response.json.data.things[0]);
+      helpers._assign_to_proxy(this, response.json.data.things[0]);
       return this;
     }));
   }
@@ -962,7 +958,7 @@ objects.VoteableContent = class VoteableContent extends objects.CreatableContent
       uri: 'api/editusertext',
       form: {api_type, text: updated_text, thing_id: this.name}
     }).then(response => {
-      helpers.assign_to_proxy(this, response.json.data.things[0]);
+      helpers._assign_to_proxy(this, response.json.data.things[0]);
       return this;
     }));
   }
