@@ -584,8 +584,15 @@ const snoowrap = class snoowrap {
       api_type, captcha, iden: captcha_iden, from_sr: from_subreddit, subject, text, to
     }});
   }
+  /**
+  * Gets a list of all oauth scopes supported by the reddit API.
+  * @returns {Promise} An object containing oauth scopes.<br><br>
+  * **Note**: To get the scope of this requester, use the `scope` property instead.
+  * @memberof snoowrap
+  * @instance
+  */
   get_oauth_scope_list () {
-    return this.get({uri: 'api/v1/scopes'});
+    return promise_wrap(this.get({uri: 'api/v1/scopes'}));
   }
   search ({query, restrict_sr = true, sort, time, sr_detail, include_facets, type, syntax, subreddit}) {
     if (subreddit instanceof objects.Subreddit) {

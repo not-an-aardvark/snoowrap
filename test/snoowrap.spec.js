@@ -404,7 +404,9 @@ describe('snoowrap', function () {
   });
 
   describe('miscellaneous API calls', () => {
-    it('can get a list of oauth scopes');
+    it('can get a list of oauth scopes', async () => {
+      expect(await r.get_oauth_scope_list()).to.have.property('creddits');
+    });
   });
 
   describe('general snoowrap behavior', () => {
