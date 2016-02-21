@@ -58,10 +58,10 @@ describe('snoowrap', function () {
     });
     it('should be able to fetch replies to comments', async () => {
       await comment.replies.fetch_more(5);
-      expect(comment.replies[0].body).to.equal('Let\'s knock the humor down to 65%.');
+      expect(comment.replies[0].body).to.equal("Let's knock the humor down to 65%.");
     });
-    it('should be able to get promise for listing items before they\'re fetched', async () => {
-      expect(await comment.replies[0].body).to.equal('Let\'s knock the humor down to 65%.');
+    it("should be able to get promise for listing items before they're fetched", async () => {
+      expect(await comment.replies[0].body).to.equal("Let's knock the humor down to 65%.");
     });
   });
 
@@ -70,7 +70,7 @@ describe('snoowrap', function () {
     beforeEach(() => {
       subreddit = r.get_subreddit('askreddit');
     });
-    it('can fetch information directly from a subreddit\'s info page', async () => {
+    it("can fetch information directly from a subreddit's info page", async () => {
       expect(await subreddit.created_utc).to.equal(1201233135);
     });
   });
@@ -93,7 +93,7 @@ describe('snoowrap', function () {
       expect(submission.comments).to.have.length.above(1000);
       expect(submission.comments.is_finished).to.be.true;
     });
-    it('can get comments by index before they\'re fetched', async () => {
+    it("can get comments by index before they're fetched", async () => {
       expect(await submission.comments[6].body).to.equal('pumpkin pie');
     });
     it('can get a random submission from a particular subreddit', async () => {
@@ -133,12 +133,12 @@ describe('snoowrap', function () {
   });
 
   describe('self-property fetching', () => {
-    it('gets information from the requester\'s own profile', async () => {
+    it("gets information from the requester's own profile", async () => {
       const me = await r.get_me();
       expect(me.name).to.equal(r.own_user_info.name); // (this doesn't necessarily mean that the name is correct)
       expect(me.name).to.be.a('string');
     });
-    it('gets the requester\'s karma', async () => {
+    it("gets the requester's karma", async () => {
       expect(await r.get_karma()).to.be.an.instanceof(snoowrap.objects.KarmaList);
     });
     it('gets current preferences', async () => {
@@ -153,10 +153,10 @@ describe('snoowrap', function () {
       // (Fix the preferences afterwards, since I'd rather this value not decrease every time I run these tests)
       await r.update_preferences({min_link_score: current_prefs});
     });
-    it('gets the current user\'s trophies', async () => {
+    it("gets the current user's trophies", async () => {
       expect(await r.get_trophies()).to.be.an.instanceof(snoowrap.objects.TrophyList);
     });
-    it('gets the user\'s friends', async () => {
+    it("gets the user's friends", async () => {
       expect(await r.get_friends()).to.be.an.instanceof(Array);
     });
     it('gets a list of blocked users', async () => {
@@ -214,8 +214,8 @@ describe('snoowrap', function () {
       expect(await await sub._get_flair_options({link: 't3_43qlu8'}).choices).to.eql([]);
     });
     it('can change multiple user flairs at once', async () => {
-      const naa_flair = 'not_an_aardvark\'s flair';
-      const aaa_flair = 'actually_an_aardvark\'s flair';
+      const naa_flair = "not_an_aardvark's flair";
+      const aaa_flair = "actually_an_aardvark's flair";
       await sub.set_multiple_user_flairs([
         {name: 'not_an_aardvark', text: naa_flair},
         {name: 'actually_an_aardvark', text: aaa_flair}
@@ -422,32 +422,42 @@ describe('snoowrap', function () {
       expect(timer.isFulfilled()).to.be.true;
     });
   });
-  describe.skip('Creating new content', () => {
-    it('can create a selfpost given a subreddit object');
-    it('can create a linkpost given a subreddit object');
-    it('can create a selfpost on a particular subreddit');
-    it('can create a linkpost on a particular subreddit');
-    it('can create a subreddit');
-    it('can compose a message');
-    it('can mute the author of a modmail', async () => {
+  describe('Creating new content', () => {
+    // All of the tests here are skipped by default to avoid spam, since they involve permanently writing content to reddit.
+    it.skip('can create a selfpost given a subreddit object');
+    it.skip('can create a linkpost given a subreddit object');
+    it.skip('can create a selfpost on a particular subreddit');
+    it.skip('can create a linkpost on a particular subreddit');
+    it.skip('can create a subreddit');
+    it.skip('can compose a message', async () => {
+      const timestamp = moment().format();
+      await r.compose_message({
+        to: 'actually_an_aardvark',
+        subject: 'snoowrap unit test message',
+        text: timestamp,
+        from_subreddit: 'snoowrap_testing'
+      });
+      expect(await r.get_sent_messages()[0].body).to.equal(timestamp);
+    });
+    it.skip('can mute the author of a modmail', async () => {
       const modmail = r.get_message('4zop6r');
       await modmail.mute_author();
       const mute_list = await modmail.subreddit.get_muted_users();
       expect(_.find(mute_list, {name: await modmail.author.name})).to.be.defined;
     });
-    it('can unmute the author of a modmail', async () => {
+    it.skip('can unmute the author of a modmail', async () => {
       const modmail = r.get_message('4zop6r');
       await modmail.unmute_author();
       const mute_list = await modmail.subreddit.get_muted_users();
       expect(_.find(mute_list, {name: await modmail.author.name})).to.be.undefined;
     });
-    it('can comment on a submission');
-    it('can reply to a comment');
-    it('can report a submission/comment');
-    it('can reply to a private message');
-    it('can delete a submission');
-    it('can delete a comment');
+    it.skip('can comment on a submission');
+    it.skip('can reply to a comment');
+    it.skip('can report a submission/comment');
+    it.skip('can reply to a private message');
+    it.skip('can delete a submission');
+    it.skip('can delete a comment');
     it.skip('can gild a submission/comment');
-    it('can delete a comment or submission');
+    it.skip('can delete a comment or submission');
   });
 });

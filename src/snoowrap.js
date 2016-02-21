@@ -555,16 +555,32 @@ const snoowrap = class snoowrap {
   read_all_messages () {
     return this.post({uri: 'api/read_all_messages'});
   }
-  compose_message ({captcha, from_subreddit, captcha_iden, subject, text, to} = {}) {
+  /**
+  * Composes a new private message.
+  * @param {object} $0
+  * @param {RedditUser|Subreddit|string} $0.to The recipient of the message.
+  * @param {string} $0.subject The message subject (100 characters max)
+  * @param {string} $0.text The body of the message, in raw markdown text_edit
+  * @param {Subreddit|string} [$0.from_subreddit] If provided, the message is sent as a modmail from the specified subreddit.
+  * @param {string} [$0.captcha_iden] A captcha identifier. This is only necessary if the authenticated account
+  requires a captcha to submit posts and comments.
+  * @param {string} [$0.captcha_response] The response to the captcha with the given identifier
+  * @returns {Promise} A Promise that fulfills when the request is complete
+  * @memberof snoowrap
+  * @instance
+  */
+  async compose_message ({captcha, from_subreddit, captcha_iden, subject, text, to}) {
     if (to instanceof objects.RedditUser) {
-      to = to.name;
+      to = await to.name;
     } else if (to instanceof objects.Subreddit) {
-      to = `/r/${to.display_name}`;
+      to = `/r/${await to.display_name}`;
     }
     if (from_subreddit instanceof objects.Subreddit) {
-      from_subreddit = from_subreddit.display_name;
+      from_subreddit = await from_subreddit.display_name;
+    } else if (typeof from_subreddit === 'string') {
+      from_subreddit = from_subreddit.replace(/^\/?r\//, ''); // Convert '/r/subreddit_name' to 'subreddit_name'
     }
-    return this.post({uri: 'api/compose', form: {
+    return await this.post({uri: 'api/compose', form: {
       api_type, captcha, iden: captcha_iden, from_sr: from_subreddit, subject, text, to
     }});
   }
