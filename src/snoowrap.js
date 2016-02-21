@@ -129,7 +129,7 @@ const snoowrap = class snoowrap {
   }
   /**
   * Retrieves or modifies the configuration options for this requester.
-  * @param {object} [object] A map of {[config property name]: value}. Note that any omitted config properties will simply
+  * @param {object} [options={}] A map of {[config property name]: value}. Note that any omitted config properties will simply
   retain whatever value they had previously (In other words, if you only want to change one property, you only need to put
   that one property in this parameter. To get the current configuration without modifying anything, simply omit this
   parameter.)
