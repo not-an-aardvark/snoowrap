@@ -370,10 +370,31 @@ describe('snoowrap', function () {
   });
 
   describe('inbox operations', () => {
-    it('can get a list of messages in an inbox');
-    it('can get modmail for all moderated subs');
-    it('can get a list of sent messages');
-    it('can read all unread messages');
+    let message;
+    before(async () => {
+      message = r.get_message('4wwxe3');
+      await message.mark_as_unread(); // Used to make sure things can be marked properly from the inbox
+    });
+    it('can get a list of new messages in an inbox', async () => {
+      const new_messages = await r.get_unread_messages({mark: false, limit: 1});
+      expect(await new_messages[0].refresh().new).to.be.true;
+      await r.get_unread_messages({mark: true});
+    });
+    it('can get modmail for all moderated subs', async () => {
+      const modmail = await r.get_modmail({limit: 1});
+      expect(modmail).to.have.lengthOf(1);
+      expect(modmail[0]).to.be.an.instanceof(snoowrap.objects.PrivateMessage);
+      expect(modmail[0].subreddit).to.be.an.instanceof(snoowrap.objects.Subreddit);
+    });
+    it('can get a list of sent messages', async () => {
+      const sent = await r.get_sent_messages({limit: 1});
+      expect(sent).to.have.lengthOf(1);
+      expect(sent[0]).to.be.an.instanceof(snoowrap.objects.PrivateMessage);
+      expect(sent[0].author.name).to.equal(await r.get_me().name);
+    });
+    after(() => {
+      message.mark_as_read();
+    });
   });
 
   describe('search', () => {

@@ -213,10 +213,10 @@ const snoowrap = class snoowrap {
   * @instance
   */
   get_me () {
-    return this.get('api/v1/me').then(result => {
+    return promise_wrap(this.get('api/v1/me').then(result => {
       this.own_user_info = new objects.RedditUser(result, this, true);
       return this.own_user_info;
-    });
+    }));
   }
   /**
   * Gets information on a reddit user with a given name.
@@ -515,32 +515,29 @@ const snoowrap = class snoowrap {
   /**
   * Gets the authenticated user's unread messages.
   * @param {object} options
-  * @param {boolean} [options.mark=false] Determines whether the retrieved messages should be marked as read.
   * @returns {Promise} A Listing containing unread items in the user's inbox
   * @memberof snoowrap
   * @instance
   */
-  get_unread_messages (options = {mark: false}) {
+  get_unread_messages (options = {}) {
     return this.get({uri: 'message/unread', qs: options});
   }
   /**
   * Gets the items in the authenticated user's inbox.
   * @param {object} options
-  * @param {boolean} [options.mark=false]
   * @returns {Promise} A Listing containing items in the user's inbox
   * @memberof snoowrap
   * @instance
   */
-  get_inbox (options = {mark: false}) {
+  get_inbox (options = {}) {
     return this.get({uri: 'message/inbox', qs: options});
   }
   /**
   * Gets the authenticated user's modmail.
   * @param {object} options
-  * @param {boolean} [options.mark=false]
   * @returns {Promise} A Listing of the user's modmail
   */
-  get_modmail (options = {mark: false}) {
+  get_modmail (options = {}) {
     return this.get({uri: 'message/moderator', qs: options});
   }
   /**
