@@ -472,11 +472,23 @@ describe('snoowrap', function () {
     });
   });
   describe('Creating new content', () => {
-    // All of the tests here are skipped by default to avoid spam, since they involve permanently writing content to reddit.
-    it.skip('can create a selfpost given a subreddit object');
-    it.skip('can create a linkpost given a subreddit object');
-    it.skip('can create a selfpost on a particular subreddit');
-    it.skip('can create a linkpost on a particular subreddit');
+    // These should all pass, but they're skipped by default to avoid spam since they permanently write content to reddit.
+    it.skip('can create a linkpost given a subreddit object, and then delete the post', async () => {
+      const title = `snoowrap unit tests: ${moment().format()}`;
+      const new_link = await r.get_subreddit('snoowrap_testing').submit_link({title, url: 'https://reddit.com'});
+      expect(new_link).to.be.an.instanceof(snoowrap.objects.Submission);
+      expect(await new_link.title).to.equal(title);
+      await new_link.delete();
+      expect(await new_link.refresh().author.name).to.equal('[deleted]');
+    });
+    it.skip('can create a selfpost given a subreddit object, and then delete the post', async () => {
+      const title = `snoowrap unit tests: ${moment().format()}`;
+      const new_selfpost = await r.get_subreddit('snoowrap_testing').submit_selfpost({title, text: 'yay cookies'});
+      expect(new_selfpost).to.be.an.instanceof(snoowrap.objects.Submission);
+      expect(await new_selfpost.title).to.equal(title);
+      await new_selfpost.delete();
+      expect(await new_selfpost.refresh().author.name).to.equal('[deleted]');
+    });
     it.skip('can create a subreddit', async () => {
       const sub_name = moment().format().slice(0,19).replace(/[-:]/g,'_');
       const new_sub = await r.create_subreddit({
@@ -510,13 +522,20 @@ describe('snoowrap', function () {
       const mute_list = await modmail.subreddit.get_muted_users();
       expect(_.find(mute_list, {name: await modmail.author.name})).to.be.undefined;
     });
-    it.skip('can comment on a submission');
-    it.skip('can reply to a comment');
-    it.skip('can report a submission/comment');
-    it.skip('can reply to a private message');
-    it.skip('can delete a submission');
-    it.skip('can delete a comment');
-    it.skip('can gild a submission/comment');
-    it.skip('can delete a comment or submission');
+    it.skip('can comment on a submission', async () => {
+      const comment_body = moment().format();
+      const new_comment = await r.get_submission('43qlu8').reply(comment_body);
+      console.log(new_comment);
+      expect(new_comment).to.be.an.instanceof(snoowrap.objects.Comment);
+      expect(await new_comment.body).to.equal(comment_body);
+    });
+    it.skip('can gild a submission/comment', async () => {
+      // I think this test should work, but I have no creddits so I can't test it.
+      // If anyone wants to try it out, be my guest.
+      const submission = r.get_submission('43qlu8');
+      const initial_gilding_amount = await submission.gilded;
+      await submission.gild();
+      expect(await submission.refresh().gilded).to.be.above(initial_gilding_amount);
+    });
   });
 });
