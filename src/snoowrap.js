@@ -105,7 +105,7 @@ const snoowrap = class snoowrap {
       }
 
       try {
-        // If the access token has expired (or will expire in the next 10 seconds), refresh it.
+        // If the access token has expired, refresh it.
         if (this.refresh_token && (!this.access_token || this.token_expiration.isBefore())) {
           await this._update_access_token();
         }
@@ -123,9 +123,6 @@ const snoowrap = class snoowrap {
   }
   _new_object(object_type, content, _has_fetched) {
     return new objects[object_type](content, this, _has_fetched);
-  }
-  _revoke_token (token) {
-    return this._base_client_requester.post({uri: 'revoke_token', form: {token}});
   }
   /**
   * Retrieves or modifies the configuration options for this requester.
@@ -156,6 +153,9 @@ const snoowrap = class snoowrap {
   */
   config (options) {
     return _.assign(this._config, options);
+  }
+  _revoke_token (token) {
+    return this._base_client_requester.post({uri: 'revoke_token', form: {token}});
   }
   /**
   * Invalidates the current access token.
@@ -1632,14 +1632,40 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   get_edited (options = {}) {
     return this.get({uri: `r/${this.display_name}/about/edited`, qs: options});
   }
+  /**
+  * Accepts an invite to become a moderator of this subreddit.
+  * @returns {Promise} A Promise that fulfills with this subreddit when the request is complete
+  */
   accept_moderator_invite () {
-    return this.post({uri: `r/${this.display_name}/api/accept_moderator_invite`, form: {api_type}});
+    return promise_wrap(this.post({uri: `r/${this.display_name}/api/accept_moderator_invite`, form: {api_type}}).then(res => {
+      if (res.json.errors.length) {
+        throw res.json.errors[0];
+      }
+      return this;
+    }));
   }
-  async leave_contributor () {
-    return await this.post({uri: `api/leavecontributor`, form: {id: await this.name}});
+  /**
+  * Abdicates moderator status on this subreddit.
+  * @returns {Promise} A Promise for this subreddit.
+  */
+  leave_moderator () {
+    return promise_wrap(this.name.then(name => {
+      return this.post({uri: 'api/leavemoderator', form: {id: name}}).then(res => {
+        if (res.json.errors.length) {
+          throw res.json.errors[0];
+        }
+        return this;
+      });
+    }));
   }
-  async leave_moderator () {
-    return await this.post({uri: `api/leavemoderator`, form: {id: await this.name}});
+  /**
+  * Abdicates approved submitter status on this subreddit.
+  * @returns {Promise} A Promise that resolves with this subreddit when the request is complete.
+  */
+  leave_contributor () {
+    return promise_wrap(this.name.then(name => {
+      return this.post({uri: 'api/leavecontributor', form: {id: name}}).return(this);
+    }));
   }
   get_subreddit_stylesheet () {
     return this.get({uri: `r/${this.display_name}/stylesheet`, json: false, transform: _.identity});
