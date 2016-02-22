@@ -36,6 +36,16 @@ exports._populate = (response_tree, _ac) => {
   return response_tree;
 };
 
+exports._handle_json_errors = function (response) {
+  if (_.isEmpty(response)) {
+    return this;
+  }
+  if (response.json.errors.length) {
+    throw response.json.errors[0];
+  }
+  return this;
+};
+
 exports.find_message_in_tree = (desired_message_name, current_message) => {
   if (current_message.name === desired_message_name) {
     return current_message;

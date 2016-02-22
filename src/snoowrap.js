@@ -423,7 +423,7 @@ const snoowrap = class snoowrap {
       options = subreddit_name;
       subreddit_name = undefined;
     }
-    const parsed_options = _(options).assign({t: options.time}).omit(['time']).value();
+    const parsed_options = _(options).assign({t: options.time, time: undefined}).omit(['time']).value();
     return this.get({uri: (subreddit_name ? `r/${subreddit_name}/` : '') + sort_type, qs: parsed_options});
   }
   /**
@@ -793,7 +793,7 @@ objects.RedditContent = class RedditContent {
 };
 
 /**
-* A set of mixin functions that applies to Submissions, Comments, and PrivateMessages
+* A set of mixin functions that apply to Submissions, Comments, and PrivateMessages
 * @extends objects.RedditContent
 */
 objects.CreatableContent = class CreatableClass extends objects.RedditContent {
@@ -1690,18 +1690,43 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   search (options) {
     return this._ac.search(_.assign(options, {subreddit: this, restrict_sr: true}));
   }
+  /**
+  * Gets the list of banned users on this subreddit.
+  * @param {object} options Filtering options. Can also contain options for the resulting Listing.
+  * @returns {Promise} A Listing of users
+  */
   get_banned_users ({user} = {}) {
     return this.get({uri: `r/${this.display_name}/about/banned`, qs: {user}});
   }
+  /**
+  * Gets the list of muted users on this subreddit.
+  * @param {object} options Filtering options. Can also contain options for the resulting Listing.
+  * @returns {Promise} A Listing of users
+  */
   get_muted_users ({user} = {}) {
     return this.get({uri: `r/${this.display_name}/about/muted`, qs: {user}});
   }
+  /**
+  * Gets the list of users banned from this subreddit's wiki.
+  * @param {object} options Filtering options. Can also contain options for the resulting Listing.
+  * @returns {Promise} A Listing of users
+  */
   get_wikibanned_users ({user} = {}) {
     return this.get({uri: `r/${this.display_name}/about/wikibanned`, qs: {user}});
   }
+  /**
+  * Gets the list of approved submitters on this subreddit.
+  * @param {object} options Filtering options. Can also contain options for the resulting Listing.
+  * @returns {Promise} A Listing of users
+  */
   get_contributors ({user} = {}) {
     return this.get({uri: `r/${this.display_name}/about/contributors`, qs: {user}});
   }
+  /**
+  * Gets the list of approved wiki submitters on this subreddit .
+  * @param {object} options Filtering options. Can also contain options for the resulting Listing.
+  * @returns {Promise} A Listing of users
+  */
   get_wiki_contributors ({user} = {}) {
     return this.get({uri: `r/${this.display_name}/about/wikicontributors`, qs: {user}});
   }
@@ -1713,30 +1738,75 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   get_moderators ({user} = {}) {
     return this.get({uri: `r/${this.display_name}/about/moderators`, qs: {user}});
   }
+  /**
+  * Deletes the banner for this Subreddit.
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
+  */
   delete_banner () {
-    return this.post({uri: `r/${this.display_name}/api/delete_sr_banner`, form: {api_type}});
+    return promise_wrap(this.post({
+      uri: `r/${this.display_name}/api/delete_sr_banner`,
+      form: {api_type}
+    }).bind(this).then(helpers._handle_json_errors));
   }
+  /**
+  * Deletes the header image for this Subreddit.
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
+  */
   delete_header () {
-    return this.post({uri: `r/${this.display_name}/api/delete_sr_header`, form: {api_type}});
+    return promise_wrap(this.post({
+      uri: `r/${this.display_name}/api/delete_sr_header`,
+      form: {api_type}
+    }).bind(this).then(helpers._handle_json_errors));
   }
+  /**
+  * Deletes this subreddit's icon.
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
+  */
   delete_icon () {
-    return this.post({uri: `r/${this.display_name}/api/delete_sr_icon`, form: {api_type}});
+    return promise_wrap(this.post({
+      uri: `r/${this.display_name}/api/delete_sr_icon`,
+      form: {api_type}
+    }).bind(this).then(helpers._handle_json_errors));
   }
+  /**
+  * Deletes an image from this subreddit.
+  * @param {object} $0
+  * @param {string} $0.image_name The name of the image.
+  */
   delete_image ({image_name}) {
-    return this.post({uri: `r/${this.display_name}/api/delete_sr_image`, form: {api_type, img_name: image_name}});
+    return promise_wrap(this.post({
+      uri: `r/${this.display_name}/api/delete_sr_image`,
+      form: {api_type, img_name: image_name}
+    }).bind(this).then(helpers._handle_json_errors));
   }
+  /**
+  * Gets this subreddit's current settings.
+  * @returns {Promise} An Object containing this subreddit's current settings.
+  */
   get_subreddit_settings () {
     return this.get({uri: `r/${this.display_name}/about/edit`});
   }
-  async edit_settings (options) {
-    const current_settings = await this.get_subreddit_settings();
-    return this._ac._create_or_edit_subreddit(_.assign(current_settings, options, {sr: this.display_name}));
+  /**
+  * Edits this subreddit's settings.
+  * @param {object} options An Object containing {[option name]: new value} mappings of the options that should be modified.
+  Any omitted option names will simply retain their previous values.
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
+  */
+  edit_settings (options) {
+    return promise_wrap(this.get_subreddit_settings().then(current_values => {
+      return this._ac._create_or_edit_subreddit(_.assign(current_values, options, {sr: this.display_name, name: undefined}));
+    }).return(this));
   }
-  get_muted_users () {
-    return this.get({uri: `r/${this.display_name}/about/muted`});
-  }
-  get_recommended_subreddits ({sr_names, omit}) {
-    return this.get({uri: `api/recommend/sr/${sr_names.join(',')}`, qs: {omit: omit && omit.join(',')}});
+  /**
+  * Gets a list of recommended other subreddits given this one.
+  * @param {object} [$0=]
+  * @param {Array} [$0.omit=[]] An Array of subreddit names that should be excluded from the listing.
+  * @param {Promise} An Array of subreddit names
+  */
+  get_recommended_subreddits ({omit} = {}) {
+    return this.get({uri: `api/recommend/sr/${this.display_name}`, qs: {omit: omit && omit.join(',')}}).then(names => {
+      return _.map(names, 'sr_name');
+    });
   }
 };
 
