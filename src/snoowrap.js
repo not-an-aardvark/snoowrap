@@ -1667,9 +1667,26 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
       return this.post({uri: 'api/leavecontributor', form: {id: name}}).return(this);
     }));
   }
-  get_subreddit_stylesheet () {
+  /**
+  * Gets a subreddit's CSS stylesheet.
+  * @returns {Promise} A Promise for a string containing the subreddit's CSS. Note that this method will return a 404 error
+  if the subreddit in question does not have a custom stylesheet.
+  */
+  get_stylesheet () {
     return this.get({uri: `r/${this.display_name}/stylesheet`, json: false, transform: _.identity});
   }
+  /**
+  * Conducts a search of reddit submissions, restricted to this subreddit.
+  * @param {object} options Search options. Can also contain options for the resulting Listing.
+  * @param {string} options.query The search query
+  * @param {string} [options.time=] Describes the timespan that posts should be retrieved frome. One of
+  `hour, day, week, month, year, all`
+  * @param {string} [options.sort=] Determines how the results should be sorted. One of `relevance, hot, top, new, comments`
+  * @param {string} [options.syntax='plain'] Specifies a syntax for the search. One of `cloudsearch, lucene, plain`
+  * @returns {Promise} A Listing containing the search results.
+  * @memberof snoowrap
+  * @instance
+  */
   search (options) {
     return this._ac.search(_.assign(options, {subreddit: this, restrict_sr: true}));
   }

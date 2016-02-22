@@ -67,13 +67,16 @@ describe('snoowrap', function () {
     });
   });
 
-  describe('getting a subreddit', () => {
+  describe("getting a subreddit's information", () => {
     let subreddit;
     beforeEach(() => {
-      subreddit = r.get_subreddit('askreddit');
+      subreddit = r.get_subreddit('snoowrap_testing');
     });
     it("can fetch information directly from a subreddit's info page", async () => {
-      expect(await subreddit.created_utc).to.equal(1201233135);
+      expect(await subreddit.created_utc).to.equal(1453703345);
+    });
+    it('can get a subreddit stylesheet', async () => {
+      expect(await subreddit.get_stylesheet()).to.match(/^\.snoowrap_testing-stylesheet-starts-here{}/);
     });
   });
 
@@ -427,6 +430,13 @@ describe('snoowrap', function () {
       expect(results[0].author.name).to.equal('DO_U_EVN_SPAGHETTI');
       await results.fetch_more(2);
       expect(results).to.have.lengthOf(4);
+    });
+    it('can search a given subreddit for posts', async () => {
+      const results = await r.get_subreddit('askreddit').search({query: 'e', limit: 5});
+      expect(results).to.have.lengthOf(5);
+      for (let i = 0; i < results.length; i++) {
+        expect(results[i].subreddit.display_name).to.equal('AskReddit');
+      }
     });
     it('can search for a list of subreddits', async () => {
       const results = await r.search_subreddits({query: 'AskReddit'});
