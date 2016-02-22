@@ -78,6 +78,12 @@ describe('snoowrap', function () {
     it('can get a subreddit stylesheet', async () => {
       expect(await subreddit.get_stylesheet()).to.match(/^\.snoowrap_testing-stylesheet-starts-here{}/);
     });
+    it("can get and modify a subreddit's settings", async () => {
+      await subreddit.edit_settings({public_traffic: false});
+      expect(await subreddit.get_settings().public_traffic).to.be.false;
+      await subreddit.edit_settings({public_traffic: true});
+      expect(await subreddit.get_settings().public_traffic).to.be.true;
+    });
   });
 
   describe('getting a submission', () => {

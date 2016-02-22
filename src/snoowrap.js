@@ -376,8 +376,10 @@ const snoowrap = class snoowrap {
     return this.post({uri: 'api/store_visits', links: _.map(links, 'name').join(',')});
   }
   _submit ({captcha_response, captcha_iden, kind, resubmit = true, send_replies = true, text, title, url, subreddit_name}) {
-    return promise_wrap(this.post({uri: 'api/submit', form: {captcha: captcha_response, iden: captcha_iden,
-      sendreplies: send_replies, sr: subreddit_name, kind, resubmit, text, title, url}})).json.data.things[0];
+    return promise_wrap(this.post({uri: 'api/submit', form: {
+      api_type, captcha: captcha_response, iden: captcha_iden, sendreplies: send_replies, sr: subreddit_name, kind, resubmit,
+      text, title, url
+    }}).tap(helpers._handle_json_errors).then(result => this.get_submission(result.json.data.id)));
   }
   /**
   * Creates a new selfpost on the given subreddit.
@@ -655,6 +657,7 @@ const snoowrap = class snoowrap {
     suggested_comment_sort = 'confidence',
     title,
     type = 'public',
+    subreddit_type, // This is the same as `type`, but for some reason the name is changed when fetching current settings
     wiki_edit_age,
     wiki_edit_karma,
     wikimode = 'modonly'
@@ -663,19 +666,14 @@ const snoowrap = class snoowrap {
       allow_top, api_type, captcha, collapse_deleted_comments, comment_score_hide_mins, description, exclude_banned_modqueue,
       'header-title': header_title, hide_ads, iden: captcha_iden, lang, link_type, name, over_18, public_description,
       public_traffic, show_media, spam_comments, spam_links, spam_selfposts, sr, submit_link_label, submit_text,
-      submit_text_label, suggested_comment_sort, title, type, wiki_edit_age, wiki_edit_karma, wikimode
-    }}).then(result => {
-      if (result.json.errors.length) {
-        throw result.json.errors[0];
-      }
-      return(this.get_subreddit(name));
-    }));
+      submit_text_label, suggested_comment_sort, title, type: subreddit_type || type, wiki_edit_age, wiki_edit_karma, wikimode
+    }}).bind(this.get_subreddit(name)).then(helpers._handle_json_errors));
   }
   /**
   * Creates a new subreddit.
   * @param {object} options
   * @param {string} options.name The name of the new subreddit
-  * @param {string} options.title The text that should appear in the new header of the subreddit
+  * @param {string} options.title The text that should appear in the header of the subreddit
   * @param {string} options.public_description The text that appears with this subreddit on the search page, or on the
   blocked-access page if this subreddit is private. (500 characters max)
   * @param {string} options.description The sidebar text for the subreddit. (5120 characters max)
@@ -1637,12 +1635,10 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @returns {Promise} A Promise that fulfills with this subreddit when the request is complete
   */
   accept_moderator_invite () {
-    return promise_wrap(this.post({uri: `r/${this.display_name}/api/accept_moderator_invite`, form: {api_type}}).then(res => {
-      if (res.json.errors.length) {
-        throw res.json.errors[0];
-      }
-      return this;
-    }));
+    return promise_wrap(this.post({
+      uri: `r/${this.display_name}/api/accept_moderator_invite`,
+      form: {api_type}
+    }).bind(this).then(helpers._handle_json_errors));
   }
   /**
   * Abdicates moderator status on this subreddit.
@@ -1650,12 +1646,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   */
   leave_moderator () {
     return promise_wrap(this.name.then(name => {
-      return this.post({uri: 'api/leavemoderator', form: {id: name}}).then(res => {
-        if (res.json.errors.length) {
-          throw res.json.errors[0];
-        }
-        return this;
-      });
+      return this.post({uri: 'api/leavemoderator', form: {id: name}}).bind(this).then(helpers._handle_json_errors);
     }));
   }
   /**
@@ -1695,7 +1686,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @param {object} options Filtering options. Can also contain options for the resulting Listing.
   * @returns {Promise} A Listing of users
   */
-  get_banned_users ({user} = {}) {
+  get_banned_users ({user} = {}) { // TODO: Return Listings containing RedditUser objects rather than normal objects with data
     return this.get({uri: `r/${this.display_name}/about/banned`, qs: {user}});
   }
   /**
@@ -1783,18 +1774,60 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * Gets this subreddit's current settings.
   * @returns {Promise} An Object containing this subreddit's current settings.
   */
-  get_subreddit_settings () {
+  get_settings () {
     return this.get({uri: `r/${this.display_name}/about/edit`});
   }
   /**
   * Edits this subreddit's settings.
   * @param {object} options An Object containing {[option name]: new value} mappings of the options that should be modified.
   Any omitted option names will simply retain their previous values.
+  * @param {object} options
+  * @param {string} options.title The text that should appear in the header of the subreddit
+  * @param {string} options.public_description The text that appears with this subreddit on the search page, or on the
+  blocked-access page if this subreddit is private. (500 characters max)
+  * @param {string} options.description The sidebar text for the subreddit. (5120 characters max)
+  * @param {string} [options.submit_text=''] The text to show below the submission page (1024 characters max)
+  * @param {boolean} [options.hide_ads=false] Determines whether ads should be hidden on this subreddit. (This is only
+  allowed for gold-only subreddits.)
+  * @param {string} [options.lang='en'] The language of the subreddit (represented as an IETF language tag)
+  * @param {string} [options.type='public'] Determines who should be able to access the subreddit. This should be one of
+  `public, private, restricted, gold_restricted, gold_only, archived, employees_only`.
+  * @param {string} [options.link_type='any'] Determines what types of submissions are allowed on the subreddit. This should
+  be one of `any, link, self`.
+  * @param {string} [options.submit_link_label=undefined] Custom text to display on the button that submits a link. If
+  this is omitted, the default text will be displayed.
+  * @param {string} [options.submit_text_label=undefined] Custom text to display on the button that submits a selfpost. If
+  this is omitted, the default text will be displayed.
+  * @param {string} [options.wikimode='modonly'] Determines who can edit wiki pages on the subreddit. This should be one of
+  `modonly, anyone, disabled`.
+  * @param {number} [options.wiki_edit_karma=0] The minimum amount of subreddit karma needed for someone to edit this
+  subreddit's wiki. (This is only relevant if `options.wikimode` is set to `anyone`.)
+  * @param {number} [options.wiki_edit_age=0] The minimum account age (in days) needed for someone to edit this subreddit's
+  wiki. (This is only relevant if `options.wikimode` is set to `anyone`.)
+  * @param {string} [options.spam_links='high'] The spam filter strength for links on this subreddit. This should be one of
+  `low, high, all`.
+  * @param {string} [options.spam_selfposts='high'] The spam filter strength for selfposts on this subreddit. This should be
+  one of `low, high, all`.
+  * @param {string} [options.spam_comments='high'] The spam filter strength for comments on this subreddit. This should be one
+  of `low, high, all`.
+  * @param {boolean} [options.over_18=false] Determines whether this subreddit should be classified as NSFW
+  * @param {boolean} [options.allow_top=true] Determines whether the new subreddit should be able to appear in /r/all and
+  trending subreddits
+  * @param {boolean} [options.show_media=false] Determines whether image thumbnails should be enabled on this subreddit
+  * @param {boolean} [options.exclude_banned_modqueue=false] Determines whether posts by site-wide banned users should be
+  excluded from the modqueue.
+  * @param {boolean} [options.public_traffic=false] Determines whether the /about/traffic page for this subreddit should be
+  viewable by anyone.
+  * @param {boolean} [options.collapse_deleted_comments=false] Determines whether deleted and removed comments should be
+  collapsed by default
+  * @param {string} [options.suggested_comment_sort=undefined] The suggested comment sort for the subreddit. This should be
+  one of `confidence, top, new, controversial, old, random, qa`.If left blank, there will be no suggested sort,
+  which means that users will see the sort method that is set in their own preferences (usually `confidence`.)
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
   */
   edit_settings (options) {
-    return promise_wrap(this.get_subreddit_settings().then(current_values => {
-      return this._ac._create_or_edit_subreddit(_.assign(current_values, options, {sr: this.display_name, name: undefined}));
+    return promise_wrap(Promise.join(this.get_settings(), this.name, (current_values, name) => {
+      return this._ac._create_or_edit_subreddit(_.assign(current_values, options, {sr: name}));
     }).return(this));
   }
   /**
@@ -1941,7 +1974,7 @@ objects.Trophy = class Trophy extends objects.RedditContent {};
 objects.PromoCampaign = class PromoCampaign extends objects.RedditContent {};
 objects.KarmaList = class KarmaList extends objects.RedditContent {};
 objects.TrophyList = class TrophyList extends objects.RedditContent {};
-objects.SubredditSettings = class SubredditSettings extends objects.RedditContent {};
+objects.subreddit_settings = class subreddit_settings extends objects.RedditContent {};
 objects.modaction = class modaction extends objects.RedditContent {};
 
 snoowrap.objects = objects;
