@@ -241,16 +241,16 @@ describe('snoowrap', function () {
       const user1 = r.get_user('not_an_aardvark');
       const user2 = r.get_user('actually_an_aardvark');
       const flair_text = moment().format();
-      await user1.assign_user_flair({subreddit_name: sub.display_name, text: flair_text});
+      await user1.assign_flair({subreddit_name: sub.display_name, text: flair_text});
       expect(await sub.get_user_flair(user1.name).flair_text).to.equal(flair_text);
-      await user2.assign_user_flair({subreddit_name: sub.display_name, text: flair_text});
+      await user2.assign_flair({subreddit_name: sub.display_name, text: flair_text});
       expect(await sub.get_user_flair(user2.name).flair_text).to.equal(flair_text);
     });
     it('can assign flair to a submission', async () => {
       /* The submission's flair is cached by reddit for a few minutes, so there's not really any reliable way to verify that
       the flair text was set successfully while still having the tests run in a reasonable amount of time. If nothing else,
       send the request and make sure no error is returned. */
-      await r.get_submission('443bn7').assign_link_flair({text: moment().format()});
+      await r.get_submission('443bn7').assign_flair({text: moment().format()});
     });
     it('can select its own user flair', async () => {
       const text = moment().format();
@@ -265,7 +265,7 @@ describe('snoowrap', function () {
       await sub.create_link_flair_template({text});
       const submission = r.get_submission('443bn7');
       const flair_template_id = _.last(await submission.get_link_flair_templates()).flair_template_id;
-      await submission.select_link_flair({flair_template_id});
+      await submission.select_flair({flair_template_id});
       expect(await submission.refresh().link_flair_text).to.equal(text);
       await sub.delete_all_link_flair_templates();
     });

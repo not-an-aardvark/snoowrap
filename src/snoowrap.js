@@ -1044,7 +1044,7 @@ objects.RedditUser = class RedditUser extends objects.RedditContent {
   * @param {string} [options.css_class=""] The CSS class that the user's flair should have
   * @returns {Promise} A Promise that fulfills with the current user after the request is complete
   */
-  assign_user_flair (options) {
+  assign_flair (options) {
     return promise_wrap(this._ac._assign_flair(_.assign(options, {name: this.name})).return(this));
   }
 };
@@ -1213,7 +1213,7 @@ objects.Submission = class Submission extends objects.VoteableContent {
   * @param {string} options.css_class The CSS class that the link's flair should have
   * @returns {Promise} A Promise that fulfills with an updated version of this Submission
   */
-  assign_link_flair (options) {
+  assign_flair (options) {
     return promise_wrap(this._ac._assign_flair(_.assign(options, {
       link: this.name, subreddit_name: this.subreddit.display_name
     })).then(() => {
@@ -1231,7 +1231,7 @@ objects.Submission = class Submission extends objects.VoteableContent {
   template has the `text_editable` property set to `true`.)
   * @returns {Promise} A Promise that fulfills with this objects after the request is complete
   */
-  select_link_flair (options) {
+  select_flair (options) {
     return promise_wrap(this._ac._select_flair(_.assign(options, {
       link: this.name, subreddit_name: this.subreddit.display_name
     })).return(this));
@@ -1458,15 +1458,12 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   template has the `text_editable` property set to `true`.)
   * @returns {Promise} A Promise that fulfills when the request is complete
   */
-  async select_my_flair (options) {
+  select_my_flair (options) {
     /* NOTE: This requires `identity` scope in addition to `flair` scope, since the reddit api needs to be passed a username.
     I'm not sure if there's a way to do this without requiring additional scope. */
-    if (!this._ac.own_user_info) {
-      await this._ac.get_me();
-    }
-    return await this._ac._select_flair(_.assign(options, {
-      subreddit_name: this.display_name, name: this._ac.own_user_info.name
-    }));
+    return promise_wrap((this._ac.own_user_info ? Promise.resolve() : this._ac.get_me()).then(() =>
+      this._ac._select_flair(_.assign(options, {subreddit_name: this.display_name, name: this._ac.own_user_info.name}))
+    ));
   }
   _set_my_flair_visibility (flair_enabled) {
     return this.post({uri: `r/${this.display_name}/api/setflairenabled`, form: {api_type, flair_enabled}});
