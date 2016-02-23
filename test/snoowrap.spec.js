@@ -75,14 +75,39 @@ describe('snoowrap', function () {
     it("can fetch information directly from a subreddit's info page", async () => {
       expect(await subreddit.created_utc).to.equal(1453703345);
     });
-    it('can get a subreddit stylesheet', async () => {
-      expect(await subreddit.get_stylesheet()).to.match(/^\.snoowrap_testing-stylesheet-starts-here{}/);
+    it('can get and modify a subreddit stylesheet', async () => {
+      const gibberish = require('crypto').randomBytes(4).toString('hex');
+      const new_stylesheet = `.stylesheet-${gibberish}{}`; // it has to be valid CSS or reddit returns a 404 when fetching it
+      await subreddit.update_stylesheet({css: new_stylesheet});
+      // Reddit caches stylesheets for awhile, so this is annoying to test reliably. Make sure the sheet is fetched, at least
+      expect(await subreddit.get_stylesheet()).to.match(/^\.stylesheet-[0-9a-f]{8}/);
     });
     it("can get and modify a subreddit's settings", async () => {
       await subreddit.edit_settings({public_traffic: false});
       expect(await subreddit.get_settings().public_traffic).to.be.false;
       await subreddit.edit_settings({public_traffic: true});
       expect(await subreddit.get_settings().public_traffic).to.be.true;
+    });
+    it("can get a subreddit's submit text", async () => {
+      expect(await subreddit.get_submit_text()).to.equal('snoowrap_testing submit text');
+    });
+    it('can subscribe/unsubscribe from a subreddit', async () => {
+      await subreddit.subscribe();
+      expect(await subreddit.refresh().user_is_subscriber).to.be.true;
+      await subreddit.unsubscribe();
+      expect(await subreddit.refresh().user_is_subscriber).to.be.false;
+    });
+    it('can upload images to a subreddit', async () => {
+      await subreddit.upload_header_image({file: 'test/test_image.png'});
+    });
+    it("can get a subreddit's rules", async () => {
+      const rules_obj = await subreddit.get_rules();
+      expect(rules_obj.rules[0].short_name).to.equal('Rule 1: No breaking the rules');
+    });
+    it('can get a stickied post on a subreddit', async () => {
+      const stickied_post = await subreddit.get_sticky();
+      expect(stickied_post).to.be.an.instanceof(snoowrap.objects.Submission);
+      expect(stickied_post.title).to.equal('This post is stickied');
     });
   });
 
@@ -444,9 +469,14 @@ describe('snoowrap', function () {
         expect(results[i].subreddit.display_name).to.equal('AskReddit');
       }
     });
-    it('can search for a list of subreddits', async () => {
-      const results = await r.search_subreddits({query: 'AskReddit'});
+    it('can search for a list of subreddits by name', async () => {
+      const results = await r.search_subreddit_names({query: 'AskReddit'});
       expect(Array.isArray(results)).to.be.true;
+    });
+    it('can search for a list of subreddits by topic', async () => {
+      const results = await r.search_subreddits({query: 'snoowrap'});
+      expect(Array.isArray(results)).to.be.true;
+      expect(results[0]).to.be.an.instanceof(snoowrap.objects.Subreddit);
     });
   });
 

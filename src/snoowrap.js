@@ -295,11 +295,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   update_preferences (updated_preferences) {
-    // reddit expects all fields to be present in the patch request, so get the current values of the fields
-    // and then apply the changes.
-    return this.get_preferences().then(current_prefs => {
-      return this.patch({uri: 'api/v1/me/prefs', body: _.assign(current_prefs, updated_preferences)});
-    });
+    return this.patch({uri: 'api/v1/me/prefs', body: updated_preferences});
   }
   /**
   * Gets the currently-authenticated user's trophies.
@@ -627,7 +623,7 @@ const snoowrap = class snoowrap {
   * @memberof snoowrap
   * @instance
   */
-  search_subreddits ({exact = false, include_nsfw = true, query}) {
+  search_subreddit_names ({exact = false, include_nsfw = true, query}) {
     return this.post({uri: `api/search_reddit_names`, qs: {exact, include_over_18: include_nsfw, query}}).names;
   }
   _create_or_edit_subreddit ({
@@ -720,6 +716,17 @@ const snoowrap = class snoowrap {
   */
   create_subreddit (options) {
     return this._create_or_edit_subreddit(options);
+  }
+  /**
+  * Searches subreddits by topic.
+  * @param {object} $0
+  * @param {string} $0.query The search query. (50 characters max)
+  * @returns {Promise} An Array of subreddit objects corresponding to the search results
+  */
+  search_subreddits ({query}) {
+    return promise_wrap(this.get({uri: 'api/subreddits_by_topic', qs: {query}}).then(results => {
+      return _.map(results, 'name').map(this.get_subreddit.bind(this));
+    }));
   }
 };
 /** A base class for content from reddit. With the expection of Listings, all content types extend this class. */
@@ -1837,6 +1844,120 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
     return this.get({uri: `api/recommend/sr/${this.display_name}`, qs: {omit: omit && omit.join(',')}}).then(names => {
       return _.map(names, 'sr_name');
     });
+  }
+  /**
+  * Gets the submit text (which displays on the submission form) for this subreddit.
+  * @returns {Promise} The submit text, represented as a string.
+  */
+  get_submit_text () {
+    return this.get({uri: `r/${this.display_name}/api/submit_text`}).submit_text;
+  }
+  /**
+  * Updates this subreddit's stylesheet.
+  * @param {object} $0
+  * @param {string} $0.css The new contents of the stylesheet
+  * @param {string} [$0.reason=] The reason for the change (256 characters max)
+  */
+  update_stylesheet ({css, reason}) {
+    return promise_wrap(this.post({
+      uri: `r/${this.display_name}/api/subreddit_stylesheet`,
+      form: {api_type, op: 'save', reason, stylesheet_contents: css}
+    }).bind(this).then(helpers._handle_json_errors));
+  }
+
+  _set_subscribed (status) {
+    return promise_wrap(this.name.then(name => this.post({
+      uri: 'api/subscribe',
+      form: {action: status ? 'sub' : 'unsub', sr: name}
+    }).return(this)));
+  }
+  /**
+  * Subscribes to this subreddit.
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  */
+  subscribe () {
+    return this._set_subscribed(true);
+  }
+  /**
+  * Unsubscribes from this subreddit.
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  */
+  unsubscribe () {
+    return this._set_subscribed(false);
+  }
+  _upload_sr_img ({name, file, upload_type, image_type}) {
+    if (typeof file !== 'string' && !(file instanceof require('stream').Readable)) {
+      throw new errors.InvalidMethodCallError('Uploaded image filepath must be a string or a ReadableStream.');
+    }
+    const parsed_file = typeof file === 'string' ? require('fs').createReadStream(file) : file;
+    return promise_wrap(this.post({
+      uri: `r/${this.display_name}/api/upload_sr_img`,
+      formData: {name, upload_type, img_type: image_type, file: parsed_file}
+    }).then(result => {
+      if (result.errors.length) {
+        throw result.errors[0];
+      }
+      return this;
+    }));
+  }
+  /**
+  * Uploads an image for use in this subreddit's stylesheet.
+  * @param {object} $0
+  * @param {string} $0.name The name that the new image should have in the stylesheet
+  * @param {string|stream.Readable} $0.file The image file that should get uploaded. This should either be the path to an
+  image file, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) in environments (e.g.
+  browsers) where the filesystem is unavailable.
+  * @param {string} [$0.image_type='png'] Determines how the uploaded image should be stored. One of `png, jpg`
+  * @returns {Promise} A Promise that fulfills with this subreddit when the request is complete.
+  */
+  upload_stylesheet_image ({name, file, image_type = 'png'}) {
+    return this._upload_sr_img({name, file, image_type, upload_type: 'img'});
+  }
+  /**
+  * Uploads an image to use as this subreddit's header.
+  * @param {object} $0
+  * @param {string|stream.Readable} $0.file The image file that should get uploaded. This should either be the path to an
+  image file, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) for environments (e.g.
+  browsers) where the filesystem is unavailable.
+  * @param {string} [$0.image_type='png'] Determines how the uploaded image should be stored. One of `png, jpg`
+  * @returns {Promise} A Promise that fulfills with this subreddit when the request is complete.
+  */
+  upload_header_image ({file, image_type = 'png'}) {
+    return this._upload_sr_img({file, image_type, upload_type: 'header'});
+  }
+  /**
+  * Uploads an image to use as this subreddit's mobile icon.
+  * @param {object} $0
+  * @param {string|stream.Readable} $0.file The image file that should get uploaded. This should either be the path to an
+  image file, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) for environments (e.g.
+  browsers) where the filesystem is unavailable.
+  * @param {string} [$0.image_type='png'] Determines how the uploaded image should be stored. One of `png, jpg`
+  * @returns {Promise} A Promise that fulfills with this subreddit when the request is complete.
+  */
+  upload_icon ({file, image_type = 'png'}) {
+    return this._upload_sr_img({file, image_type, upload_type: 'icon'});
+  }
+  /**
+  * Uploads an image to use as this subreddit's mobile banner.
+  * @param {object} $0
+  * @param {string|stream.Readable} $0.file The image file that should get uploaded. This should either be the path to an
+  image file, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) for environments (e.g.
+  browsers) where the filesystem is unavailable.
+  * @param {string} [$0.image_type='png'] Determines how the uploaded image should be stored. One of `png, jpg`
+  * @returns {Promise} A Promise that fulfills with this subreddit when the request is complete.
+  */
+  upload_banner_image ({file, image_type = 'png'}) {
+    return this._upload_sr_img({file, image_type, upload_type: 'banner'});
+  }
+  /**
+  * Gets information on this subreddit's rules.
+  * @returns {Promise} A Promise that fulfills with information on this subreddit's rules.
+  */
+  get_rules () {
+    return this.get({uri: `r/${this.display_name}/about/rules`});
+  }
+  get_sticky ({num = 1} = {}) {
+    return this.get({uri: `r/${this.display_name}/about/sticky`, qs: {num}});
   }
 };
 
