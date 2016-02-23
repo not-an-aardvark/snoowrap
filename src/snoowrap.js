@@ -814,6 +814,9 @@ const snoowrap = class snoowrap {
   get_default_subreddits (options) {
     return this.get({uri: 'subreddits/default', qs: options});
   }
+  _friend (options) {
+    return this.post({uri: 'api/friend', form: _.assign(options, {api_type})});
+  }
 };
 
 _.forEach(constants.HTTP_VERBS, type => {
@@ -2049,8 +2052,31 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   get_rules () {
     return this.get({uri: `r/${this.display_name}/about/rules`});
   }
+  /**
+  * Gets the stickied post on this subreddit, or throws a 404 error if none exists.
+  * @param {object} $0
+  * @param {number} [$0.num=1] The number of the sticky to get. Should be either `1` or `2`.
+  */
   get_sticky ({num = 1} = {}) {
     return this.get({uri: `r/${this.display_name}/about/sticky`, qs: {num}});
+  }
+  invite_moderator ({name, permissions}) {
+    return this._ac._friend({name, permissions, type: 'moderator_invite'});
+  }
+  add_contributor ({name}) {
+    return this._ac._friend({name, type: 'contributor'});
+  }
+  ban_user ({name, ban_message, ban_reason, duration, ban_note}) {
+    return this._ac._friend({name, ban_message, ban_reason, duration, note: ban_note, type: 'banned'});
+  }
+  mute_user({name}) {
+    return this._ac._friend({name, type: 'muted'});
+  }
+  wikiban_user ({name}) {
+    return this._ac._friend({name, type: 'wikibanned'});
+  }
+  add_wiki_contributor ({name}) {
+    return this._ac._friend({name, type: 'wikicontributor'});
   }
 };
 
