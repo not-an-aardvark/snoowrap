@@ -18,8 +18,7 @@ const snoowrap = class snoowrap {
   /**
   * Constructs a new requester. This will be necessary if you want to do anything.
   * @param {object} $0 An Object containing credentials.  This should have the properties (a) `user_agent`,
-  `client_id`, `client_secret`, and `refresh_token`, **or**
-  (b) `user_agent` and `access_token`.
+  `client_id`, `client_secret`, and `refresh_token`, **or** (b) `user_agent` and `access_token`.
   * @param {string} $0.user_agent A unique description of what your app does
   * @param {string} [$0.client_id] The client ID of your app (assigned by reddit)
   * @param {string} [$0.client_secret] The client secret of your app (assigned by reddit)
@@ -43,9 +42,6 @@ const snoowrap = class snoowrap {
     this.access_token = access_token;
     this._config = require('./default_config');
     this._throttle = Promise.resolve();
-    constants.HTTP_VERBS.forEach(type => {
-      Object.defineProperty(this, type, {get: () => this._oauth_requester.defaults({method: type})});
-    });
   }
   get _base_client_requester () {
     return request.defaults({
@@ -64,12 +60,12 @@ const snoowrap = class snoowrap {
     this.scope = token_info.scope.split(' ');
   }
   get _oauth_requester () {
-    const default_requester = request.defaults({
+    return request.defaults({
       headers: {'user-agent': this.user_agent},
       baseUrl: `https://oauth.${this._config.endpoint_domain}`,
       qs: {raw_json: 1}, // This tells reddit to unescape html characters, e.g. it will send '<' instead of '&lt;'
       resolveWithFullResponse: true,
-      transform: (body, response) => {
+      transform: (function (body, response) {
         this.ratelimit_remaining = response.headers['x-ratelimit-remaining'];
         this.ratelimit_reset_point = moment().add(response.headers['x-ratelimit-reset'], 'seconds');
         const populated = helpers._populate(body, this);
@@ -77,49 +73,46 @@ const snoowrap = class snoowrap {
           populated.uri = response.request.uri.path;
         }
         return populated;
-      }
+      }).bind(this)
     });
-    const handle_request = async (requester, self, args, attempts = 0) => {
-      /* this._throttle is a timer that gets reset to this._config.request_delay whenever a request is sent.
-      This ensures that requests are throttled correctly according to the user's config settings, and that no requests are
-      lost. The await statement is wrapped in a loop to make sure that if the throttle promise resolves while multiple
-      requests are pending, only one of the requests is sent, and the others await the throttle again. (The loop is
-      non-blocking due to its await statement.) */
-      while (!this._throttle.isFulfilled()) {
-        await this._throttle;
+  }
+  async _handle_request (requester, args, attempts = 0) {
+    /* this._throttle is a timer that gets reset to this._config.request_delay whenever a request is sent.
+    This ensures that requests are throttled correctly according to the user's config settings, and that no requests are
+    lost. The await statement is wrapped in a loop to make sure that if the throttle promise resolves while multiple
+    requests are pending, only one of the requests is sent, and the others await the throttle again. (The loop is
+    non-blocking due to its await statement.) */
+    while (!this._throttle.isFulfilled()) {
+      await this._throttle;
+    }
+    this._throttle = Promise.delay(this._config.request_delay);
+    if (this.ratelimit_remaining < 1 && this.ratelimit_reset_point.isAfter()) {
+      // If the ratelimit has been exceeded, delay or abort the request depending on the user's config.
+      const seconds_until_expiry = this.ratelimit_reset_point.diff(moment(), 'seconds');
+      if (this._config.continue_after_ratelimit_error) {
+        /* If the `continue_after_ratelimit_error` setting is enabled, queue the request, wait until the next ratelimit
+        period, and then send it. */
+        this.warn(errors.RateLimitWarning(seconds_until_expiry));
+        await Promise.delay(this.ratelimit_reset_point.diff());
+      } else {
+        // Otherwise, throw an error.
+        throw new errors.RateLimitError(seconds_until_expiry);
       }
-      this._throttle = Promise.delay(this._config.request_delay);
-
-      if (this.ratelimit_remaining < 1 && this.ratelimit_reset_point.isAfter()) {
-        // If the ratelimit has been exceeded, delay or abort the request depending on the user's config.
-        const seconds_until_expiry = this.ratelimit_reset_point.diff(moment(), 'seconds');
-        if (this._config.continue_after_ratelimit_error) {
-          /* If the `continue_after_ratelimit_error` setting is enabled, queue the request, wait until the next ratelimit
-          period, and then send it. */
-          this.warn(errors.RateLimitWarning(seconds_until_expiry));
-          await Promise.delay(this.ratelimit_reset_point.diff());
-        } else {
-          // Otherwise, throw an error.
-          throw new errors.RateLimitError(seconds_until_expiry);
-        }
+    }
+    try {
+      // If the access token has expired, refresh it.
+      if (this.refresh_token && (!this.access_token || this.token_expiration.isBefore())) {
+        await this._update_access_token();
       }
-
-      try {
-        // If the access token has expired, refresh it.
-        if (this.refresh_token && (!this.access_token || this.token_expiration.isBefore())) {
-          await this._update_access_token();
-        }
-        // Send the request and return the response.
-        return await requester.defaults({auth: {bearer: this.access_token}})(...args);
-      } catch (err) {
-        if (attempts + 1 < this._config.max_retry_attempts && _.includes(this._config.retry_error_codes, err.statusCode)) {
-          this.warn(`Warning: Received status code ${err.statusCode} from reddit. Retrying request...`);
-          return handle_request(requester, self, args, attempts + 1);
-        }
-        throw err;
+      // Send the request and return the response.
+      return await requester.defaults({auth: {bearer: this.access_token}})(...args);
+    } catch (err) {
+      if (attempts + 1 < this._config.max_retry_attempts && _.includes(this._config.retry_error_codes, err.statusCode)) {
+        this.warn(`Warning: Received status code ${err.statusCode} from reddit. Retrying request...`);
+        return this._handle_request(requester, args, attempts + 1);
       }
-    };
-    return new Proxy(default_requester, {apply: (...args) => promise_wrap(handle_request(...args))});
+      throw err;
+    }
   }
   _new_object(object_type, content, _has_fetched) {
     return new objects[object_type](content, this, _has_fetched);
@@ -767,6 +760,13 @@ const snoowrap = class snoowrap {
     return this.get({uri: 'subreddits/mine/moderator', qs: options});
   }
 };
+
+_.forEach(constants.HTTP_VERBS, type => {
+  snoowrap.prototype[type] = function (...args) {
+    return promise_wrap(this._handle_request(this._oauth_requester.defaults({method: type}), args));
+  };
+});
+
 /** A base class for content from reddit. With the expection of Listings, all content types extend this class. */
 objects.RedditContent = class RedditContent {
   /**
@@ -781,20 +781,12 @@ objects.RedditContent = class RedditContent {
     this._fetch = undefined;
     this._has_fetched = !!_has_fetched;
     _.assignIn(this, options);
-    /* Omit the 'delete' request shortcut, since the property name is used by Comments and Submissions. To send an HTTP DELETE
-    request, use `this._ac.delete` rather than the shortcut `this.delete`. */
-    _.without(constants.HTTP_VERBS, 'delete').forEach(type => {
-      Object.defineProperty(this, type, {get: () => this._ac[type]});
-    });
     return new Proxy(this, {get: (target, key) => {
       if (key in target || key === 'length' || key in Promise.prototype || target._has_fetched) {
         return target[key];
       }
       if (key === '_raw') {
         return target;
-      }
-      if (_.includes(constants.HTTP_VERBS, key)) {
-        return target._ac[key];
       }
       return this.fetch()[key];
     }});
@@ -834,6 +826,14 @@ objects.RedditContent = class RedditContent {
     return response_object;
   }
 };
+
+/* Omit the 'delete' request shortcut, since the property name is used by Comments and Submissions. To send an HTTP DELETE
+request, use `this._ac.delete` rather than the shortcut `this.delete`. */
+_.without(constants.HTTP_VERBS, 'delete').forEach(type => {
+  objects.RedditContent.prototype[type] = function (...args) {
+    return this._ac[type](...args);
+  };
+});
 
 /**
 * A set of mixin functions that apply to Submissions, Comments, and PrivateMessages
@@ -2009,7 +2009,7 @@ Most methods that return Listings will also accept `limit`, `after`, `before`, `
 */
 objects.Listing = class Listing extends Array {
   constructor ({children = [], query = {}, show_all = true, limit, _transform = _.identity,
-      uri, method, after, before, _is_comment_list = false} = {}, _ac) {
+      uri, method = 'get', after, before, _is_comment_list = false} = {}, _ac) {
     super();
     _.assign(this, children);
     const constant_params = _.assign(query, {show: show_all ? 'all' : undefined, limit});
@@ -2025,9 +2025,6 @@ objects.Listing = class Listing extends Array {
       this._more = this.pop();
       this._is_comment_list = true;
     }
-  }
-  get _requester () {
-    return this._ac._oauth_requester.defaults({uri: this.uri, method: this.method, qs: this.constant_params});
   }
   /**
   * This is a getter that is true if there are no more items left to fetch, and false otherwise.
@@ -2062,8 +2059,12 @@ objects.Listing = class Listing extends Array {
   }
   async _fetch_more_regular (amount) {
     const limit_for_request = Math.min(amount, this.limit) || this.limit;
-    const request_params = {qs: {after: this.after, before: this.before, limit: limit_for_request}};
-    const response = await this._requester(request_params).then(this._transform);
+    const request_params = _.merge({after: this.after, before: this.before, limit: limit_for_request}, this.constant_params);
+    const response = await this._ac[this.method]({
+      uri: this.uri,
+      qs: request_params,
+      limit: limit_for_request
+    }).then(this._transform);
     this.push(..._.toArray(response));
     this.before = response.before;
     this.after = response.after;
