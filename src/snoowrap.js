@@ -208,7 +208,7 @@ const snoowrap = class snoowrap {
   }
   /**
   * Gets information on the requester's own user profile.
-  * @returns {objects.RedditUser} A RedditUser object corresponding to the requester's profile
+  * @returns {RedditUser} A RedditUser object corresponding to the requester's profile
   * @memberof snoowrap
   * @instance
   */
@@ -723,10 +723,34 @@ const snoowrap = class snoowrap {
   * @param {string} $0.query The search query. (50 characters max)
   * @returns {Promise} An Array of subreddit objects corresponding to the search results
   */
-  search_subreddits ({query}) {
+  search_subreddit_topics ({query}) {
     return promise_wrap(this.get({uri: 'api/subreddits_by_topic', qs: {query}}).then(results => {
       return _.map(results, 'name').map(this.get_subreddit.bind(this));
     }));
+  }
+  /**
+  * Gets a list of subreddits that the currently-authenticated user is subscribed to.
+  * @param {object} [options=] Options for the resulting Listing
+  * @returns {Promise} A Listing containing Subreddits.
+  */
+  get_subscriptions (options) {
+    return this.get({uri: 'subreddits/mine/subscriber', qs: options});
+  }
+  /**
+  * Gets a list of subreddits in which the currently-authenticated user is an approved submitter.
+  * @param {object} [options=] Options for the resulting Listing
+  * @returns {Promise} A Listing containing Subreddits.
+  */
+  get_contributor_subreddits (options) {
+    return this.get({uri: 'subreddits/mine/contributor', qs: options});
+  }
+  /**
+  * Gets a list of subreddits in which the currently-authenticated user is a moderator.
+  * @param {object} [options=] Options for the resulting Listing
+  * @returns {Promise} A Listing containing Subreddits.
+  */
+  get_moderated_subreddits (options) {
+    return this.get({uri: 'subreddits/mine/moderator', qs: options});
   }
 };
 /** A base class for content from reddit. With the expection of Listings, all content types extend this class. */
@@ -1583,7 +1607,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   wikibanned, wikicontributor, wikiunbanned, wikipagelisted, removewikicontributor, wikirevise, wikipermlevel,
   ignorereports, unignorereports, setpermissions, setsuggestedsort, sticky, unsticky, setcontestmode, unsetcontestmode,
   lock, unlock, muteuser, unmuteuser, createrule, editrule, deleterule`
-  * @returns {Listing} A Listing containing moderation actions
+  * @returns {Promise} A Listing containing moderation actions
   */
   get_moderation_log (options = {}) {
     const parsed_options = _(options).assign({mod: options.mods && options.mods.join(',')}).omit(['mods']).value();
