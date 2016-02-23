@@ -1,5 +1,5 @@
 'use strict';
-require('harmony-reflect'); // temp dependency until v8 implements Proxies properly
+require('harmony-reflect'); // temp dependency until node implements Proxies correctly
 const Promise = require('bluebird');
 const _ = require('lodash');
 const request = require('request-promise').defaults({json: true});
@@ -22,7 +22,9 @@ const snoowrap = class snoowrap {
   * @param {string} $0.user_agent A unique description of what your app does
   * @param {string} [$0.client_id] The client ID of your app (assigned by reddit)
   * @param {string} [$0.client_secret] The client secret of your app (assigned by reddit)
-  * @param {string} [$0.refresh_token] A refresh token for your app. You will need to get this from reddit beforehand.
+  * @param {string} [$0.refresh_token] A refresh token for your app. You will need to get this from reddit beforehand. A
+  script to automatically generate refresh tokens for you can be found
+  [here](https://github.com/not-an-aardvark/reddit-oauth-helper).
   * @param {string} [$0.access_token] An access token for your app. If this is provided, then the
   client ID/client secret/refresh token are not required. Note that all access tokens expire one hour after being
   generated; if you want to retain access for longer than that, provide the other credentials instead.
