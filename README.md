@@ -25,7 +25,7 @@ r.get_submission('2np694').subreddit.get_moderators()[0].name
 // --> returns a Promise for the string 'krispykrackers'
 // (this submission's subreddit's first mod's name)
 ```
-...or chain actions together with fluid syntax:
+...or chain actions together with fluent syntax:
 
 ```javascript
 r.get_subreddit('snoowrap')
