@@ -734,7 +734,7 @@ const snoowrap = class snoowrap {
   /**
   * Gets a list of subreddits that the currently-authenticated user is subscribed to.
   * @param {object} [options=] Options for the resulting Listing
-  * @returns {Promise} A Listing containing Subreddits.
+  * @returns {Promise} A Listing containing Subreddits
   * @memberof snoowrap
   * @instance
   */
@@ -744,7 +744,7 @@ const snoowrap = class snoowrap {
   /**
   * Gets a list of subreddits in which the currently-authenticated user is an approved submitter.
   * @param {object} [options=] Options for the resulting Listing
-  * @returns {Promise} A Listing containing Subreddits.
+  * @returns {Promise} A Listing containing Subreddits
   * @memberof snoowrap
   * @instance
   */
@@ -754,12 +754,37 @@ const snoowrap = class snoowrap {
   /**
   * Gets a list of subreddits in which the currently-authenticated user is a moderator.
   * @param {object} [options=] Options for the resulting Listing
-  * @returns {Promise} A Listing containing Subreddits.
+  * @returns {Promise} A Listing containing Subreddits
   * @memberof snoowrap
   * @instance
   */
   get_moderated_subreddits (options) {
     return this.get({uri: 'subreddits/mine/moderator', qs: options});
+  }
+  /**
+  * Searches subreddits by title and description.
+  * @param {object} options Options for the search. May also contain Listing parameters.
+  * @param {string} options.query The search query
+  * @returns {Promise} A Listing containing Subreddits
+  * @memberof snoowrap
+  * @instance
+  */
+  search_subreddits (options) {
+    options.q = options.query;
+    delete options.query;
+    return this.get({uri: 'subreddits/search', qs: options});
+  }
+  get_popular_subreddits (options) {
+    return this.get({uri: 'subreddits/popular', qs: options});
+  }
+  get_new_subreddits (options) {
+    return this.get({uri: 'subreddits/new', qs: options});
+  }
+  get_gold_subreddits (options) {
+    return this.get({uri: 'subreddits/gold', qs: options});
+  }
+  get_default_subreddits (options) {
+    return this.get({uri: 'subreddits/default', qs: options});
   }
 };
 

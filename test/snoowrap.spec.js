@@ -6,7 +6,7 @@ const moment = require('moment');
 const snoowrap = require('..');
 const errors = require('../lib/errors');
 describe('snoowrap', function () {
-  this.timeout(20000);
+  this.timeout(30000);
   let r;
   before(() => {
     // oauth_info.json has the properties `user_agent`, `client_id`, `client_secret`, and `refresh_token`.
@@ -296,7 +296,7 @@ describe('snoowrap', function () {
     });
   });
 
-  describe('my subreddits', () => {
+  describe('lists of subreddits', () => {
     it('can get my subscriptions', async () => {
       const subs = await r.get_subscriptions({limit: 3});
       expect(subs).to.be.an.instanceof(snoowrap.objects.Listing);
@@ -311,6 +311,24 @@ describe('snoowrap', function () {
     });
     it('can get my moderated subreddits', async () => {
       const subs = await r.get_moderated_subreddits({limit: 3});
+      expect(subs).to.be.an.instanceof(snoowrap.objects.Listing);
+      expect(subs).to.have.length.of.at.most(3);
+      expect(subs[0]).to.be.an.instanceof(snoowrap.objects.Subreddit);
+    });
+    it('can get popular subreddits', async () => {
+      const subs = await r.get_popular_subreddits({limit: 3});
+      expect(subs).to.be.an.instanceof(snoowrap.objects.Listing);
+      expect(subs).to.have.length.of.at.most(3);
+      expect(subs[0]).to.be.an.instanceof(snoowrap.objects.Subreddit);
+    });
+    it('can get new subreddits', async () => {
+      const subs = await r.get_new_subreddits({limit: 3});
+      expect(subs).to.be.an.instanceof(snoowrap.objects.Listing);
+      expect(subs).to.have.length.of.at.most(3);
+      expect(subs[0]).to.be.an.instanceof(snoowrap.objects.Subreddit);
+    });
+    it('can get default subreddits', async () => {
+      const subs = await r.get_default_subreddits({limit: 3});
       expect(subs).to.be.an.instanceof(snoowrap.objects.Listing);
       expect(subs).to.have.length.of.at.most(3);
       expect(subs[0]).to.be.an.instanceof(snoowrap.objects.Subreddit);
@@ -497,6 +515,13 @@ describe('snoowrap', function () {
     it('can search for a list of subreddits by topic', async () => {
       const results = await r.search_subreddit_topics({query: 'snoowrap'});
       expect(Array.isArray(results)).to.be.true;
+      expect(results[0]).to.be.an.instanceof(snoowrap.objects.Subreddit);
+    });
+    // honestly I have no idea why there are three separate subreddit search functions
+    it('can search for a list of subreddits by name and description', async () => {
+      const results = await r.search_subreddits({query: 'AskReddit', limit: 5});
+      expect(results).to.have.length.of.at.most(5);
+      expect(results).to.be.an.instanceof(snoowrap.objects.Listing);
       expect(results[0]).to.be.an.instanceof(snoowrap.objects.Subreddit);
     });
   });
