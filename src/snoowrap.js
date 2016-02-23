@@ -774,15 +774,43 @@ const snoowrap = class snoowrap {
     delete options.query;
     return this.get({uri: 'subreddits/search', qs: options});
   }
+  /**
+  * Gets a list of subreddits, arranged by popularity.
+  * @param {object} [options] Options for the resulting Listing
+  * @returns {Promise} A Listing containing Subreddits
+  * @memberof snoowrap
+  * @instance
+  */
   get_popular_subreddits (options) {
     return this.get({uri: 'subreddits/popular', qs: options});
   }
+  /**
+  * Gets a list of subreddits, arranged by age.
+  * @param {object} [options] Options for the resulting Listing
+  * @returns {Promise} A Listing containing Subreddits
+  * @memberof snoowrap
+  * @instance
+  */
   get_new_subreddits (options) {
     return this.get({uri: 'subreddits/new', qs: options});
   }
+  /**
+  * Gets a list of gold-exclusive subreddits.
+  * @param {object} [options] Options for the resulting Listing
+  * @returns {Promise} A Listing containing Subreddits
+  * @memberof snoowrap
+  * @instance
+  */
   get_gold_subreddits (options) {
     return this.get({uri: 'subreddits/gold', qs: options});
   }
+  /**
+  * Gets a list of default subreddits.
+  * @param {object} [options] Options for the resulting Listing
+  * @returns {Promise} A Listing containing Subreddits
+  * @memberof snoowrap
+  * @instance
+  */
   get_default_subreddits (options) {
     return this.get({uri: 'subreddits/default', qs: options});
   }
