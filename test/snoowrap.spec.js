@@ -526,6 +526,18 @@ describe('snoowrap', function () {
     });
   });
 
+  describe('modifying user status', () => {
+    it('can ban/unban a user from a subreddit', async () => {
+      const sub = r.get_subreddit('snoowrap_testing');
+      await sub.ban_user({name: 'actually_an_aardvark', ban_message: 'banned for stuff', ban_note: 'test note'});
+      let banned_users = await sub.get_banned_users({name: 'actually_an_aardvark'});
+      expect(banned_users).to.have.lengthOf(1);
+      await sub.unban_user({name: 'actually_an_aardvark'});
+      banned_users = await sub.get_banned_users({name: 'actually_an_aardvark'});
+      expect(banned_users).to.have.lengthOf(0);
+    });
+  });
+
   describe('miscellaneous API calls', () => {
     it('can get a list of oauth scopes', async () => {
       expect(await r.get_oauth_scope_list()).to.have.property('creddits');

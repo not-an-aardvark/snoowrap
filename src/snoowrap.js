@@ -815,7 +815,10 @@ const snoowrap = class snoowrap {
     return this.get({uri: 'subreddits/default', qs: options});
   }
   _friend (options) {
-    return this.post({uri: 'api/friend', form: _.assign(options, {api_type})});
+    return this.post({uri: `${options.sub ? `r/${options.sub}/` : ''}api/friend`, form: _.assign(options, {api_type})});
+  }
+  _unfriend (options) {
+    return this.post({uri: `${options.sub ? `r/${options.sub}/` : ''}api/unfriend`, form: _.assign(options, {api_type})});
   }
 };
 
@@ -1784,6 +1787,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   /**
   * Gets the list of banned users on this subreddit.
   * @param {object} options Filtering options. Can also contain options for the resulting Listing.
+  * @param {string} options.user A username on the list to jump to.
   * @returns {Promise} A Listing of users
   */
   get_banned_users ({user} = {}) { // TODO: Return Listings containing RedditUser objects rather than normal objects with data
@@ -1792,6 +1796,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   /**
   * Gets the list of muted users on this subreddit.
   * @param {object} options Filtering options. Can also contain options for the resulting Listing.
+  * @param {string} options.user A username on the list to jump to.
   * @returns {Promise} A Listing of users
   */
   get_muted_users ({user} = {}) {
@@ -1800,6 +1805,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   /**
   * Gets the list of users banned from this subreddit's wiki.
   * @param {object} options Filtering options. Can also contain options for the resulting Listing.
+  * @param {string} options.user A username on the list to jump to.
   * @returns {Promise} A Listing of users
   */
   get_wikibanned_users ({user} = {}) {
@@ -1808,6 +1814,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   /**
   * Gets the list of approved submitters on this subreddit.
   * @param {object} options Filtering options. Can also contain options for the resulting Listing.
+  * @param {string} options.user A username on the list to jump to.
   * @returns {Promise} A Listing of users
   */
   get_contributors ({user} = {}) {
@@ -1816,6 +1823,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   /**
   * Gets the list of approved wiki submitters on this subreddit .
   * @param {object} options Filtering options. Can also contain options for the resulting Listing.
+  * @param {string} options.user A username on the list to jump to.
   * @returns {Promise} A Listing of users
   */
   get_wiki_contributors ({user} = {}) {
@@ -1824,6 +1832,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   /**
   * Gets the list of moderators on this subreddit.
   * @param {string} [$0.user=] The name of a user to find in the list
+  * @param {string} $0.user A username on the list to jump to.
   * @returns {Promise} An Array of RedditUsers representing the moderators of this subreddit
   */
   get_moderators ({user} = {}) {
@@ -2060,23 +2069,54 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   get_sticky ({num = 1} = {}) {
     return this.get({uri: `r/${this.display_name}/about/sticky`, qs: {num}});
   }
+  _friend (options) {
+    return promise_wrap(
+      this._ac._friend(_.assign(options, {sub: this.display_name})).bind(this).then(helpers._handle_json_errors)
+    );
+  }
+  _unfriend (options) {
+    return promise_wrap(
+      this._ac._unfriend(_.assign(options, {sub: this.display_name})).bind(this).then(helpers._handle_json_errors)
+    );
+  }
   invite_moderator ({name, permissions}) {
-    return this._ac._friend({name, permissions, type: 'moderator_invite'});
+    return this._friend({name, permissions, type: 'moderator_invite'});
   }
   add_contributor ({name}) {
-    return this._ac._friend({name, type: 'contributor'});
+    return this._friend({name, type: 'contributor'});
   }
+  /**
+  * Bans the given user from this subreddit.
+  * @param {object} $0
+  * @param {string} $0.name The username of the account that should be banned
+  * @param {string} [$0.ban_message] The ban message. This will get sent to the user in a private message, alerting them
+  that they have been banned.
+  * @param {string} [$0.ban_reason] A string indicating which rule the banned user broke (100 characters max)
+  * @param {number} [$0.duration] The duration of the ban, in days. For a permanent ban, omit this parameter.
+  * @param {string} [$0.ban_note] A note that appears on the moderation log, usually used to indicate the reason for the
+  ban. This is not visible to the banned user.
+  * @returns {Promise} A Promise that fulfills with this subreddit when the request is complete
+  */
   ban_user ({name, ban_message, ban_reason, duration, ban_note}) {
-    return this._ac._friend({name, ban_message, ban_reason, duration, note: ban_note, type: 'banned'});
+    return this._friend({name, ban_message, ban_reason, duration, note: ban_note, type: 'banned'});
+  }
+  /**
+  * Unbans the given user from this subreddit.
+  * @param {object} $0
+  * @param {string} $0.name The username of the account that should be unbanned
+  * @returns {Promise} A Promise that fulfills when the request is complete
+  */
+  unban_user({name}) {
+    return this._unfriend({name, type: 'banned'});
   }
   mute_user({name}) {
-    return this._ac._friend({name, type: 'muted'});
+    return this._friend({name, type: 'muted'});
   }
   wikiban_user ({name}) {
-    return this._ac._friend({name, type: 'wikibanned'});
+    return this._friend({name, type: 'wikibanned'});
   }
   add_wiki_contributor ({name}) {
-    return this._ac._friend({name, type: 'wikicontributor'});
+    return this._friend({name, type: 'wikicontributor'});
   }
 };
 
