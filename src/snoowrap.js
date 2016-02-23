@@ -534,6 +534,8 @@ const snoowrap = class snoowrap {
   * Gets the authenticated user's modmail.
   * @param {object} options
   * @returns {Promise} A Listing of the user's modmail
+  * @memberof snoowrap
+  * @instance
   */
   get_modmail (options = {}) {
     return this.get({uri: 'message/moderator', qs: options});
@@ -542,6 +544,8 @@ const snoowrap = class snoowrap {
   * Gets the user's sent messages.
   * @param {object} [options={}] options for the resulting Listing
   * @returns {Promise} A Listing of the user's sent messages
+  * @memberof snoowrap
+  * @instance
   */
   get_sent_messages (options = {}) {
     return this.get({uri: 'message/sent', qs: options});
@@ -549,6 +553,8 @@ const snoowrap = class snoowrap {
   /**
   * Marks all of the user's messages as read.
   * @returns {Promise} A Promise that resolves when the request is complete
+  * @memberof snoowrap
+  * @instance
   */
   read_all_messages () {
     return this.post({uri: 'api/read_all_messages'});
@@ -722,6 +728,8 @@ const snoowrap = class snoowrap {
   * @param {object} $0
   * @param {string} $0.query The search query. (50 characters max)
   * @returns {Promise} An Array of subreddit objects corresponding to the search results
+  * @memberof snoowrap
+  * @instance
   */
   search_subreddit_topics ({query}) {
     return promise_wrap(this.get({uri: 'api/subreddits_by_topic', qs: {query}}).then(results => {
@@ -732,6 +740,8 @@ const snoowrap = class snoowrap {
   * Gets a list of subreddits that the currently-authenticated user is subscribed to.
   * @param {object} [options=] Options for the resulting Listing
   * @returns {Promise} A Listing containing Subreddits.
+  * @memberof snoowrap
+  * @instance
   */
   get_subscriptions (options) {
     return this.get({uri: 'subreddits/mine/subscriber', qs: options});
@@ -740,6 +750,8 @@ const snoowrap = class snoowrap {
   * Gets a list of subreddits in which the currently-authenticated user is an approved submitter.
   * @param {object} [options=] Options for the resulting Listing
   * @returns {Promise} A Listing containing Subreddits.
+  * @memberof snoowrap
+  * @instance
   */
   get_contributor_subreddits (options) {
     return this.get({uri: 'subreddits/mine/contributor', qs: options});
@@ -748,6 +760,8 @@ const snoowrap = class snoowrap {
   * Gets a list of subreddits in which the currently-authenticated user is a moderator.
   * @param {object} [options=] Options for the resulting Listing
   * @returns {Promise} A Listing containing Subreddits.
+  * @memberof snoowrap
+  * @instance
   */
   get_moderated_subreddits (options) {
     return this.get({uri: 'subreddits/mine/moderator', qs: options});
