@@ -30,7 +30,7 @@ const snoowrap = class snoowrap {
   generated; if you want to retain access for longer than that, provide the other credentials instead.
   * @memberof snoowrap
   */
-  constructor({user_agent, client_id, client_secret, refresh_token, access_token}) {
+  constructor ({user_agent, client_id, client_secret, refresh_token, access_token}) {
     if (!user_agent) {
       throw new errors.MissingUserAgentError();
     }
@@ -116,7 +116,7 @@ const snoowrap = class snoowrap {
       throw err;
     }
   }
-  _new_object(object_type, content, _has_fetched) {
+  _new_object (object_type, content, _has_fetched) {
     return new objects[object_type](content, this, _has_fetched);
   }
   /**
@@ -837,7 +837,7 @@ objects.RedditContent = class RedditContent {
   * @param {object} _ac The authenticated client (i.e. `snoowrap` instance) that is being used to fetch this object
   * @param {boolean} _has_fetched Determines whether this object was created fully-formed (as opposed to lacking information)
   */
-  constructor(options, _ac, _has_fetched) {
+  constructor (options, _ac, _has_fetched) {
     this._ac = _ac;
     this._fetch = undefined;
     this._has_fetched = !!_has_fetched;
@@ -1081,7 +1081,7 @@ objects.VoteableContent = class VoteableContent extends objects.CreatableContent
   delete () {
     return promise_wrap(this._post({uri: 'api/del', form: {id: this.name}}).return(this));
   }
-  _set_inbox_replies_enabled(state) {
+  _set_inbox_replies_enabled (state) {
     return this._post({uri: 'api/sendreplies', form: {state, id: this.name}});
   }
   /**
@@ -1133,7 +1133,7 @@ objects.RedditUser = class RedditUser extends objects.RedditContent {
   * @param {number} months The number of months of gold to give. This must be a number between 1 and 36.
   * @returns {Promise} A Promise that fulfills when the request is complete
   */
-  give_gold(months) {
+  give_gold (months) {
     /* Ideally this would allow for more than 36 months by sending multiple requests, but I don't have the resources to test
     that code, and it's probably better that such a big investment be deliberate anyway. */
     if (typeof months !== 'number' || months < 1 || months > 36) {
@@ -1245,7 +1245,7 @@ objects.Submission = class Submission extends objects.VoteableContent {
   disable_contest_mode () {
     return this._set_contest_mode_enabled(false);
   }
-  _set_stickied({state, num}) {
+  _set_stickied ({state, num}) {
     return promise_wrap(this._post({
       uri: 'api/set_subreddit_sticky',
       form: {api_type, state, num, id: this.name}
@@ -2115,11 +2115,14 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @param {string} $0.name The username of the account that should be unbanned
   * @returns {Promise} A Promise that fulfills when the request is complete
   */
-  unban_user({name}) {
+  unban_user ({name}) {
     return this._unfriend({name, type: 'banned'});
   }
-  mute_user({name}) {
+  mute_user ({name}) {
     return this._friend({name, type: 'muted'});
+  }
+  unmute_user ({name}) {
+    return this._unfriend({name, type: 'muted'});
   }
   wikiban_user ({name}) {
     return this._friend({name, type: 'wikibanned'});

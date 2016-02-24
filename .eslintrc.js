@@ -10,7 +10,8 @@ module.exports = {
     'no-unused-vars': 1,
     'arrow-spacing': 2,
     'no-var': 2,
-    'prefer-const': 1
+    'prefer-const': 1,
+    'space-before-function-paren': 2
   },
   env: {
     es6: true,
