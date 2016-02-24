@@ -2147,7 +2147,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @param {string} [$0.ban_reason] A string indicating which rule the banned user broke (100 characters max)
   * @param {number} [$0.duration] The duration of the ban, in days. For a permanent ban, omit this parameter.
   * @param {string} [$0.ban_note] A note that appears on the moderation log, usually used to indicate the reason for the
-  ban. This is not visible to the banned user.
+  ban. This is not visible to the banned user. (300 characters max)
   * @returns {Promise} A Promise that fulfills with this subreddit when the request is complete
   */
   ban_user ({name, ban_message, ban_reason, duration, ban_note}) {
@@ -2215,6 +2215,21 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   */
   remove_wiki_contributor ({name}) {
     return this._unfriend({name, type: 'wikicontributor'});
+  }
+  /**
+  * Sets the permissions for a given moderator on this subreddit.
+  * @param {object} $0
+  * @param {string} $0.name The username of the moderator whose permissions are being changed
+  * @param {Array} [$0.permissions] The new moderator permissions that this user should have. This should be an array
+  containing some combination of `"wiki", "posts", "access", "mail", "config", "flair"`. To add a moderator with full
+  permissions, omit this property entirely.
+  * @returns {Promise} A Promise that fulfills with this Subreddit when this request is complete
+  */
+  set_moderator_permissions ({name, permissions}) {
+    return this._post({
+      uri: `r/${this.display_name}/api/setpermissions`,
+      form: {api_type, name, permissions: helpers._format_permissions(permissions), type: 'moderator'}
+    }).bind(this).tap(helpers._handle_json_errors);
   }
 };
 

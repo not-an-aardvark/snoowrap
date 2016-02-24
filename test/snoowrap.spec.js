@@ -556,6 +556,12 @@ describe('snoowrap', function () {
       await sub.remove_wiki_contributor(victim);
       expect(await sub.get_wiki_contributors(victim)).to.have.lengthOf(0);
     });
+    it("can change a moderator's permissions on a subreddit", async () => {
+      await sub.set_moderator_permissions({name: 'snoowrap_testing', permissions: ['flair', 'wiki']});
+      expect(await sub.get_moderators({name: 'snoowrap_testing'})[0].mod_permissions.sort()).to.eql(['flair', 'wiki']);
+      await sub.set_moderator_permissions({name: 'snoowrap_testing'});
+      expect(await sub.get_moderators({name: 'snoowrap_testing'})[0].mod_permissions).to.eql(['all']);
+    });
   });
 
   describe('miscellaneous API calls', () => {
