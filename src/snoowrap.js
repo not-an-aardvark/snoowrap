@@ -568,18 +568,18 @@ const snoowrap = class snoowrap {
   * @memberof snoowrap
   * @instance
   */
-  async compose_message ({captcha, from_subreddit, captcha_iden, subject, text, to}) {
+  compose_message ({captcha, from_subreddit, captcha_iden, subject, text, to}) {
     if (to instanceof objects.RedditUser) {
-      to = await to.name;
+      to = to.name;
     } else if (to instanceof objects.Subreddit) {
-      to = `/r/${await to.display_name}`;
+      to = `/r/${to.display_name}`;
     }
     if (from_subreddit instanceof objects.Subreddit) {
-      from_subreddit = await from_subreddit.display_name;
+      from_subreddit = from_subreddit.display_name;
     } else if (typeof from_subreddit === 'string') {
       from_subreddit = from_subreddit.replace(/^\/?r\//, ''); // Convert '/r/subreddit_name' to 'subreddit_name'
     }
-    return await this._post({uri: 'api/compose', form: {
+    return this._post({uri: 'api/compose', form: {
       api_type, captcha, iden: captcha_iden, from_sr: from_subreddit, subject, text, to
     }});
   }
