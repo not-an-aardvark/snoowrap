@@ -823,6 +823,19 @@ const snoowrap = class snoowrap {
   _unfriend (options) {
     return this._post({uri: `${options.sub ? `r/${options.sub}/` : ''}api/unfriend`, form: _.assign(options, {api_type})});
   }
+  /**
+  * Checks whether a given username is available for registration
+  * @param {string} name The username in question
+  * @returns {Promise} A Promise that fulfills with a Boolean (`true` or `false`)
+  */
+  check_username_availability (name) {
+    // The oauth endpoint listed in reddit's documentation doesn't actually work, so just send an unauthenticated request.
+    return request.get({
+      url: 'https://www.reddit.com/api/username_available.json',
+      qs: {user: name},
+      headers: {'user-agent': this.user_agent}
+    });
+  }
 };
 
 _.forEach(constants.HTTP_VERBS, type => {

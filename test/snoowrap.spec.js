@@ -568,6 +568,9 @@ describe('snoowrap', function () {
     it('can get a list of oauth scopes', async () => {
       expect(await r.get_oauth_scope_list()).to.have.property('creddits');
     });
+    it('can check whether a given username is available', async () => {
+      expect(await r.check_username_availability('not_an_aardvark')).to.be.false();
+    });
   });
 
   describe('general snoowrap behavior', () => {
