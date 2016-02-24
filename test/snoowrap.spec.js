@@ -527,14 +527,34 @@ describe('snoowrap', function () {
   });
 
   describe('modifying user status', () => {
+    let sub, victim;
+    beforeEach(() => {
+      sub = r.get_subreddit('snoowrap_testing');
+      victim = r.get_user('actually_an_aardvark');
+    });
     it('can ban/unban a user from a subreddit', async () => {
-      const sub = r.get_subreddit('snoowrap_testing');
-      await sub.ban_user({name: 'actually_an_aardvark', ban_message: 'banned for stuff', ban_note: 'test note'});
-      let banned_users = await sub.get_banned_users({name: 'actually_an_aardvark'});
-      expect(banned_users).to.have.lengthOf(1);
-      await sub.unban_user({name: 'actually_an_aardvark'});
-      banned_users = await sub.get_banned_users({name: 'actually_an_aardvark'});
-      expect(banned_users).to.have.lengthOf(0);
+      await sub.ban_user({name: victim.name, ban_message: 'banned for stuff', ban_note: 'test note'});
+      expect(await sub.get_banned_users(victim)).to.have.lengthOf(1);
+      await sub.unban_user(victim);
+      expect(await sub.get_banned_users(victim)).to.have.lengthOf(0);
+    });
+    it('can add/remove an approved submitter from a subreddit', async () => {
+      await sub.add_contributor(victim);
+      expect(await sub.get_contributors(victim)).to.have.lengthOf(1);
+      await sub.remove_contributor(victim);
+      expect(await sub.get_contributors(victim)).to.have.lengthOf(0);
+    });
+    it('can wikiban/unwikiban a user from a subreddit', async () => {
+      await sub.wikiban_user(victim);
+      expect(await sub.get_wikibanned_users(victim)).to.have.lengthOf(1);
+      await sub.unwikiban_user(victim);
+      expect(await sub.get_wikibanned_users(victim)).to.have.lengthOf(0);
+    });
+    it('can add/remove a user from approved wiki editor status on a subreddit', async () => {
+      await sub.add_wiki_contributor(victim);
+      expect(await sub.get_wiki_contributors(victim)).to.have.lengthOf(1);
+      await sub.remove_wiki_contributor(victim);
+      expect(await sub.get_wiki_contributors(victim)).to.have.lengthOf(0);
     });
   });
 
@@ -609,6 +629,14 @@ describe('snoowrap', function () {
       await modmail.unmute_author();
       const mute_list = await modmail.subreddit.get_muted_users();
       expect(_.find(mute_list, {name: await modmail.author.name})).to.be.undefined();
+    });
+    it.skip('can mute/unmute a user from a subreddit', async () => {
+      const sub = r.get_subreddit('snoowrap_testing');
+      const victim = r.get_user('actually_an_aardvark');
+      await sub.mute_user(victim);
+      expect(await sub.get_muted_users(victim)).to.have.lengthOf(1);
+      await sub.unmute_user(victim);
+      expect(await sub.get_muted_users(victim)).to.have.lengthOf(0);
     });
     it.skip('can comment on a submission', async () => {
       const comment_body = moment().format();

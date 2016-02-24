@@ -61,3 +61,5 @@ exports._format_permissions = permissions_array => {
   }
   return constants.MODERATOR_PERMISSIONS.map(type => (_.includes(permissions_array, type) ? '+' : '-') + type).join(',');
 };
+
+exports.rename_key = (obj, oldkey, newkey) => obj && _(_.clone(obj)).assign({[newkey]: obj[oldkey]}).omit([oldkey]).value();
