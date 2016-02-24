@@ -23,5 +23,6 @@ module.exports = {
     modaction: 'modaction'
   },
   USERNAME_REGEX: /^[\w-]{1,20}$/,
+  MODERATOR_PERMISSIONS: ['wiki', 'posts', 'access', 'mail', 'config', 'flair'],
   HTTP_VERBS: ['get', 'head', 'post', 'put', 'delete', 'trace', 'options', 'connect', 'patch']
 };

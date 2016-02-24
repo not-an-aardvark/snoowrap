@@ -625,7 +625,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   search_subreddit_names ({exact = false, include_nsfw = true, query}) {
-    return this.post({uri: `api/search_reddit_names`, qs: {exact, include_over_18: include_nsfw, query}}).names;
+    return this.post({uri: 'api/search_reddit_names', qs: {exact, include_over_18: include_nsfw, query}}).names;
   }
   _create_or_edit_subreddit ({
     allow_top = true,
@@ -2079,8 +2079,19 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
       this._ac._unfriend(_.assign(options, {sub: this.display_name})).bind(this).then(helpers._handle_json_errors)
     );
   }
+  /**
+  * Invites the given user to be a moderator of this subreddit.
+  * @param {object} $0
+  * @param {string} $0.name The username of the account that should be invited
+  * @param {Array} [$0.permissions] The moderator permissions that this user should have. This should be an array containing
+  some combination of `"wiki", "posts", "access", "mail", "config", "flair"`. To add a moderator with full permissions, omit
+  this property entirely.
+  */
   invite_moderator ({name, permissions}) {
-    return this._friend({name, permissions, type: 'moderator_invite'});
+    return this._friend({name, permissions: helpers._format_permissions(permissions), type: 'moderator_invite'});
+  }
+  remove_moderator ({name}) {
+    return this._unfriend({name});
   }
   add_contributor ({name}) {
     return this._friend({name, type: 'contributor'});

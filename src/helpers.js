@@ -54,3 +54,10 @@ exports.find_message_in_tree = (desired_message_name, current_message) => {
     return _.find(current_message.replies.map(_.partial(exports.find_message_in_tree, desired_message_name)));
   }
 };
+
+exports._format_permissions = permissions_array => {
+  if (!permissions_array) {
+    return '+all';
+  }
+  return constants.MODERATOR_PERMISSIONS.map(type => (_.includes(permissions_array, type) ? '+' : '-') + type).join(',');
+};
