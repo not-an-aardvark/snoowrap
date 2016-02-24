@@ -208,7 +208,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   get_me () {
-    return promise_wrap(this.get('api/v1/me').then(result => {
+    return promise_wrap(this._get('api/v1/me').then(result => {
       this.own_user_info = new objects.RedditUser(result, this, true);
       return this.own_user_info;
     }));
@@ -270,7 +270,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   get_karma () {
-    return this.get({uri: 'api/v1/me/karma'});
+    return this._get({uri: 'api/v1/me/karma'});
   }
   /**
   * Gets information on the user's current preferences.
@@ -279,7 +279,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   get_preferences () {
-    return this.get({uri: 'api/v1/me/prefs'});
+    return this._get({uri: 'api/v1/me/prefs'});
   }
   /**
   * Updates the user's current preferences.
@@ -290,7 +290,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   update_preferences (updated_preferences) {
-    return this.patch({uri: 'api/v1/me/prefs', body: updated_preferences});
+    return this._patch({uri: 'api/v1/me/prefs', body: updated_preferences});
   }
   /**
   * Gets the currently-authenticated user's trophies.
@@ -299,7 +299,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   get_trophies () {
-    return this.get({uri: 'api/v1/me/trophies'});
+    return this._get({uri: 'api/v1/me/trophies'});
   }
   /**
   * Gets the list of the currently-authenticated user's friends.
@@ -308,7 +308,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   get_friends () {
-    return this.get({uri: 'prefs/friends'});
+    return this._get({uri: 'prefs/friends'});
   }
   /**
   * Gets the list of people that the currently-authenticated user has blocked.
@@ -317,7 +317,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   get_blocked_users () {
-    return this.get({uri: 'prefs/blocked'});
+    return this._get({uri: 'prefs/blocked'});
   }
   /**
   * Determines whether the currently-authenticated user needs to fill out a captcha in order to submit a post/comment.
@@ -326,7 +326,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   check_captcha_requirement () {
-    return this.get({uri: 'api/needs_captcha'});
+    return this._get({uri: 'api/needs_captcha'});
   }
   /**
   * Gets the identifier (a hex string) for a new captcha image.
@@ -335,7 +335,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   get_new_captcha_identifier () {
-    return this.post({uri: 'api/new_captcha', form: {api_type}}).json.data.iden;
+    return this._post({uri: 'api/new_captcha', form: {api_type}}).json.data.iden;
   }
   /**
   * Gets an image for a given captcha identifier.
@@ -345,7 +345,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   get_captcha_image (identifier) {
-    return this.get({uri: `captcha/${identifier}`});
+    return this._get({uri: `captcha/${identifier}`});
   }
   /**
   * Gets an array of categories that items can be saved it. (Requires reddit gold)
@@ -354,7 +354,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   get_saved_categories () {
-    return this.get({uri: 'api/saved_categories'}).categories;
+    return this._get({uri: 'api/saved_categories'}).categories;
   }
   /**
   * Marks a list of submissions as 'visited'.
@@ -364,10 +364,10 @@ const snoowrap = class snoowrap {
   * @instance
   */
   mark_as_visited (links) {
-    return this.post({uri: 'api/store_visits', links: _.map(links, 'name').join(',')});
+    return this._post({uri: 'api/store_visits', links: _.map(links, 'name').join(',')});
   }
   _submit ({captcha_response, captcha_iden, kind, resubmit = true, send_replies = true, text, title, url, subreddit_name}) {
-    return promise_wrap(this.post({uri: 'api/submit', form: {
+    return promise_wrap(this._post({uri: 'api/submit', form: {
       api_type, captcha: captcha_response, iden: captcha_iden, sendreplies: send_replies, sr: subreddit_name, kind, resubmit,
       text, title, url
     }}).tap(helpers._handle_json_errors).then(result => this.get_submission(result.json.data.id)));
@@ -417,7 +417,7 @@ const snoowrap = class snoowrap {
       subreddit_name = undefined;
     }
     const parsed_options = _(options).assign({t: options.time, time: undefined}).omit(['time']).value();
-    return this.get({uri: (subreddit_name ? `r/${subreddit_name}/` : '') + sort_type, qs: parsed_options});
+    return this._get({uri: (subreddit_name ? `r/${subreddit_name}/` : '') + sort_type, qs: parsed_options});
   }
   /**
   * Gets a Listing of hot posts.
@@ -498,12 +498,12 @@ const snoowrap = class snoowrap {
     if (!flair_template_id) {
       throw new errors.InvalidMethodCallError('Error: No flair template ID provided');
     }
-    return await this.post({uri: `r/${await subreddit_name}/api/selectflair`, form: {
+    return await this._post({uri: `r/${await subreddit_name}/api/selectflair`, form: {
       api_type, flair_template_id, link, name, text}
     });
   }
   async _assign_flair ({css_class, link, name, text, subreddit_name}) {
-    return await this.post({uri: `r/${await subreddit_name}/api/flair`, form: {api_type, name, text, link, css_class}});
+    return await this._post({uri: `r/${await subreddit_name}/api/flair`, form: {api_type, name, text, link, css_class}});
   }
   /**
   * Gets the authenticated user's unread messages.
@@ -513,7 +513,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   get_unread_messages (options = {}) {
-    return this.get({uri: 'message/unread', qs: options});
+    return this._get({uri: 'message/unread', qs: options});
   }
   /**
   * Gets the items in the authenticated user's inbox.
@@ -523,7 +523,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   get_inbox (options = {}) {
-    return this.get({uri: 'message/inbox', qs: options});
+    return this._get({uri: 'message/inbox', qs: options});
   }
   /**
   * Gets the authenticated user's modmail.
@@ -533,7 +533,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   get_modmail (options = {}) {
-    return this.get({uri: 'message/moderator', qs: options});
+    return this._get({uri: 'message/moderator', qs: options});
   }
   /**
   * Gets the user's sent messages.
@@ -543,7 +543,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   get_sent_messages (options = {}) {
-    return this.get({uri: 'message/sent', qs: options});
+    return this._get({uri: 'message/sent', qs: options});
   }
   /**
   * Marks all of the user's messages as read.
@@ -552,7 +552,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   read_all_messages () {
-    return this.post({uri: 'api/read_all_messages'});
+    return this._post({uri: 'api/read_all_messages'});
   }
   /**
   * Composes a new private message.
@@ -579,7 +579,7 @@ const snoowrap = class snoowrap {
     } else if (typeof from_subreddit === 'string') {
       from_subreddit = from_subreddit.replace(/^\/?r\//, ''); // Convert '/r/subreddit_name' to 'subreddit_name'
     }
-    return await this.post({uri: 'api/compose', form: {
+    return await this._post({uri: 'api/compose', form: {
       api_type, captcha, iden: captcha_iden, from_sr: from_subreddit, subject, text, to
     }});
   }
@@ -591,7 +591,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   get_oauth_scope_list () {
-    return promise_wrap(this.get({uri: 'api/v1/scopes'}));
+    return promise_wrap(this._get({uri: 'api/v1/scopes'}));
   }
   /**
   * Conducts a search of reddit submissions.
@@ -612,7 +612,7 @@ const snoowrap = class snoowrap {
       options.subreddit = options.subreddit.display_name;
     }
     const parsed_query = _(options).assign({t: options.time, q: options.query}).omit(['time', 'query']).value();
-    return this.get({uri: `${options.subreddit ? `r/${options.subreddit}/` : ''}search`, qs: parsed_query});
+    return this._get({uri: `${options.subreddit ? `r/${options.subreddit}/` : ''}search`, qs: parsed_query});
   }
   /**
   * Searches for subreddits given a query.
@@ -625,7 +625,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   search_subreddit_names ({exact = false, include_nsfw = true, query}) {
-    return this.post({uri: 'api/search_reddit_names', qs: {exact, include_over_18: include_nsfw, query}}).names;
+    return this._post({uri: 'api/search_reddit_names', qs: {exact, include_over_18: include_nsfw, query}}).names;
   }
   _create_or_edit_subreddit ({
     allow_top = true,
@@ -659,7 +659,7 @@ const snoowrap = class snoowrap {
     wiki_edit_karma,
     wikimode = 'modonly'
   }) {
-    return promise_wrap(this.post({uri: 'api/site_admin', form: {
+    return promise_wrap(this._post({uri: 'api/site_admin', form: {
       allow_top, api_type, captcha, collapse_deleted_comments, comment_score_hide_mins, description, exclude_banned_modqueue,
       'header-title': header_title, hide_ads, iden: captcha_iden, lang, link_type, name, over_18, public_description,
       public_traffic, show_media, spam_comments, spam_links, spam_selfposts, sr, submit_link_label, submit_text,
@@ -727,7 +727,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   search_subreddit_topics ({query}) {
-    return promise_wrap(this.get({uri: 'api/subreddits_by_topic', qs: {query}}).then(results => {
+    return promise_wrap(this._get({uri: 'api/subreddits_by_topic', qs: {query}}).then(results => {
       return _.map(results, 'name').map(this.get_subreddit.bind(this));
     }));
   }
@@ -739,7 +739,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   get_subscriptions (options) {
-    return this.get({uri: 'subreddits/mine/subscriber', qs: options});
+    return this._get({uri: 'subreddits/mine/subscriber', qs: options});
   }
   /**
   * Gets a list of subreddits in which the currently-authenticated user is an approved submitter.
@@ -749,7 +749,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   get_contributor_subreddits (options) {
-    return this.get({uri: 'subreddits/mine/contributor', qs: options});
+    return this._get({uri: 'subreddits/mine/contributor', qs: options});
   }
   /**
   * Gets a list of subreddits in which the currently-authenticated user is a moderator.
@@ -759,7 +759,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   get_moderated_subreddits (options) {
-    return this.get({uri: 'subreddits/mine/moderator', qs: options});
+    return this._get({uri: 'subreddits/mine/moderator', qs: options});
   }
   /**
   * Searches subreddits by title and description.
@@ -772,7 +772,7 @@ const snoowrap = class snoowrap {
   search_subreddits (options) {
     options.q = options.query;
     delete options.query;
-    return this.get({uri: 'subreddits/search', qs: options});
+    return this._get({uri: 'subreddits/search', qs: options});
   }
   /**
   * Gets a list of subreddits, arranged by popularity.
@@ -782,7 +782,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   get_popular_subreddits (options) {
-    return this.get({uri: 'subreddits/popular', qs: options});
+    return this._get({uri: 'subreddits/popular', qs: options});
   }
   /**
   * Gets a list of subreddits, arranged by age.
@@ -792,7 +792,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   get_new_subreddits (options) {
-    return this.get({uri: 'subreddits/new', qs: options});
+    return this._get({uri: 'subreddits/new', qs: options});
   }
   /**
   * Gets a list of gold-exclusive subreddits.
@@ -802,7 +802,7 @@ const snoowrap = class snoowrap {
   * @instance
   */
   get_gold_subreddits (options) {
-    return this.get({uri: 'subreddits/gold', qs: options});
+    return this._get({uri: 'subreddits/gold', qs: options});
   }
   /**
   * Gets a list of default subreddits.
@@ -812,18 +812,18 @@ const snoowrap = class snoowrap {
   * @instance
   */
   get_default_subreddits (options) {
-    return this.get({uri: 'subreddits/default', qs: options});
+    return this._get({uri: 'subreddits/default', qs: options});
   }
   _friend (options) {
-    return this.post({uri: `${options.sub ? `r/${options.sub}/` : ''}api/friend`, form: _.assign(options, {api_type})});
+    return this._post({uri: `${options.sub ? `r/${options.sub}/` : ''}api/friend`, form: _.assign(options, {api_type})});
   }
   _unfriend (options) {
-    return this.post({uri: `${options.sub ? `r/${options.sub}/` : ''}api/unfriend`, form: _.assign(options, {api_type})});
+    return this._post({uri: `${options.sub ? `r/${options.sub}/` : ''}api/unfriend`, form: _.assign(options, {api_type})});
   }
 };
 
 _.forEach(constants.HTTP_VERBS, type => {
-  snoowrap.prototype[type] = function (...args) {
+  snoowrap.prototype[`_${type}`] = function (...args) {
     return promise_wrap(this._handle_request(this._oauth_requester.defaults({method: type}), args));
   };
 });
@@ -860,7 +860,7 @@ objects.RedditContent = class RedditContent {
   */
   fetch () {
     if (!this._fetch) {
-      this._fetch = promise_wrap(this._ac.get({uri: this._uri}).bind(this).then(this._transform_api_response));
+      this._fetch = promise_wrap(this._ac._get({uri: this._uri}).bind(this).then(this._transform_api_response));
     }
     return this._fetch;
   }
@@ -888,11 +888,9 @@ objects.RedditContent = class RedditContent {
   }
 };
 
-/* Omit the 'delete' request shortcut, since the property name is used by Comments and Submissions. To send an HTTP DELETE
-request, use `this._ac.delete` rather than the shortcut `this.delete`. */
-_.without(constants.HTTP_VERBS, 'delete').forEach(type => {
-  objects.RedditContent.prototype[type] = function (...args) {
-    return this._ac[type](...args);
+constants.HTTP_VERBS.forEach(type => {
+  objects.RedditContent.prototype[`_${type}`] = function (...args) {
+    return this._ac[`_${type}`](...args);
   };
 });
 
@@ -907,7 +905,7 @@ objects.CreatableContent = class CreatableClass extends objects.RedditContent {
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
   */
   remove ({spam = false} = {}) {
-    return promise_wrap(this.post({uri: 'api/remove', form: {spam, id: this.name}}).return(this));
+    return promise_wrap(this._post({uri: 'api/remove', form: {spam, id: this.name}}).return(this));
   }
   /**
   * Removes this Comment, Submission, or PrivateMessage and marks it as spam. Equivalent to #remove({spam: true})
@@ -921,7 +919,7 @@ objects.CreatableContent = class CreatableClass extends objects.RedditContent {
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
   */
   approve () {
-    return promise_wrap(this.post({uri: 'api/approve', form: {id: this.name}}).return(this));
+    return promise_wrap(this._post({uri: 'api/approve', form: {id: this.name}}).return(this));
   }
   /**
   * Reports this content anonymously to subreddit moderators (for Comments and Submissions)
@@ -930,7 +928,7 @@ objects.CreatableContent = class CreatableClass extends objects.RedditContent {
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
   */
   report ({reason} = {}) {
-    return promise_wrap(this.post({uri: 'api/report', form: {
+    return promise_wrap(this._post({uri: 'api/report', form: {
       api_type, reason: 'other', other_reason: reason, thing_id: this.name
     }}).return(this));
   }
@@ -939,14 +937,14 @@ objects.CreatableContent = class CreatableClass extends objects.RedditContent {
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
   */
   ignore_reports () {
-    return promise_wrap(this.post({uri: 'api/ignore_reports', form: {id: this.name}}).return(this));
+    return promise_wrap(this._post({uri: 'api/ignore_reports', form: {id: this.name}}).return(this));
   }
   /**
   * Unignores reports on this Comment, Submission, or PrivateMessages
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
   */
   unignore_reports () {
-    return promise_wrap(this.post({uri: 'api/unignore_reports', form: {id: this.name}}).return(this));
+    return promise_wrap(this._post({uri: 'api/unignore_reports', form: {id: this.name}}).return(this));
   }
   /**
   * Submits a new reply to this object. (This takes the form of a new Comment if this object is a Submission/Comment, or a
@@ -955,7 +953,7 @@ objects.CreatableContent = class CreatableClass extends objects.RedditContent {
   * @returns {Promise} A Promise that fulfills with the newly-created reply
   */
   reply (text) {
-    return this.post({uri: 'api/comment',form: {api_type, text, thing_id: this.name}}).json.data.things[0];
+    return this._post({uri: 'api/comment',form: {api_type, text, thing_id: this.name}}).json.data.things[0];
   }
 };
 
@@ -971,7 +969,7 @@ objects.VoteableContent = class VoteableContent extends objects.CreatableContent
   * @returns {Promise} A Promise that fulfills when the request is complete.
   */
   _vote (direction) {
-    return this.post({uri: 'api/vote', form: {dir: direction, id: this.name}});
+    return this._post({uri: 'api/vote', form: {dir: direction, id: this.name}});
   }
   /**
   * Upvotes this Comment or Submission.
@@ -1011,7 +1009,7 @@ objects.VoteableContent = class VoteableContent extends objects.CreatableContent
   * @returns {Promise} A Promise that fulfills when the request is complete
   */
   save () {
-    return promise_wrap(this.post({uri: 'api/save', form: {id: this.name}}).then(() => {
+    return promise_wrap(this._post({uri: 'api/save', form: {id: this.name}}).then(() => {
       this.saved = true;
       return this;
     }));
@@ -1021,7 +1019,7 @@ objects.VoteableContent = class VoteableContent extends objects.CreatableContent
   * @returns {Promise} A Promise that fulfills when the request is complete
   */
   unsave () {
-    return promise_wrap(this.post({uri: 'api/unsave', form: {id: this.name}}).then(() => {
+    return promise_wrap(this._post({uri: 'api/unsave', form: {id: this.name}}).then(() => {
       this.saved = false;
       return this;
     }));
@@ -1037,7 +1035,7 @@ objects.VoteableContent = class VoteableContent extends objects.CreatableContent
   * @returns {Promise} A Promise that fulfills when the request is complete.
   */
   distinguish ({status = true, sticky = false} = {}) {
-    return promise_wrap(this._ac.post({uri: 'api/distinguish', form: {
+    return promise_wrap(this._post({uri: 'api/distinguish', form: {
       api_type,
       how: status === true ? 'yes' : status === false ? 'no' : status,
       sticky: sticky,
@@ -1061,7 +1059,7 @@ objects.VoteableContent = class VoteableContent extends objects.CreatableContent
   * @returns {Promise} A Promise that fulfills when this request is complete.
   */
   edit (updated_text) {
-    return promise_wrap(this.post({
+    return promise_wrap(this._post({
       uri: 'api/editusertext',
       form: {api_type, text: updated_text, thing_id: this.name}
     }).then(response => {
@@ -1074,17 +1072,17 @@ objects.VoteableContent = class VoteableContent extends objects.CreatableContent
   * @returns {Promise} A Promise that fullfills with this Comment/Submission when this request is complete
   */
   gild () {
-    return promise_wrap(this.post({uri: `api/v1/gold/gild/${this.name}`}).return(this));
+    return promise_wrap(this._post({uri: `api/v1/gold/gild/${this.name}`}).return(this));
   }
   /**
   * Deletes this Comment or Submission
   * @returns {Promise} A Promise that fulfills with this Comment/Submission when this request is complete
   */
   delete () {
-    return promise_wrap(this.post({uri: 'api/del', form: {id: this.name}}).return(this));
+    return promise_wrap(this._post({uri: 'api/del', form: {id: this.name}}).return(this));
   }
   _set_inbox_replies_enabled(state) {
-    return this.post({uri: 'api/sendreplies', form: {state, id: this.name}});
+    return this._post({uri: 'api/sendreplies', form: {state, id: this.name}});
   }
   /**
   * Enables inbox replies on this Comment or Submission
@@ -1141,7 +1139,7 @@ objects.RedditUser = class RedditUser extends objects.RedditContent {
     if (typeof months !== 'number' || months < 1 || months > 36) {
       throw new errors.InvalidMethodCallError('Invalid argument to RedditUser.give_gold; `months` must be between 1 and 36.');
     }
-    return this.post({uri: `api/v1/gold/give/${this.name}`, form: {months}});
+    return this._post({uri: `api/v1/gold/give/${this.name}`, form: {months}});
   }
   /** Assigns flair to this user on a given subreddit (as a moderator).
   * @param {object} options
@@ -1169,7 +1167,7 @@ objects.Submission = class Submission extends objects.VoteableContent {
   * @returns {Promise} The updated version of this Submission
   */
   hide () {
-    return promise_wrap(this.post({uri: 'api/hide', form: {id: this.name}}).then(() => {
+    return promise_wrap(this._post({uri: 'api/hide', form: {id: this.name}}).then(() => {
       this.hidden = true;
       return this;
     }));
@@ -1179,7 +1177,7 @@ objects.Submission = class Submission extends objects.VoteableContent {
   * @returns {Promise} The updated version of this Submission
   */
   unhide () {
-    return promise_wrap(this.post({uri: 'api/unhide', form: {id: this.name}}).then(() => {
+    return promise_wrap(this._post({uri: 'api/unhide', form: {id: this.name}}).then(() => {
       this.hidden = false;
       return this;
     }));
@@ -1189,7 +1187,7 @@ objects.Submission = class Submission extends objects.VoteableContent {
   * @returns {Promise} The updated version of this Submission
   */
   lock () {
-    return promise_wrap(this.post({uri: 'api/lock', form: {id: this.name}}).then(() => {
+    return promise_wrap(this._post({uri: 'api/lock', form: {id: this.name}}).then(() => {
       this.locked = true;
       return this;
     }));
@@ -1199,7 +1197,7 @@ objects.Submission = class Submission extends objects.VoteableContent {
   * @returns {Promise} The updated version of this Submission
   */
   unlock () {
-    return promise_wrap(this.post({uri: 'api/unlock', form: {id: this.name}}).then(() => {
+    return promise_wrap(this._post({uri: 'api/unlock', form: {id: this.name}}).then(() => {
       this.locked = false;
     }).return(this));
   }
@@ -1208,7 +1206,7 @@ objects.Submission = class Submission extends objects.VoteableContent {
   * @returns {Promise} The updated version of this Submission
   */
   mark_nsfw () {
-    return promise_wrap(this.post({uri: 'api/marknsfw', form: {id: this.name}}).then(() => {
+    return promise_wrap(this._post({uri: 'api/marknsfw', form: {id: this.name}}).then(() => {
       this.over_18 = true;
     }).return(this));
   }
@@ -1217,7 +1215,7 @@ objects.Submission = class Submission extends objects.VoteableContent {
   * @returns {Promise} The updated version of this Submission
   */
   unmark_nsfw () {
-    return promise_wrap(this.post({uri: 'api/unmarknsfw', form: {id: this.name}}).then(() => {
+    return promise_wrap(this._post({uri: 'api/unmarknsfw', form: {id: this.name}}).then(() => {
       this.over_18 = false;
     }).return(this));
   }
@@ -1228,7 +1226,7 @@ objects.Submission = class Submission extends objects.VoteableContent {
   * @returns {Promise} The updated version of this Submission
   */
   _set_contest_mode_enabled (state) {
-    return promise_wrap(this.post({
+    return promise_wrap(this._post({
       uri: 'api/set_contest_mode',
       form: {api_type, state, id: this.name}
     }).return(this));
@@ -1248,7 +1246,7 @@ objects.Submission = class Submission extends objects.VoteableContent {
     return this._set_contest_mode_enabled(false);
   }
   _set_stickied({state, num}) {
-    return promise_wrap(this.post({
+    return promise_wrap(this._post({
       uri: 'api/set_subreddit_sticky',
       form: {api_type, state, num, id: this.name}
     }).then(() => {
@@ -1278,7 +1276,7 @@ objects.Submission = class Submission extends objects.VoteableContent {
   * @returns {Promise} The updated version of this Submission
   */
   set_suggested_sort (sort) {
-    return promise_wrap(this.post({uri: 'api/set_suggested_sort', form: {api_type, id: this.name, sort}}).then(() => {
+    return promise_wrap(this._post({uri: 'api/set_suggested_sort', form: {api_type, id: this.name, sort}}).then(() => {
       this.suggested_sort = sort;
     }).return(this));
   }
@@ -1287,7 +1285,7 @@ objects.Submission = class Submission extends objects.VoteableContent {
   * @returns {Promise} The updated version of this Submission
   */
   mark_as_read () { // Requires reddit gold
-    return promise_wrap(this.post({uri: 'api/store_visits', form: {links: this.name}}).return(this));
+    return promise_wrap(this._post({uri: 'api/store_visits', form: {links: this.name}}).return(this));
   }
   /**
   * Gets a Listing of other submissions on reddit that had the same link as this one.
@@ -1295,7 +1293,7 @@ objects.Submission = class Submission extends objects.VoteableContent {
   * @returns {Promise} A Listing of other Submission objects
   */
   get_duplicates (options = {}) {
-    return this.get({uri: `duplicates/${this.name}`, qs: options});
+    return this._get({uri: `duplicates/${this.name}`, qs: options});
   }
   /**
   * Gets a Listing of Submissions that are related to this one.
@@ -1303,7 +1301,7 @@ objects.Submission = class Submission extends objects.VoteableContent {
   * @returns {Promise} A Listing of other Submission objects
   */
   get_related (options = {}) {
-    return this.get({uri: `related/${this.name}`, qs: options});
+    return this._get({uri: `related/${this.name}`, qs: options});
   }
   /**
   * Gets a list of flair template options for this post.
@@ -1361,35 +1359,35 @@ objects.PrivateMessage = class PrivateMessage extends objects.CreatableContent {
   * @returns {Promise} A Promise that fulfills with this message after the request is complete
   */
   block_author () {
-    return promise_wrap(this.post({uri: 'api/block', form: {id: this.name}}).return(this));
+    return promise_wrap(this._post({uri: 'api/block', form: {id: this.name}}).return(this));
   }
   /**
   * Marks this message as read.
   * @returns {Promise} A Promise that fulfills with this message after the request is complete
   */
   mark_as_read () {
-    return promise_wrap(this.post({uri: 'api/read_message', form: {id: this.name}}).return(this));
+    return promise_wrap(this._post({uri: 'api/read_message', form: {id: this.name}}).return(this));
   }
   /**
   * Marks this message as unread.
   * @returns {Promise} A Promise that fulfills with this message after the request is complete
   */
   mark_as_unread () {
-    return promise_wrap(this.post({uri: 'api/unread_message', form: {id: this.name}}).return(this));
+    return promise_wrap(this._post({uri: 'api/unread_message', form: {id: this.name}}).return(this));
   }
   /**
   * Mutes the author of this message for 72 hours. This should only be used on moderator mail.
   * @returns {Promise} A Promise that fulfills with this message after the request is complete
   */
   mute_author () {
-    return promise_wrap(this.post({uri: 'api/mute_message_author', form: {id: this.name}}).return(this));
+    return promise_wrap(this._post({uri: 'api/mute_message_author', form: {id: this.name}}).return(this));
   }
   /**
   * Unmutes the author of this message.
   * @returns {Promise} A Promise that fulfills with this message after the request is complete
   */
   unmute_author () {
-    return promise_wrap(this.post({uri: 'api/unmute_message_author', form: {id: this.name}}).return(this));
+    return promise_wrap(this._post({uri: 'api/unmute_message_author', form: {id: this.name}}).return(this));
   }
 };
 
@@ -1402,7 +1400,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
     return `r/${this.display_name}/about`;
   }
   _delete_flair_templates ({flair_type}) {
-    return this.post({uri: `r/${this.display_name}/api/clearflairtemplates`, form: {api_type, flair_type}});
+    return this._post({uri: `r/${this.display_name}/api/clearflairtemplates`, form: {api_type, flair_type}});
   }
   /**
   * Deletes all of this subreddit's user flair templates
@@ -1425,13 +1423,13 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @returns {Promise} A Promise that fulfills when the request is complete
   */
   delete_flair_template (options) {
-    return this.post({
+    return this._post({
       uri: `r/${this.display_name}/api/deleteflairtemplate`,
       form: {api_type, flair_template_id: options.flair_template_id}
     });
   }
   _create_flair_template ({text, css_class, flair_type, text_editable = false}) {
-    return this.post({
+    return this._post({
       uri: `r/${this.display_name}/api/flairtemplate`,
       form: {api_type, text, css_class, flair_type, text_editable}
     });
@@ -1459,7 +1457,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
     return this._create_flair_template(_.assign(options, {flair_type: 'LINK_FLAIR'}));
   }
   _get_flair_options ({name, link} = {}) { // TODO: Add shortcuts for this on RedditUser and Submission
-    return this.post({uri: `r/${this.display_name}/api/flairselector`, form: {name, link}});
+    return this._post({uri: `r/${this.display_name}/api/flairselector`, form: {name, link}});
   }
   /**
   * Gets the flair templates for a given link.
@@ -1482,7 +1480,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @returns {Promise} A Promise that fulfills when the request is complete
   */
   delete_user_flair (name) {
-    return this.post({uri: `r/${this.display_name}/api/deleteflair`, form: {api_type, name}});
+    return this._post({uri: `r/${this.display_name}/api/deleteflair`, form: {api_type, name}});
   }
   /**
   * Gets a user's flair on this subreddit.
@@ -1493,7 +1491,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
     return this._get_flair_options({name}).current;
   }
   _set_flair_from_csv (flair_csv) {
-    return this.post({uri: `r/${this.display_name}/api/flaircsv`, form: {flair_csv}});
+    return this._post({uri: `r/${this.display_name}/api/flaircsv`, form: {flair_csv}});
   }
   /**
   * Sets multiple user flairs at the same time
@@ -1520,7 +1518,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @returns {Promise} A Listing containing user flairs
   */
   get_user_flair_list (options) {
-    return this.get({uri: `r/${this.display_name}/api/flairlist`, qs: options}).users;
+    return this._get({uri: `r/${this.display_name}/api/flairlist`, qs: options}).users;
   }
   /**
   * Configures the flair settings for this subreddit.
@@ -1536,7 +1534,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @returns {Promise} A Promise that fulfills when the request is complete
   */
   configure_flair (options) {
-    return this.post({
+    return this._post({
       uri: `r/${this.display_name}/api/flairconfig`,
       form: {
         api_type,
@@ -1572,7 +1570,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
     ));
   }
   _set_my_flair_visibility (flair_enabled) {
-    return this.post({uri: `r/${this.display_name}/api/setflairenabled`, form: {api_type, flair_enabled}});
+    return this._post({uri: `r/${this.display_name}/api/setflairenabled`, form: {api_type, flair_enabled}});
   }
   /**
   * Makes the requester's flair visible on this subreddit.
@@ -1686,7 +1684,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   */
   get_moderation_log (options = {}) {
     const parsed_options = _(options).assign({mod: options.mods && options.mods.join(',')}).omit(['mods']).value();
-    return this.get({uri: `r/${this.display_name}/about/log`, qs: parsed_options});
+    return this._get({uri: `r/${this.display_name}/about/log`, qs: parsed_options});
   }
   /**
   * Gets a list of reported items on this subreddit.
@@ -1695,7 +1693,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @returns {Promise} A Listing containing reported items
   */
   get_reports (options = {}) {
-    return this.get({uri: `r/${this.display_name}/about/reports`, qs: options});
+    return this._get({uri: `r/${this.display_name}/about/reports`, qs: options});
   }
   /**
   * Gets a list of removed items on this subreddit.
@@ -1704,7 +1702,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @returns {Promise} A Listing containing removed items
   */
   get_spam (options = {}) {
-    return this.get({uri: `r/${this.display_name}/about/spam`, qs: options});
+    return this._get({uri: `r/${this.display_name}/about/spam`, qs: options});
   }
   /**
   * Gets a list of items on the modqueue on this subreddit.
@@ -1713,7 +1711,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @returns {Promise} A Listing containing items on the modqueue
   */
   get_modqueue (options = {}) {
-    return this.get({uri: `r/${this.display_name}/about/modqueue`, qs: options});
+    return this._get({uri: `r/${this.display_name}/about/modqueue`, qs: options});
   }
   /**
   * Gets a list of unmoderated items on this subreddit.
@@ -1722,7 +1720,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @returns {Promise} A Listing containing unmoderated items
   */
   get_unmoderated (options = {}) {
-    return this.get({uri: `r/${this.display_name}/about/unmoderated`, qs: options});
+    return this._get({uri: `r/${this.display_name}/about/unmoderated`, qs: options});
   }
   /**
   * Gets a list of edited items on this subreddit.
@@ -1731,14 +1729,14 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @returns {Promise} A Listing containing edited items
   */
   get_edited (options = {}) {
-    return this.get({uri: `r/${this.display_name}/about/edited`, qs: options});
+    return this._get({uri: `r/${this.display_name}/about/edited`, qs: options});
   }
   /**
   * Accepts an invite to become a moderator of this subreddit.
   * @returns {Promise} A Promise that fulfills with this subreddit when the request is complete
   */
   accept_moderator_invite () {
-    return promise_wrap(this.post({
+    return promise_wrap(this._post({
       uri: `r/${this.display_name}/api/accept_moderator_invite`,
       form: {api_type}
     }).bind(this).then(helpers._handle_json_errors));
@@ -1749,7 +1747,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   */
   leave_moderator () {
     return promise_wrap(this.name.then(name => {
-      return this.post({uri: 'api/leavemoderator', form: {id: name}}).bind(this).then(helpers._handle_json_errors);
+      return this._post({uri: 'api/leavemoderator', form: {id: name}}).bind(this).then(helpers._handle_json_errors);
     }));
   }
   /**
@@ -1758,7 +1756,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   */
   leave_contributor () {
     return promise_wrap(this.name.then(name => {
-      return this.post({uri: 'api/leavecontributor', form: {id: name}}).return(this);
+      return this._post({uri: 'api/leavecontributor', form: {id: name}}).return(this);
     }));
   }
   /**
@@ -1767,7 +1765,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   if the subreddit in question does not have a custom stylesheet.
   */
   get_stylesheet () {
-    return this.get({uri: `r/${this.display_name}/stylesheet`, json: false, transform: _.identity});
+    return this._get({uri: `r/${this.display_name}/stylesheet`, json: false, transform: _.identity});
   }
   /**
   * Conducts a search of reddit submissions, restricted to this subreddit.
@@ -1791,7 +1789,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @returns {Promise} A Listing of users
   */
   get_banned_users ({user} = {}) { // TODO: Return Listings containing RedditUser objects rather than normal objects with data
-    return this.get({uri: `r/${this.display_name}/about/banned`, qs: {user}});
+    return this._get({uri: `r/${this.display_name}/about/banned`, qs: {user}});
   }
   /**
   * Gets the list of muted users on this subreddit.
@@ -1800,7 +1798,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @returns {Promise} A Listing of users
   */
   get_muted_users ({user} = {}) {
-    return this.get({uri: `r/${this.display_name}/about/muted`, qs: {user}});
+    return this._get({uri: `r/${this.display_name}/about/muted`, qs: {user}});
   }
   /**
   * Gets the list of users banned from this subreddit's wiki.
@@ -1809,7 +1807,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @returns {Promise} A Listing of users
   */
   get_wikibanned_users ({user} = {}) {
-    return this.get({uri: `r/${this.display_name}/about/wikibanned`, qs: {user}});
+    return this._get({uri: `r/${this.display_name}/about/wikibanned`, qs: {user}});
   }
   /**
   * Gets the list of approved submitters on this subreddit.
@@ -1818,7 +1816,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @returns {Promise} A Listing of users
   */
   get_contributors ({user} = {}) {
-    return this.get({uri: `r/${this.display_name}/about/contributors`, qs: {user}});
+    return this._get({uri: `r/${this.display_name}/about/contributors`, qs: {user}});
   }
   /**
   * Gets the list of approved wiki submitters on this subreddit .
@@ -1827,7 +1825,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @returns {Promise} A Listing of users
   */
   get_wiki_contributors ({user} = {}) {
-    return this.get({uri: `r/${this.display_name}/about/wikicontributors`, qs: {user}});
+    return this._get({uri: `r/${this.display_name}/about/wikicontributors`, qs: {user}});
   }
   /**
   * Gets the list of moderators on this subreddit.
@@ -1836,14 +1834,14 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @returns {Promise} An Array of RedditUsers representing the moderators of this subreddit
   */
   get_moderators ({user} = {}) {
-    return this.get({uri: `r/${this.display_name}/about/moderators`, qs: {user}});
+    return this._get({uri: `r/${this.display_name}/about/moderators`, qs: {user}});
   }
   /**
   * Deletes the banner for this Subreddit.
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
   */
   delete_banner () {
-    return promise_wrap(this.post({
+    return promise_wrap(this._post({
       uri: `r/${this.display_name}/api/delete_sr_banner`,
       form: {api_type}
     }).bind(this).then(helpers._handle_json_errors));
@@ -1853,7 +1851,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
   */
   delete_header () {
-    return promise_wrap(this.post({
+    return promise_wrap(this._post({
       uri: `r/${this.display_name}/api/delete_sr_header`,
       form: {api_type}
     }).bind(this).then(helpers._handle_json_errors));
@@ -1863,7 +1861,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
   */
   delete_icon () {
-    return promise_wrap(this.post({
+    return promise_wrap(this._post({
       uri: `r/${this.display_name}/api/delete_sr_icon`,
       form: {api_type}
     }).bind(this).then(helpers._handle_json_errors));
@@ -1874,7 +1872,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @param {string} $0.image_name The name of the image.
   */
   delete_image ({image_name}) {
-    return promise_wrap(this.post({
+    return promise_wrap(this._post({
       uri: `r/${this.display_name}/api/delete_sr_image`,
       form: {api_type, img_name: image_name}
     }).bind(this).then(helpers._handle_json_errors));
@@ -1884,7 +1882,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @returns {Promise} An Object containing this subreddit's current settings.
   */
   get_settings () {
-    return this.get({uri: `r/${this.display_name}/about/edit`});
+    return this._get({uri: `r/${this.display_name}/about/edit`});
   }
   /**
   * Edits this subreddit's settings.
@@ -1946,7 +1944,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @param {Promise} An Array of subreddit names
   */
   get_recommended_subreddits ({omit} = {}) {
-    return this.get({uri: `api/recommend/sr/${this.display_name}`, qs: {omit: omit && omit.join(',')}}).then(names => {
+    return this._get({uri: `api/recommend/sr/${this.display_name}`, qs: {omit: omit && omit.join(',')}}).then(names => {
       return _.map(names, 'sr_name');
     });
   }
@@ -1955,7 +1953,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @returns {Promise} The submit text, represented as a string.
   */
   get_submit_text () {
-    return this.get({uri: `r/${this.display_name}/api/submit_text`}).submit_text;
+    return this._get({uri: `r/${this.display_name}/api/submit_text`}).submit_text;
   }
   /**
   * Updates this subreddit's stylesheet.
@@ -1964,14 +1962,14 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @param {string} [$0.reason=] The reason for the change (256 characters max)
   */
   update_stylesheet ({css, reason}) {
-    return promise_wrap(this.post({
+    return promise_wrap(this._post({
       uri: `r/${this.display_name}/api/subreddit_stylesheet`,
       form: {api_type, op: 'save', reason, stylesheet_contents: css}
     }).bind(this).then(helpers._handle_json_errors));
   }
 
   _set_subscribed (status) {
-    return promise_wrap(this.name.then(name => this.post({
+    return promise_wrap(this.name.then(name => this._post({
       uri: 'api/subscribe',
       form: {action: status ? 'sub' : 'unsub', sr: name}
     }).return(this)));
@@ -1995,7 +1993,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
       throw new errors.InvalidMethodCallError('Uploaded image filepath must be a string or a ReadableStream.');
     }
     const parsed_file = typeof file === 'string' ? require('fs').createReadStream(file) : file;
-    return promise_wrap(this.post({
+    return promise_wrap(this._post({
       uri: `r/${this.display_name}/api/upload_sr_img`,
       formData: {name, upload_type, img_type: image_type, file: parsed_file}
     }).then(result => {
@@ -2059,7 +2057,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @returns {Promise} A Promise that fulfills with information on this subreddit's rules.
   */
   get_rules () {
-    return this.get({uri: `r/${this.display_name}/about/rules`});
+    return this._get({uri: `r/${this.display_name}/about/rules`});
   }
   /**
   * Gets the stickied post on this subreddit, or throws a 404 error if none exists.
@@ -2067,7 +2065,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @param {number} [$0.num=1] The number of the sticky to get. Should be either `1` or `2`.
   */
   get_sticky ({num = 1} = {}) {
-    return this.get({uri: `r/${this.display_name}/about/sticky`, qs: {num}});
+    return this._get({uri: `r/${this.display_name}/about/sticky`, qs: {num}});
   }
   _friend (options) {
     return promise_wrap(
@@ -2192,7 +2190,7 @@ objects.Listing = class Listing extends Array {
   async _fetch_more_regular (amount) {
     const limit_for_request = Math.min(amount, this.limit) || this.limit;
     const request_params = _.merge({after: this.after, before: this.before, limit: limit_for_request}, this.constant_params);
-    const response = await this._ac[this.method]({
+    const response = await this._ac[`_${this.method}`]({
       uri: this.uri,
       qs: request_params,
       limit: limit_for_request
@@ -2247,7 +2245,7 @@ objects.more = class more extends objects.RedditContent {
     const ids_for_this_request = this.children.splice(0, Math.min(amount, 100)).map(id => `t1_${id}`);
     // Requests are capped at 100 comments. Send lots of requests recursively to get the comments, then concatenate them.
     // (This speed-requesting is only possible with comment Listings since the entire list of ids is present initially.)
-    const promise_for_this_batch = this.get({uri: 'api/info', qs: {id: ids_for_this_request.join(',')}});
+    const promise_for_this_batch = this._get({uri: 'api/info', qs: {id: ids_for_this_request.join(',')}});
     const promise_for_remaining_items = this.fetch_more(amount - ids_for_this_request.length);
     return _.toArray(await promise_for_this_batch).concat(await promise_for_remaining_items);
   }
