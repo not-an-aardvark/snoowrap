@@ -11,7 +11,8 @@ module.exports = {
     'arrow-spacing': 2,
     'no-var': 2,
     'prefer-const': 1,
-    'space-before-function-paren': 2
+    'space-before-function-paren': 2,
+    'max-len': [2, 126]
   },
   env: {
     es6: true,
