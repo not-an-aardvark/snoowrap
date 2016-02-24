@@ -1,5 +1,5 @@
 'use strict';
-const expect = require('chai').expect;
+const expect = require('chai').use(require('dirty-chai')).expect;
 const Promise = require('bluebird');
 const _ = require('lodash');
 const moment = require('moment');
@@ -37,13 +37,13 @@ describe('snoowrap', function () {
       const fetched_user = await user.fetch();
       expect(fetched_user.name).to.equal('not_an_aardvark');
       expect(fetched_user.created_utc).to.equal(1419104352);
-      expect(fetched_user.nonexistent_property).to.be.undefined;
+      expect(fetched_user.nonexistent_property).to.be.undefined();
     });
     it('returns individual properties as Promises', async () => {
-      expect(await user.has_verified_email).to.be.true;
+      expect(await user.has_verified_email).to.be.true();
     });
     it('returns a promise that resolves as undefined when fetching a nonexistent property', async () => {
-      expect(await user.nonexistent_property).to.be.undefined;
+      expect(await user.nonexistent_property).to.be.undefined();
     });
     it('throws an error if it tries to fetch the profile of a deleted/invalid account', () => {
       expect(() => r.get_user('[deleted]').fetch()).to.throw(errors.InvalidUserError);
@@ -60,7 +60,7 @@ describe('snoowrap', function () {
       expect(await comment.body).to.equal('`RuntimeError: maximum humor depth exceeded`');
     });
     it('should convert the comment author to a RedditUser object and be able to get its properties', async () => {
-      expect(await comment.author.has_verified_email).to.be.true;
+      expect(await comment.author.has_verified_email).to.be.true();
     });
     it('should be able to fetch replies to comments', async () => {
       expect(await comment.replies.fetch_until({length: 1})[0].body).to.equal("Let's knock the humor down to 65%.");
@@ -84,18 +84,18 @@ describe('snoowrap', function () {
     });
     it("can get and modify a subreddit's settings", async () => {
       await subreddit.edit_settings({public_traffic: false});
-      expect(await subreddit.get_settings().public_traffic).to.be.false;
+      expect(await subreddit.get_settings().public_traffic).to.be.false();
       await subreddit.edit_settings({public_traffic: true});
-      expect(await subreddit.get_settings().public_traffic).to.be.true;
+      expect(await subreddit.get_settings().public_traffic).to.be.true();
     });
     it("can get a subreddit's submit text", async () => {
       expect(await subreddit.get_submit_text()).to.equal('snoowrap_testing submit text');
     });
     it('can subscribe/unsubscribe from a subreddit', async () => {
       await subreddit.subscribe();
-      expect(await subreddit.refresh().user_is_subscriber).to.be.true;
+      expect(await subreddit.refresh().user_is_subscriber).to.be.true();
       await subreddit.unsubscribe();
-      expect(await subreddit.refresh().user_is_subscriber).to.be.false;
+      expect(await subreddit.refresh().user_is_subscriber).to.be.false();
     });
     it('can upload images to a subreddit', async () => {
       await subreddit.upload_header_image({file: 'test/test_image.png'});
@@ -122,13 +122,13 @@ describe('snoowrap', function () {
     });
     it('can get comments on a submission', async () => {
       const comments = await submission.comments;
-      expect(comments.is_finished).to.be.false;
+      expect(comments.is_finished).to.be.false();
       expect(await comments.fetch_more(5)).to.have.length.within(6, 100);
       expect(comments[0]).to.be.an.instanceof(snoowrap.objects.Comment);
       expect(_.last(await comments)).to.be.an.instanceof(snoowrap.objects.Comment);
       await comments.fetch_all();
       expect(comments).to.have.length.above(1000);
-      expect(comments.is_finished).to.be.true;
+      expect(comments.is_finished).to.be.true();
     });
     it("can get comments by index before they're fetched", async () => {
       expect(await submission.comments[6].body).to.equal('pumpkin pie');
@@ -158,7 +158,7 @@ describe('snoowrap', function () {
     });
     it('can get new posts from the front page', async () => {
       const posts = await r.get_new();
-      expect(moment.unix(posts[0].created_utc).add(30, 'minutes').isAfter()).to.be.true;
+      expect(moment.unix(posts[0].created_utc).add(30, 'minutes').isAfter()).to.be.true();
       // i.e. the first post should be newer than 1 hour old, to be sure that this is actually the 'new' listing
     });
     it('can get top posts from the front page or a subreddit given a certain timespan', async () => {
@@ -167,7 +167,7 @@ describe('snoowrap', function () {
       expect(top_alltime.name).to.eql(top_alltime_v2.name);
       expect(top_alltime.ups).to.be.above(50000);
       const top_in_last_day = await r.get_top({time: 'day'})[0];
-      expect(moment.unix(top_in_last_day.created_utc).add(24, 'hours').isAfter()).to.be.true;
+      expect(moment.unix(top_in_last_day.created_utc).add(24, 'hours').isAfter()).to.be.true();
     });
   });
 
@@ -208,7 +208,7 @@ describe('snoowrap', function () {
       const iden = await r.get_new_captcha_identifier();
       expect(iden).to.be.a('string');
       const image = await r.get_captcha_image(iden);
-      expect(image).to.be.ok;
+      expect(image).to.be.ok();
     });
   });
 
@@ -218,13 +218,13 @@ describe('snoowrap', function () {
       sub = r.get_subreddit('snoowrap_testing');
     });
     it('can add/delete/fetch user flair templates', async () => {
-      const text = moment().format(); // Use the current timestamp as the flair text to make it easy to distinguish from others
+      const text = moment().format(); // Use the current timestamp as the flair text to make it easy to distinguish
       await sub.create_user_flair_template({text, css_class: ''});
       const added_flair = _.last(await sub.get_user_flair_templates());
       expect(added_flair.flair_text).to.equal(text);
       await sub.delete_flair_template(added_flair);
       const user_flairs_afterwards = await sub.get_user_flair_templates();
-      expect(user_flairs_afterwards.length === 0 || _.last(user_flairs_afterwards).flair_text !== text).to.be.true;
+      expect(user_flairs_afterwards.length === 0 || _.last(user_flairs_afterwards).flair_text !== text).to.be.true();
     });
     it('can add/delete/fetch link flair templates', async () => {
       const text = moment().format();
@@ -233,8 +233,8 @@ describe('snoowrap', function () {
       const added_flair = _.last(await sub._get_flair_options({link: 't3_43qlu8'}).choices);
       expect(added_flair.flair_text).to.equal(text);
       await sub.delete_flair_template(added_flair);
-      const link_flairs_afterwards= await sub._get_flair_options({link: 't3_43qlu8'}).choices;
-      expect(link_flairs_afterwards.length === 0 || _.last(link_flairs_afterwards).flair_text !== text).to.be.true;
+      const link_flairs_afterwards = await sub._get_flair_options({link: 't3_43qlu8'}).choices;
+      expect(link_flairs_afterwards.length === 0 || _.last(link_flairs_afterwards).flair_text !== text).to.be.true();
     });
     it('can delete all user flair templates', async () => {
       await Promise.all([
@@ -286,7 +286,7 @@ describe('snoowrap', function () {
       await sub.delete_all_user_flair_templates();
     });
     it('can select link flair for its post', async () => {
-      const text = moment().format() + ' (self-selected)';
+      const text = `${moment().format()} (self-selected)`;
       await sub.create_link_flair_template({text});
       const submission = r.get_submission('443bn7');
       const flair_template_id = _.last(await submission.get_link_flair_templates()).flair_template_id;
@@ -354,7 +354,7 @@ describe('snoowrap', function () {
       const log = await sub.get_moderation_log({mods: [await r.get_me().name]});
       expect(log[0].action).to.equal('approvecomment');
       const log2 = await sub.get_moderation_log({mods: ['not_a_mod']});
-      expect(log2).to.be.empty;
+      expect(log2).to.be.empty();
     });
     it('can get reported items', async () => {
       expect(await sub.get_reports()).to.be.an.instanceof(snoowrap.objects.Listing);
@@ -392,42 +392,42 @@ describe('snoowrap', function () {
     it('can distinguish/undistinguish/sticky a comment', async () => {
       await comment.distinguish();
       expect(comment.distinguished).to.equal('moderator');
-      expect(comment.stickied).to.be.false;
+      expect(comment.stickied).to.be.false();
       await comment.distinguish({sticky: true});
       expect(comment.distinguished).to.equal('moderator');
-      expect(comment.stickied).to.be.true;
+      expect(comment.stickied).to.be.true();
       await comment.undistinguish();
-      expect(comment.distinguished).to.be.null;
+      expect(comment.distinguished).to.be.null();
     });
     it('can save/unsave a post', async () => {
       await post.save().refresh();
-      expect(post.saved).to.be.true;
+      expect(post.saved).to.be.true();
       await post.unsave().refresh();
-      expect(post.saved).to.be.false;
+      expect(post.saved).to.be.false();
     });
     it('can save/unsave a comment', async () => {
       await comment.save().refresh();
-      expect(comment.saved).to.be.true;
+      expect(comment.saved).to.be.true();
       await comment.unsave().refresh();
-      expect(await comment.saved).to.be.false;
+      expect(await comment.saved).to.be.false();
     });
     it('can remove/approve a post', async () => {
       await post.remove().refresh();
-      expect(post.banned_by.value()).to.not.be.null;
-      expect(post.approved_by.value()).to.be.null;
+      expect(post.banned_by.value()).to.not.be.null();
+      expect(post.approved_by.value()).to.be.null();
       await post.approve().refresh();
-      expect(post.banned_by.value()).to.be.null;
-      expect(post.approved_by.value()).to.not.be.null;
+      expect(post.banned_by.value()).to.be.null();
+      expect(post.approved_by.value()).to.not.be.null();
       // There's no way to differentiate posts marked as spam with the API, but make sure the function doesn't throw an error.
       await post.mark_as_spam().approve();
     });
     it('can remove/approve a comment', async () => {
       await comment.remove().refresh();
-      expect(comment.banned_by.value()).to.not.be.null;
-      expect(comment.approved_by.value()).to.be.null;
+      expect(comment.banned_by.value()).to.not.be.null();
+      expect(comment.approved_by.value()).to.be.null();
       await comment.approve().refresh();
-      expect(comment.banned_by.value()).to.be.null;
-      expect(comment.approved_by.value()).to.not.be.null;
+      expect(comment.banned_by.value()).to.be.null();
+      expect(comment.approved_by.value()).to.not.be.null();
     });
   });
 
@@ -451,10 +451,10 @@ describe('snoowrap', function () {
       expect(await message1.replies[0].name).to.equal(message2.name);
     });
     it('can mark a message as unread', async () => {
-      expect(await message3.mark_as_unread().refresh().new).to.be.true;
+      expect(await message3.mark_as_unread().refresh().new).to.be.true();
     });
     it('can mark a message as read', async () => {
-      expect(await message3.mark_as_read().refresh().new).to.be.false;
+      expect(await message3.mark_as_read().refresh().new).to.be.false();
     });
   });
 
@@ -466,7 +466,7 @@ describe('snoowrap', function () {
     });
     it('can get a list of new messages in an inbox', async () => {
       const new_messages = await r.get_unread_messages({mark: false, limit: 1});
-      expect(await new_messages[0].refresh().new).to.be.true;
+      expect(await new_messages[0].refresh().new).to.be.true();
       await r.get_unread_messages({mark: true});
     });
     it('can get modmail for all moderated subs', async () => {
@@ -510,11 +510,11 @@ describe('snoowrap', function () {
     });
     it('can search for a list of subreddits by name', async () => {
       const results = await r.search_subreddit_names({query: 'AskReddit'});
-      expect(Array.isArray(results)).to.be.true;
+      expect(Array.isArray(results)).to.be.true();
     });
     it('can search for a list of subreddits by topic', async () => {
       const results = await r.search_subreddit_topics({query: 'snoowrap'});
-      expect(Array.isArray(results)).to.be.true;
+      expect(Array.isArray(results)).to.be.true();
       expect(results[0]).to.be.an.instanceof(snoowrap.objects.Subreddit);
     });
     // honestly I have no idea why there are three separate subreddit search functions
@@ -556,7 +556,7 @@ describe('snoowrap', function () {
       const timer = Promise.delay(1999);
       await r.get_user('not_an_aardvark').fetch();
       await r.get_user('actually_an_aardvark').fetch();
-      expect(timer.isFulfilled()).to.be.true;
+      expect(timer.isFulfilled()).to.be.true();
     });
   });
   describe('Creating new content', () => {
@@ -578,7 +578,7 @@ describe('snoowrap', function () {
       expect(await new_selfpost.refresh().author.name).to.equal('[deleted]');
     });
     it.skip('can create a subreddit', async () => {
-      const sub_name = moment().format().slice(0,19).replace(/[-:]/g,'_');
+      const sub_name = moment().format().slice(0, 19).replace(/[-:]/g, '_');
       const new_sub = await r.create_subreddit({
         description: 'a test subreddit for snoowrap',
         name: sub_name,
@@ -602,13 +602,13 @@ describe('snoowrap', function () {
       const modmail = r.get_message('4zop6r');
       await modmail.mute_author();
       const mute_list = await modmail.subreddit.get_muted_users();
-      expect(_.find(mute_list, {name: await modmail.author.name})).to.be.defined;
+      expect(_.find(mute_list, {name: await modmail.author.name})).to.be.defined();
     });
     it.skip('can unmute the author of a modmail', async () => {
       const modmail = r.get_message('4zop6r');
       await modmail.unmute_author();
       const mute_list = await modmail.subreddit.get_muted_users();
-      expect(_.find(mute_list, {name: await modmail.author.name})).to.be.undefined;
+      expect(_.find(mute_list, {name: await modmail.author.name})).to.be.undefined();
     });
     it.skip('can comment on a submission', async () => {
       const comment_body = moment().format();

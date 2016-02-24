@@ -67,7 +67,7 @@ const snoowrap = class snoowrap {
       baseUrl: `https://oauth.${this._config.endpoint_domain}`,
       qs: {raw_json: 1}, // This tells reddit to unescape html characters, e.g. it will send '<' instead of '&lt;'
       resolveWithFullResponse: true,
-      transform: (function (body, response) {
+      transform: function (body, response) {
         this.ratelimit_remaining = response.headers['x-ratelimit-remaining'];
         this.ratelimit_reset_point = moment().add(response.headers['x-ratelimit-reset'], 'seconds');
         const populated = helpers._populate(body, this);
@@ -75,7 +75,7 @@ const snoowrap = class snoowrap {
           populated.uri = response.request.uri.path;
         }
         return populated;
-      }).bind(this)
+      }.bind(this)
     });
   }
   async _handle_request (requester, args, attempts = 0) {
@@ -410,14 +410,16 @@ const snoowrap = class snoowrap {
   }
   _get_sorted_frontpage (sort_type, subreddit_name, options = {}) {
     // Handle things properly if only a time parameter is provided but not the subreddit name
-    if (typeof subreddit_name === 'object' && _(options).omitBy(_.isUndefined).isEmpty()) {
+    let opts = options;
+    let sub_name = subreddit_name;
+    if (typeof subreddit_name === 'object' && _(opts).omitBy(_.isUndefined).isEmpty()) {
       /* In this case, "subreddit_name" ends up referring to the second argument, which is not actually a name since the user
       decided to omit that parameter. */
-      options = subreddit_name;
-      subreddit_name = undefined;
+      opts = subreddit_name;
+      sub_name = undefined;
     }
-    const parsed_options = _(options).assign({t: options.time, time: undefined}).omit(['time']).value();
-    return this._get({uri: (subreddit_name ? `r/${subreddit_name}/` : '') + sort_type, qs: parsed_options});
+    const parsed_options = _(opts).assign({t: opts.time, time: undefined}).omit(['time']).value();
+    return this._get({uri: (sub_name ? `r/${sub_name}/` : '') + sort_type, qs: parsed_options});
   }
   /**
   * Gets a Listing of hot posts.
@@ -569,18 +571,20 @@ const snoowrap = class snoowrap {
   * @instance
   */
   compose_message ({captcha, from_subreddit, captcha_iden, subject, text, to}) {
+    let parsed_to = to;
+    let parsed_from_sr = from_subreddit;
     if (to instanceof objects.RedditUser) {
-      to = to.name;
+      parsed_to = to.name;
     } else if (to instanceof objects.Subreddit) {
-      to = `/r/${to.display_name}`;
+      parsed_to = `/r/${to.display_name}`;
     }
     if (from_subreddit instanceof objects.Subreddit) {
-      from_subreddit = from_subreddit.display_name;
+      parsed_from_sr = from_subreddit.display_name;
     } else if (typeof from_subreddit === 'string') {
-      from_subreddit = from_subreddit.replace(/^\/?r\//, ''); // Convert '/r/subreddit_name' to 'subreddit_name'
+      parsed_from_sr = from_subreddit.replace(/^\/?r\//, ''); // Convert '/r/subreddit_name' to 'subreddit_name'
     }
     return this._post({uri: 'api/compose', form: {
-      api_type, captcha, iden: captcha_iden, from_sr: from_subreddit, subject, text, to
+      api_type, captcha, iden: captcha_iden, from_sr: parsed_from_sr, subject, text, to: parsed_to
     }});
   }
   /**
@@ -727,9 +731,9 @@ const snoowrap = class snoowrap {
   * @instance
   */
   search_subreddit_topics ({query}) {
-    return promise_wrap(this._get({uri: 'api/subreddits_by_topic', qs: {query}}).then(results => {
-      return _.map(results, 'name').map(this.get_subreddit.bind(this));
-    }));
+    return promise_wrap(this._get({uri: 'api/subreddits_by_topic', qs: {query}}).then(results =>
+      _.map(results, 'name').map(this.get_subreddit.bind(this))
+    ));
   }
   /**
   * Gets a list of subreddits that the currently-authenticated user is subscribed to.
@@ -771,8 +775,7 @@ const snoowrap = class snoowrap {
   */
   search_subreddits (options) {
     options.q = options.query;
-    delete options.query;
-    return this._get({uri: 'subreddits/search', qs: options});
+    return this._get({uri: 'subreddits/search', qs: _.omit(options, ['query'])});
   }
   /**
   * Gets a list of subreddits, arranged by popularity.
@@ -953,7 +956,7 @@ objects.CreatableContent = class CreatableClass extends objects.RedditContent {
   * @returns {Promise} A Promise that fulfills with the newly-created reply
   */
   reply (text) {
-    return this._post({uri: 'api/comment',form: {api_type, text, thing_id: this.name}}).json.data.things[0];
+    return this._post({uri: 'api/comment', form: {api_type, text, thing_id: this.name}}).json.data.things[0];
   }
 };
 
@@ -1038,7 +1041,7 @@ objects.VoteableContent = class VoteableContent extends objects.CreatableContent
     return promise_wrap(this._post({uri: 'api/distinguish', form: {
       api_type,
       how: status === true ? 'yes' : status === false ? 'no' : status,
-      sticky: sticky,
+      sticky,
       id: this.name
     }}).then(response => {
       this._fetch = response.json.data.things[0];
@@ -1353,7 +1356,7 @@ objects.PrivateMessage = class PrivateMessage extends objects.CreatableContent {
   _transform_api_response (response_obj) {
     return helpers.find_message_in_tree(this.name, response_obj[0]);
   }
-  //TODO: Get rid of the repeated code here, most of these methods are exactly the same with the exception of the URIs
+  // TODO: Get rid of the repeated code here, most of these methods are exactly the same with the exception of the URIs
   /**
   * Blocks the author of this private message.
   * @returns {Promise} A Promise that fulfills with this message after the request is complete
@@ -1420,19 +1423,19 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * Deletes one of this subreddit's flair templates
   * @param {object} options
   * @param {string} options.flair_template_id The ID of the template that should be deleted
-  * @returns {Promise} A Promise that fulfills when the request is complete
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   delete_flair_template (options) {
-    return this._post({
+    return promise_wrap(this._post({
       uri: `r/${this.display_name}/api/deleteflairtemplate`,
       form: {api_type, flair_template_id: options.flair_template_id}
-    });
+    }).return(this));
   }
   _create_flair_template ({text, css_class, flair_type, text_editable = false}) {
-    return this._post({
+    return promise_wrap(this._post({
       uri: `r/${this.display_name}/api/flairtemplate`,
       form: {api_type, text, css_class, flair_type, text_editable}
-    });
+    }).return(this));
   }
   /**
   * Creates a new user flair template for this subreddit
@@ -1440,6 +1443,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @param {string} options.text The flair text for this template
   * @param {string} [options.css_class=''] The CSS class for this template
   * @param {boolean} [options.text_editable=false] Determines whether users should be able to edit their flair text
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
   when it has this template
   */
   create_user_flair_template (options) {
@@ -1452,6 +1456,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @param {string} [options.css_class=''] The CSS class for this template
   * @param {boolean} [options.text_editable=false] Determines whether users should be able to edit the flair text of their
   links when it has this template
+  * @returns {Promise} A Promise that fulfills with this Subredit when the request is complete.
   */
   create_link_flair_template (options) {
     return this._create_flair_template(_.assign(options, {flair_type: 'LINK_FLAIR'}));
@@ -1746,18 +1751,18 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @returns {Promise} A Promise for this subreddit.
   */
   leave_moderator () {
-    return promise_wrap(this.name.then(name => {
-      return this._post({uri: 'api/leavemoderator', form: {id: name}}).bind(this).then(helpers._handle_json_errors);
-    }));
+    return promise_wrap(this.name.then(name =>
+      this._post({uri: 'api/leavemoderator', form: {id: name}}).bind(this).then(helpers._handle_json_errors)
+    ));
   }
   /**
   * Abdicates approved submitter status on this subreddit.
   * @returns {Promise} A Promise that resolves with this subreddit when the request is complete.
   */
   leave_contributor () {
-    return promise_wrap(this.name.then(name => {
-      return this._post({uri: 'api/leavecontributor', form: {id: name}}).return(this);
-    }));
+    return promise_wrap(this.name.then(name =>
+      this._post({uri: 'api/leavecontributor', form: {id: name}}).return(this)
+    ));
   }
   /**
   * Gets a subreddit's CSS stylesheet.
@@ -1838,7 +1843,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   }
   /**
   * Deletes the banner for this Subreddit.
-  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   delete_banner () {
     return promise_wrap(this._post({
@@ -1848,7 +1853,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   }
   /**
   * Deletes the header image for this Subreddit.
-  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   delete_header () {
     return promise_wrap(this._post({
@@ -1858,7 +1863,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   }
   /**
   * Deletes this subreddit's icon.
-  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   delete_icon () {
     return promise_wrap(this._post({
@@ -1870,6 +1875,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * Deletes an image from this subreddit.
   * @param {object} $0
   * @param {string} $0.image_name The name of the image.
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   delete_image ({image_name}) {
     return promise_wrap(this._post({
@@ -1888,7 +1894,6 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * Edits this subreddit's settings.
   * @param {object} options An Object containing {[option name]: new value} mappings of the options that should be modified.
   Any omitted option names will simply retain their previous values.
-  * @param {object} options
   * @param {string} options.title The text that should appear in the header of the subreddit
   * @param {string} options.public_description The text that appears with this subreddit on the search page, or on the
   blocked-access page if this subreddit is private. (500 characters max)
@@ -1933,20 +1938,20 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
   */
   edit_settings (options) {
-    return promise_wrap(Promise.join(this.get_settings(), this.name, (current_values, name) => {
-      return this._ac._create_or_edit_subreddit(_.assign(current_values, options, {sr: name}));
-    }).return(this));
+    return promise_wrap(Promise.join(this.get_settings(), this.name, (current_values, name) =>
+      this._ac._create_or_edit_subreddit(_.assign(current_values, options, {sr: name}))
+    ).return(this));
   }
   /**
   * Gets a list of recommended other subreddits given this one.
   * @param {object} [$0=]
   * @param {Array} [$0.omit=[]] An Array of subreddit names that should be excluded from the listing.
-  * @param {Promise} An Array of subreddit names
+  * @returns {Promise} An Array of subreddit names
   */
   get_recommended_subreddits ({omit} = {}) {
-    return this._get({uri: `api/recommend/sr/${this.display_name}`, qs: {omit: omit && omit.join(',')}}).then(names => {
-      return _.map(names, 'sr_name');
-    });
+    return this._get({uri: `api/recommend/sr/${this.display_name}`, qs: {omit: omit && omit.join(',')}}).then(names =>
+      _.map(names, 'sr_name')
+    );
   }
   /**
   * Gets the submit text (which displays on the submission form) for this subreddit.
@@ -1960,6 +1965,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @param {object} $0
   * @param {string} $0.css The new contents of the stylesheet
   * @param {string} [$0.reason=] The reason for the change (256 characters max)
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   update_stylesheet ({css, reason}) {
     return promise_wrap(this._post({
@@ -2063,6 +2069,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * Gets the stickied post on this subreddit, or throws a 404 error if none exists.
   * @param {object} $0
   * @param {number} [$0.num=1] The number of the sticky to get. Should be either `1` or `2`.
+  * @returns {Promise} A Submission object representing this subreddit's stickied submission
   */
   get_sticky ({num = 1} = {}) {
     return this._get({uri: `r/${this.display_name}/about/sticky`, qs: {num}});
@@ -2084,6 +2091,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   * @param {Array} [$0.permissions] The moderator permissions that this user should have. This should be an array containing
   some combination of `"wiki", "posts", "access", "mail", "config", "flair"`. To add a moderator with full permissions, omit
   this property entirely.
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   invite_moderator ({name, permissions}) {
     return this._friend({name, permissions: helpers._format_permissions(permissions), type: 'moderator_invite'});
@@ -2161,7 +2169,7 @@ objects.Listing = class Listing extends Array {
   }
   /**
   * This is a getter that is true if there are no more items left to fetch, and false otherwise.
-  * @type number
+  * @type {number}
   */
   get is_finished () {
     if (this._is_comment_list) {
@@ -2225,6 +2233,7 @@ objects.Listing = class Listing extends Array {
   * @param {number} $0.length The maximum length that the Listing should have after completion. The length might end up
   being less than this if the true number of available items in the Listing is less than `$0.length`. For example, this
   can't fetch 200 comments on a Submission that only has 100 comments in total.
+  * @returns {Promise} The updated Listing
   */
   fetch_until ({length}) {
     return this.fetch_more(length - this.length);
