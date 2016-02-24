@@ -2096,8 +2096,23 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
   invite_moderator ({name, permissions}) {
     return this._friend({name, permissions: helpers._format_permissions(permissions), type: 'moderator_invite'});
   }
+  /**
+  * Revokes an invitation for the given user to be a moderator
+  * @param {object} $0
+  * @param {string} $0.name The username of the account whose invitation should be revoked
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  */
+  revoke_moderator_invite ({name}) {
+    return this._unfriend({name, type: 'moderator_invite'});
+  }
+  /**
+  * Removes the given user's moderator status
+  * @param {object} $0
+  * @param {string} $0.name The username of the account whose moderator status should be removed
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  */
   remove_moderator ({name}) {
-    return this._unfriend({name});
+    return this._unfriend({name, type: 'moderator'});
   }
   add_contributor ({name}) {
     return this._friend({name, type: 'contributor'});
