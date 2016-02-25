@@ -44,11 +44,63 @@ r.get_subreddit('snoowrap')
 
 For more examples of what can be done with snoowrap, take a look at the [documentation](https://not-an-aardvark.github.io/snoowrap) or the [test file](https://github.com/not-an-aardvark/snoowrap/blob/master/test/snoowrap.spec.js).
 
+### Quick example file
+
+```javascript
+'use strict';
+const snoowrap = require('snoowrap');
+
+/* Create a new snoowrap requester. If you're uncomfortable storing confidential info in your file, one solution is to
+simply store it in a json file and require() it. For more information on how to get valid credentials, see here: https://github.com/not-an-aardvark/reddit-oauth-helper */
+const r = new snoowrap({
+  client_id: 'put your client id here',
+  client_secret: 'put your client secret here',
+  refresh_token: 'put your refresh token here'
+});
+
+/* That's the entire setup process, now you can just make requests. I would recommend including async functions in your project
+by using babel.js (or some equivalent), but this example file uses vanilla Promises for simplicity. */
+
+// Submitting a link to a subreddit
+r.get_subreddit('gifs').submit_link({
+  title: 'Mt. Cameramanjaro',
+  url: 'https://i.imgur.com/n5iOc72.gifv'
+});
+
+// Printing a list of the titles on the front page
+r.get_hot().map(post => post.title).then(console.log);
+
+// Replying to comments that match certain criteria
+r.get_new_comments().fetch_until(500).forEach(comment => {
+  if (comment.body === 'ayy') {
+    comment.reply('lmao'); // (look at me I'm so original)
+  }
+});
+
+// Automating moderation tasks
+r.get_subreddit('some_subreddit_name').get_modqueue({limit: 100}).filter(/some-removal-condition/.test).forEach(flaggedItem => {
+  flaggedItem.remove();
+  flaggedItem.subreddit.ban_user(flaggedItem.author);
+  // (Probably overkill here, but that's none of my business and pretty much any functionality is there if you want it)
+});
+
+// Automatically creating a stickied thread for a moderated subreddit
+r.get_subreddit('some_subreddit_name')
+  .create_selfpost({title: 'Daily thread', text: 'Discuss things here'})
+  .sticky()
+  .distinguish()
+  .approve()
+  .assign_flair({text: 'Daily Thread flair text', css_class: 'daily-thread'})
+  .reply('This is a comment that appears on that daily thread');
+  // etc. etc.
+
+```
+
 ---
 
 ### To include in a project:
 1. `npm install snoowrap --save`
-1. (In some file): `var snoowrap = require('snoowrap');`
+1. `var snoowrap = require('snoowrap');`
 
 ### To build/run the tests independently:
 1. `git clone https://github.com/not-an-aardvark/snoowrap.git`
