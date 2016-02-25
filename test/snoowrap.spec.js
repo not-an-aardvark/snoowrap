@@ -49,6 +49,9 @@ describe('snoowrap', function () {
       expect(() => r.get_user('[deleted]').fetch()).to.throw(errors.InvalidUserError);
       expect(() => r.get_user(null).fetch()).to.throw(errors.InvalidUserError);
     });
+    it("can get a user's trophies", async () => {
+      expect(await user.get_trophies()).to.be.an.instanceof(snoowrap.objects.TrophyList);
+    });
   });
 
   describe('getting a comment', () => {
@@ -193,7 +196,7 @@ describe('snoowrap', function () {
       await r.update_preferences({min_link_score: current_prefs});
     });
     it("gets the current user's trophies", async () => {
-      expect(await r.get_trophies()).to.be.an.instanceof(snoowrap.objects.TrophyList);
+      expect(await r.get_my_trophies()).to.be.an.instanceof(snoowrap.objects.TrophyList);
     });
     it("gets the user's friends", async () => {
       expect(await r.get_friends()).to.be.an.instanceof(Array);
@@ -561,6 +564,12 @@ describe('snoowrap', function () {
       expect(await sub.get_moderators({name: 'snoowrap_testing'})[0].mod_permissions.sort()).to.eql(['flair', 'wiki']);
       await sub.set_moderator_permissions({name: 'snoowrap_testing'});
       expect(await sub.get_moderators({name: 'snoowrap_testing'})[0].mod_permissions).to.eql(['all']);
+    });
+    it('can add/remove a user as a friend', async () => {
+      await victim.friend();
+      expect(await victim.get_friend_information().name).to.equal(victim.name);
+      await victim.unfriend();
+      await victim.get_friend_information().then(expect.fail, res => expect(res.statusCode).to.equal(400));
     });
   });
 

@@ -298,7 +298,7 @@ const snoowrap = class snoowrap {
   * @memberof snoowrap
   * @instance
   */
-  get_trophies () {
+  get_my_trophies () {
     return this._get({uri: 'api/v1/me/trophies'});
   }
   /**
@@ -1166,6 +1166,35 @@ objects.RedditUser = class RedditUser extends objects.RedditContent {
   */
   assign_flair (options) {
     return promise_wrap(this._ac._assign_flair(_.assign(options, {name: this.name})).return(this));
+  }
+  /**
+  * Adds this user as a friend, or modifies their friend note.
+  * @param {object} $0
+  * @param {string} [$0.note] An optional note to add on the user (300 characters max)
+  */
+  friend ({note} = {}) {
+    return this._put({uri: `api/v1/me/friends/${this.name}`, json: {user: this.name, note}});
+  }
+  /**
+  * Removes this user from the requester's friend list.
+  * @returns {Promise} A Promise that fulfills with this user when the request is complete
+  */
+  unfriend () {
+    return this._delete({uri: `api/v1/me/friends/${this.name}`});
+  }
+  /**
+  * Gets information on this user related to their presence on the friend list.
+  * @returns {Promise} A Promise that fulfills with an object containing friend information
+  */
+  get_friend_information () {
+    return this._get({uri: `api/v1/me/friends/${this.name}`});
+  }
+  /**
+  * Gets a list of this user's trophies.
+  * @returns {Promise} A TrophyList containing this user's trophies
+  */
+  get_trophies () {
+    return this._get({uri: `api/v1/user/${this.name}/trophies`});
   }
 };
 
