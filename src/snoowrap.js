@@ -827,6 +827,8 @@ const snoowrap = class snoowrap {
   * Checks whether a given username is available for registration
   * @param {string} name The username in question
   * @returns {Promise} A Promise that fulfills with a Boolean (`true` or `false`)
+  * @memberof snoowrap
+  * @instance
   */
   check_username_availability (name) {
     // The oauth endpoint listed in reddit's documentation doesn't actually work, so just send an unauthenticated request.
@@ -924,7 +926,7 @@ objects.CreatableContent = class CreatableClass extends objects.RedditContent {
     return promise_wrap(this._post({uri: 'api/remove', form: {spam, id: this.name}}).return(this));
   }
   /**
-  * Removes this Comment, Submission, or PrivateMessage and marks it as spam. Equivalent to #remove({spam: true})
+  * Removes this Comment, Submission, or PrivateMessage and marks it as spam.
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
   */
   mark_as_spam () {
@@ -1257,7 +1259,7 @@ objects.RedditUser = class RedditUser extends objects.RedditContent {
     return this._get({uri: `user/${this.name}/hidden`, qs: options});
   }
   /**
-  * Gets a Listing of this user's submissions/comments which have been gilded.
+  * Gets a Listing of this user's content which has been gilded.
   * @param {object} [options] Options for the resulting Listing
   * @returns {Promise} A Listing containing Submissions and Comments
   */
@@ -2372,7 +2374,6 @@ objects.Listing = class Listing extends Array {
   }
   /**
   * This is a getter that is true if there are no more items left to fetch, and false otherwise.
-  * @type {number}
   */
   get is_finished () {
     if (this._is_comment_list) {
