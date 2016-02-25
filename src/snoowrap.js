@@ -1196,6 +1196,74 @@ objects.RedditUser = class RedditUser extends objects.RedditContent {
   get_trophies () {
     return this._get({uri: `api/v1/user/${this.name}/trophies`});
   }
+  /**
+  * Gets a Listing of the content this user has submitted.
+  * @param {object} [options] Options for the resulting Listing
+  * @returns {Promise} A Listing containing Submissions and Comments
+  */
+  get_overview (options) {
+    return this._get({uri: `user/${this.name}/overview`, qs: options});
+  }
+  /**
+  * Gets a Listing of this user's submissions.
+  * @param {object} [options] Options for the resulting Listing
+  * @returns {Promise} A Listing containing Submissions
+  */
+  get_submissions (options) {
+    return this._get({uri: `user/${this.name}/submitted`, qs: options});
+  }
+  /**
+  * Gets a Listing of this user's comments.
+  * @param {object} [options] Options for the resulting Listing
+  * @returns {Promise} A Listing containing Comments
+  */
+  get_comments (options) {
+    return this._get({uri: `user/${this.name}/comments`, qs: options});
+  }
+  /**
+  * Gets a Listing of the content that this user has upvoted.
+  * @param {object} [options] Options for the resulting Listing
+  * @returns {Promise} A Listing containing Submissions and Comments. Note that this can only be used to view one's own
+  upvoted content, unless the user in question has chosen to make this information public in their preferences.
+  */
+  get_upvoted_content (options) {
+    return this._get({uri: `user/${this.name}/upvoted`, qs: options});
+  }
+  /**
+  * Gets a Listing of the content that this user has downvoted.
+  * @param {object} [options] Options for the resulting Listing
+  * @returns {Promise} A Listing containing Submissions and Comments. Note that this can only be used to view one's own
+  downvoted content, unless the user in question has chosen to make this information public in their preferences.
+  */
+  get_downvoted_content (options) {
+    return this._get({uri: `user/${this.name}/downvoted`, qs: options});
+  }
+  /**
+  * Gets a Listing of the submissions that this user has hidden.
+  * @param {object} [options] Options for the resulting Listing
+  * @returns {Promise} A Listing containing Submissions. Note that this can only be used to view one's own set of hidden
+  posts, as reddit will return a 403 error when attempting to view other users' hidden posts.
+  */
+  get_hidden_content (options) {
+    return this._get({uri: `user/${this.name}/hidden`, qs: options});
+  }
+  /**
+  * Gets a Listing of the content that this user has saved.
+  * @param {object} [options] Options for the resulting Listing
+  * @returns {Promise} A Listing containing Submissions and Comments. Note that this can only be used to view one's own set
+  of saved content, as reddit will return a 403 error when attempting to view other users' saved content.
+  */
+  get_saved_content (options) {
+    return this._get({uri: `user/${this.name}/hidden`, qs: options});
+  }
+  /**
+  * Gets a Listing of this user's submissions/comments which have been gilded.
+  * @param {object} [options] Options for the resulting Listing
+  * @returns {Promise} A Listing containing Submissions and Comments
+  */
+  get_gilded_content (options) {
+    return this._get({uri: `user/${this.name}/gilded`, qs: options});
+  }
 };
 
 /**

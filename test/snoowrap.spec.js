@@ -52,6 +52,34 @@ describe('snoowrap', function () {
     it("can get a user's trophies", async () => {
       expect(await user.get_trophies()).to.be.an.instanceof(snoowrap.objects.TrophyList);
     });
+    it("can get a user's overview", async () => {
+      expect(await user.get_overview()).to.be.an.instanceof(snoowrap.objects.Listing);
+    });
+    it("can get a user's submissions", async () => {
+      const submissions = await user.get_submissions();
+      expect(submissions).to.be.an.instanceof(snoowrap.objects.Listing);
+      expect(submissions[0]).to.be.an.instanceof(snoowrap.objects.Submission);
+    });
+    it("can get a user's comments", async () => {
+      const comments = await user.get_comments();
+      expect(comments).to.be.an.instanceof(snoowrap.objects.Listing);
+      expect(comments[0]).to.be.an.instanceof(snoowrap.objects.Comment);
+    });
+    it("can get a user's upvoted content", async () => {
+      expect(await user.get_upvoted_content()).to.be.an.instanceof(snoowrap.objects.Listing);
+    });
+    it("can get a user's downvoted content", async () => {
+      expect(await user.get_downvoted_content()).to.be.an.instanceof(snoowrap.objects.Listing);
+    });
+    it("can get a user's hidden content", async () => {
+      expect(await user.get_hidden_content()).to.be.an.instanceof(snoowrap.objects.Listing);
+    });
+    it("can get a user's saved content", async () => {
+      expect(await user.get_saved_content()).to.be.an.instanceof(snoowrap.objects.Listing);
+    });
+    it("can get a user's gilded content", async () => {
+      expect(await user.get_gilded_content()).to.be.an.instanceof(snoowrap.objects.Listing);
+    });
   });
 
   describe('getting a comment', () => {
