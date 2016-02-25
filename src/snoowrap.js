@@ -859,7 +859,7 @@ objects.RedditContent = class RedditContent {
     this._ac = _ac;
     this._fetch = undefined;
     this._has_fetched = !!_has_fetched;
-    _.assignIn(this, options);
+    _.assign(this, options);
     return new Proxy(this, {get: (target, key) => {
       if (key in target || key === 'length' || key in Promise.prototype || target._has_fetched) {
         return target[key];
