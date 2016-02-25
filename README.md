@@ -108,6 +108,8 @@ r.get_subreddit('some_subreddit_name')
 1. `npm install`
 1. `npm test`
 
+---
+
 Note: snoowrap uses the `Proxy` object introduced in ES6. Since this is not yet included in Node by default, you will need to run your project with the `--harmony-proxies` flag. E.g. `node --harmony-proxies yourProject.js`
 
 snoowrap is currently in active development; while it provides shortcuts for a large number of API endpoints, it is not yet feature-complete. See [here](https://not-an-aardvark.github.io/snoowrap) for full documentation.
