@@ -66,8 +66,7 @@ const snoowrap = class snoowrap {
       headers: {'user-agent': this.user_agent},
       baseUrl: `https://oauth.${this._config.endpoint_domain}`,
       qs: {raw_json: 1}, // This tells reddit to unescape html characters, e.g. it will send '<' instead of '&lt;'
-      resolveWithFullResponse: true,
-      transform: function (body, response) {
+      transform: (body, response) => {
         this.ratelimit_remaining = response.headers['x-ratelimit-remaining'];
         this.ratelimit_reset_point = moment().add(response.headers['x-ratelimit-reset'], 'seconds');
         const populated = helpers._populate(body, this);
@@ -75,7 +74,7 @@ const snoowrap = class snoowrap {
           populated.uri = response.request.uri.path;
         }
         return populated;
-      }.bind(this)
+      }
     });
   }
   async _handle_request (requester, args, attempts = 0) {
@@ -109,11 +108,11 @@ const snoowrap = class snoowrap {
       // Send the request and return the response.
       return await requester.defaults({auth: {bearer: this.access_token}})(...args);
     } catch (err) {
-      if (attempts + 1 < this._config.max_retry_attempts && _.includes(this._config.retry_error_codes, err.statusCode)) {
-        this.warn(`Warning: Received status code ${err.statusCode} from reddit. Retrying request...`);
-        return this._handle_request(requester, args, attempts + 1);
+      if (attempts + 1 >= this._config.max_retry_attempts || !_.includes(this._config.retry_error_codes, err.statusCode)) {
+        throw err;
       }
-      throw err;
+      this.warn(`Warning: Received status code ${err.statusCode} from reddit. Retrying request...`);
+      return await this._handle_request(requester, args, attempts + 1);
     }
   }
   _new_object (object_type, content, _has_fetched) {
