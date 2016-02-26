@@ -351,7 +351,7 @@ const snoowrap = class snoowrap {
     return this._get({uri: `captcha/${identifier}`});
   }
   /**
-  * Gets an array of categories that items can be saved it. (Requires reddit gold)
+  * Gets an array of categories that items can be saved in. (Requires reddit gold)
   * @returns {Promise} An array of categories
   * @memberof snoowrap
   * @instance
