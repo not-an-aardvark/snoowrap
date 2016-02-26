@@ -919,7 +919,7 @@ constants.HTTP_VERBS.forEach(type => {
 * A set of mixin functions that apply to Submissions, Comments, and PrivateMessages
 * @extends objects.RedditContent
 */
-objects.CreatableContent = class CreatableClass extends objects.RedditContent {
+objects.ReplyableContent = class ReplyableContent extends objects.RedditContent {
   /**
   * Removes this Comment, Submission or PrivateMessage from public listings. Also see: #delete()
   * @param {boolean} [$0.spam=false] Determines whether this should be marked as spam
@@ -980,9 +980,9 @@ objects.CreatableContent = class CreatableClass extends objects.RedditContent {
 
 /**
 * A set of mixin functions that apply to Submissions and Comments.
-* @extends objects.CreatableContent
+* @extends objects.ReplyableContent
 */
-objects.VoteableContent = class VoteableContent extends objects.CreatableContent {
+objects.VoteableContent = class VoteableContent extends objects.ReplyableContent {
   /**
   * Casts a vote on this Comment or Submission.
   * @private
@@ -1123,7 +1123,7 @@ objects.VoteableContent = class VoteableContent extends objects.CreatableContent
 
 /**
 * A class representing a reddit comment
-* @extends CreatableContent
+* @extends ReplyableContent
 */
 objects.Comment = class Comment extends objects.VoteableContent {
   _transform_api_response (response_obj) {
@@ -1140,7 +1140,7 @@ objects.Comment = class Comment extends objects.VoteableContent {
 
 /**
 * A class representing a reddit user
-* @extends CreatableContent
+* @extends ReplyableContent
 */
 objects.RedditUser = class RedditUser extends objects.RedditContent {
   get _uri () {
@@ -1273,7 +1273,7 @@ objects.RedditUser = class RedditUser extends objects.RedditContent {
 
 /**
 * A class representing a reddit submission
-* @extends CreatableContent
+* @extends ReplyableContent
 */
 objects.Submission = class Submission extends objects.VoteableContent {
   get _uri () {
@@ -1462,9 +1462,9 @@ objects.Submission = class Submission extends objects.VoteableContent {
 
 /**
 * A class representing a private message or a modmail.
-* @extends CreatableContent
+* @extends ReplyableContent
 */
-objects.PrivateMessage = class PrivateMessage extends objects.CreatableContent {
+objects.PrivateMessage = class PrivateMessage extends objects.ReplyableContent {
   get _uri () {
     return `message/messages/${this.name.slice(3)}`;
   }
