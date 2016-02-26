@@ -117,6 +117,9 @@ const snoowrap = class snoowrap {
     }
   }
   _new_object (object_type, content, _has_fetched) {
+    if (Array.isArray(content)) {
+      return content;
+    }
     return new objects[object_type](content, this, _has_fetched);
   }
   /**
@@ -2343,14 +2346,140 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
       form: {api_type, name, permissions: helpers._format_permissions(permissions), type: 'moderator'}
     }).bind(this).tap(helpers._handle_json_errors);
   }
+  /**
+  * Gets a given wiki page on this subreddit.
+  * @param {string} title The title of the desired wiki page.
+  * @returns {WikiPage} An unfetched WikiPage object corresponding to the desired wiki page
+  */
   get_wiki_page (title) {
     return this._ac._new_object('WikiPage', {subreddit: this, title});
   }
+  /**
+  * Gets the list of wiki pages on this subreddit.
+  * @returns {Promise} An Array containing WikiPage objects
+  */
+  get_wiki_pages () {
+    return this._get({uri: `r/${this.display_name}/wiki/pages`}).then(result =>
+      _.map(result, title => this.get_wiki_page(title))
+    );
+  }
+  /**
+  * Gets a list of revisions on this subreddit's wiki.
+  * @param {object} [options] Options for the resulting Listing
+  * @returns {Promise} A Listing containing wiki revisions
+  */
+  get_wiki_revisions (options) {
+    return this._get({uri: `r/${this.display_name}/wiki/revisions`, qs: options});
+  }
 };
 
+/**
+* A class representing a wiki page on a subreddit.
+* @extends objects.RedditContent
+*/
 objects.WikiPage = class WikiPage extends objects.RedditContent {
   get _uri () {
     return `r/${this.subreddit.display_name}/wiki/${this.title}`;
+  }
+  /**
+  * Gets the current settings for this wiki page.
+  * @returns {Promise} An Object representing the settings for this page
+  */
+  get_settings () {
+    return this._get({uri: `r/${this.subreddit.display_name}/wiki/settings/${this.title}`});
+  }
+  /**
+  * Edits the settings for this wiki page.
+  * @param {object} $0
+  * @param {boolean} listed Determines whether this wiki page should appear on the public list of pages for this subreddit.
+  * @param {number} Determines who should be allowed to access and edit this page `0` indicates that this subreddit's
+  default wiki settings should get used, `1` indicates that only approved wiki contributors on this subreddit should be
+  able to edit this page, and `2` indicates that only mods should be able to view and edit this page.
+  */
+  edit_settings ({listed, permission_level}) {
+    return promise_wrap(this._post({
+      uri: `r/${this.subreddit.display_name}/wiki/settings/${this.title}`,
+      form: {listed, permlevel: permission_level}
+    }).return(this));
+  }
+  _modify_editor ({name, action}) {
+    return this._post({
+      uri: `r/${this.subreddit.display_name}/api/wiki/alloweditor/${action}`,
+      form: {page: this.title, username: name}
+    });
+  }
+  /**
+  * Makes the given user an approved editor of this wiki page.
+  * @param {object} $0
+  * @param {string} $0.name The name of the user to be added
+  * @returns {Promise} A Promise that fulfills with this WikiPage when the request is complete
+  */
+  add_editor ({name}) {
+    return promise_wrap(this._modify_editor({name, action: 'add'}).return(this));
+  }
+  /**
+  * Revokes this user's approved editor status for this wiki page
+  * @param {object} $0
+  * @param {string} $0.name The name of the user to be removed
+  * @returns {Promise} A Promise that fulfills with this WikiPage when the request is complete
+  */
+  remove_editor ({name}) {
+    return promise_wrap(this._modify_editor({name, action: 'del'}).return(this));
+  }
+  /**
+  * Edits this wiki page.
+  * @param {object} $0
+  * @param {string} $0.text The new content of the page, in markdown.
+  * @param {string} [$0.reason] The edit reason that will appear in this page's revision history. 256 characters max
+  * @param {string} [$0.previous_revision] Determines which revision this edit should be added to. If this parameter is
+  omitted, this edit is simply added to the most recent revision.
+  * @returns {Promise} A Promise that fulfills with this WikiPage when the request is complete
+  */
+  edit ({text, reason, previous_revision}) {
+    return promise_wrap(this._post({
+      uri: `r/${this.subreddit.display_name}/api/wiki/edit`,
+      form: {content: text, page: this.title, previous: previous_revision, reason}
+    }).return(this));
+  }
+  /**
+  * Gets a list of revisions for this wiki page.
+  * @param {object} [options] Options for the resulting Listing
+  * @returns {Promise} A Listing containing revisions of this page
+  */
+  get_revisions (options) {
+    return this._get({uri: `r/${this.subreddit.display_name}/wiki/revisions/${this.title}`, qs: options});
+  }
+  /**
+  * Hides the given revision from this page's public revision history.
+  * @param {object} $0
+  * @param {string} $0.id The revision's id
+  * @returns {Promise} A Promise that fulfills with this WikiPage when the request is complete
+  */
+  hide_revision ({id}) {
+    return promise_wrap(this._post({
+      uri: `r/${this.subreddit.display_name}/api/wiki/hide`,
+      qs: {page: this.title, revision: id}
+    }).return(this));
+  }
+  /**
+  * Reverts this wiki page to the given point.
+  * @param {object} $0
+  * @param {string} $0.id The id of the revision that this page should be reverted to
+  * @returns {Promise} A Promise that fulfills with this WikiPage when the request is complete
+  */
+  revert ({id}) {
+    return promise_wrap(this._post({
+      uri: `r/${this.subreddit.display_name}/api/wiki/revert`,
+      qs: {page: this.title, revision: id}
+    }).return(this));
+  }
+  /**
+  * Gets a list of discussions about this wiki page.
+  * @param {object} [options] Options for the resulting Listing
+  * @returns {Promise} A Listing containing discussions about this page
+  */
+  get_discussions (options) {
+    return this._get({uri: `r/${this.subreddit.display_name}/wiki/discussions/${this.title}`, qs: options});
   }
 };
 
@@ -2488,6 +2617,8 @@ objects.KarmaList = class KarmaList extends objects.RedditContent {};
 objects.TrophyList = class TrophyList extends objects.RedditContent {};
 objects.SubredditSettings = class SubredditSettings extends objects.RedditContent {};
 objects.ModAction = class ModAction extends objects.RedditContent {};
+objects.WikiPageSettings = class WikiPageSettings extends objects.RedditContent {};
+objects.WikiPageListing = class WikiPageListing extends objects.RedditContent {};
 
 snoowrap.objects = objects;
 snoowrap.helpers = helpers;

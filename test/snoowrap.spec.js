@@ -209,7 +209,7 @@ describe('snoowrap', function () {
       expect(me.name).to.be.a('string');
     });
     it("gets the requester's karma", async () => {
-      expect(await r.get_karma()).to.be.an.instanceof(snoowrap.objects.KarmaList);
+      expect(await r.get_karma()).to.be.an.instanceof(Array);
     });
     it('gets current preferences', async () => {
       const prefs = await r.get_preferences();
@@ -627,14 +627,53 @@ describe('snoowrap', function () {
   });
 
   describe('wiki content', () => {
-    let sub;
+    let page1, page2;
     before(() => {
-      sub = r.get_subreddit('snoowrap_testing');
+      const sub = r.get_subreddit('snoowrap_testing');
+      page1 = sub.get_wiki_page('exciting_page_name');
+      page2 = sub.get_wiki_page('another_exciting_page_name');
     });
-    it.only('can get the content of a wiki page', async () => {
-      const page = sub.get_wiki_page('exciting_page_name');
-      expect(page).to.be.an.instanceof(snoowrap.objects.WikiPage);
-      expect(await page.content_md).to.equal('blah blah blah content');
+    it('can get the content of a wiki page', async () => {
+      expect(page1).to.be.an.instanceof(snoowrap.objects.WikiPage);
+      expect(await page1.content_md).to.equal('blah blah blah content');
+    });
+    it('can add/remove an editor to a wiki page', async () => {
+      await page1.add_editor({name: 'actually_an_aardvark'});
+      expect(_.find(await page1.get_settings().editors, {name: 'actually_an_aardvark'})).to.not.be.undefined();
+      await page1.remove_editor({name: 'actually_an_aardvark'});
+      expect(_.find(await page1.get_settings().editors, {name: 'actually_an_aardvark'})).to.be.undefined();
+    });
+    it('can edit the settings on a wiki page', async () => {
+      await page1.edit_settings({listed: true, permission_level: 2});
+      expect(await page1.get_settings().permlevel).to.equal(2);
+      await page1.edit_settings({listed: true, permission_level: 0});
+      expect(await page1.get_settings().permlevel).to.equal(0);
+    });
+    it('can edit a wiki page', async () => {
+      const new_content = moment().format();
+      await page2.edit({text: new_content, reason: `unit tests ${new_content}`});
+      expect(await page2.refresh().content_md).to.equal(new_content);
+    });
+    it('can get the revision history for a wiki page', async () => {
+      expect(await page2.get_revisions()).to.be.an.instanceof(snoowrap.objects.Listing);
+    });
+    it('can get the wiki revision history for a subreddit', async () => {
+      expect(await r.get_subreddit('snoowrap_testing').get_wiki_revisions()).to.be.an.instanceof(snoowrap.objects.Listing);
+    });
+    it('can revert to a given revision', async () => {
+      const history = await page2.get_revisions();
+      await page2.revert(history[1]);
+      const updated_history = await page2.get_revisions();
+      expect(history[0].id).to.equal(updated_history[1].id);
+      expect(_.find(history, updated_history[0])).to.be.undefined();
+    });
+    it('can get the discussions for a wiki page', async () => {
+      expect(await page2.get_discussions()).to.be.an.instanceof(snoowrap.objects.Listing);
+    });
+    it('can get a list of wiki pages on a subreddit', async () => {
+      const pages = await r.get_subreddit('snoowrap_testing').get_wiki_pages();
+      expect(pages).to.be.an.instanceof(Array);
+      expect(pages[0]).to.be.an.instanceof(snoowrap.objects.WikiPage);
     });
   });
 

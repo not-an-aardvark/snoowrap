@@ -21,7 +21,9 @@ module.exports = {
     TrophyList: 'TrophyList',
     subreddit_settings: 'SubredditSettings',
     modaction: 'ModAction',
-    wikipage: 'WikiPage'
+    wikipage: 'WikiPage',
+    wikipagesettings: 'WikiPageSettings',
+    wikipagelisting: 'WikiPageListing'
   },
   USERNAME_REGEX: /^[\w-]{1,20}$/,
   MODERATOR_PERMISSIONS: ['wiki', 'posts', 'access', 'mail', 'config', 'flair'],
