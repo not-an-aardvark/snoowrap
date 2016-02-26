@@ -2343,6 +2343,15 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
       form: {api_type, name, permissions: helpers._format_permissions(permissions), type: 'moderator'}
     }).bind(this).tap(helpers._handle_json_errors);
   }
+  get_wiki_page (title) {
+    return this._ac._new_object('WikiPage', {subreddit: this, title});
+  }
+};
+
+objects.WikiPage = class WikiPage extends objects.RedditContent {
+  get _uri () {
+    return `r/${this.subreddit.display_name}/wiki/${this.title}`;
+  }
 };
 
 /**
@@ -2477,8 +2486,8 @@ objects.Trophy = class Trophy extends objects.RedditContent {};
 objects.PromoCampaign = class PromoCampaign extends objects.RedditContent {};
 objects.KarmaList = class KarmaList extends objects.RedditContent {};
 objects.TrophyList = class TrophyList extends objects.RedditContent {};
-objects.subreddit_settings = class subreddit_settings extends objects.RedditContent {};
-objects.modaction = class modaction extends objects.RedditContent {};
+objects.SubredditSettings = class SubredditSettings extends objects.RedditContent {};
+objects.ModAction = class ModAction extends objects.RedditContent {};
 
 snoowrap.objects = objects;
 snoowrap.helpers = helpers;

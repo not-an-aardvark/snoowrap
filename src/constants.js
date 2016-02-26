@@ -19,8 +19,9 @@ module.exports = {
     UserList: 'UserList',
     KarmaList: 'KarmaList',
     TrophyList: 'TrophyList',
-    subreddit_settings: 'subreddit_settings',
-    modaction: 'modaction'
+    subreddit_settings: 'SubredditSettings',
+    modaction: 'ModAction',
+    wikipage: 'WikiPage'
   },
   USERNAME_REGEX: /^[\w-]{1,20}$/,
   MODERATOR_PERMISSIONS: ['wiki', 'posts', 'access', 'mail', 'config', 'flair'],

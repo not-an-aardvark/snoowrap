@@ -625,6 +625,19 @@ describe('snoowrap', function () {
       expect(timer.isFulfilled()).to.be.true();
     });
   });
+
+  describe('wiki content', () => {
+    let sub;
+    before(() => {
+      sub = r.get_subreddit('snoowrap_testing');
+    });
+    it.only('can get the content of a wiki page', async () => {
+      const page = sub.get_wiki_page('exciting_page_name');
+      expect(page).to.be.an.instanceof(snoowrap.objects.WikiPage);
+      expect(await page.content_md).to.equal('blah blah blah content');
+    });
+  });
+
   describe('Creating new content', () => {
     // These should all pass, but they're skipped by default to avoid spam since they permanently write content to reddit.
     it.skip('can create a linkpost given a subreddit object, and then delete the post', async () => {
