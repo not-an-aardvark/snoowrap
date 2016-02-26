@@ -2391,10 +2391,10 @@ objects.WikiPage = class WikiPage extends objects.RedditContent {
   /**
   * Edits the settings for this wiki page.
   * @param {object} $0
-  * @param {boolean} listed Determines whether this wiki page should appear on the public list of pages for this subreddit.
-  * @param {number} Determines who should be allowed to access and edit this page `0` indicates that this subreddit's
-  default wiki settings should get used, `1` indicates that only approved wiki contributors on this subreddit should be
-  able to edit this page, and `2` indicates that only mods should be able to view and edit this page.
+  * @param {boolean} $0.listed Determines whether this wiki page should appear on the public list of pages for this subreddit.
+  * @param {number} $0.permission_level Determines who should be allowed to access and edit this page `0` indicates that this
+  subreddit's default wiki settings should get used, `1` indicates that only approved wiki contributors on this subreddit
+  should be able to edit this page, and `2` indicates that only mods should be able to view and edit this page.
   */
   edit_settings ({listed, permission_level}) {
     return promise_wrap(this._post({
