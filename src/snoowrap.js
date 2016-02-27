@@ -753,6 +753,21 @@ const snoowrap = class snoowrap {
       headers: {'user-agent': this.user_agent}
     });
   }
+  /**
+  * Creates a new LiveThread.
+  * @param {object} $0
+  * @param {string} $0.title The title of the livethread (100 characters max)
+  * @param {string} [$0.description] A descriptions of the thread. 120 characters max
+  * @param {string} [$0.resources] Information and useful links related to the thread. 120 characters max
+  * @param {boolean} [$0.nsfw=false] Determines whether the thread is Not Safe For Work
+  * @returns {Promise} A Promise that fulfills with the new LiveThread when the request is complete
+  */
+  create_livethread ({title, description, resources, nsfw = false}) {
+    return promise_wrap(this._post({
+      uri: 'api/live/create',
+      form: {api_type, description, nsfw, resources, title}
+    }).tap(helpers._handle_json_errors).then(result => this.get_livethread(result.json.data.id)));
+  }
 };
 
 _.forEach(constants.HTTP_VERBS, type => {
