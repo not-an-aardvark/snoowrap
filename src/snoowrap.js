@@ -2334,7 +2334,7 @@ objects.WikiPage = class WikiPage extends objects.RedditContent {
     return promise_wrap(this._modify_editor({name, action: 'del'}).return(this));
   }
   /**
-  * @summary Edits this wiki page.
+  * @summary Edits this wiki page, or creates it if it does not exist yet.
   * @param {object} $0
   * @param {string} $0.text The new content of the page, in markdown.
   * @param {string} [$0.reason] The edit reason that will appear in this page's revision history. 256 characters max
