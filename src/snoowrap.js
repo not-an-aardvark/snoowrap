@@ -16,7 +16,7 @@ const helpers = require('./helpers');
 
 
 /** The class for a snoowrap requester */
-const snoowrap = class snoowrap {
+const snoowrap = class {
   /**
   * @summary Constructs a new requester. This will be necessary if you want to do anything.
   * @param {object} $0 An Object containing credentials.  This should have the properties (a) `user_agent`,
@@ -45,6 +45,9 @@ const snoowrap = class snoowrap {
     this.access_token = access_token;
     this._config = require('./default_config');
     this._throttle = Promise.resolve();
+  }
+  static get name () {
+    return constants.MODULE_NAME;
   }
   get _base_client_requester () {
     return request.defaults({
@@ -191,7 +194,7 @@ const snoowrap = class snoowrap {
       }
       return value;
     }).value();
-    return `<${constants.MODULE_NAME} authenticated client> ${util.inspect(formatted)}`;
+    return `${constants.MODULE_NAME} ${util.inspect(formatted)}`;
   }
   warn (...args) {
     if (!this._config.suppress_warnings) {
@@ -777,7 +780,7 @@ _.forEach(constants.HTTP_VERBS, type => {
 });
 
 /** A base class for content from reddit. With the expection of Listings, all content types extend this class. */
-objects.RedditContent = class RedditContent {
+objects.RedditContent = class {
   constructor (options, _ac, _has_fetched) {
     this._ac = _ac;
     this._fetch = undefined;
@@ -823,7 +826,7 @@ objects.RedditContent = class RedditContent {
     return _.omitBy(this, (value, key) => key.startsWith('_'));
   }
   inspect () {
-    return `<${constants.MODULE_NAME}.objects.${this.constructor.name}> ${util.inspect(this.toJSON())}`;
+    return `${this.constructor.name} ${util.inspect(this.toJSON())}`;
   }
   _transform_api_response (response_object) {
     return response_object;
@@ -840,7 +843,7 @@ constants.HTTP_VERBS.forEach(type => {
 * A set of mixin functions that apply to Submissions, Comments, and PrivateMessages
 * @extends objects.RedditContent
 */
-objects.ReplyableContent = class ReplyableContent extends objects.RedditContent {
+objects.ReplyableContent = class extends objects.RedditContent {
   /**
   * @summary Removes this Comment, Submission or PrivateMessage from public listings.
   * @desc This requires the authenticated user to be a moderator of the subreddit with the `posts` permission.
@@ -905,7 +908,7 @@ objects.ReplyableContent = class ReplyableContent extends objects.RedditContent 
 * A set of mixin functions that apply to Submissions and Comments.
 * @extends objects.ReplyableContent
 */
-objects.VoteableContent = class VoteableContent extends objects.ReplyableContent {
+objects.VoteableContent = class extends objects.ReplyableContent {
   /**
   * @summary Casts a vote on this Comment or Submission.
   * @private
@@ -1047,7 +1050,7 @@ objects.VoteableContent = class VoteableContent extends objects.ReplyableContent
 * A class representing a reddit comment
 * @extends ReplyableContent
 */
-objects.Comment = class Comment extends objects.VoteableContent {
+objects.Comment = class extends objects.VoteableContent {
   _transform_api_response (response_obj) {
     const replies_uri = `comments/${response_obj[0].link_id.slice(3)}`;
     const replies_query = {comment: this.name.slice(3)};
@@ -1064,7 +1067,7 @@ objects.Comment = class Comment extends objects.VoteableContent {
 * A class representing a reddit user
 * @extends ReplyableContent
 */
-objects.RedditUser = class RedditUser extends objects.RedditContent {
+objects.RedditUser = class extends objects.RedditContent {
   get _uri () {
     if (typeof this.name !== 'string' || !constants.USERNAME_REGEX.test(this.name)) {
       throw new errors.InvalidUserError(this.name);
@@ -1201,7 +1204,7 @@ objects.RedditUser = class RedditUser extends objects.RedditContent {
 * A class representing a reddit submission
 * @extends ReplyableContent
 */
-objects.Submission = class Submission extends objects.VoteableContent {
+objects.Submission = class extends objects.VoteableContent {
   get _uri () {
     return `comments/${this.name.slice(3)}`;
   }
@@ -1390,7 +1393,7 @@ objects.Submission = class Submission extends objects.VoteableContent {
 * A class representing a private message or a modmail.
 * @extends ReplyableContent
 */
-objects.PrivateMessage = class PrivateMessage extends objects.ReplyableContent {
+objects.PrivateMessage = class extends objects.ReplyableContent {
   get _uri () {
     return `message/messages/${this.name.slice(3)}`;
   }
@@ -1439,7 +1442,7 @@ objects.PrivateMessage = class PrivateMessage extends objects.ReplyableContent {
 * A class representing a subreddit
 * @extends RedditContent
 */
-objects.Subreddit = class Subreddit extends objects.RedditContent {
+objects.Subreddit = class extends objects.RedditContent {
   get _uri () {
     return `r/${this.display_name}/about`;
   }
@@ -2299,7 +2302,7 @@ objects.Subreddit = class Subreddit extends objects.RedditContent {
 * A class representing a wiki page on a subreddit.
 * @extends objects.RedditContent
 */
-objects.WikiPage = class WikiPage extends objects.RedditContent {
+objects.WikiPage = class extends objects.RedditContent {
   get _uri () {
     return `r/${this.subreddit.display_name}/wiki/${this.title}`;
   }
@@ -2433,7 +2436,7 @@ some_livethread.stream.on('update', data => {
 });
 ```
 */
-objects.LiveThread = class LiveThread extends objects.RedditContent {
+objects.LiveThread = class extends objects.RedditContent {
   get _uri () {
     return `live/${this.id}/about`;
   }
@@ -2628,7 +2631,7 @@ and #fetch_all() functions.
 
 Most methods that return Listings will also accept `limit`, `after`, `before`, `show`, and `count` properties.
 */
-objects.Listing = class Listing extends Array {
+objects.Listing = class extends Array {
   constructor ({children = [], query = {}, show_all = true, limit, _transform = _.identity,
       uri, method = 'get', after, before, _is_comment_list = false} = {}, _ac) {
     super();
@@ -2718,11 +2721,11 @@ objects.Listing = class Listing extends Array {
     return this.fetch_more(length - this.length);
   }
   inspect () {
-    return `<${constants.MODULE_NAME}.objects.${this.constructor.name}> ${util.inspect(_.toArray(this))}`;
+    return `Listing ${util.inspect(_.toArray(this))}`;
   }
 };
 
-objects.more = class more extends objects.RedditContent {
+objects.more = class extends objects.RedditContent {
   /* Requests to /api/morechildren are capped at 20 comments at a time, but requests to /api/info are capped at 100, so
   it's easier to send to the latter. The disadvantage is that comment replies are not automatically sent from requests
   to /api/info. */
@@ -2742,21 +2745,22 @@ objects.more = class more extends objects.RedditContent {
   }
 };
 
-objects.UserList = class UserList {
+objects.UserList = class {
   constructor (options, _ac) {
     return options.children.map(user => _ac._new_object('RedditUser', user, false));
   }
 };
 
-objects.Trophy = class Trophy extends objects.RedditContent {};
-objects.PromoCampaign = class PromoCampaign extends objects.RedditContent {};
-objects.KarmaList = class KarmaList extends objects.RedditContent {};
-objects.TrophyList = class TrophyList extends objects.RedditContent {};
-objects.SubredditSettings = class SubredditSettings extends objects.RedditContent {};
-objects.ModAction = class ModAction extends objects.RedditContent {};
-objects.WikiPageSettings = class WikiPageSettings extends objects.RedditContent {};
-objects.WikiPageListing = class WikiPageListing extends objects.RedditContent {};
-objects.LiveUpdate = class LiveUpdate extends objects.RedditContent {};
+_.forOwn(constants.KINDS, value => {
+  objects[value] = objects[value] || class extends objects.RedditContent {};
+});
+
+_.forOwn(objects, (value, key) => {
+  /* This is used to allow `objects.something = class {}` as opposed to `objects.something = class something {}`. The
+  alternative sets the class name properly under normal circumstances, but it causes issues when the code gets minifified,
+  since the class name changes. */
+  Reflect.defineProperty(value, 'name', {get: _.constant(key)});
+});
 
 snoowrap.objects = objects;
 snoowrap.helpers = helpers;
