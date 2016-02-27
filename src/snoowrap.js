@@ -900,7 +900,10 @@ objects.ReplyableContent = class extends objects.RedditContent {
   * @returns {Promise} A Promise that fulfills with the newly-created reply
   */
   reply (text) {
-    return this._post({uri: 'api/comment', form: {api_type, text, thing_id: this.name}}).json.data.things[0];
+    return promise_wrap(this._post({
+      uri: 'api/comment',
+      form: {api_type, text, thing_id: this.name}
+    }).tap(helpers._handle_json_errors)).json.data.things[0];
   }
 };
 
@@ -1008,8 +1011,8 @@ objects.VoteableContent = class extends objects.ReplyableContent {
     return promise_wrap(this._post({
       uri: 'api/editusertext',
       form: {api_type, text: updated_text, thing_id: this.name}
-    }).then(response => {
-      this._fetch = response.json.data.things[0];
+    }).tap(helpers._handle_json_errors).then(response => {
+      this._fetch = Promise.resolve(response.json.data.things[0]);
       return this;
     }));
   }

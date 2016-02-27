@@ -7,6 +7,7 @@ const snoowrap = require('..');
 const errors = require('../lib/errors');
 describe('snoowrap', function () {
   this.timeout(30000);
+  this.slow(20000);
   let r;
   before(() => {
     // oauth_info.json has the properties `user_agent`, `client_id`, `client_secret`, and `refresh_token`.
@@ -31,12 +32,12 @@ describe('snoowrap', function () {
   describe('getting a user profile', () => {
     let user;
     beforeEach(() => {
-      user = r.get_user('not_an_aardvark');
+      user = r.get_user('snoowrap_testing');
     });
     it('gets information from a user profile', async () => {
       const fetched_user = await user.fetch();
-      expect(fetched_user.name).to.equal('not_an_aardvark');
-      expect(fetched_user.created_utc).to.equal(1419104352);
+      expect(fetched_user.name).to.equal('snoowrap_testing');
+      expect(fetched_user.created_utc).to.equal(1453703196);
       expect(fetched_user.nonexistent_property).to.be.undefined();
     });
     it('returns individual properties as Promises', async () => {
@@ -113,7 +114,10 @@ describe('snoowrap', function () {
       // Reddit caches stylesheets for awhile, so this is annoying to test reliably. Make sure the sheet is fetched, at least
       expect(await subreddit.get_stylesheet()).to.match(/^\.stylesheet-[0-9a-f]{8}/);
     });
-    it("can get and modify a subreddit's settings", async () => {
+    it("can get and modify a subreddit's settings", async function () {
+      if (await r.check_captcha_requirement()) {
+        return this.skip();
+      }
       await subreddit.edit_settings({public_traffic: false});
       expect(await subreddit.get_settings().public_traffic).to.be.false();
       await subreddit.edit_settings({public_traffic: true});
@@ -407,18 +411,18 @@ describe('snoowrap', function () {
   describe('comment/post actions', () => {
     let post, comment;
     beforeEach(() => {
-      post = r.get_submission('43qlu8');
-      comment = r.get_comment('czn0rpn');
+      post = r.get_submission('47ybh5');
+      comment = r.get_comment('d0g704c');
     });
     it('can edit a selfpost', async () => {
       const new_text = moment().format();
       await post.edit(new_text);
-      expect(post.selftext).to.equal(new_text);
+      expect(await post.refresh().selftext).to.equal(new_text);
     });
     it('can edit a comment', async () => {
       const new_text = moment().format();
       await comment.edit(new_text);
-      expect(comment.body).to.equal(new_text);
+      expect(await comment.refresh().body).to.equal(new_text);
     });
     it('can distinguish/undistinguish/sticky a comment', async () => {
       await comment.distinguish();
@@ -464,19 +468,19 @@ describe('snoowrap', function () {
 
   describe('private messages', () => {
     // Threads used for these tests:
-    // PMs: https://i.gyazo.com/d05f5cf5999e270b64c389984bc06f3e.png
+    // PMs: https://i.gyazo.com/24f3b97e55b6ff8e3a74cb026a58b167.png
     // Modmails: https://i.gyazo.com/f0e6de4190c7eef5368f9d12c25bacc7.png
     let message1, message2, message3;
     beforeEach(() => {
-      message1 = r.get_message('4wwx80');
-      message2 = r.get_message('4wwxe3');
-      message3 = r.get_message('4wwxhp');
+      message1 = r.get_message('51shnw');
+      message2 = r.get_message('51shsd');
+      message3 = r.get_message('51shxv');
     });
     it('can get the contents of the first message in a chain', async () => {
-      expect(await message1.body).to.equal('PM 1: not_an_aardvark --> actually_an_aardvark');
+      expect(await message1.body).to.equal('PM 1: snoowrap_testing --> not_an_aardvark');
     });
     it('can get the contents of a message later in a chain', async () => {
-      expect(await message2.body).to.equal('PM 2 (re: PM 1): actually_an_aardvark --> not_an_aardvark');
+      expect(await message2.body).to.equal('PM 2 (re: PM 1): not_an_aardvark --> snoowrap_testing');
     });
     it('can get replies to a message', async () => {
       expect(await message1.replies[0].name).to.equal(message2.name);
@@ -492,7 +496,7 @@ describe('snoowrap', function () {
   describe('inbox operations', () => {
     let message;
     before(async () => {
-      message = r.get_message('4wwxe3');
+      message = r.get_message('51shsd');
       await message.mark_as_unread(); // Used to make sure things can be marked properly from the inbox
     });
     it('can get a list of new messages in an inbox', async () => {
@@ -588,10 +592,10 @@ describe('snoowrap', function () {
       expect(await sub.get_wiki_contributors(victim)).to.have.lengthOf(0);
     });
     it("can change a moderator's permissions on a subreddit", async () => {
-      await sub.set_moderator_permissions({name: 'snoowrap_testing', permissions: ['flair', 'wiki']});
-      expect(await sub.get_moderators({name: 'snoowrap_testing'})[0].mod_permissions.sort()).to.eql(['flair', 'wiki']);
-      await sub.set_moderator_permissions({name: 'snoowrap_testing'});
-      expect(await sub.get_moderators({name: 'snoowrap_testing'})[0].mod_permissions).to.eql(['all']);
+      await sub.set_moderator_permissions({name: 'not_an_aardvark', permissions: ['flair', 'wiki']});
+      expect(await sub.get_moderators({name: 'not_an_aardvark'})[0].mod_permissions.sort()).to.eql(['flair', 'wiki']);
+      await sub.set_moderator_permissions({name: 'not_an_aardvark'});
+      expect(await sub.get_moderators({name: 'not_an_aardvark'})[0].mod_permissions).to.eql(['all']);
     });
     it('can add/remove a user as a friend', async () => {
       await victim.friend();
@@ -623,6 +627,9 @@ describe('snoowrap', function () {
       await r.get_user('not_an_aardvark').fetch();
       await r.get_user('actually_an_aardvark').fetch();
       expect(timer.isFulfilled()).to.be.true();
+    });
+    after(() => {
+      r.config({request_delay: 0});
     });
   });
 
@@ -719,10 +726,10 @@ describe('snoowrap', function () {
       expect(await thread.get_discussions()).to.be.an.instanceof(snoowrap.objects.Listing);
     });
     it('can modify the permissions of contributors on a livethread', async () => {
-      await thread.set_contributor_permissions({name: 'snoowrap_testing', permissions: ['edit']});
-      expect(_.find(await thread.get_contributors()[0], {name: 'snoowrap_testing'}).permissions).to.eql(['edit']);
-      await thread.set_contributor_permissions({name: 'snoowrap_testing'});
-      expect(_.find(await thread.get_contributors()[0], {name: 'snoowrap_testing'}).permissions).to.eql(['all']);
+      await thread.set_contributor_permissions({name: 'not_an_aardvark', permissions: ['edit']});
+      expect(_.find(await thread.get_contributors()[0], {name: 'not_an_aardvark'}).permissions).to.eql(['edit']);
+      await thread.set_contributor_permissions({name: 'not_an_aardvark'});
+      expect(_.find(await thread.get_contributors()[0], {name: 'not_an_aardvark'}).permissions).to.eql(['all']);
     });
     after(() => {
       thread.close_stream();
@@ -791,7 +798,6 @@ describe('snoowrap', function () {
     it.skip('can comment on a submission', async () => {
       const comment_body = moment().format();
       const new_comment = await r.get_submission('43qlu8').reply(comment_body);
-      console.log(new_comment);
       expect(new_comment).to.be.an.instanceof(snoowrap.objects.Comment);
       expect(await new_comment.body).to.equal(comment_body);
     });
