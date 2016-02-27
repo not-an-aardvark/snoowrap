@@ -10,8 +10,21 @@ describe('snoowrap', function () {
   this.slow(20000);
   let r;
   before(() => {
-    // oauth_info.json has the properties `user_agent`, `client_id`, `client_secret`, and `refresh_token`.
-    r = new snoowrap(require('../oauth_info.json'));
+    try {
+      // oauth_info.json has the properties `user_agent`, `client_id`, `client_secret`, and `refresh_token`.
+      r = new snoowrap(require('../oauth_info.json'));
+    } catch (err) {
+      if (process.env.CI) {
+        r = new snoowrap({
+          user_agent: process.env.SNOOWRAP_USER_AGENT,
+          client_id: process.env.SNOOWRAP_CLIENT_ID,
+          client_secret: process.env.SNOOWRAP_CLIENT_SECRET,
+          refresh_token: process.env.SNOOWRAP_REFRESH_TOKEN
+        });
+      } else {
+        throw err;
+      }
+    }
   });
 
   describe('.constructor', () => {
