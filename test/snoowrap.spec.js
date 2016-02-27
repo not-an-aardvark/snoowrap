@@ -677,6 +677,58 @@ describe('snoowrap', function () {
     });
   });
 
+  describe('livethreads', () => {
+    let thread;
+    before(async () => {
+      thread = r.get_livethread('whrdxo8dg9n0');
+      await thread.fetch();
+    });
+    it('can add and listen for content on a livethread using websockets', done => {
+      const new_update = moment().format();
+      thread.add_update(new_update);
+      thread.stream.once('update', data => {
+        expect(data.body).to.equal(new_update);
+        done();
+      });
+    });
+    it('can delete an update', done => {
+      thread.get_recent_updates()[0].then(most_recent_update => {
+        thread.delete_update(most_recent_update);
+      });
+      thread.stream.once('delete', () => done());
+    });
+    it('can edit the settings on a livethread', async () => {
+      const new_description = moment().format();
+      await thread.edit_settings({description: new_description, title: 'test livethread'});
+      expect(await thread.refresh().description).to.equal(new_description);
+    });
+    it('can invite a contributor, then revoke the invitation', async () => {
+      await thread.invite_contributor({name: 'actually_an_aardvark'});
+      await thread.revoke_contributor_invite({name: 'actually_an_aardvark'});
+    });
+    it('can strike an update', done => {
+      thread.get_recent_updates()[0].then(most_recent_update => {
+        thread.strike_update(most_recent_update);
+      });
+      thread.stream.once('strike', () => done());
+    });
+    it('can get recent updates on a livethread', async () => {
+      expect(await thread.get_recent_updates()).to.be.an.instanceof(snoowrap.objects.Listing);
+    });
+    it('can get the discussions on a livethread', async () => {
+      expect(await thread.get_discussions()).to.be.an.instanceof(snoowrap.objects.Listing);
+    });
+    it('can modify the permissions of contributors on a livethread', async () => {
+      await thread.set_contributor_permissions({name: 'snoowrap_testing', permissions: ['edit']});
+      expect(_.find(await thread.get_contributors()[0], {name: 'snoowrap_testing'}).permissions).to.eql(['edit']);
+      await thread.set_contributor_permissions({name: 'snoowrap_testing'});
+      expect(_.find(await thread.get_contributors()[0], {name: 'snoowrap_testing'}).permissions).to.eql(['all']);
+    });
+    after(() => {
+      thread.close_stream();
+    });
+  });
+
   describe('Creating new content', () => {
     // These should all pass, but they're skipped by default to avoid spam since they permanently write content to reddit.
     it.skip('can create a linkpost given a subreddit object, and then delete the post', async () => {

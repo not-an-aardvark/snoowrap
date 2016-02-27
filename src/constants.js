@@ -23,9 +23,12 @@ module.exports = {
     modaction: 'ModAction',
     wikipage: 'WikiPage',
     wikipagesettings: 'WikiPageSettings',
-    wikipagelisting: 'WikiPageListing'
+    wikipagelisting: 'WikiPageListing',
+    LiveUpdateEvent: 'LiveThread',
+    LiveUpdate: 'LiveUpdate'
   },
   USERNAME_REGEX: /^[\w-]{1,20}$/,
   MODERATOR_PERMISSIONS: ['wiki', 'posts', 'access', 'mail', 'config', 'flair'],
+  LIVETHREAD_PERMISSIONS: ['update', 'edit', 'manage'],
   HTTP_VERBS: ['get', 'head', 'post', 'put', 'delete', 'trace', 'options', 'connect', 'patch']
 };

@@ -55,11 +55,14 @@ exports.find_message_in_tree = (desired_message_name, current_message) => {
   }
 };
 
-exports._format_permissions = permissions_array => {
+exports._format_permissions = (all_permission_names, permissions_array) => {
   if (!permissions_array) {
     return '+all';
   }
-  return constants.MODERATOR_PERMISSIONS.map(type => (_.includes(permissions_array, type) ? '+' : '-') + type).join(',');
+  return all_permission_names.map(type => (_.includes(permissions_array, type) ? '+' : '-') + type).join(',');
 };
+
+exports._format_mod_permissions = _.partial(exports._format_permissions, constants.MODERATOR_PERMISSIONS);
+exports._format_livethread_permissions = _.partial(exports._format_permissions, constants.LIVETHREAD_PERMISSIONS);
 
 exports.rename_key = (obj, oldkey, newkey) => obj && _(_.clone(obj)).assign({[newkey]: obj[oldkey]}).omit([oldkey]).value();

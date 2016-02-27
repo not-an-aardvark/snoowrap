@@ -39,7 +39,8 @@
     "lodash": "^4.5.1",
     "moment": "^2.11.2",
     "promise-chains": "^0.2.4",
-    "request-promise": "^2.0.1"
+    "request-promise": "^2.0.1",
+    "ws": "^1.0.1"
   },
   "devDependencies": {
     "babel-cli": "^6.5.1",
