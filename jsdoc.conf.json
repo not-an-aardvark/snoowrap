@@ -1,11 +1,8 @@
 {
-  "tags": {
-    "allowUnknownTags": true
-  },
   "plugins": ["plugins/markdown"],
   "templates": {
     "logoFile": "",
-    "cleverLinks": false,
+    "cleverLinks": true,
     "monospaceLinks": false,
     "dateFormat": "ddd MMM Do YYYY",
     "outputSourceFiles": false,
@@ -28,6 +25,9 @@
     "hardwrap": false
   },
   "opts": {
-    "sort": false
+    "sort": false,
+    "destination": "./doc/",
+    "template": "./node_modules/ink-docstrap/template",
+    "readme": "./README.md"
   }
 }

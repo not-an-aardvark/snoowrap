@@ -753,13 +753,6 @@ _.forEach(constants.HTTP_VERBS, type => {
 
 /** A base class for content from reddit. With the expection of Listings, all content types extend this class. */
 objects.RedditContent = class RedditContent {
-  /**
-  * @summary Constructs a new RedditContent instance.
-  * @private
-  * @param {object} options The properties that the RedditContent should be initialized with
-  * @param {object} _ac The authenticated client (i.e. `snoowrap` instance) that is being used to fetch this object
-  * @param {boolean} _has_fetched Determines whether this object was created fully-formed (as opposed to lacking information)
-  */
   constructor (options, _ac, _has_fetched) {
     this._ac = _ac;
     this._fetch = undefined;
