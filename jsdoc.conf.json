@@ -1,0 +1,33 @@
+{
+  "tags": {
+    "allowUnknownTags": true
+  },
+  "plugins": ["plugins/markdown"],
+  "templates": {
+    "logoFile": "",
+    "cleverLinks": false,
+    "monospaceLinks": false,
+    "dateFormat": "ddd MMM Do YYYY",
+    "outputSourceFiles": false,
+    "outputSourcePath": false,
+    "systemName": "snoowrap",
+    "footer": "",
+    "copyright": "",
+    "navType": "vertical",
+    "theme": "yeti",
+    "linenums": false,
+    "collapseSymbols": false,
+    "inverseNav": false,
+    "protocol": "html://",
+    "methodHeadingReturns": false,
+    "includeDate": false,
+    "syntaxTheme": "dark"
+  },
+  "markdown": {
+    "parser": "gfm",
+    "hardwrap": false
+  },
+  "opts": {
+    "sort": false
+  }
+}
