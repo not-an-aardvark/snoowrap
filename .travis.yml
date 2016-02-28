@@ -16,12 +16,12 @@ deploy:
     api_key:
       secure: v4yrNmyFnIFbVL6MCTQFtRKtK+QPMG8dlI6i218gvL1m/CKmfsVhW+TFxVRhbgB77Evtprku2zS/wRtwzv+KHWQ83LFaNc3LnxW0JPe+AFbIDVBU6Q6lrieZspCzrqztvAu92uTvbE/P/RpoTGLmWVzDyBW9CT05oG9GmrpLvU2rE68UjhDEnSkZxCF3WKeDJCgWlHi+LOkZYPida3vWalnYnsc/mC3ulbQTu2O/AhlmGXq6ZaisJmu4lH8+UfXqnrTW6N1/I6/ZIc7x3zZHhoX/v/1cYpatS+qpN9tOH2jj3glUB1nX0uWA6XDlVFFc4ZHVB7Fg+pbzNELhU0wmyqGuW7JWJtHTW83cOZVBXjvgib2b6isDRNyTbS3z6NC4GxPrTilPDB+ir2oSG/mj+EsFFgiL4wswPqOlr+unB/FinQBn11jtJPrt1NbO3/fyQznUWMWom04evoYUqTOMIC7XSHBynvAow6N3P2ZnCP5GdjaUwpjTR9P1hZf+18lG55/oWAs5prHuqvGCOvU3pU8JImtGH5eWKTcLIUS7NhUU7SZVG0fI04fZ+uSx4/YnQ7tptkQZz41dw6BSzAzkWNeV20j92Ep2+pwgBJux9rMzS5G43eBt+o6dhPrxpUrk/NqdL2H5Qdr/HggNc9CisdldOa72dXDCoeAV/jn1+RU=
     on:
-      tags: true
       branch: npm-latest
+      tags: true
       repo: not-an-aardvark/snoowrap
   - provider: script
     script: scripts/build_docs.sh
     on:
-      tags: true
       branch: npm-latest
+      tags: true
       repo: not-an-aardvark/snoowrap
