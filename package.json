@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "pretest": "npm run lint && npm run compile",
     "test": "mocha --harmony_proxies --compilers js:babel-core/register",
-    "docs": "jsdoc lib/snoowrap.js -c jsdoc.conf.json"
+    "docs": "jsdoc lib/snoowrap.js lib/objects/* -c jsdoc.conf.json"
   },
   "repository": {
     "type": "git",

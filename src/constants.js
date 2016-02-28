@@ -30,5 +30,5 @@ module.exports = {
   USERNAME_REGEX: /^[\w-]{1,20}$/,
   MODERATOR_PERMISSIONS: ['wiki', 'posts', 'access', 'mail', 'config', 'flair'],
   LIVETHREAD_PERMISSIONS: ['update', 'edit', 'manage'],
-  HTTP_VERBS: ['get', 'head', 'post', 'put', 'delete', 'trace', 'options', 'connect', 'patch']
+  HTTP_VERBS: ['del', 'get', 'head', 'patch', 'post', 'put']
 };
