@@ -1,5 +1,4 @@
 'use strict';
-require('harmony-reflect'); // temp dependency until node implements Proxies correctly
 const Promise = require('bluebird');
 const _ = require('lodash');
 const promise_wrap = require('promise-chains');
@@ -112,9 +111,6 @@ const snoowrap = class {
     const formatted = _(this).omitBy((value, key) => key.startsWith('_')).mapValues((value, key) => {
       if (_.includes(keys_for_hidden_values, key)) {
         return value && '(redacted)';
-      }
-      if (key === 'token_expiration') {
-        return value.format();
       }
       return value;
     }).value();
@@ -239,7 +235,7 @@ const snoowrap = class {
   * @returns {Promise} A Promise that resolves with a string
   */
   get_new_captcha_identifier () {
-    return this._post({uri: 'api/new_captcha', form: {api_type}}).json.data.iden;
+    return promise_wrap(this._post({uri: 'api/new_captcha', form: {api_type}}).then(res => res.json.data.iden));
   }
   /**
   * @summary Gets an image for a given captcha identifier.
@@ -254,7 +250,7 @@ const snoowrap = class {
   * @returns {Promise} An array of categories
   */
   get_saved_categories () {
-    return this._get({uri: 'api/saved_categories'}).categories;
+    return this._get({uri: 'api/saved_categories'}).get('categories');
   }
   /**
   * @summary Marks a list of submissions as 'visited'.
@@ -712,7 +708,7 @@ _.forOwn(snoowrap.objects, (value, key) => {
   /* This is used to allow `objects.something = class {}` as opposed to `objects.something = class something {}`. The
   alternative sets the class name properly under normal circumstances, but it causes issues when the code gets minifified,
   since the class name changes. */
-  Reflect.defineProperty(value, 'name', {get: _.constant(key)});
+  Object.defineProperty(value, 'name', {get: _.constant(key)});
 });
 
 snoowrap.helpers = helpers;

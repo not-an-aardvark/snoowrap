@@ -68,7 +68,6 @@ module.exports = {
     'padded-blocks': [2, 'never'],
     'prefer-arrow-callback': 2,
     'prefer-const': 1,
-    'prefer-reflect': 2,
     'prefer-rest-params': 2,
     'prefer-spread': 2,
     'prefer-template': 2,

@@ -4,10 +4,13 @@ A simple Node.js wrapper for the reddit API. ([Documentation](https://not-an-aar
 
 ### Features
 
-* If you've used [PRAW](https://praw.readthedocs.org/en/stable/), you'll probably find a lot of snoowrap's syntax to be familiar. However, aside from being written in a different language, there are a few important differences.
-* For example, unlike PRAW, snoowrap is non-blocking; all API calls are async and return bluebird Promises. This means that you can handle asynchronous events however you want, and you can use snoowrap as part of a larger process without it holding everything back.
+snoowrap supports every API endpoint, and provides a simple interface to access each of them. The method to get a user profile is just `get_user()`, and the method to upvote something is just `upvote()`. There's no need to look up REST endpoints or deal with low-level HTTP requests.
+
+If you've used [PRAW](https://praw.readthedocs.org/en/stable/), you'll probably find a lot of snoowrap's syntax to be familiar. However, aside from being written in a different language, there are a few important differences:
+* Unlike PRAW, snoowrap is non-blocking; all API calls are async and return bluebird Promises. This means that you can handle asynchronous events however you want, and you can use snoowrap as part of a larger process without it holding everything back.
 * Each snoowrap object is completely independent. If you want, you can have scripts from separate accounts make requests at the same time.
-* snoowrap's objects are structured to keep the syntax as simple as possible. So the following expression:
+
+snoowrap's objects are structured to keep the syntax as simple as possible. So the following expression:
 
 ```javascript
 r.get_submission('2np694').body
@@ -36,7 +39,7 @@ r.get_subreddit('snoowrap')
   .assign_flair({text: 'Exciting Flair Text', css_class: 'modpost'})
 ```
 
-* snoowrap handles many API interactions such as authentication, ratelimiting, error correction, and HTTP requests internally, so that you can write less boilerplate code and focus more on doing what you want to do.
+snoowrap handles all API interactions such as authentication, ratelimiting, error correction, and HTTP requests under the hood. That way, you can write less boilerplate code and focus more on doing what you actually want to do.
  * After you provide a token once, snoowrap will refresh it on its own from then on -- you won't have to worry about authentication again.
  * snoowrap uses lazy objects, so it never fetches more than it needs to.
  * snoowrap has built-in ratelimit protection. If you hit reddit's ratelimit, you can choose to queue the request, and then run it after the current ratelimit period runs out. That way you won't lose a request if you go a bit too fast.
@@ -44,7 +47,9 @@ r.get_subreddit('snoowrap')
 
 For more examples of what can be done with snoowrap, take a look at the [documentation](https://not-an-aardvark.github.io/snoowrap) or the [test file](https://github.com/not-an-aardvark/snoowrap/blob/master/test/snoowrap.spec.js).
 
-### Quick example file
+---
+
+### Simple example file
 
 ```javascript
 'use strict';
@@ -94,22 +99,58 @@ r.get_subreddit('some_subreddit_name')
   .reply('This is a comment that appears on that daily thread');
   // etc. etc.
 
+// Printing the content of a wiki page
+r.get_subreddit('AskReddit').get_wiki_page('bestof').content_md.then(console.log);
+
 ```
 
 ---
 
-### To include in a project:
+### Live threads
+
+Reddit's [live threads](https://www.reddit.com/r/live/wiki/index) are different from most other content, in that messages are distributed through websockets instead of a RESTful API. snoowrap fully supports this protocol under the hood, and it represents the content stream as an [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter). For example, the following code will stream all livethread updates to the console as they appear:
+
+```javascript
+r.get_livethread('whrdxo8dg9n0').stream.on('update', console.log);
+```
+
+For more information, see snoowrap's [LiveThread documentation page](https://not-an-aardvark.github.io/snoowrap/LiveThread.html).
+
+---
+
+### Important note regarding ES6
+
+snoowrap uses the `Proxy` object introduced in ES6. Since this is not yet included in Node by default, you will need to run your project with the `--harmony-proxies` runtime flag, e.g. `node --harmony-proxies yourProject.js`. As of February 2016, the only browsers that support Proxies are Chrome 49+ and Microsoft Edge.
+
+If you *can't* use that flag for some reason, or your code is running in a non-supporting browser, snoowrap will still function. However, method chaining as described above won't work, so your syntax will need to be a bit heavier.
+
+For example:
+
+```javascript
+// This works when run with node's --harmony-proxies flag, or with a browser that supports Proxies.
+// However, it fails if Proxies are not available.
+r.get_submission('47v7tm').comments[0].upvote();
+
+// ----------
+
+// This is equivalent and works on all platforms, but the syntax isn't as nice.
+// Note: .get() and .call() are the standard bluebird utility methods.
+r.get_submission('47v7tm').fetch().get('comments').get(0).call('upvote');
+
+```
+
+---
+
+### To include in a project
 1. `npm install snoowrap --save`
 1. `var snoowrap = require('snoowrap');`
 
-### To build/run the tests independently:
+### To build/run the tests independently
 1. `git clone https://github.com/not-an-aardvark/snoowrap.git`
 1. `cd snoowrap`
 1. `npm install`
 1. `npm test`
 
 ---
-
-Note: snoowrap uses the `Proxy` object introduced in ES6. Since this is not yet included in Node by default, you will need to run your project with the `--harmony-proxies` flag. E.g. `node --harmony-proxies yourProject.js`
 
 snoowrap is currently in active development; while it provides shortcuts for a large number of API endpoints, it is not yet feature-complete. See [here](https://not-an-aardvark.github.io/snoowrap) for full documentation.

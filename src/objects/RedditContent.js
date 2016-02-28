@@ -1,4 +1,7 @@
 'use strict';
+if (typeof Proxy !== 'undefined' && typeof Reflect === 'undefined') {
+  require('harmony-reflect'); // temp dependency until node implements Proxies correctly
+}
 const Promise = require('bluebird');
 const _ = require('lodash');
 const promise_wrap = require('promise-chains');
@@ -12,15 +15,17 @@ const RedditContent = class {
     this._fetch = undefined;
     this._has_fetched = !!_has_fetched;
     _.assign(this, options);
-    return new Proxy(this, {get: (target, key) => {
-      if (key in target || key === 'length' || key in Promise.prototype || target._has_fetched) {
-        return target[key];
-      }
-      if (key === '_raw') {
-        return target;
-      }
-      return this.fetch()[key];
-    }});
+    if (typeof Proxy !== 'undefined') {
+      return new Proxy(this, {get: (target, key) => {
+        if (key in target || key === 'length' || key in Promise.prototype || target._has_fetched) {
+          return target[key];
+        }
+        if (key === '_raw') {
+          return target;
+        }
+        return this.fetch()[key];
+      }});
+    }
   }
   /**
   * @summary Fetches this content from reddit.

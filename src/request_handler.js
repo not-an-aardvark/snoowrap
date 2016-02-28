@@ -14,14 +14,14 @@ exports.oauth_request = async (r, method, args, attempts = 0) => {
     await r._throttle;
   }
   r._throttle = Promise.delay(r.config().request_delay);
-  if (r.ratelimit_remaining < 1 && r.ratelimit_reset_point.isAfter()) {
+  if (r.ratelimit_remaining < 1 && moment(r.ratelimit_reset_point).isAfter()) {
     // If the ratelimit has been exceeded, delay or abort the request depending on the user's config.
-    const seconds_until_expiry = r.ratelimit_reset_point.diff(moment(), 'seconds');
+    const seconds_until_expiry = moment(r.ratelimit_reset_point).diff();
     if (r.config().continue_after_ratelimit_error) {
       /* If the `continue_after_ratelimit_error` setting is enabled, queue the request, wait until the next ratelimit
       period, and then send it. */
       r.warn(errors.RateLimitWarning(seconds_until_expiry));
-      await Promise.delay(r.ratelimit_reset_point.diff());
+      await Promise.delay(moment(r.ratelimit_reset_point).diff());
     } else {
       // Otherwise, throw an error.
       throw new errors.RateLimitError(seconds_until_expiry);
@@ -29,7 +29,7 @@ exports.oauth_request = async (r, method, args, attempts = 0) => {
   }
   try {
     // If the access token has expired, refresh it.
-    if (r.refresh_token && (!r.access_token || r.token_expiration.isBefore())) {
+    if (r.refresh_token && (!r.access_token || moment(r.token_expiration).isBefore())) {
       await exports.update_access_token(r);
     }
     // Send the request and return the response.
@@ -40,7 +40,7 @@ exports.oauth_request = async (r, method, args, attempts = 0) => {
       auth: {bearer: r.access_token},
       transform: (body, response) => {
         r.ratelimit_remaining = response.headers['x-ratelimit-remaining'];
-        r.ratelimit_reset_point = moment().add(response.headers['x-ratelimit-reset'], 'seconds');
+        r.ratelimit_reset_point = moment().add(response.headers['x-ratelimit-reset'], 'seconds').format();
         const populated = helpers._populate(body, r);
         if (populated && populated.constructor && populated.constructor.name === 'Listing') {
           populated.uri = response.request.uri.path;
@@ -74,6 +74,6 @@ exports.update_access_token = async r => {
     form: {grant_type: 'refresh_token', refresh_token: r.refresh_token}
   }]);
   r.access_token = token_info.access_token;
-  r.token_expiration = moment().add(token_info.expires_in, 'seconds');
+  r.token_expiration = moment().add(token_info.expires_in, 'seconds').format();
   r.scope = token_info.scope.split(' ');
 };

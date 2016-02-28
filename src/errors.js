@@ -6,7 +6,7 @@ module.exports = {
     constructor (expiry_time_from_now) {
       super();
       this.name = 'RateLimitError';
-      this.message = `${constants.MODULE_NAME}.errors.${this.name}: ${constants.MODULE_NAME} refused to continue because reddit's ratelimit was exceeded. For more information about reddit's ratelimit, please consult reddit's API rules at ${constants.API_RULES_LINK}. To avoid hitting the ratelimit again, you should probably wait at least ${expiry_time_from_now} seconds before making any more requests.`;
+      this.message = `${constants.MODULE_NAME}.errors.${this.name}: ${constants.MODULE_NAME} refused to continue because reddit's ratelimit was exceeded. For more information about reddit's ratelimit, please consult reddit's API rules at ${constants.API_RULES_LINK}. To avoid hitting the ratelimit again, you should probably wait at least ${expiry_time_from_now} milliseconds before making any more requests.`;
     }
   },
   InvalidUserError: class extends Error {
@@ -23,7 +23,7 @@ module.exports = {
       this.message = `${constants.MODULE_NAME}.errors.${this.name}: ${reason}`;
     }
   },
-  RateLimitWarning: time_until_reset => `Warning: ${constants.MODULE_NAME} temporarily stopped sending requests because reddit's ratelimit was exceeded. The request you attempted to send was queued, and will be sent to reddit when the current ratelimit period expires in ${time_until_reset} seconds.`,
+  RateLimitWarning: time_until_reset => `Warning: ${constants.MODULE_NAME} temporarily stopped sending requests because reddit's ratelimit was exceeded. The request you attempted to send was queued, and will be sent to reddit when the current ratelimit period expires in ${time_until_reset} milliseconds.`,
   NoCredentialsError: class extends Error {
     constructor () {
       super();
