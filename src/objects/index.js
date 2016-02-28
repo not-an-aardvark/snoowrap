@@ -9,6 +9,7 @@ exports.Submission = require('./Submission');
 exports.LiveThread = require('./LiveThread');
 exports.PrivateMessage = require('./PrivateMessage');
 exports.Subreddit = require('./Subreddit');
+exports.MultiReddit = require('./MultiReddit');
 exports.WikiPage = require('./WikiPage');
 exports.Listing = require('./Listing');
 exports.more = require('./more');

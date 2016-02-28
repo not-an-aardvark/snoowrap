@@ -17,11 +17,11 @@ const RedditContent = class {
     _.assign(this, options);
     if (typeof Proxy !== 'undefined') {
       return new Proxy(this, {get: (target, key) => {
-        if (key in target || key === 'length' || key in Promise.prototype || target._has_fetched) {
-          return target[key];
-        }
         if (key === '_raw') {
           return target;
+        }
+        if (key in target || key === 'length' || key in Promise.prototype || target._has_fetched) {
+          return target[key];
         }
         return this.fetch()[key];
       }});

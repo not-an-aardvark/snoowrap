@@ -139,6 +139,14 @@ const RedditUser = class extends require('./RedditContent') {
   get_gilded_content (options) {
     return this._get({uri: `user/${this.name}/gilded`, qs: options});
   }
+  /**
+  * @summary Gets a multireddit belonging to this user.
+  * @param {string} name The name of the multireddit
+  * @returns {Promise} An unfetched MultiReddit object
+  */
+  get_multireddit (name) {
+    return this._ac._new_object('MultiReddit', {name, curator: this}, false);
+  }
 };
 
 module.exports = RedditUser;

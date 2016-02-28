@@ -749,6 +749,51 @@ describe('snoowrap', function () {
     });
   });
 
+  describe('multireddits', () => {
+    let multi, my_multi;
+    before(() => {
+      multi = r.get_user('Lapper').get_multireddit('depthhub');
+      my_multi = r.get_user('snoowrap_testing').get_multireddit('perma_multi');
+    });
+    it('can get information about a multireddit', async () => {
+      const subs = await multi.subreddits;
+      expect(subs).to.be.an.instanceof(Array);
+      expect(subs[0]).to.be.an.instanceof(snoowrap.objects.Subreddit);
+      expect(subs[0].display_name).to.equal('AcademicPhilosophy');
+    });
+    it('can copy a and delete a multireddit', async () => {
+      const copied = await multi.copy({new_name: 'copied_multi'});
+      expect(copied).to.be.an.instanceof(snoowrap.objects.MultiReddit);
+      expect(copied.name).to.equal('copied_multi');
+      await copied.delete();
+      await r.get_me().get_multireddit('copied_multi').fetch().then(expect.fail, err => {
+        expect(err.statusCode).to.equal(404);
+      });
+    });
+    it("can get a list of the requester's multireddits", async () => {
+      const mine = await r.get_my_multireddits();
+      expect(mine).to.be.an.instanceof(Array);
+      expect(mine[0]).to.be.an.instanceof(snoowrap.objects.MultiReddit);
+    });
+    it('can rename a multireddit', async () => {
+      await my_multi.rename({new_name: 'perma_multi2'});
+      expect(my_multi.name).to.equal('perma_multi2');
+      await my_multi.rename({new_name: 'perma_multi'});
+      expect(my_multi.name).to.equal('perma_multi');
+    });
+    xit('can create a multireddit', async () => {
+      console.log(await r.create_multireddit({name: 'just_created', subreddits: ['snoowrap_testing', 'cookies']}
+    ).then(console.log, console.log));
+    });
+    it('can delete a multireddit', async () => {
+      const temp_multi = await my_multi.copy({new_name: 'temp_multi'});
+      await temp_multi.delete();
+      await temp_multi.refresh().then(expect.fail, err => {
+        expect(err.statusCode).to.equal(404);
+      });
+    });
+  });
+
   describe('Creating new content', () => {
     // These should all pass, but they're skipped by default to avoid spam since they permanently write content to reddit.
     it.skip('can create a linkpost given a subreddit object, and then delete the post', async () => {

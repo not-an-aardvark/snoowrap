@@ -25,7 +25,8 @@ module.exports = {
     wikipagesettings: 'WikiPageSettings',
     wikipagelisting: 'WikiPageListing',
     LiveUpdateEvent: 'LiveThread',
-    LiveUpdate: 'LiveUpdate'
+    LiveUpdate: 'LiveUpdate',
+    LabeledMulti: 'MultiReddit'
   },
   USERNAME_REGEX: /^[\w-]{1,20}$/,
   MODERATOR_PERMISSIONS: ['wiki', 'posts', 'access', 'mail', 'config', 'flair'],

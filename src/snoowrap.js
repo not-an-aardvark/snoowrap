@@ -131,6 +131,9 @@ const snoowrap = class {
       return this.own_user_info;
     }));
   }
+  _get_my_name () {
+    return Promise.resolve(this.own_user_info ? this.own_user_info.name : this.get_me().get('name'));
+  }
   /**
   * @summary Gets information on a reddit user with a given name.
   * @param {string} name - The user's username
@@ -689,6 +692,28 @@ const snoowrap = class {
       uri: 'api/live/create',
       form: {api_type, description, nsfw, resources, title}
     }).tap(helpers._handle_json_errors).then(result => this.get_livethread(result.json.data.id)));
+  }
+  /**
+  * @description Gets the user's own multireddits.
+  * @returns {Promise} A Promise for an Array containing the requester's MultiReddits.
+  */
+  get_my_multireddits () {
+    return this._get({uri: 'api/multi/mine'});
+  }
+  create_multireddit ({name, description, icon_name = '', key_color = '#000000', subreddits, visibility = 'private',
+      weighting_scheme = 'classic'}) {
+    const parsed_subreddits = subreddits.map(sub => ({name: _.isString(sub) ? sub : sub.display_name}));
+    return promise_wrap(this._get_my_name().then(my_name => this._post({uri: `api/multi/user/${my_name}/m/${name}`, form: {
+      model: {
+        display_name: name,
+        description_md: description,
+        icon_name,
+        key_color,
+        subreddits: parsed_subreddits,
+        visibility,
+        weighting_scheme
+      }
+    }})));
   }
 };
 
