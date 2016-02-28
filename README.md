@@ -4,7 +4,7 @@ A simple Node.js wrapper for the reddit API. ([Documentation](https://not-an-aar
 
 ### Features
 
-* If you've used [PRAW](https://praw.readthedocs.org/en/stable/), you'll probably find a lot of snoowrap's syntax to be familiar. Aside from being written in a different language, there are a few important differences.
+* If you've used [PRAW](https://praw.readthedocs.org/en/stable/), you'll probably find a lot of snoowrap's syntax to be familiar. However, aside from being written in a different language, there are a few important differences.
 * For example, unlike PRAW, snoowrap is non-blocking; all API calls are async and return bluebird Promises. This means that you can handle asynchronous events however you want, and you can use snoowrap as part of a larger process without it holding everything back.
 * Each snoowrap object is completely independent. If you want, you can have scripts from separate accounts make requests at the same time.
 * snoowrap's objects are structured to keep the syntax as simple as possible. So the following expression:
