@@ -86,7 +86,7 @@ const MultiReddit = class extends require('./RedditContent') {
   }
   /**
   * @summary Adds a subreddit to this multireddit.
-  * @param {Subreddit} The Subreddit object to add (or a string representing a subreddit name)
+  * @param {Subreddit} sub The Subreddit object to add (or a string representing a subreddit name)
   * @returns {Promise} A Promise that fulfills with this multireddit when the reuqest is complete
   */
   add_subreddit (sub) {
@@ -98,7 +98,7 @@ const MultiReddit = class extends require('./RedditContent') {
   }
   /**
   * @summary Removes a subreddit from this multireddit.
-  * @param {Subreddit} The Subreddit object to remove (or a string representing a subreddit name)
+  * @param {Subreddit} sub The Subreddit object to remove (or a string representing a subreddit name)
   * @returns {Promise} A Promise that fulfills with this multireddit when the request is complete
   */
   remove_subreddit (sub) {

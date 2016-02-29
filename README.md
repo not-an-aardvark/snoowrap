@@ -150,7 +150,3 @@ r.get_submission('47v7tm').fetch().get('comments').get(0).call('upvote');
 1. `cd snoowrap`
 1. `npm install`
 1. `npm test`
-
----
-
-snoowrap is currently in active development; while it provides shortcuts for a large number of API endpoints, it is not yet feature-complete. See [here](https://not-an-aardvark.github.io/snoowrap) for full documentation.
