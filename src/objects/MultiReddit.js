@@ -30,7 +30,7 @@ const MultiReddit = class extends require('./RedditContent') {
     return this._ac._get_my_name().then(name =>
       this._post({
         uri: 'api/multi/copy',
-        form: {from: this.path, to: `/user/${name}/m/${new_name}`}
+        form: {from: this.path, to: `/user/${name}/m/${new_name}`, display_name: new_name}
       })
     );
   }
@@ -42,10 +42,10 @@ const MultiReddit = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills with this multireddit
   */
   rename ({new_name}) {
-    return promise_wrap(this._post({
+    return promise_wrap(this._ac._get_my_name().then(my_name => this._post({
       uri: 'api/multi/rename',
-      form: {from: this.path, display_name: new_name}
-    }).then(res => {
+      form: {from: this.path, to: `/user/${my_name}/m/${new_name}`, display_name: new_name}
+    })).then(res => {
       Object.keys(res).forEach(key => {
         this[key] = res[key];
       });
@@ -57,7 +57,7 @@ const MultiReddit = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills when this request is complete
   */
   delete () {
-    return this._del({uri: `api/multi/${this.path}`});
+    return this._del({uri: `api/multi${this.path}`});
   }
   /**
   * @summary Edits the properties of this multireddit.
