@@ -466,8 +466,6 @@ describe('snoowrap', function () {
       await post.approve().refresh();
       expect(post.banned_by.value()).to.be.null();
       expect(post.approved_by.value()).to.not.be.null();
-      // There's no way to differentiate posts marked as spam with the API, but make sure the function doesn't throw an error.
-      await post.mark_as_spam().approve();
     });
     it('can remove/approve a comment', async () => {
       await comment.remove().refresh();

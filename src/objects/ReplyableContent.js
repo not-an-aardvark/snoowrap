@@ -19,13 +19,6 @@ const ReplyableContent = class extends require('./RedditContent') {
     return promise_wrap(this._post({uri: 'api/remove', form: {spam, id: this.name}}).return(this));
   }
   /**
-  * @summary Removes this Comment, Submission, or PrivateMessage and marks it as spam.
-  * @returns {Promise} A Promise that fulfills with this content when the request is complete
-  */
-  mark_as_spam () {
-    return promise_wrap(this.remove({spam: true, id: this.name}).return(this));
-  }
-  /**
   * @summary Approves this Comment, Submission, or PrivateMessage, re-adding it to public listings if it had been removed
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
   */
@@ -35,6 +28,7 @@ const ReplyableContent = class extends require('./RedditContent') {
   /**
   * @summary Reports this content anonymously to subreddit moderators (for Comments and Submissions)
   or to the reddit admins (for PrivateMessages)
+  * @param {object} [$0]
   * @param {string} [$0.reason] The reason for the report
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
   */
