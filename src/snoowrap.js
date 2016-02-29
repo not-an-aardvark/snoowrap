@@ -679,7 +679,7 @@ const snoowrap = class {
     }]);
   }
   /**
-  * Creates a new LiveThread.
+  * @summary Creates a new LiveThread.
   * @param {object} $0
   * @param {string} $0.title The title of the livethread (100 characters max)
   * @param {string} [$0.description] A descriptions of the thread. 120 characters max
@@ -694,26 +694,38 @@ const snoowrap = class {
     }).tap(helpers._handle_json_errors).then(result => this.get_livethread(result.json.data.id)));
   }
   /**
-  * @description Gets the user's own multireddits.
+  * @summary Gets the user's own multireddits.
   * @returns {Promise} A Promise for an Array containing the requester's MultiReddits.
   */
   get_my_multireddits () {
-    return this._get({uri: 'api/multi/mine'});
+    return this._get({uri: 'api/multi/mine', qs: {expand_srs: true}});
   }
-  create_multireddit ({name, description, icon_name = '', key_color = '#000000', subreddits, visibility = 'private',
+  /**
+  * @summary Creates a new multireddit.
+  * @param {object} $0
+  * @param {string} $0.name The name of the new multireddit. 50 characters max
+  * @param {string} $0.description A description for the new multireddit, in markdown.
+  * @param {Array} $0.subreddits An Array of Subreddit objects (or subreddit names) that this multireddit should compose of.
+  * @param {string} [$0.visibility='private'] The multireddit's visibility setting. One of `private`, `public`, `hidden`.
+  * @param {string} [$0.icon_name=''] One of `'art and design'`, `ask`, `books`, `business`, `cars`, `comics`, `cute animals`,
+  `diy`, `entertainment`, `food and drink`, `funny`, `games`, `grooming`, `health`, `life advice`, `military`, `models pinup`,
+  `music`, `news`, `philosophy`, `pictures and gifs`, `science`, `shopping`, `sports`, `style`, `tech`, `travel`,
+  `unusual stories`, `video`, `None`
+  * @param {string} [$0.key_color='#000000'] A six-digit RGB hex color, preceded by '#'
+  * @param {string} [$0.weighting_scheme='classic'] One of 'classic', 'fresh'
+  * @returns {Promise} A Promise for the newly-created MultiReddit object
+  */
+  create_multireddit ({name, description, subreddits, visibility = 'private', icon_name = '', key_color = '#000000',
       weighting_scheme = 'classic'}) {
-    const parsed_subreddits = subreddits.map(sub => ({name: _.isString(sub) ? sub : sub.display_name}));
-    return promise_wrap(this._get_my_name().then(my_name => this._post({uri: `api/multi/user/${my_name}/m/${name}`, form: {
-      model: {
-        display_name: name,
-        description_md: description,
-        icon_name,
-        key_color,
-        subreddits: parsed_subreddits,
-        visibility,
-        weighting_scheme
-      }
-    }})));
+    return this._post({uri: 'api/multi', form: {model: JSON.stringify({
+      display_name: name,
+      description_md: description,
+      icon_name,
+      key_color,
+      subreddits: subreddits.map(sub => ({name: _.isString(sub) ? sub : sub.display_name})),
+      visibility,
+      weighting_scheme
+    })}});
   }
 };
 

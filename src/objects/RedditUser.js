@@ -147,6 +147,9 @@ const RedditUser = class extends require('./RedditContent') {
   get_multireddit (name) {
     return this._ac._new_object('MultiReddit', {name, curator: this}, false);
   }
+  get_multireddits () {
+    return this._get({uri: `api/multi/user/${this.name}`, qs: {expand_srs: true}});
+  }
 };
 
 module.exports = RedditUser;

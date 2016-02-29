@@ -659,9 +659,9 @@ describe('snoowrap', function () {
     });
     it('can add/remove an editor to a wiki page', async () => {
       await page1.add_editor({name: 'actually_an_aardvark'});
-      expect(_.find(await page1.get_settings().editors, {name: 'actually_an_aardvark'})).to.not.be.undefined();
+      expect(_.map(await page1.get_settings().editors, 'name')).to.include('actually_an_aardvark');
       await page1.remove_editor({name: 'actually_an_aardvark'});
-      expect(_.find(await page1.get_settings().editors, {name: 'actually_an_aardvark'})).to.be.undefined();
+      expect(_.map(await page1.get_settings().editors, 'name')).to.not.include('actually_an_aardvark');
     });
     it('can edit the settings on a wiki page', async () => {
       await page1.edit_settings({listed: true, permission_level: 2});
@@ -761,7 +761,7 @@ describe('snoowrap', function () {
       expect(subs[0]).to.be.an.instanceof(snoowrap.objects.Subreddit);
       expect(subs[0].display_name).to.equal('AcademicPhilosophy');
     });
-    it('can copy a and delete a multireddit', async () => {
+    it('can copy and delete a multireddit', async () => {
       const copied = await multi.copy({new_name: 'copied_multi'});
       expect(copied).to.be.an.instanceof(snoowrap.objects.MultiReddit);
       expect(copied.name).to.equal('copied_multi');
@@ -775,22 +775,41 @@ describe('snoowrap', function () {
       expect(mine).to.be.an.instanceof(Array);
       expect(mine[0]).to.be.an.instanceof(snoowrap.objects.MultiReddit);
     });
+    it('can get a list of multireddits belonging to a given user', async () => {
+      const multis = await r.get_user('snoowrap_testing').get_multireddits();
+      expect(multis).to.be.an.instanceof(Array);
+      expect(multis[0]).to.be.an.instanceof(snoowrap.objects.MultiReddit);
+    });
     it('can rename a multireddit', async () => {
       await my_multi.rename({new_name: 'perma_multi2'});
       expect(my_multi.name).to.equal('perma_multi2');
       await my_multi.rename({new_name: 'perma_multi'});
       expect(my_multi.name).to.equal('perma_multi');
     });
-    xit('can create a multireddit', async () => {
-      console.log(await r.create_multireddit({name: 'just_created', subreddits: ['snoowrap_testing', 'cookies']}
-    ).then(console.log, console.log));
+    it('can create a multireddit', async () => {
+      const multi_name = require('crypto').randomBytes(8).toString('hex');
+      const new_multi = await r.create_multireddit({name: multi_name, subreddits: ['snoowrap_testing', 'Cookies']});
+      expect(new_multi.name).to.equal(multi_name);
+      expect(_.map(new_multi.subreddits, 'display_name').sort()).to.eql(['Cookies', 'snoowrap_testing']);
     });
     it('can delete a multireddit', async () => {
-      const temp_multi = await my_multi.copy({new_name: 'temp_multi'});
+      const new_name = require('crypto').randomBytes(4).toString('hex');
+      const temp_multi = await my_multi.copy({new_name});
       await temp_multi.delete();
       await temp_multi.refresh().then(expect.fail, err => {
         expect(err.statusCode).to.equal(404);
       });
+    });
+    it("can update a multireddit's information", async () => {
+      const timestamp = moment().format();
+      await my_multi.edit({description: timestamp});
+      expect(await my_multi.refresh().description_md).to.equal(timestamp);
+    });
+    it('can add/remove a subreddit from a multireddit', async () => {
+      await my_multi.add_subreddit('gifs');
+      expect(_.map(await my_multi.refresh().subreddits, 'display_name')).to.include('gifs');
+      await my_multi.remove_subreddit('gifs');
+      expect(_.map(await my_multi.refresh().subreddits, 'display_name')).to.not.include('gifs');
     });
   });
 
