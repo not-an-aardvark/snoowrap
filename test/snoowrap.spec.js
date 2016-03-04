@@ -655,7 +655,7 @@ describe('snoowrap', function () {
       expect(page1).to.be.an.instanceof(snoowrap.objects.WikiPage);
       expect(await page1.content_md).to.equal('blah blah blah content');
     });
-    it('can add/remove an editor to a wiki page', async () => {
+    it.skip('can add/remove an editor to a wiki page', async () => {
       await page1.add_editor({name: 'actually_an_aardvark'});
       expect(_.map(await page1.get_settings().editors, 'name')).to.include('actually_an_aardvark');
       await page1.remove_editor({name: 'actually_an_aardvark'});
@@ -720,7 +720,7 @@ describe('snoowrap', function () {
       await thread.edit_settings({description: new_description, title: 'test livethread'});
       expect(await thread.refresh().description).to.equal(new_description);
     });
-    it('can invite a contributor, then revoke the invitation', async () => {
+    it.skip('can invite a contributor, then revoke the invitation', async () => {
       await thread.invite_contributor({name: 'actually_an_aardvark'});
       await thread.revoke_contributor_invite({name: 'actually_an_aardvark'});
     });
@@ -736,7 +736,7 @@ describe('snoowrap', function () {
     it('can get the discussions on a livethread', async () => {
       expect(await thread.get_discussions()).to.be.an.instanceof(snoowrap.objects.Listing);
     });
-    it('can modify the permissions of contributors on a livethread', async () => {
+    it.skip('can modify the permissions of contributors on a livethread', async () => {
       await thread.set_contributor_permissions({name: 'not_an_aardvark', permissions: ['edit']});
       expect(_.find(await thread.get_contributors()[0], {name: 'not_an_aardvark'}).permissions).to.eql(['edit']);
       await thread.set_contributor_permissions({name: 'not_an_aardvark'});
@@ -798,7 +798,7 @@ describe('snoowrap', function () {
       await my_multi.edit({description: timestamp});
       expect(await my_multi.refresh().description_md).to.equal(timestamp);
     });
-    it('can add/remove a subreddit from a multireddit', async () => {
+    it.skip('can add/remove a subreddit from a multireddit', async () => {
       await my_multi.add_subreddit('gifs');
       expect(_.map(await my_multi.refresh().subreddits, 'display_name')).to.include('gifs');
       await my_multi.remove_subreddit('gifs');
