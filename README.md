@@ -120,7 +120,7 @@ For more information, see snoowrap's [LiveThread documentation page](https://not
 
 ### Important note regarding ES6
 
-snoowrap uses the `Proxy` object introduced in ES6. Since this is not yet included in Node by default, you will need to run your project with the `--harmony-proxies` runtime flag, e.g. `node --harmony-proxies yourProject.js`. With regard to running code in browsers, as of February 2016 the only browsers that support Proxies are Chrome 49+ and Microsoft Edge.
+snoowrap uses the `Proxy` object introduced in ES6. Since this is not yet included in Node by default, you will need to run your project with the `--harmony-proxies` runtime flag, e.g. `node --harmony-proxies yourProject.js`. With regard to running code in browsers, as of March 2016 the only browsers that support Proxies are Chrome 49+, Microsoft Edge, Firefox, and Opera.
 
 If you *can't* use that node flag for some reason, or your code is running in a non-supporting browser, snoowrap will still function. However, method chaining as described above won't work, so your syntax will need to be a bit heavier.
 
