@@ -752,7 +752,7 @@ describe('snoowrap', function () {
     before(async () => {
       multi = r.get_user('Lapper').get_multireddit('depthhub');
       await r.get_me().get_multireddits().then(my_multis => Promise.map(my_multis, m => m.delete()));
-      my_multi = await multi.copy({new_name: 'perma_multi'});
+      my_multi = await multi.copy({new_name: require('crypto').randomBytes(8).toString('hex')});
     });
     it('can get information about a multireddit', async () => {
       const subs = await multi.subreddits;
@@ -776,10 +776,9 @@ describe('snoowrap', function () {
       expect(multis[0]).to.be.an.instanceof(snoowrap.objects.MultiReddit);
     });
     it('can rename a multireddit', async () => {
-      await my_multi.rename({new_name: 'perma_multi2'});
-      expect(my_multi.name).to.equal('perma_multi2');
-      await my_multi.rename({new_name: 'perma_multi'});
-      expect(my_multi.name).to.equal('perma_multi');
+      const new_name = require('crypto').randomBytes(8).toString('hex');
+      await my_multi.rename({new_name});
+      expect(my_multi.name).to.equal(new_name);
     });
     it('can create a multireddit', async () => {
       const multi_name = require('crypto').randomBytes(8).toString('hex');

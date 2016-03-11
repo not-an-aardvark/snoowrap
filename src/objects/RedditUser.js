@@ -1,6 +1,5 @@
 'use strict';
 const _ = require('lodash');
-const promise_wrap = require('promise-chains');
 const constants = require('../constants');
 const errors = require('../errors');
 
@@ -36,7 +35,7 @@ const RedditUser = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills with the current user after the request is complete
   */
   assign_flair (options) {
-    return promise_wrap(this._ac._assign_flair(_.assign(options, {name: this.name})).return(this));
+    return this._ac._assign_flair(_.assign(options, {name: this.name})).return(this);
   }
   /**
   * @summary Adds this user as a friend, or modifies their friend note.

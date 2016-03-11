@@ -1,5 +1,4 @@
 'use strict';
-const promise_wrap = require('promise-chains');
 
 /**
 * A class representing a wiki page on a subreddit.
@@ -25,10 +24,10 @@ const WikiPage = class extends require('./RedditContent') {
   should be able to edit this page, and `2` indicates that only mods should be able to view and edit this page.
   */
   edit_settings ({listed, permission_level}) {
-    return promise_wrap(this._post({
+    return this._post({
       uri: `r/${this.subreddit.display_name}/wiki/settings/${this.title}`,
       form: {listed, permlevel: permission_level}
-    }).return(this));
+    }).return(this);
   }
   _modify_editor ({name, action}) {
     return this._post({
@@ -43,7 +42,7 @@ const WikiPage = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills with this WikiPage when the request is complete
   */
   add_editor ({name}) {
-    return promise_wrap(this._modify_editor({name, action: 'add'}).return(this));
+    return this._modify_editor({name, action: 'add'}).return(this);
   }
   /**
   * @summary Revokes this user's approved editor status for this wiki page
@@ -52,7 +51,7 @@ const WikiPage = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills with this WikiPage when the request is complete
   */
   remove_editor ({name}) {
-    return promise_wrap(this._modify_editor({name, action: 'del'}).return(this));
+    return this._modify_editor({name, action: 'del'}).return(this);
   }
   /**
   * @summary Edits this wiki page, or creates it if it does not exist yet.
@@ -64,10 +63,10 @@ const WikiPage = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills with this WikiPage when the request is complete
   */
   edit ({text, reason, previous_revision}) {
-    return promise_wrap(this._post({
+    return this._post({
       uri: `r/${this.subreddit.display_name}/api/wiki/edit`,
       form: {content: text, page: this.title, previous: previous_revision, reason}
-    }).return(this));
+    }).return(this);
   }
   /**
   * @summary Gets a list of revisions for this wiki page.
@@ -84,10 +83,10 @@ const WikiPage = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills with this WikiPage when the request is complete
   */
   hide_revision ({id}) {
-    return promise_wrap(this._post({
+    return this._post({
       uri: `r/${this.subreddit.display_name}/api/wiki/hide`,
       qs: {page: this.title, revision: id}
-    }).return(this));
+    }).return(this);
   }
   /**
   * @summary Reverts this wiki page to the given point.
@@ -96,10 +95,10 @@ const WikiPage = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills with this WikiPage when the request is complete
   */
   revert ({id}) {
-    return promise_wrap(this._post({
+    return this._post({
       uri: `r/${this.subreddit.display_name}/api/wiki/revert`,
       qs: {page: this.title, revision: id}
-    }).return(this));
+    }).return(this);
   }
   /**
   * @summary Gets a list of discussions about this wiki page.

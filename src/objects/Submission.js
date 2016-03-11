@@ -1,6 +1,5 @@
 'use strict';
 const _ = require('lodash');
-const promise_wrap = require('promise-chains');
 const api_type = 'json';
 
 /**
@@ -17,57 +16,57 @@ const Submission = class extends require('./VoteableContent') {
   * @returns {Promise} The updated version of this Submission
   */
   hide () {
-    return promise_wrap(this._post({uri: 'api/hide', form: {id: this.name}}).then(() => {
+    return this._post({uri: 'api/hide', form: {id: this.name}}).then(() => {
       this.hidden = true;
       return this;
-    }));
+    });
   }
   /**
   * @summary Unhides this Submission, allowing it to reappear on most Listings.
   * @returns {Promise} The updated version of this Submission
   */
   unhide () {
-    return promise_wrap(this._post({uri: 'api/unhide', form: {id: this.name}}).then(() => {
+    return this._post({uri: 'api/unhide', form: {id: this.name}}).then(() => {
       this.hidden = false;
       return this;
-    }));
+    });
   }
   /**
   * @summary Locks this Submission, preventing new comments from being posted on it.
   * @returns {Promise} The updated version of this Submission
   */
   lock () {
-    return promise_wrap(this._post({uri: 'api/lock', form: {id: this.name}}).then(() => {
+    return this._post({uri: 'api/lock', form: {id: this.name}}).then(() => {
       this.locked = true;
       return this;
-    }));
+    });
   }
   /**
   * @summary Unlocks this Submission, allowing comments to be posted on it again.
   * @returns {Promise} The updated version of this Submission
   */
   unlock () {
-    return promise_wrap(this._post({uri: 'api/unlock', form: {id: this.name}}).then(() => {
+    return this._post({uri: 'api/unlock', form: {id: this.name}}).then(() => {
       this.locked = false;
-    }).return(this));
+    }).return(this);
   }
   /**
   * @summary Marks this Submission as NSFW (Not Safe For Work).
   * @returns {Promise} The updated version of this Submission
   */
   mark_nsfw () {
-    return promise_wrap(this._post({uri: 'api/marknsfw', form: {id: this.name}}).then(() => {
+    return this._post({uri: 'api/marknsfw', form: {id: this.name}}).then(() => {
       this.over_18 = true;
-    }).return(this));
+    }).return(this);
   }
   /**
   * @summary Unmarks this Submission as NSFW (Not Safe For Work).
   * @returns {Promise} The updated version of this Submission
   */
   unmark_nsfw () {
-    return promise_wrap(this._post({uri: 'api/unmarknsfw', form: {id: this.name}}).then(() => {
+    return this._post({uri: 'api/unmarknsfw', form: {id: this.name}}).then(() => {
       this.over_18 = false;
-    }).return(this));
+    }).return(this);
   }
   /**
   * @summary Sets the contest mode status of this submission.
@@ -76,10 +75,10 @@ const Submission = class extends require('./VoteableContent') {
   * @returns {Promise} The updated version of this Submission
   */
   _set_contest_mode_enabled (state) {
-    return promise_wrap(this._post({
+    return this._post({
       uri: 'api/set_contest_mode',
       form: {api_type, state, id: this.name}
-    }).return(this));
+    }).return(this);
   }
   /**
   * @summary Enables contest mode for this Submission.
@@ -96,12 +95,12 @@ const Submission = class extends require('./VoteableContent') {
     return this._set_contest_mode_enabled(false);
   }
   _set_stickied ({state, num}) {
-    return promise_wrap(this._post({
+    return this._post({
       uri: 'api/set_subreddit_sticky',
       form: {api_type, state, num, id: this.name}
     }).then(() => {
       this.stickied = state;
-    }).return(this));
+    }).return(this);
   }
   /**
   * @summary Stickies this Submission.
@@ -126,16 +125,16 @@ const Submission = class extends require('./VoteableContent') {
   * @returns {Promise} The updated version of this Submission
   */
   set_suggested_sort (sort) {
-    return promise_wrap(this._post({uri: 'api/set_suggested_sort', form: {api_type, id: this.name, sort}}).then(() => {
+    return this._post({uri: 'api/set_suggested_sort', form: {api_type, id: this.name, sort}}).then(() => {
       this.suggested_sort = sort;
-    }).return(this));
+    }).return(this);
   }
   /**
   * @summary Marks this submission as 'visited'.
   * @returns {Promise} The updated version of this Submission
   */
   mark_as_read () { // Requires reddit gold
-    return promise_wrap(this._post({uri: 'api/store_visits', form: {links: this.name}}).return(this));
+    return this._post({uri: 'api/store_visits', form: {links: this.name}}).return(this);
   }
   /**
   * @summary Gets a Listing of other submissions on reddit that had the same link as this one.
@@ -168,12 +167,12 @@ const Submission = class extends require('./VoteableContent') {
   * @returns {Promise} A Promise that fulfills with an updated version of this Submission
   */
   assign_flair (options) {
-    return promise_wrap(this._ac._assign_flair(_.assign(options, {
+    return this._ac._assign_flair(_.assign(options, {
       link: this.name, subreddit_name: this.subreddit.display_name
     })).then(() => {
       this.link_flair_text = options.text || null;
       this.link_flair_css_class = options.css_class || null;
-    }).return(this));
+    }).return(this);
   }
 
   /**
@@ -186,9 +185,9 @@ const Submission = class extends require('./VoteableContent') {
   * @returns {Promise} A Promise that fulfills with this objects after the request is complete
   */
   select_flair (options) {
-    return promise_wrap(this._ac._select_flair(_.assign(options, {
+    return this._ac._select_flair(_.assign(options, {
       link: this.name, subreddit_name: this.subreddit.display_name
-    })).return(this));
+    })).return(this);
   }
 };
 

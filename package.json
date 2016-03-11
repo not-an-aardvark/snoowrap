@@ -39,7 +39,7 @@
     "harmony-reflect": "^1.4.2",
     "lodash": "^4.5.1",
     "moment": "^2.11.2",
-    "promise-chains": "^0.2.6",
+    "promise-chains": "^0.3.0",
     "request-promise": "^2.0.1",
     "ws": "^1.0.1"
   },

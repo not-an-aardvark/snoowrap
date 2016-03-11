@@ -1,6 +1,5 @@
 'use strict';
 const _ = require('lodash');
-const promise_wrap = require('promise-chains');
 
 /**
 * @summary A class representing a multireddit.
@@ -42,7 +41,7 @@ const MultiReddit = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills with this multireddit
   */
   rename ({new_name}) {
-    return promise_wrap(this._ac._get_my_name().then(my_name => this._post({
+    return this._ac._get_my_name().then(my_name => this._post({
       uri: 'api/multi/rename',
       form: {from: this.path, to: `/user/${my_name}/m/${new_name}`, display_name: new_name}
     })).then(res => {
@@ -50,7 +49,7 @@ const MultiReddit = class extends require('./RedditContent') {
         this[key] = res[key];
       });
       return this;
-    }));
+    });
   }
   /**
   * @summary Deletes this multireddit.
@@ -91,10 +90,10 @@ const MultiReddit = class extends require('./RedditContent') {
   */
   add_subreddit (sub) {
     const sub_name = _.isString(sub) ? sub : sub.display_name;
-    return promise_wrap(this._put({
+    return this._put({
       uri: `api/multi${this.path}/r/${sub_name}`,
       form: {model: JSON.stringify({name: sub_name})}
-    }).return(this));
+    }).return(this);
   }
   /**
   * @summary Removes a subreddit from this multireddit.
@@ -102,7 +101,7 @@ const MultiReddit = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills with this multireddit when the request is complete
   */
   remove_subreddit (sub) {
-    return promise_wrap(this._del({uri: `api/multi${this.path}/r/${_.isString(sub) ? sub : sub.display_name}`}).return(this));
+    return this._del({uri: `api/multi${this.path}/r/${_.isString(sub) ? sub : sub.display_name}`}).return(this);
   }
   /* Note: The endpoints GET/PUT /api/multi/multipath/description and GET /api/multi/multipath/r/srname are intentionally not
   included, because they're redundant and the same thing can be achieved by simply using fetch() and edit(). */

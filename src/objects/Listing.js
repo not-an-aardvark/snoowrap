@@ -1,7 +1,6 @@
 'use strict';
 const _ = require('lodash');
 const util = require('util');
-const promise_wrap = require('promise-chains');
 const errors = require('../errors');
 
 /**
@@ -55,12 +54,12 @@ const Listing = class extends Array {
       return [];
     }
     if (this._is_comment_list) {
-      return promise_wrap(this._fetch_more_comments(amount).then(() => this));
+      return this._fetch_more_comments(amount).then(() => this);
     }
     if (!this.uri) {
       return [];
     }
-    return promise_wrap(this._fetch_more_regular(amount).then(() => this));
+    return this._fetch_more_regular(amount).then(() => this);
   }
   async _fetch_more_regular (amount) {
     const limit_for_request = Math.min(amount, this.limit) || this.limit;

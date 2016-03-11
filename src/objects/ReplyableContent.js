@@ -1,5 +1,4 @@
 'use strict';
-const promise_wrap = require('promise-chains');
 const helpers = require('../helpers');
 const api_type = 'json';
 
@@ -16,14 +15,14 @@ const ReplyableContent = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
   */
   remove ({spam = false} = {}) {
-    return promise_wrap(this._post({uri: 'api/remove', form: {spam, id: this.name}}).return(this));
+    return this._post({uri: 'api/remove', form: {spam, id: this.name}}).return(this);
   }
   /**
   * @summary Approves this Comment, Submission, or PrivateMessage, re-adding it to public listings if it had been removed
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
   */
   approve () {
-    return promise_wrap(this._post({uri: 'api/approve', form: {id: this.name}}).return(this));
+    return this._post({uri: 'api/approve', form: {id: this.name}}).return(this);
   }
   /**
   * @summary Reports this content anonymously to subreddit moderators (for Comments and Submissions)
@@ -33,23 +32,23 @@ const ReplyableContent = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
   */
   report ({reason} = {}) {
-    return promise_wrap(this._post({uri: 'api/report', form: {
+    return this._post({uri: 'api/report', form: {
       api_type, reason: 'other', other_reason: reason, thing_id: this.name
-    }}).return(this));
+    }}).return(this);
   }
   /**
   * @summary Ignores reports on this Comment, Submission, or PrivateMessage
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
   */
   ignore_reports () {
-    return promise_wrap(this._post({uri: 'api/ignore_reports', form: {id: this.name}}).return(this));
+    return this._post({uri: 'api/ignore_reports', form: {id: this.name}}).return(this);
   }
   /**
   * @summary Unignores reports on this Comment, Submission, or PrivateMessages
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
   */
   unignore_reports () {
-    return promise_wrap(this._post({uri: 'api/unignore_reports', form: {id: this.name}}).return(this));
+    return this._post({uri: 'api/unignore_reports', form: {id: this.name}}).return(this);
   }
   /**
   * @summary Submits a new reply to this object. (This takes the form of a new Comment if this object is a Submission/Comment,
@@ -58,10 +57,10 @@ const ReplyableContent = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills with the newly-created reply
   */
   reply (text) {
-    return promise_wrap(this._post({
+    return this._post({
       uri: 'api/comment',
       form: {api_type, text, thing_id: this.name}
-    }).tap(helpers._handle_json_errors)).then(res => res.json.data.things[0]);
+    }).tap(helpers._handle_json_errors).then(res => res.json.data.things[0]);
   }
 };
 

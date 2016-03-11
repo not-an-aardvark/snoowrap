@@ -1,6 +1,6 @@
 'use strict';
 const _ = require('lodash');
-const promise_wrap = require('promise-chains');
+const Promise = require('bluebird');
 const helpers = require('../helpers');
 const errors = require('../errors');
 const api_type = 'json';
@@ -37,16 +37,16 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   delete_flair_template (options) {
-    return promise_wrap(this._post({
+    return this._post({
       uri: `r/${this.display_name}/api/deleteflairtemplate`,
       form: {api_type, flair_template_id: options.flair_template_id}
-    }).return(this));
+    }).return(this);
   }
   _create_flair_template ({text, css_class, flair_type, text_editable = false}) {
-    return promise_wrap(this._post({
+    return this._post({
       uri: `r/${this.display_name}/api/flairtemplate`,
       form: {api_type, text, css_class, flair_type, text_editable}
-    }).return(this));
+    }).return(this);
   }
   /**
   * @summary Creates a new user flair template for this subreddit
@@ -125,7 +125,7 @@ const Subreddit = class extends require('./RedditContent') {
         `${item.name},${item.text || ''},${item.css_class || ''}`).join('\n')
       ));
     }
-    return promise_wrap(Promise.all(requests));
+    return Promise.all(requests).return(this);
   }
   /**
   * @summary Gets a Listing all user flairs on this subreddit.
@@ -181,9 +181,9 @@ const Subreddit = class extends require('./RedditContent') {
   select_my_flair (options) {
     /* NOTE: This requires `identity` scope in addition to `flair` scope, since the reddit api needs to be passed a username.
     I'm not sure if there's a way to do this without requiring additional scope. */
-    return promise_wrap((this._ac.own_user_info ? Promise.resolve() : this._ac.get_me()).then(() =>
+    return (this._ac.own_user_info ? Promise.resolve() : this._ac.get_me()).then(() =>
       this._ac._select_flair(_.assign(options, {subreddit_name: this.display_name, name: this._ac.own_user_info.name}))
-    ));
+    );
   }
   _set_my_flair_visibility (flair_enabled) {
     return this._post({uri: `r/${this.display_name}/api/setflairenabled`, form: {api_type, flair_enabled}});
@@ -350,28 +350,28 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills with this subreddit when the request is complete
   */
   accept_moderator_invite () {
-    return promise_wrap(this._post({
+    return this._post({
       uri: `r/${this.display_name}/api/accept_moderator_invite`,
       form: {api_type}
-    }).bind(this).then(helpers._handle_json_errors));
+    }).bind(this).then(helpers._handle_json_errors);
   }
   /**
   * @summary Abdicates moderator status on this subreddit.
   * @returns {Promise} A Promise for this subreddit.
   */
   leave_moderator () {
-    return promise_wrap(this.name.then(name =>
+    return this.name.then(name =>
       this._post({uri: 'api/leavemoderator', form: {id: name}}).bind(this).then(helpers._handle_json_errors)
-    ));
+    );
   }
   /**
   * @summary Abdicates approved submitter status on this subreddit.
   * @returns {Promise} A Promise that resolves with this subreddit when the request is complete.
   */
   leave_contributor () {
-    return promise_wrap(this.name.then(name =>
+    return this.name.then(name =>
       this._post({uri: 'api/leavecontributor', form: {id: name}}).return(this)
-    ));
+    );
   }
   /**
   * @summary Gets a subreddit's CSS stylesheet.
@@ -459,30 +459,30 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   delete_banner () {
-    return promise_wrap(this._post({
+    return this._post({
       uri: `r/${this.display_name}/api/delete_sr_banner`,
       form: {api_type}
-    }).bind(this).then(helpers._handle_json_errors));
+    }).bind(this).then(helpers._handle_json_errors);
   }
   /**
   * @summary Deletes the header image for this Subreddit.
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   delete_header () {
-    return promise_wrap(this._post({
+    return this._post({
       uri: `r/${this.display_name}/api/delete_sr_header`,
       form: {api_type}
-    }).bind(this).then(helpers._handle_json_errors));
+    }).bind(this).then(helpers._handle_json_errors);
   }
   /**
   * @summary Deletes this subreddit's icon.
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   delete_icon () {
-    return promise_wrap(this._post({
+    return this._post({
       uri: `r/${this.display_name}/api/delete_sr_icon`,
       form: {api_type}
-    }).bind(this).then(helpers._handle_json_errors));
+    }).bind(this).then(helpers._handle_json_errors);
   }
   /**
   * @summary Deletes an image from this subreddit.
@@ -491,10 +491,10 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   delete_image ({image_name}) {
-    return promise_wrap(this._post({
+    return this._post({
       uri: `r/${this.display_name}/api/delete_sr_image`,
       form: {api_type, img_name: image_name}
-    }).bind(this).then(helpers._handle_json_errors));
+    }).bind(this).then(helpers._handle_json_errors);
   }
   /**
   * @summary Gets this subreddit's current settings.
@@ -551,9 +551,9 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
   */
   edit_settings (options) {
-    return promise_wrap(Promise.join(this.get_settings(), this.name, (current_values, name) =>
+    return Promise.join(this.get_settings(), this.name, (current_values, name) =>
       this._ac._create_or_edit_subreddit(_.assign(current_values, options, {sr: name}))
-    ).return(this));
+    ).return(this);
   }
   /**
   * @summary Gets a list of recommended other subreddits given this one.
@@ -581,17 +581,17 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   update_stylesheet ({css, reason}) {
-    return promise_wrap(this._post({
+    return this._post({
       uri: `r/${this.display_name}/api/subreddit_stylesheet`,
       form: {api_type, op: 'save', reason, stylesheet_contents: css}
-    }).bind(this).then(helpers._handle_json_errors));
+    }).bind(this).then(helpers._handle_json_errors);
   }
 
   _set_subscribed (status) {
-    return promise_wrap(this.name.then(name => this._post({
+    return this.name.then(name => this._post({
       uri: 'api/subscribe',
       form: {action: status ? 'sub' : 'unsub', sr: name}
-    }).return(this)));
+    }).return(this));
   }
   /**
   * @summary Subscribes to this subreddit.
@@ -612,7 +612,7 @@ const Subreddit = class extends require('./RedditContent') {
       throw new errors.InvalidMethodCallError('Uploaded image filepath must be a string or a ReadableStream.');
     }
     const parsed_file = typeof file === 'string' ? require('fs').createReadStream(file) : file;
-    return promise_wrap(this._post({
+    return this._post({
       uri: `r/${this.display_name}/api/upload_sr_img`,
       formData: {name, upload_type, img_type: image_type, file: parsed_file}
     }).then(result => {
@@ -620,7 +620,7 @@ const Subreddit = class extends require('./RedditContent') {
         throw result.errors[0];
       }
       return this;
-    }));
+    });
   }
   /**
   * @summary Uploads an image for use in this subreddit's stylesheet.
@@ -688,14 +688,12 @@ const Subreddit = class extends require('./RedditContent') {
     return this._get({uri: `r/${this.display_name}/about/sticky`, qs: {num}});
   }
   _friend (options) {
-    return promise_wrap(
-      this._ac._friend(_.assign(options, {sub: this.display_name})).bind(this).then(helpers._handle_json_errors)
-    );
+    return this._ac._friend(_.assign(options, {sub: this.display_name})).bind(this).then(helpers._handle_json_errors)
+    ;
   }
   _unfriend (options) {
-    return promise_wrap(
-      this._ac._unfriend(_.assign(options, {sub: this.display_name})).bind(this).then(helpers._handle_json_errors)
-    );
+    return this._ac._unfriend(_.assign(options, {sub: this.display_name})).bind(this).then(helpers._handle_json_errors)
+    ;
   }
   /**
   * @summary Invites the given user to be a moderator of this subreddit.

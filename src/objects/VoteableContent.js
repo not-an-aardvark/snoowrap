@@ -1,5 +1,4 @@
 'use strict';
-const promise_wrap = require('promise-chains');
 const helpers = require('../helpers.js');
 const api_type = 'json';
 
@@ -55,20 +54,20 @@ const VoteableContent = class extends require('./ReplyableContent') {
   * @returns {Promise} A Promise that fulfills when the request is complete
   */
   save () {
-    return promise_wrap(this._post({uri: 'api/save', form: {id: this.name}}).then(() => {
+    return this._post({uri: 'api/save', form: {id: this.name}}).then(() => {
       this.saved = true;
       return this;
-    }));
+    });
   }
   /**
   * @summary Unsaves this item
   * @returns {Promise} A Promise that fulfills when the request is complete
   */
   unsave () {
-    return promise_wrap(this._post({uri: 'api/unsave', form: {id: this.name}}).then(() => {
+    return this._post({uri: 'api/unsave', form: {id: this.name}}).then(() => {
       this.saved = false;
       return this;
-    }));
+    });
   }
   /**
   * @summary Distinguishes this Comment or Submission with a sigil.
@@ -81,7 +80,7 @@ const VoteableContent = class extends require('./ReplyableContent') {
   * @returns {Promise} A Promise that fulfills when the request is complete.
   */
   distinguish ({status = true, sticky = false} = {}) {
-    return promise_wrap(this._post({uri: 'api/distinguish', form: {
+    return this._post({uri: 'api/distinguish', form: {
       api_type,
       how: status === true ? 'yes' : status === false ? 'no' : status,
       sticky,
@@ -89,7 +88,7 @@ const VoteableContent = class extends require('./ReplyableContent') {
     }}).then(response => {
       this._fetch = response.json.data.things[0];
       return this;
-    }));
+    });
   }
   /**
   * @summary Undistinguishes this Comment or Submission. Alias for distinguish({status: false})
@@ -104,27 +103,27 @@ const VoteableContent = class extends require('./ReplyableContent') {
   * @returns {Promise} A Promise that fulfills when this request is complete.
   */
   edit (updated_text) {
-    return promise_wrap(this._post({
+    return this._post({
       uri: 'api/editusertext',
       form: {api_type, text: updated_text, thing_id: this.name}
     }).tap(helpers._handle_json_errors).then(response => {
       this._fetch = Promise.resolve(response.json.data.things[0]);
       return this;
-    }));
+    });
   }
   /**
   * @summary Gives reddit gold to the author of this Comment or Submission.
   * @returns {Promise} A Promise that fullfills with this Comment/Submission when this request is complete
   */
   gild () {
-    return promise_wrap(this._post({uri: `api/v1/gold/gild/${this.name}`}).return(this));
+    return this._post({uri: `api/v1/gold/gild/${this.name}`}).return(this);
   }
   /**
   * @summary Deletes this Comment or Submission
   * @returns {Promise} A Promise that fulfills with this Comment/Submission when this request is complete
   */
   delete () {
-    return promise_wrap(this._post({uri: 'api/del', form: {id: this.name}}).return(this));
+    return this._post({uri: 'api/del', form: {id: this.name}}).return(this);
   }
   _set_inbox_replies_enabled (state) {
     return this._post({uri: 'api/sendreplies', form: {state, id: this.name}});
@@ -134,14 +133,14 @@ const VoteableContent = class extends require('./ReplyableContent') {
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
   */
   enable_inbox_replies () {
-    return promise_wrap(this._set_inbox_replies_enabled(true).return(this));
+    return this._set_inbox_replies_enabled(true).return(this);
   }
   /**
   * @summary Disables inbox replies on this Comment or Submission
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
   */
   disable_inbox_replies () {
-    return promise_wrap(this._set_inbox_replies_enabled(false).return(this));
+    return this._set_inbox_replies_enabled(false).return(this);
   }
 };
 
