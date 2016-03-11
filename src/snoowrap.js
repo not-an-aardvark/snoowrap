@@ -311,7 +311,7 @@ const snoowrap = class {
       opts = subreddit_name;
       sub_name = undefined;
     }
-    const parsed_options = _(opts).assign({t: opts.time, time: undefined}).omit(['time']).value();
+    const parsed_options = _(opts).assign({t: opts.time, time: undefined}).omit('time').value();
     return this._get({uri: (sub_name ? `r/${sub_name}/` : '') + sort_type, qs: parsed_options});
   }
   /**
@@ -480,7 +480,7 @@ const snoowrap = class {
     if (options.subreddit instanceof snoowrap.objects.Subreddit) {
       options.subreddit = options.subreddit.display_name;
     }
-    const parsed_query = _(options).assign({t: options.time, q: options.query}).omit(['time', 'query']).value();
+    const parsed_query = _(options).assign({t: options.time, q: options.query}).omit('time', 'query').value();
     return this._get({uri: `${options.subreddit ? `r/${options.subreddit}/` : ''}search`, qs: parsed_query});
   }
   /**
@@ -626,7 +626,7 @@ const snoowrap = class {
   */
   search_subreddits (options) {
     options.q = options.query;
-    return this._get({uri: 'subreddits/search', qs: _.omit(options, ['query'])});
+    return this._get({uri: 'subreddits/search', qs: _.omit(options, 'query')});
   }
   /**
   * @summary Gets a list of subreddits, arranged by popularity.

@@ -65,4 +65,4 @@ exports._format_permissions = (all_permission_names, permissions_array) => {
 exports._format_mod_permissions = _.partial(exports._format_permissions, constants.MODERATOR_PERMISSIONS);
 exports._format_livethread_permissions = _.partial(exports._format_permissions, constants.LIVETHREAD_PERMISSIONS);
 
-exports.rename_key = (obj, oldkey, newkey) => obj && _(_.clone(obj)).assign({[newkey]: obj[oldkey]}).omit([oldkey]).value();
+exports.rename_key = (obj, oldkey, newkey) => obj && _(_.clone(obj)).assign({[newkey]: obj[oldkey]}).omit(oldkey).value();

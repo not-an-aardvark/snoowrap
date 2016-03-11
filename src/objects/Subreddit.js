@@ -297,7 +297,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Listing containing moderation actions
   */
   get_moderation_log (options = {}) {
-    const parsed_options = _(options).assign({mod: options.mods && options.mods.join(',')}).omit(['mods']).value();
+    const parsed_options = _(options).assign({mod: options.mods && options.mods.join(',')}).omit('mods').value();
     return this._get({uri: `r/${this.display_name}/about/log`, qs: parsed_options});
   }
   /**
