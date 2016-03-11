@@ -1,7 +1,6 @@
 'use strict';
 const Promise = require('bluebird');
 const request = require('request-promise').defaults({json: true});
-const moment = require('moment');
 const helpers = require('./helpers');
 const errors = require('./errors');
 
@@ -14,22 +13,22 @@ exports.oauth_request = async (r, method, args, attempts = 0) => {
     await r._throttle;
   }
   r._throttle = Promise.delay(r.config().request_delay);
-  if (r.ratelimit_remaining < 1 && moment(r.ratelimit_reset_point).isAfter()) {
+  if (r.ratelimit_remaining < 1 && Date.now() < r.ratelimit_reset_point) {
     // If the ratelimit has been exceeded, delay or abort the request depending on the user's config.
-    const seconds_until_expiry = moment(r.ratelimit_reset_point).diff();
+    const time_until_expiry = r.ratelimit_reset_point - Date.now();
     if (r.config().continue_after_ratelimit_error) {
       /* If the `continue_after_ratelimit_error` setting is enabled, queue the request, wait until the next ratelimit
       period, and then send it. */
-      r.warn(errors.RateLimitWarning(seconds_until_expiry));
-      await Promise.delay(moment(r.ratelimit_reset_point).diff());
+      r.warn(errors.RateLimitWarning(time_until_expiry));
+      await Promise.delay(time_until_expiry);
     } else {
       // Otherwise, throw an error.
-      throw new errors.RateLimitError(seconds_until_expiry);
+      throw new errors.RateLimitError(time_until_expiry);
     }
   }
   try {
     // If the access token has expired, refresh it.
-    if (r.refresh_token && (!r.access_token || moment(r.token_expiration).isBefore())) {
+    if (r.refresh_token && (!r.access_token || Date.now() > r.token_expiration)) {
       await exports.update_access_token(r);
     }
     // Send the request and return the response.
@@ -38,9 +37,9 @@ exports.oauth_request = async (r, method, args, attempts = 0) => {
       baseUrl: `https://oauth.${r.config().endpoint_domain}`,
       qs: {raw_json: 1},
       auth: {bearer: r.access_token},
-      transform: (body, response) => {
+      transform (body, response) {
         r.ratelimit_remaining = response.headers['x-ratelimit-remaining'];
-        r.ratelimit_reset_point = moment().add(response.headers['x-ratelimit-reset'], 'seconds').format();
+        r.ratelimit_reset_point = Date.now() + response.headers['x-ratelimit-reset'] * 1000;
         const populated = helpers._populate(body, r);
         if (populated && populated.constructor && populated.constructor.name === 'Listing') {
           populated.uri = response.request.uri.path;
@@ -74,6 +73,6 @@ exports.update_access_token = async r => {
     form: {grant_type: 'refresh_token', refresh_token: r.refresh_token}
   }]);
   r.access_token = token_info.access_token;
-  r.token_expiration = moment().add(token_info.expires_in, 'seconds').format();
+  r.token_expiration = Date.now() + token_info.expires_in * 1000;
   r.scope = token_info.scope.split(' ');
 };

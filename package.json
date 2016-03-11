@@ -38,7 +38,6 @@
     "bluebird": "^3.3.3",
     "harmony-reflect": "^1.4.2",
     "lodash": "^4.5.1",
-    "moment": "^2.11.2",
     "promise-chains": "^0.3.0",
     "request-promise": "^2.0.1",
     "ws": "^1.0.1"
@@ -56,6 +55,7 @@
     "eslint-plugin-babel": "^3.1.0",
     "ink-docstrap": "^1.1.4",
     "jsdoc": "^3.4.0",
-    "mocha": "^2.4.5"
+    "mocha": "^2.4.5",
+    "moment": "^2.12.0"
   }
 }
