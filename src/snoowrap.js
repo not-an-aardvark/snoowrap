@@ -749,4 +749,5 @@ _.forOwn(snoowrap.objects, (value, key) => {
 });
 
 snoowrap.helpers = helpers;
+snoowrap.errors = errors;
 module.exports = snoowrap;
