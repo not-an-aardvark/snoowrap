@@ -4,7 +4,6 @@ const Promise = require('bluebird');
 const _ = require('lodash');
 const moment = require('moment');
 const snoowrap = require('..');
-const errors = require('../lib/errors');
 describe('snoowrap', function () {
   this.timeout(30000);
   this.slow(20000);
@@ -29,10 +28,14 @@ describe('snoowrap', function () {
 
   describe('.constructor', () => {
     it('throws an error if no user-agent is provided', () => {
-      expect(() => new snoowrap({})).to.throw(errors.MissingUserAgentError);
+      expect(() => new snoowrap({})).to.throw(snoowrap.errors.MissingUserAgentError);
     });
     it('throws an error if insufficient credentials are provided', () => {
-      expect(() => new snoowrap({user_agent: 'a', client_id: 'b', client_secret: 'c'})).to.throw(errors.NoCredentialsError);
+      expect(() => new snoowrap({
+        user_agent: 'a',
+        client_id: 'b',
+        client_secret: 'c'
+      })).to.throw(snoowrap.errors.NoCredentialsError);
     });
     it('does not throw an error if only an access token is provided', () => {
       expect(() => new snoowrap({user_agent: 'a', access_token: 'blah'})).not.to.throw();
@@ -60,8 +63,8 @@ describe('snoowrap', function () {
       expect(await user.nonexistent_property).to.be.undefined();
     });
     it('throws an error if it tries to fetch the profile of a deleted/invalid account', () => {
-      expect(() => r.get_user('[deleted]').fetch()).to.throw(errors.InvalidUserError);
-      expect(() => r.get_user(null).fetch()).to.throw(errors.InvalidUserError);
+      expect(() => r.get_user('[deleted]').fetch()).to.throw(snoowrap.errors.InvalidUserError);
+      expect(() => r.get_user(null).fetch()).to.throw(snoowrap.errors.InvalidUserError);
     });
     it("can get a user's trophies", async () => {
       expect(await user.get_trophies()).to.be.an.instanceof(snoowrap.objects.TrophyList);
