@@ -131,9 +131,10 @@ const Submission = class extends require('./VoteableContent') {
   }
   /**
   * @summary Marks this submission as 'visited'.
+  * @desc **Note**: This function only works if the authenticated account has a subscription to reddit gold.
   * @returns {Promise} The updated version of this Submission
   */
-  mark_as_read () { // Requires reddit gold
+  mark_as_read () {
     return this._post({uri: 'api/store_visits', form: {links: this.name}}).return(this);
   }
   /**
