@@ -26,14 +26,6 @@
   "bugs": {
     "url": "https://github.com/not-an-aardvark/snoowrap/issues"
   },
-  "babel": {
-    "plugins": [
-      "transform-async-to-generator",
-      "transform-es2015-destructuring",
-      "transform-es2015-parameters",
-      "transform-es2015-spread"
-    ]
-  },
   "homepage": "https://github.com/not-an-aardvark/snoowrap",
   "dependencies": {
     "bluebird": "^3.3.3",
