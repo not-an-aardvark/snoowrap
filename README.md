@@ -60,7 +60,8 @@ simply store it in a json file and require() it. For more information on how to 
 const r = new snoowrap({
   client_id: 'put your client id here',
   client_secret: 'put your client secret here',
-  refresh_token: 'put your refresh token here'
+  refresh_token: 'put your refresh token here',
+  user_agent: 'myApp v1.0.0 by me' // learn more about User-Agent here: https://github.com/reddit/reddit/wiki/API
 });
 
 /* That's the entire setup process, now you can just make requests. I would recommend including async functions in your project
