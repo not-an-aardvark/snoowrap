@@ -220,6 +220,14 @@ describe('snoowrap', function () {
       const top_in_last_day = await r.get_top({time: 'day'})[0];
       expect(moment.unix(top_in_last_day.created_utc).add(24, 'hours').isAfter()).to.be.true();
     });
+    it('can get listings of posts without specifying a time or subreddit', async () => {
+      expect(await r.get_top('gifs', {limit: 2})).to.have.lengthOf(2);
+      expect(await r.get_top('gifs')).to.have.length.above(2);
+      expect(await r.get_top({limit: 2})).to.have.lengthOf(2);
+      expect(await r.get_controversial('AskReddit', {limit: 2})).to.have.lengthOf(2);
+      expect(await r.get_controversial('AskReddit')).to.have.length.above(2);
+      expect(await r.get_new({limit: 3})).to.have.lengthOf(3);
+    });
   });
 
   describe('self-property fetching', () => {
