@@ -38,7 +38,7 @@ exports.oauth_request = async (r, method, args, attempts = 0) => {
       qs: {raw_json: 1},
       auth: {bearer: r.access_token},
       transform (body, response) {
-        r.ratelimit_remaining = parseInt(response.headers['x-ratelimit-remaining']);
+        r.ratelimit_remaining = +response.headers['x-ratelimit-remaining'];
         r.ratelimit_reset_point = Date.now() + response.headers['x-ratelimit-reset'] * 1000;
         const populated = helpers._populate(body, r);
         if (populated && populated.constructor && populated.constructor.name === 'Listing') {
