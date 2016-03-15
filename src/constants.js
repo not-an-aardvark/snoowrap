@@ -5,7 +5,7 @@ module.exports = {
   DOCS_LINK: 'https://not-an-aardvark.github.io/snoowrap/',
   API_RULES_LINK: 'https://github.com/reddit/reddit/wiki/API',
   USER_KEYS: ['author', 'approved_by', 'banned_by'],
-  SUBREDDIT_KEYS: ['subreddit'],
+  SUBREDDIT_KEYS: ['subreddit', 'sr'],
   KINDS: {
     t1: 'Comment',
     t2: 'RedditUser',

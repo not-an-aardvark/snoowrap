@@ -237,7 +237,11 @@ describe('snoowrap', function () {
       expect(me.name).to.be.a('string');
     });
     it("gets the requester's karma", async () => {
-      expect(await r.get_karma()).to.be.an.instanceof(Array);
+      const karma = await r.get_karma();
+      expect(karma).to.be.an.instanceof(Array);
+      if (karma.length) {
+        expect(karma[0].sr).to.be.an.instanceof(snoowrap.objects.Subreddit);
+      }
     });
     it('gets current preferences', async () => {
       const prefs = await r.get_preferences();

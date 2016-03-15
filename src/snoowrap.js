@@ -204,7 +204,11 @@ const snoowrap = class {
   * @example
   *
   * r.get_karma().then(console.log)
-  * // => [ {sr: 'redditdev', comment_karma: 16, link_karma: 1}, { sr: 'programming', comment_karma: 2, link_karma: 1 }, ... ]
+  * // => [
+  * //  { sr: Subreddit { display_name: 'redditdev' }, comment_karma: 16, link_karma: 1 },
+  * //  { sr: Subreddit { display_name: 'programming' }, comment_karma: 2, link_karma: 1 },
+  * //  ...
+  * // ]
   */
   get_karma () {
     return this._get({uri: 'api/v1/me/karma'});
