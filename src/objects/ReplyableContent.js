@@ -60,7 +60,7 @@ const ReplyableContent = class extends require('./RedditContent') {
     return this._post({
       uri: 'api/comment',
       form: {api_type, text, thing_id: this.name}
-    }).tap(helpers._handle_json_errors).then(res => res.json.data.things[0]);
+    }).tap(helpers._handle_json_errors(this)).then(res => res.json.data.things[0]);
   }
 };
 

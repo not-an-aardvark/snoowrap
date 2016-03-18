@@ -57,7 +57,7 @@ const LiveThread = class extends require('./RedditContent') {
     return this._post({
       uri: `api/live/${this.id}/update`,
       form: {api_type, body}
-    }).bind(this).then(helpers._handle_json_errors);
+    }).then(helpers._handle_json_errors(this));
   }
   /**
   * @summary Accepts a pending contributor invitation on this LiveThread.
@@ -83,7 +83,7 @@ const LiveThread = class extends require('./RedditContent') {
     return this._post({
       uri: `api/live/${this.id}/delete_update`,
       form: {api_type, id: `${id.startsWith('LiveUpdate_') ? '' : 'LiveUpdate_'}${id}`}
-    }).bind(this).then(helpers._handle_json_errors);
+    }).then(helpers._handle_json_errors(this));
   }
   /**
   * @summary Edits the settings on this LiveThread.
@@ -98,7 +98,7 @@ const LiveThread = class extends require('./RedditContent') {
     return this._post({
       uri: `api/live/${this.id}/edit`,
       form: {api_type, description, nsfw, resources, title}
-    }).bind(this).then(helpers._handle_json_errors);
+    }).then(helpers._handle_json_errors(this));
   }
   /**
   * @summary Invites a contributor to this LiveThread.
@@ -117,7 +117,7 @@ const LiveThread = class extends require('./RedditContent') {
         permissions: helpers._format_livethread_permissions(permissions),
         type: 'liveupdate_contributor_invite'
       }
-    }).bind(this).then(helpers._handle_json_errors);
+    }).then(helpers._handle_json_errors(this));
   }
   /**
   * @summary Abdicates contributor status on this LiveThread.
@@ -137,7 +137,7 @@ const LiveThread = class extends require('./RedditContent') {
     return this._post({
       uri: `api/live/${this.id}/report`,
       form: {api_type, type: reason}
-    }).bind(this).then(helpers._handle_json_errors);
+    }).then(helpers._handle_json_errors(this));
   }
   /**
   * @summary Removes the given user from contributor status on this LiveThread.
@@ -149,7 +149,7 @@ const LiveThread = class extends require('./RedditContent') {
     return this._ac.get_user(name).id.then(user_id => this._post({
       uri: `api/live/${this.id}/rm_contributor`,
       form: {api_type, id: `t2_${user_id}`}
-    })).bind(this).then(helpers._handle_json_errors);
+    })).then(helpers._handle_json_errors(this));
   }
   /**
   * @summary Revokes an invitation for the given user to become a contributor on this LiveThread.
@@ -161,7 +161,7 @@ const LiveThread = class extends require('./RedditContent') {
     return this._ac.get_user(name).id.then(user_id => this._post({
       uri: `api/live/${this.id}/rm_contributor_invite`,
       form: {api_type, id: `t2_${user_id}`}
-    })).bind(this).then(helpers._handle_json_errors);
+    })).then(helpers._handle_json_errors(this));
   }
   /**
   * @summary Sets the permissions of the given contributor.
@@ -175,7 +175,7 @@ const LiveThread = class extends require('./RedditContent') {
     return this._post({
       uri: `api/live/${this.id}/set_contributor_permissions`,
       form: {api_type, name, permissions: helpers._format_livethread_permissions(permissions), type: 'liveupdate_contributor'}
-    }).bind(this).then(helpers._handle_json_errors);
+    }).then(helpers._handle_json_errors(this));
   }
   /**
   * @summary Strikes (marks incorrect and crosses out) the given update.
@@ -186,7 +186,7 @@ const LiveThread = class extends require('./RedditContent') {
     return this._post({
       uri: `api/live/${this.id}/strike_update`,
       form: {api_type, id: `${id.startsWith('LiveUpdate_') ? '' : 'LiveUpdate_'}${id}`}
-    }).bind(this).then(helpers._handle_json_errors);
+    }).then(helpers._handle_json_errors(this));
   }
   /**
   * @summary Gets a Listing containing past updates to this LiveThread.

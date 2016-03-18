@@ -106,7 +106,7 @@ const VoteableContent = class extends require('./ReplyableContent') {
     return this._post({
       uri: 'api/editusertext',
       form: {api_type, text: updated_text, thing_id: this.name}
-    }).tap(helpers._handle_json_errors).then(response => {
+    }).tap(helpers._handle_json_errors(this)).then(response => {
       this._fetch = Promise.resolve(response.json.data.things[0]);
       return this;
     });

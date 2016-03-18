@@ -36,14 +36,13 @@ exports._populate = (response_tree, _ac) => {
   return response_tree;
 };
 
-exports._handle_json_errors = function (response) {
-  if (_.isEmpty(response)) {
-    return this;
-  }
-  if (response.json.errors.length) {
+exports._handle_json_errors = returnValue => {
+  return response => {
+    if (_.isEmpty(response) || !response.json.errors.length) {
+      return returnValue;
+    }
     throw response.json.errors[0];
-  }
-  return this;
+  };
 };
 
 exports.find_message_in_tree = (desired_message_name, current_message) => {

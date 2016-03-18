@@ -353,7 +353,7 @@ const Subreddit = class extends require('./RedditContent') {
     return this._post({
       uri: `r/${this.display_name}/api/accept_moderator_invite`,
       form: {api_type}
-    }).bind(this).then(helpers._handle_json_errors);
+    }).then(helpers._handle_json_errors(this));
   }
   /**
   * @summary Abdicates moderator status on this subreddit.
@@ -361,7 +361,7 @@ const Subreddit = class extends require('./RedditContent') {
   */
   leave_moderator () {
     return this.name.then(name =>
-      this._post({uri: 'api/leavemoderator', form: {id: name}}).bind(this).then(helpers._handle_json_errors)
+      this._post({uri: 'api/leavemoderator', form: {id: name}}).then(helpers._handle_json_errors(this))
     );
   }
   /**
@@ -462,7 +462,7 @@ const Subreddit = class extends require('./RedditContent') {
     return this._post({
       uri: `r/${this.display_name}/api/delete_sr_banner`,
       form: {api_type}
-    }).bind(this).then(helpers._handle_json_errors);
+    }).then(helpers._handle_json_errors(this));
   }
   /**
   * @summary Deletes the header image for this Subreddit.
@@ -472,7 +472,7 @@ const Subreddit = class extends require('./RedditContent') {
     return this._post({
       uri: `r/${this.display_name}/api/delete_sr_header`,
       form: {api_type}
-    }).bind(this).then(helpers._handle_json_errors);
+    }).then(helpers._handle_json_errors(this));
   }
   /**
   * @summary Deletes this subreddit's icon.
@@ -482,7 +482,7 @@ const Subreddit = class extends require('./RedditContent') {
     return this._post({
       uri: `r/${this.display_name}/api/delete_sr_icon`,
       form: {api_type}
-    }).bind(this).then(helpers._handle_json_errors);
+    }).then(helpers._handle_json_errors(this));
   }
   /**
   * @summary Deletes an image from this subreddit.
@@ -494,7 +494,7 @@ const Subreddit = class extends require('./RedditContent') {
     return this._post({
       uri: `r/${this.display_name}/api/delete_sr_image`,
       form: {api_type, img_name: image_name}
-    }).bind(this).then(helpers._handle_json_errors);
+    }).then(helpers._handle_json_errors(this));
   }
   /**
   * @summary Gets this subreddit's current settings.
@@ -584,7 +584,7 @@ const Subreddit = class extends require('./RedditContent') {
     return this._post({
       uri: `r/${this.display_name}/api/subreddit_stylesheet`,
       form: {api_type, op: 'save', reason, stylesheet_contents: css}
-    }).bind(this).then(helpers._handle_json_errors);
+    }).then(helpers._handle_json_errors(this));
   }
 
   _set_subscribed (status) {
@@ -688,11 +688,11 @@ const Subreddit = class extends require('./RedditContent') {
     return this._get({uri: `r/${this.display_name}/about/sticky`, qs: {num}});
   }
   _friend (options) {
-    return this._ac._friend(_.assign(options, {sub: this.display_name})).bind(this).then(helpers._handle_json_errors)
+    return this._ac._friend(_.assign(options, {sub: this.display_name})).then(helpers._handle_json_errors(this))
     ;
   }
   _unfriend (options) {
-    return this._ac._unfriend(_.assign(options, {sub: this.display_name})).bind(this).then(helpers._handle_json_errors)
+    return this._ac._unfriend(_.assign(options, {sub: this.display_name})).then(helpers._handle_json_errors(this))
     ;
   }
   /**
@@ -834,7 +834,7 @@ const Subreddit = class extends require('./RedditContent') {
     return this._post({
       uri: `r/${this.display_name}/api/setpermissions`,
       form: {api_type, name, permissions: helpers._format_mod_permissions(permissions), type: 'moderator'}
-    }).bind(this).tap(helpers._handle_json_errors);
+    }).tap(helpers._handle_json_errors(this));
   }
   /**
   * @summary Gets a given wiki page on this subreddit.
