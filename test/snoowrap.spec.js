@@ -650,8 +650,35 @@ describe('snoowrap', function () {
       await r.get_user('actually_an_aardvark').fetch();
       expect(timer.isFulfilled()).to.be.true();
     });
+    it('stores the version number as a constant', () => {
+      expect(snoowrap.constants.VERSION).to.equal(require('../package.json').version);
+    });
+    it('stores the ratelimit remaining as a number', async () => {
+      await r.get_me();
+      expect(r.ratelimit_remaining).to.be.a('number');
+    });
     after(() => {
       r.config({request_delay: 0});
+    });
+  });
+
+  describe('requester metadata', () => {
+    before(async () => {
+      await r.get_me();
+    });
+    it('stores the ratelimit remaining as a number', () => {
+      expect(r.ratelimit_remaining).to.be.a('number');
+    });
+    it('stores the ratelimit reset point properly', () => {
+      expect(r.ratelimit_reset_point).to.be.a('number');
+      expect(moment(r.ratelimit_reset_point).isAfter()).to.be.true();
+      expect(moment(r.ratelimit_reset_point).subtract({minutes: 10}).isBefore()).to.be.true();
+    });
+    it('stores the access token and the access token expiration properly', () => {
+      expect(r.access_token).to.be.a('string');
+      expect(r.token_expiration).to.be.a('number');
+      expect(moment(r.token_expiration).isAfter()).to.be.true();
+      expect(moment(r.token_expiration).subtract({hours: 1}).isBefore()).to.be.true();
     });
   });
 
