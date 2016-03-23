@@ -151,3 +151,9 @@ r.get_submission('47v7tm').fetch().get('comments').get(0).call('upvote');
 1. `cd snoowrap`
 1. `npm install`
 1. `npm test`
+
+---
+
+### License
+
+This software is freely distributable under the terms of the [MIT License](https://github.com/not-an-aardvark/snoowrap/blob/master/LICENSE.md).
