@@ -2,6 +2,7 @@
 const Promise = require('bluebird');
 const request = require('request-promise').defaults({json: true});
 const helpers = require('./helpers');
+const constants = require('./constants');
 const errors = require('./errors');
 
 module.exports = {
@@ -50,6 +51,15 @@ module.exports = {
         }
       })[method](...args);
     } catch (err) {
+      if (err.statusCode === 401 && r.token_expiration - Date.now() < constants.MAX_TOKEN_LATENCY && r.refresh_token) {
+        /* If the server returns a 401 error, it's possible that the access token expired during the latency period
+        as this request was being sent. In this scenario, snoowrap thought that the access token was valid
+        for a few more seconds, so it didn't refresh the token, but the token had expired by the time the request
+        reached the server. To handle this issue, invalidate the access token and call oauth_request again,
+        automatically causing the token to be refreshed. */
+        r.access_token = undefined;
+        return await module.exports.oauth_request(r, method, args, attempts);
+      }
       if (attempts + 1 >= r._config.max_retry_attempts || r._config.retry_error_codes.indexOf(err.statusCode) === -1) {
         throw err;
       }
