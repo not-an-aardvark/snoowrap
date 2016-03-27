@@ -1,5 +1,6 @@
 'use strict';
 const _ = require('lodash');
+const Promise = require('bluebird');
 const util = require('util');
 const errors = require('../errors');
 
@@ -51,13 +52,13 @@ const Listing = class extends Array {
       throw new errors.InvalidMethodCallError('Failed to fetch Listing. (amount must be a Number.)');
     }
     if (amount <= 0 || this.is_finished) {
-      return [];
+      return Promise.resolve([]);
     }
     if (this._is_comment_list) {
       return this._fetch_more_comments(amount).then(() => this);
     }
     if (!this.uri) {
-      return [];
+      return Promise.resolve([]);
     }
     return this._fetch_more_regular(amount).then(() => this);
   }
