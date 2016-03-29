@@ -13,7 +13,6 @@ const RedditContent = class {
   constructor (options, _ac, _has_fetched) {
     // _ac stands for 'authenticated client' -- it refers to the snoowrap requester that is used to fetch this content.
     this._ac = _ac;
-    this._fetch = undefined;
     this._has_fetched = !!_has_fetched;
     _.assign(this, options);
     if (typeof Proxy !== 'undefined') {

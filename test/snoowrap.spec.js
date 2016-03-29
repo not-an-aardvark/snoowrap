@@ -663,19 +663,52 @@ describe('snoowrap', function () {
   });
 
   describe('requester metadata', () => {
+    /* When running tests on private info such as access tokens, always use an expression that evaluates to true or false
+    instead of using chai's shortcuts.
+    * GOOD: expect(typeof r.access_token === 'string').to.be.true();
+    * BAD: expect(r.access_token).to.be.a('string');
+    *
+    * If the first test fails, the error message will simply say `expected false to be true`, but if the second test fails,
+    * the error message will say `expected <the access token's value> to be a string`. Since the unit tests are run on a
+    * public travis server, this would have the effect of leaking the private credentials.
+    */
     before(async () => {
       await r.get_me();
     });
-    it('stores the ratelimit remaining as a number', () => {
-      expect(r.ratelimit_remaining).to.be.a('number');
+    it('stores the client id, client secret, refresh token, and access token on the requester', () => {
+      expect(r.client_id).to.be.a('string');
+      expect(typeof r.client_secret === 'string').to.be.true();
+      expect(typeof r.refresh_token === 'string').to.be.true();
+      expect(typeof r.access_token === 'string').to.be.true();
     });
-    it('stores the ratelimit reset point properly', () => {
-      expect(r.ratelimit_reset_point).to.be.a('number');
-      expect(moment(r.ratelimit_reset_point).isAfter()).to.be.true();
-      expect(moment(r.ratelimit_reset_point).subtract({minutes: 10}).isBefore()).to.be.true();
+    it('redacts the client secret, the refresh token, and the access token from the console.log view', () => {
+      const inspected = require('util').inspect(r);
+      expect(_.includes(inspected, r.client_secret)).to.be.false();
+      expect(_.includes(inspected, r.refresh_token)).to.be.false();
+      expect(_.includes(inspected, r.access_token)).to.be.false();
+    });
+    it('stores the ratelimit expiration and access token expiration as unix ms timestamps', () => {
+      expect(r.ratelimit_expiration).to.be.a('number');
+      expect(moment(r.ratelimit_expiration).isAfter()).to.be.true();
+      expect(moment(r.ratelimit_expiration).subtract({minutes: 10}).isBefore()).to.be.true();
+      expect(r.token_expiration).to.be.a('number');
+      expect(moment(r.token_expiration).isAfter()).to.be.true();
+      expect(moment(r.token_expiration).subtract({hours: 1}).isBefore()).to.be.true();
+    });
+    it("stores the token's scope on the requester after making a request", () => {
+      expect(r.scope).to.be.an.instanceof(Array);
+      expect(r.scope).to.include('account');
+      expect(r.scope).to.include('creddits');
+    });
+    it('stores the ratelimit remaining as a number returned from reddit', () => {
+      expect(r.ratelimit_remaining).to.be.a('number');
+      expect(r.ratelimit_remaining).to.be.at.least(0).and.at.most(600);
+    });
+    it("stores a user's own info on the requester after calling get_me()", () => {
+      expect(r.own_user_info).to.be.an.instanceof(snoowrap.objects.RedditUser);
     });
     it('stores the access token and the access token expiration properly', () => {
-      expect(r.access_token).to.be.a('string');
+      expect(typeof r.access_token === 'string').to.be.true();
       expect(r.token_expiration).to.be.a('number');
       expect(moment(r.token_expiration).isAfter()).to.be.true();
       expect(moment(r.token_expiration).subtract({hours: 1}).isBefore()).to.be.true();
