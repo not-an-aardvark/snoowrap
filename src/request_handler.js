@@ -16,9 +16,9 @@ module.exports = {
       await r._throttle;
     }
     r._throttle = Promise.delay(r._config.request_delay);
-    if (r.ratelimit_remaining < 1 && Date.now() < r.ratelimit_reset_point) {
+    if (r.ratelimit_remaining < 1 && Date.now() < r.ratelimit_expiration) {
       // If the ratelimit has been exceeded, delay or abort the request depending on the user's config.
-      const time_until_expiry = r.ratelimit_reset_point - Date.now();
+      const time_until_expiry = r.ratelimit_expiration - Date.now();
       if (r._config.continue_after_ratelimit_error) {
         /* If the `continue_after_ratelimit_error` setting is enabled, queue the request, wait until the next ratelimit
         period, and then send it. */
@@ -42,7 +42,7 @@ module.exports = {
         auth: {bearer: r.access_token},
         transform (body, response) {
           r.ratelimit_remaining = +response.headers['x-ratelimit-remaining'];
-          r.ratelimit_reset_point = Date.now() + response.headers['x-ratelimit-reset'] * 1000;
+          r.ratelimit_expiration = Date.now() + response.headers['x-ratelimit-reset'] * 1000;
           const populated = helpers._populate(body, r);
           if (populated && populated.constructor && populated.constructor.name === 'Listing') {
             populated.uri = response.request.uri.path;
