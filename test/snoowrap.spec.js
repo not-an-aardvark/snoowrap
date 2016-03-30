@@ -492,17 +492,27 @@ describe('snoowrap', function () {
     // Threads used for these tests:
     // PMs: https://i.gyazo.com/24f3b97e55b6ff8e3a74cb026a58b167.png
     // Modmails: https://i.gyazo.com/f0e6de4190c7eef5368f9d12c25bacc7.png
-    let message1, message2, message3;
+    let message1, message2, message3, message4;
     beforeEach(() => {
       message1 = r.get_message('51shnw');
       message2 = r.get_message('51shsd');
       message3 = r.get_message('51shxv');
+      message4 = r.get_message('51si23');
     });
     it('can get the contents of the first message in a chain', async () => {
       expect(await message1.body).to.equal('PM 1: snoowrap_testing --> not_an_aardvark');
     });
     it('can get the contents of a message later in a chain', async () => {
       expect(await message2.body).to.equal('PM 2 (re: PM 1): not_an_aardvark --> snoowrap_testing');
+      expect(await message4.body).to.equal('PM 4 (re: PM 2): snoowrap_testing --> not_an_aardvark');
+    });
+    it('arranges PM replies into a tree', async () => {
+      const root = await message1.fetch();
+      expect(root.replies).to.have.lengthOf(2);
+      expect(root.replies[0].name).to.equal(message2.name);
+      expect(root.replies[1].name).to.equal(message3.name);
+      expect(root.replies[0].replies).to.have.lengthOf(1);
+      expect(root.replies[0].replies[0].name).to.equal(message4.name);
     });
     it('can get replies to a message', async () => {
       expect(await message1.replies[0].name).to.equal(message2.name);
