@@ -41,7 +41,7 @@ exports._add_empty_replies_listing = item => {
     const replies_uri = `comments/${item.link_id.slice(3)}`;
     const replies_query = {comment: item.name.slice(3)};
     const _transform = response => response.comments[0].replies;
-    item.replies = item._ac._new_object('Listing', {uri: replies_uri, query: replies_query, _transform});
+    item.replies = item._ac._new_object('Listing', {_uri: replies_uri, _query: replies_query, _transform});
   } else if (item.constructor.name === 'PrivateMessage') {
     item.replies = item._ac._new_object('Listing');
   }

@@ -6,7 +6,7 @@ const helpers = require('../helpers');
 */
 const Comment = class extends require('./VoteableContent') {
   _transform_api_response (response_obj) {
-    return helpers._add_empty_replies_listing(response_obj[0]);
+    return response_obj[0].replies ? response_obj[0] : helpers._add_empty_replies_listing(response_obj[0]);
   }
   get _uri () {
     return `api/info?id=${this.name}`;

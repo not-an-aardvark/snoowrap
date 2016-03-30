@@ -45,7 +45,7 @@ module.exports = {
           r.ratelimit_expiration = Date.now() + response.headers['x-ratelimit-reset'] * 1000;
           const populated = helpers._populate(body, r);
           if (populated && populated.constructor && populated.constructor.name === 'Listing') {
-            populated.uri = response.request.uri.path;
+            populated._uri = response.request.uri.path;
           }
           return populated;
         }

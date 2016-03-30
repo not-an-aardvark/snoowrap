@@ -173,9 +173,9 @@ describe('snoowrap', function () {
       expect(await comments.fetch_more(5)).to.have.length.within(6, 100);
       expect(comments[0]).to.be.an.instanceof(snoowrap.objects.Comment);
       expect(_.last(await comments)).to.be.an.instanceof(snoowrap.objects.Comment);
-      await comments.fetch_all();
-      expect(comments).to.have.length.above(1000);
-      expect(comments.is_finished).to.be.true();
+      const all_comments = await comments.fetch_all();
+      expect(all_comments).to.have.length.above(1000);
+      expect(all_comments.is_finished).to.be.true();
     });
     it("can get comments by index before they're fetched", async () => {
       expect(await submission.comments[6].body).to.equal('pumpkin pie');
@@ -200,8 +200,7 @@ describe('snoowrap', function () {
       const posts = await r.get_hot();
       expect(posts).to.be.an.instanceof(snoowrap.objects.Listing);
       expect(posts).to.have.length.above(0).and.at.most(100);
-      await posts.fetch_more(101);
-      expect(posts).to.have.length.above(100);
+      expect(await posts.fetch_more(101)).to.have.length.above(100);
     });
     it('can get new posts from the front page', async () => {
       const posts = await r.get_new();
@@ -565,8 +564,7 @@ describe('snoowrap', function () {
       expect(results).to.have.lengthOf(2);
       expect(results[0]).to.be.an.instanceof(snoowrap.objects.Submission);
       expect(results[0].author.name).to.equal('DO_U_EVN_SPAGHETTI');
-      await results.fetch_more(2);
-      expect(results).to.have.lengthOf(4);
+      expect(await results.fetch_more(2)).to.have.lengthOf(4);
     });
     it('can search a given subreddit for posts', async () => {
       const results = await r.get_subreddit('askreddit').search({query: 'e', limit: 5});
