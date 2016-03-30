@@ -31,11 +31,7 @@ const snoowrap = class {
     if (!access_token && !(client_id && client_secret && refresh_token)) {
       throw new errors.NoCredentialsError();
     }
-    this.user_agent = user_agent;
-    this.client_id = client_id;
-    this.client_secret = client_secret;
-    this.refresh_token = refresh_token;
-    this.access_token = access_token;
+    _.assign(this, {user_agent, client_id, client_secret, refresh_token, access_token});
     this._config = require('./default_config');
     this._throttle = Promise.resolve();
   }
