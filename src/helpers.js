@@ -83,7 +83,7 @@ nonintuitive way (see https://github.com/not-an-aardvark/snoowrap/issues/15 for 
 tree so that replies are threaded properly. */
 exports._build_replies_tree = root_item => {
   const child_list = root_item.replies;
-  const child_map = _.mapValues(_.groupBy(child_list, 'name'), 0);
+  const child_map = _.keyBy(child_list, 'name');
   child_list.forEach(exports._add_empty_replies_listing);
   _.remove(child_list, child => child_map[child.parent_id]).forEach(child => child_map[child.parent_id].replies.push(child));
   return root_item;
