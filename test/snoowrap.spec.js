@@ -274,6 +274,52 @@ describe('snoowrap', function () {
     });
   });
 
+  describe('general Listing behavior', () => {
+    let comments;
+    beforeEach(async () => {
+      comments = await r.get_submission('2np694').comments;
+    });
+    it('can store elements and inherit Array functions', async () => {
+      expect(comments).to.be.an.instanceof(snoowrap.objects.Listing);
+      expect(comments.length).to.be.above(0).and.below(200);
+      expect(comments.map).to.equal(Array.prototype.map);
+    });
+    it('can fetch more comment items and get a new Listing without modifying the original Listing', async () => {
+      const initial_comments_length = comments.length;
+      const initial_comments_morechildren_length = comments._more.children.length;
+      const more_comments = await comments.fetch_more(10);
+      expect(comments).to.have.lengthOf(initial_comments_length);
+      expect(comments._more.children).to.have.lengthOf(initial_comments_morechildren_length);
+      expect(more_comments).to.have.lengthOf(comments.length + 10);
+      expect(more_comments._more.children).to.have.lengthOf(initial_comments_morechildren_length - 10);
+      expect(comments[0].name).to.equal(more_comments[0].name);
+      expect(_.map(more_comments.slice(-10), 'id')).to.eql(comments._more.children.slice(0, 10));
+      const more_comments_duplicate = await comments.fetch_more(10);
+      expect(_.map(more_comments, 'name')).to.eql(_.map(more_comments_duplicate, 'name'));
+      const even_more_comments = await more_comments.fetch_more(10);
+      expect(even_more_comments).to.have.lengthOf(comments.length + 20);
+      expect(_.map(even_more_comments.slice(0, -10), 'name')).to.eql(_.map(more_comments, 'name'));
+      expect(_.map(even_more_comments.slice(-10), 'name')).to.not.eql(_.map(more_comments.slice(-10), 'name'));
+    });
+    it('can fetch more regular items and get a new Listing without modifying the original Listing', async () => {
+      const initial_list = await r.get_top({t: 'all'});
+      const original_length = initial_list.length;
+      expect(original_length).to.be.at.least(1).and.at.most(100);
+      const expanded_list = await initial_list.fetch_more(5);
+      expect(initial_list).to.have.lengthOf(original_length);
+      expect(expanded_list).to.have.lengthOf(original_length + 5);
+      const expanded_list_duplicate = await initial_list.fetch_more(5);
+      expect(_.map(expanded_list, 'name')).to.eql(_.map(expanded_list_duplicate, 'name'));
+      const double_expanded_list = await expanded_list.fetch_more(5);
+      expect(double_expanded_list).to.have.lengthOf(original_length + 10);
+      expect(_.map(double_expanded_list.slice(0, -5), 'name')).to.eql(_.map(expanded_list, 'name'));
+      expect(_.map(double_expanded_list.slice(-5), 'name')).to.not.eql(_.map(expanded_list.slice(-5), 'name'));
+    });
+    it('allows fetch_more() et al. to be chained', async () => {
+      expect(await comments.fetch_more(1)[0]).to.exist();
+    });
+  });
+
   describe('getting a list of posts', () => {
     it('can get hot posts from the front page', async () => {
       const posts = await r.get_hot();

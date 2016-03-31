@@ -2,7 +2,7 @@
 const _ = require('lodash');
 const errors = require('../errors');
 
-module.exports = class extends require('./RedditContent') {
+const more = class extends require('./RedditContent') {
   /* Requests to /api/morechildren are capped at 20 comments at a time, but requests to /api/info are capped at 100, so
   it's easier to send to the latter. The disadvantage is that comment replies are not automatically sent from requests
   to /api/info. */
@@ -20,4 +20,15 @@ module.exports = class extends require('./RedditContent') {
     const promise_for_remaining_items = this.fetch_more(amount - ids.length, start_index + ids.length);
     return _.toArray(await promise_for_this_batch).concat(await promise_for_remaining_items);
   }
+  _clone () {
+    return new more({
+      count: this.count,
+      parent_id: this.parent_id,
+      id: this.id,
+      name: this.name,
+      children: _.clone(this.children)
+    }, this._ac);
+  }
 };
+
+module.exports = more;

@@ -1,6 +1,21 @@
 'use strict';
 const _ = require('lodash');
+const Promise = require('bluebird');
+const promise_wrap = require('promise-chains');
 const errors = require('../errors');
+
+const INTERNAL_DEFAULTS = {
+  _query: {},
+  _show: 'all',
+  _transform: _.identity,
+  _method: 'get',
+  _is_comment_list: false,
+  _limit: undefined,
+  _uri: undefined,
+  _more: undefined,
+  after: undefined,
+  before: undefined
+};
 
 /**
 * A class representing a list of content. This is a subclass of the native Array object, so it has all the properties of
@@ -12,13 +27,12 @@ Most methods that return Listings will also accept `limit`, `after`, `before`, `
 * @extends Array
 */
 const Listing = class extends Array {
-  constructor ({children = [], _query = {}, _show = 'all', _limit, _transform = _.identity,
-      _uri, _method = 'get', _is_comment_list = false, after, before} = {}, _ac) {
+  constructor (options = {}, _ac) {
     super();
-    _.assign(this, children);
-    _.assign(this, {_query, _show, _limit, _transform, _uri, _method, _is_comment_list, after, before, _ac});
-    this._constant_params = _.assign(_.clone(_query), {show: _show, limit: _limit});
-    if (_.last(children) instanceof require('./more')) {
+    _.assign(this, options.children || []);
+    _.defaults(this, _.pick(options, _.keys(INTERNAL_DEFAULTS)), INTERNAL_DEFAULTS);
+    this._ac = _ac;
+    if (_.last(options.children) instanceof require('./more')) {
       this._more = this.pop();
       this._is_comment_list = true;
     }
@@ -43,9 +57,9 @@ const Listing = class extends Array {
       throw new errors.InvalidMethodCallError('Failed to fetch Listing. (amount must be a Number.)');
     }
     if (amount <= 0 || this.is_finished) {
-      return this._clone();
+      return promise_wrap(Promise.resolve(this._clone()));
     }
-    return this._is_comment_list ? this._fetch_more_comments(amount) : this._fetch_more_regular(amount);
+    return promise_wrap(this._more ? this._fetch_more_comments(amount) : this._fetch_more_regular(amount));
   }
   async _fetch_more_regular (amount) {
     const limit = this._is_comment_list ? amount + this.length : amount;
@@ -58,6 +72,8 @@ const Listing = class extends Array {
       }
       const cloned = this._clone();
       cloned.push(..._.toArray(response));
+      cloned.before = response.before;
+      cloned.after = response.after;
       return cloned.fetch_more(amount - response.length);
     });
   }
@@ -69,7 +85,7 @@ const Listing = class extends Array {
     if (this._more) {
       const more_comments = await this._more.fetch_more(...args);
       cloned.push(..._.toArray(more_comments));
-      _.remove(cloned._more, item => _(more_comments).map('id').includes(item));
+      cloned._more.children.splice(0, cloned.length - this.length);
     }
     return cloned;
   }
@@ -96,17 +112,10 @@ const Listing = class extends Array {
     return `Listing ${require('util').inspect(_.toArray(this))}`;
   }
   _clone () {
-    return new Listing({
-      children: _.toArray(this),
-      _query: this._query,
-      _show: this._show,
-      _limit: this._limit,
-      _transform: this._transform,
-      _uri: this._uri,
-      _method: this._method,
-      after: this.after,
-      before: this.before
-    }, this._ac);
+    const properties = _.pick(this, _.keys(INTERNAL_DEFAULTS));
+    properties._more = this._more && this._more._clone();
+    properties.children = _.toArray(this);
+    return new Listing(properties, this._ac);
   }
 };
 
