@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "pretest": "npm run lint && npm run compile",
     "test": "mocha --harmony-proxies --compilers js:babel-core/register",
+    "smoketest": "npm run test -- -g 'smoketest'",
     "docs": "npm run compile && jsdoc -c jsdoc.conf.json lib/snoowrap.js lib/objects/RedditContent.js lib/objects/ReplyableContent.js lib/objects/VoteableContent.js lib/objects/Comment.js lib/objects/RedditUser.js lib/objects/Submission.js lib/objects/LiveThread.js lib/objects/PrivateMessage.js lib/objects/Subreddit.js lib/objects/MultiReddit.js lib/objects/WikiPage.js lib/objects/Listing.js"
   },
   "repository": {

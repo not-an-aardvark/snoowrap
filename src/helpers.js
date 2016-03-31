@@ -10,9 +10,6 @@ exports._populate = (response_tree, _ac) => {
       if (constants.KINDS[response_tree.kind]) {
         return _ac._new_object(constants.KINDS[response_tree.kind], remainder_of_tree, true);
       }
-      _ac.warn(
-        `Warning: Unknown type '${response_tree.kind}'. This may be a bug, please report it: ${constants.ISSUE_REPORT_LINK}.`
-      );
       return _ac._new_object('RedditContent', remainder_of_tree, true);
     }
     const mapFunction = Array.isArray(response_tree) ? _.map : _.mapValues;

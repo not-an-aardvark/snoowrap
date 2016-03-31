@@ -120,6 +120,12 @@ describe('snoowrap', function () {
     });
   });
 
+  describe('smoketest', () => {
+    it("can get the requester's profile", async () => {
+      expect(await r.get_me()).to.be.an.instanceof(snoowrap.objects.RedditUser);
+    });
+  });
+
   describe('getting a user profile', () => {
     let user;
     beforeEach(() => {

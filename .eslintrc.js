@@ -19,7 +19,7 @@ module.exports = {
     'key-spacing': 2,
     'keyword-spacing': 2,
     'linebreak-style': [2, 'unix'],
-    'max-len': [1, 126],
+    'max-len': [1, 128],
     'new-parens': 2,
     'no-caller': 2,
     'no-catch-shadow': 2,

@@ -47,6 +47,8 @@ module.exports = {
           if (populated && populated.constructor && populated.constructor.name === 'Listing') {
             populated._uri = response.request.uri.path;
           }
+          r.log.debug(`Received a ${response.statusCode} status code from a \`${method.toUpperCase()}\` request sent to ${
+            response.request.uri.href}. ratelimit_remaining: ${r.ratelimit_remaining}`);
           return populated;
         }
       })[method](...args);
@@ -63,7 +65,7 @@ module.exports = {
       if (attempts + 1 >= r._config.max_retry_attempts || r._config.retry_error_codes.indexOf(err.statusCode) === -1) {
         throw err;
       }
-      r.warn(`Warning: Received status code ${err.statusCode} from reddit. Retrying request...`);
+      r.log.warn(`Received status code ${err.statusCode} from reddit. Retrying request...`);
       return await module.exports.oauth_request(r, method, args, attempts + 1);
     }
   },

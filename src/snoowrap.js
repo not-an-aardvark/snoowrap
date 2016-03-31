@@ -67,6 +67,8 @@ const snoowrap = class {
   * @param {number} [options.max_retry_attempts=3] See `retry_error_codes`.
   * @param {boolean} [options.suppress_warnings=false] snoowrap may occasionally log relevant warnings, such as deprecation
   notices, to the console. These can be disabled by setting this to `true`.
+  * @param {boolean} [options.debug=false] If set to true, snoowrap will print out potentially-useful information for debugging
+  purposes as it runs.
   * @returns {object} An updated Object containing all of the configuration values
   * @example
   *
@@ -87,10 +89,19 @@ const snoowrap = class {
     }).value();
     return `${constants.MODULE_NAME} ${require('util').inspect(formatted)}`;
   }
-  warn (...args) {
-    if (!this._config.suppress_warnings) {
-      console.warn(...args);
-    }
+  get log () {
+    return {
+      warn: (...args) => {
+        if (!this._config.suppress_warnings) {
+          console.warn('[warning]', ...args);
+        }
+      },
+      debug: (...args) => {
+        if (this._config.debug) {
+          console.log('[debug]', ...args);
+        }
+      }
+    };
   }
   /**
   * @summary Gets information on a reddit user with a given name.
