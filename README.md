@@ -147,10 +147,7 @@ r.get_submission('47v7tm').fetch().get('comments').get(0).call('upvote');
 1. `var snoowrap = require('snoowrap');`
 
 ### To build/run the tests independently
-1. `git clone https://github.com/not-an-aardvark/snoowrap.git`
-1. `cd snoowrap`
-1. `npm install`
-1. `npm test`
+See the [contributing guide](https://github.com/not-an-aardvark/snoowrap/blob/master/CONTRIBUTING.md) and the [getting started](https://github.com/not-an-aardvark/snoowrap/blob/master/src/README.md) page.
 
 ---
 

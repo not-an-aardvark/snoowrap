@@ -1,6 +1,44 @@
-# snoowrap internal layout
+# snoowrap internal layout/contributors' map
 
-This file is intended to be a general explanation of snoowrap's internal layout, for any potential contributors who aren't familiar with the codebase.
+This guide is aimed at people who are interested in contributing to snoowrap itself, or getting a general idea of how snoowrap works.
+
+If you just want to use snoowrap, check out the [readme](https://github.com/not-an-aardvark/snoowrap/blob/master/README.md) or [the documentation](https://not-an-aardvark.github.io/snoowrap/) instead.
+
+## Getting started
+
+First, clone snoowrap:
+
+```bash
+git clone https://github.com/not-an-aardvark/snoowrap.git
+cd snoowrap/
+npm install
+```
+
+At the moment, the unit tests are run on the reddit.com live site. (This will hopefully change soon -- see [issue #8](https://github.com/not-an-aardvark/snoowrap/issues/8).) As a result, you will need to generate a reddit.com OAuth token the first time in order to run the tests on your own machine. This can be done using [reddit-oauth-helper](https://github.com/not-an-aardvark/reddit-oauth-helper).
+
+Put these credentials in a file called `oauth_info.json` in the project root directory. The file should look something like this:
+
+```json
+{
+  "client_id": "put_your_client_id_here",
+  "client_secret": "put_your_client_secret_here",
+  "refresh_token": "put_your_refresh_token_here",
+  "user_agent": "put_a_descriptive_useragent_string_here"
+}
+```
+
+After you create your file, use `npm test` to run the linter and the test suite.
+
+Note: A few of the tests will certainly fail when run on your machine; for tests such as retrieving private messages, reddit.com will return a 403 error, since your account won't have access to those messages.
+
+A few other useful commands:
+
+```bash
+npm run lint # runs only the linter
+npm run smoketest # runs a single test and then stops. This is useful to make sure your setup is correct.
+npm run compile # compiles the source code using babel. This automatically gets run before the tests are run, but it's useful if you want to use `require('.')` in the node REPL.
+npm run docs # builds the documentation into a doc/ folder
+```
 
 ## Build tools
 snoowrap's source code is written with some ES7 syntax. It gets transpiled by [babel](https://babeljs.io/) from the `src/` folder into a `lib/` folder (which is on gitigngore). The resulting `lib/` folder is the only code that is actually included when the module is installed with npm.
