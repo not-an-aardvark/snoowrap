@@ -8,7 +8,17 @@ const errors = require('./errors');
 const helpers = require('./helpers');
 const api_type = 'json';
 
-/** The class for a snoowrap requester */
+/** The class for a snoowrap requester.
+* A requester is the base object that is used to fetch content from reddit. Each requester contains a single set of OAuth
+tokens.
+
+If constructed with a refresh token, a requester will be able to repeatedly generate access tokens as necessary, without any
+further user intervention. After making at least one request, a requester will have the `access_token` property, which specifies
+the access token currently in use. It will also have a few additional properties such as `scope` (an array of scope strings)
+and `ratelimit_remaining` (the number of requests remaining for the current 10-minute interval, in compliance with reddit's
+[API rules](https://github.com/reddit/reddit/wiki/API).) These properties primarily exist for internal use, but they are
+exposed since they are useful externally as well.
+*/
 const snoowrap = class {
   /**
   * @summary Constructs a new requester. This will be necessary if you want to do anything.
