@@ -14,11 +14,11 @@ const VoteableContent = class extends require('./ReplyableContent') {
   * @returns {Promise} A Promise that fulfills when the request is complete.
   */
   _vote (direction) {
-    return this._post({uri: 'api/vote', form: {dir: direction, id: this.name}});
+    return this._post({uri: 'api/vote', form: {dir: direction, id: this.name}}).return(this);
   }
   /**
   * @summary Upvotes this Comment or Submission.
-  * @returns {Promise} A Promise that fulfills when the request is complete
+  * @returns {Promise} A Promise that fulfills with this Comment/Submission when the request is complete
   * @desc **Note: votes must be cast by humans.** That is, API clients proxying a human's action one-for-one are OK,
   but bots deciding how to vote on content or amplifying a human's vote are not. See the
   [reddit rules](https://reddit.com/rules) for more details on what constitutes vote cheating. (This guideline is quoted from
@@ -29,7 +29,7 @@ const VoteableContent = class extends require('./ReplyableContent') {
   }
   /**
   * @summary Downvotes this Comment or Submission.
-  * @returns {Promise} A Promise that fulfills when the request is complete.
+  * @returns {Promise} A Promise that fulfills with this Comment/Submission when the request is complete.
   * @desc **Note: votes must be cast by humans.** That is, API clients proxying a human's action one-for-one are OK, but
   bots deciding how to vote on content or amplifying a human's vote are not. See the [reddit rules](https://reddit.com/rules)
   for more details on what constitutes vote cheating. (This guideline is quoted from
@@ -40,7 +40,7 @@ const VoteableContent = class extends require('./ReplyableContent') {
   }
   /**
   * @summary Removes any existing vote on this Comment or Submission.
-  * @returns {Promise} A Promise that fulfills when the request is complete.
+  * @returns {Promise} A Promise that fulfills with this Comment/Submission when the request is complete.
   * @desc **Note: votes must be cast by humans.** That is, API clients proxying a human's action one-for-one are OK, but
   bots deciding how to vote on content or amplifying a human's vote are not. See the [reddit rules](https://reddit.com/rules)
   for more details on what constitutes vote cheating. (This guideline is quoted from
