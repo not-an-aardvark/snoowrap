@@ -33,5 +33,7 @@ module.exports = {
   MODERATOR_PERMISSIONS: ['wiki', 'posts', 'access', 'mail', 'config', 'flair'],
   LIVETHREAD_PERMISSIONS: ['update', 'edit', 'manage'],
   HTTP_VERBS: ['del', 'get', 'head', 'patch', 'post', 'put'],
-  MAX_TOKEN_LATENCY: 10000
+  MAX_TOKEN_LATENCY: 10000,
+  MAX_API_INFO_AMOUNT: 100, // the maximum number of items fetched from a request to the api/info endpoint
+  MAX_API_MORECHILDREN_AMOUNT: 20 // the maximum number of items fetched from a request to the api/morechildren endpoint
 };

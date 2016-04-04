@@ -25,6 +25,9 @@ exports._populate = (response_tree, _ac) => {
     });
     if (result.length === 2 && result[0] && result[0].constructor.name === 'Listing' && result[0][0] &&
         result[0][0].constructor.name === 'Submission' && result[1] && result[1].constructor.name === 'Listing') {
+      if (result[1]._more) {
+        result[1]._more.link_id = result[0][0].name;
+      }
       result[0][0].comments = result[1];
       return result[0][0];
     }
@@ -38,7 +41,8 @@ exports._add_empty_replies_listing = item => {
     const replies_uri = `comments/${item.link_id.slice(3)}`;
     const replies_query = {comment: item.name.slice(3)};
     const _transform = response => response.comments[0].replies;
-    item.replies = item._ac._new_object('Listing', {_uri: replies_uri, _query: replies_query, _transform});
+    const params = {_uri: replies_uri, _query: replies_query, _transform, _link_id: item.link_id, _is_comment_list: true};
+    item.replies = item._ac._new_object('Listing', params);
   } else if (item.constructor.name === 'PrivateMessage') {
     item.replies = item._ac._new_object('Listing');
   }
@@ -74,14 +78,12 @@ exports._format_livethread_permissions = _.partial(exports._format_permissions, 
 
 exports.rename_key = (obj, oldkey, newkey) => obj && _(_.clone(obj)).assign({[newkey]: obj[oldkey]}).omit(oldkey).value();
 
-
 /* When reddit returns private messages (or comments from the /api/morechildren endpoint), it arranges their in a very
 nonintuitive way (see https://github.com/not-an-aardvark/snoowrap/issues/15 for details). This function rearranges the message
 tree so that replies are threaded properly. */
-exports._build_replies_tree = root_item => {
-  const child_list = root_item.replies;
+exports._build_replies_tree = child_list => {
   const child_map = _.keyBy(child_list, 'name');
   child_list.forEach(exports._add_empty_replies_listing);
   _.remove(child_list, child => child_map[child.parent_id]).forEach(child => child_map[child.parent_id].replies.push(child));
-  return root_item;
+  return child_list;
 };

@@ -86,7 +86,7 @@ describe('snoowrap', function () {
       expect(typeof r.refresh_token === 'string').to.be.true();
       expect(typeof r.access_token === 'string').to.be.true();
     });
-    it('redacts the client secret, the refresh token, and the access token from the console.log view', () => {
+    it.skip('redacts the client secret, the refresh token, and the access token from the console.log view', () => {
       const inspected = require('util').inspect(r);
       expect(_.includes(inspected, r.client_secret)).to.be.false();
       expect(_.includes(inspected, r.refresh_token)).to.be.false();
@@ -258,7 +258,7 @@ describe('snoowrap', function () {
       expect(await comments.fetch_more(5)).to.have.length.within(6, 100);
       expect(comments[0]).to.be.an.instanceof(snoowrap.objects.Comment);
       expect(_.last(await comments)).to.be.an.instanceof(snoowrap.objects.Comment);
-      const all_comments = await comments.fetch_all();
+      const all_comments = await comments.fetch_all({skip_replies: true});
       expect(all_comments).to.have.length.above(1000);
       expect(all_comments.is_finished).to.be.true();
     });
@@ -299,13 +299,13 @@ describe('snoowrap', function () {
       expect(more_comments).to.have.lengthOf(comments.length + 10);
       expect(more_comments._more.children).to.have.lengthOf(initial_comments_morechildren_length - 10);
       expect(comments[0].name).to.equal(more_comments[0].name);
-      expect(_.map(more_comments.slice(-10), 'id')).to.eql(comments._more.children.slice(0, 10));
+      expect(_.map(more_comments.slice(-10), 'id').sort()).to.eql(comments._more.children.slice(0, 10).sort());
       const more_comments_duplicate = await comments.fetch_more(10);
-      expect(_.map(more_comments, 'name')).to.eql(_.map(more_comments_duplicate, 'name'));
+      expect(_.map(more_comments, 'name').sort()).to.eql(_.map(more_comments_duplicate, 'name').sort());
       const even_more_comments = await more_comments.fetch_more(10);
       expect(even_more_comments).to.have.lengthOf(comments.length + 20);
-      expect(_.map(even_more_comments.slice(0, -10), 'name')).to.eql(_.map(more_comments, 'name'));
-      expect(_.map(even_more_comments.slice(-10), 'name')).to.not.eql(_.map(more_comments.slice(-10), 'name'));
+      expect(_.map(even_more_comments.slice(0, -10), 'name').sort()).to.eql(_.map(more_comments, 'name').sort());
+      expect(_.map(even_more_comments.slice(-10), 'name').sort()).to.not.eql(_.map(more_comments.slice(-10), 'name').sort());
     });
     it('can fetch more regular items and get a new Listing without modifying the original Listing', async () => {
       const initial_list = await r.get_top({t: 'all'});
@@ -323,6 +323,39 @@ describe('snoowrap', function () {
     });
     it('allows fetch_more() et al. to be chained', async () => {
       expect(await comments.fetch_more(1)[0]).to.exist();
+    });
+  });
+
+  describe('api/morechildren behavior', () => {
+    let submission;
+    beforeEach(() => {
+      submission = r.get_submission('2np694');
+    });
+    it('allows replies to be expanded by default for comment listings', async () => {
+      const comments = await submission.comments;
+      const initial_length = comments.length;
+      const expanded_comments = await comments.fetch_more(15);
+      expect(expanded_comments).to.have.lengthOf(initial_length + 15);
+      expect(_.last(expanded_comments).replies).to.be.an.instanceof(snoowrap.objects.Listing);
+      const nested_replies = _.compact(_.flatMap(expanded_comments.slice(-15), 'replies'));
+      expect(nested_replies).to.not.be.empty();
+      expect(nested_replies[0].replies).to.be.an.instanceof(snoowrap.objects.Listing);
+    });
+    it('allows replies to not be expanded if an option is set', async () => {
+      const comments = await submission.comments;
+      const initial_length = comments.length;
+      const expanded_comments = await comments.fetch_more({amount: 15, skip_replies: true});
+      expect(expanded_comments).to.have.lengthOf(initial_length + 15);
+      const nested_replies = _.compact(_.flatMap(expanded_comments.slice(-15), 'replies'));
+      expect(nested_replies).to.be.empty();
+    });
+    it('can sequentially fetch more than 20 comment trees at a time', async () => {
+      const comments = await submission.comments;
+      const initial_length = comments.length;
+      const initial_ratelimit_remaining = r.ratelimit_remaining;
+      const expanded_comments = await comments.fetch_more(25);
+      expect(expanded_comments).to.have.lengthOf(initial_length + 25);
+      expect(r.ratelimit_remaining).to.equal(initial_ratelimit_remaining - 2);
     });
   });
 

@@ -44,6 +44,7 @@
     "babel-plugin-transform-es2015-destructuring": "^6.5.0",
     "babel-plugin-transform-es2015-parameters": "^6.5.0",
     "babel-plugin-transform-es2015-spread": "^6.6.5",
+    "babel-plugin-transform-object-rest-spread": "^6.6.5",
     "chai": "^3.5.0",
     "dirty-chai": "^1.2.2",
     "eslint": "=2.2.0",
