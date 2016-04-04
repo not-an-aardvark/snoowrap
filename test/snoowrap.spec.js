@@ -86,7 +86,7 @@ describe('snoowrap', function () {
       expect(typeof r.refresh_token === 'string').to.be.true();
       expect(typeof r.access_token === 'string').to.be.true();
     });
-    it.skip('redacts the client secret, the refresh token, and the access token from the console.log view', () => {
+    it('redacts the client secret, the refresh token, and the access token from the console.log view', () => {
       const inspected = require('util').inspect(r);
       expect(_.includes(inspected, r.client_secret)).to.be.false();
       expect(_.includes(inspected, r.refresh_token)).to.be.false();
