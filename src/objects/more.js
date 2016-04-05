@@ -22,7 +22,7 @@ const more = class {
     const ids = this._get_id_slice(Math.min(options.amount, constants.MAX_API_INFO_AMOUNT), start_index).map(id => `t1_${id}`);
     // Requests are capped at 100 comments. Send lots of requests recursively to get the comments, then concatenate them.
     // (This speed-requesting is only possible with comment Listings since the entire list of ids is present initially.)
-    const promise_for_this_batch = this._ac._get({uri: 'api/info', qs: {id: ids.join(',')}});
+    const promise_for_this_batch = this._ac._get_listing({uri: 'api/info', qs: {id: ids.join(',')}});
     const next_request_options = {...options, amount: options.amount - ids.length};
     const promise_for_remaining_items = this.fetch_more(next_request_options, start_index + ids.length);
     return _.toArray(await promise_for_this_batch).concat(await promise_for_remaining_items);

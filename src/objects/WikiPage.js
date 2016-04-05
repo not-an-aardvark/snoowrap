@@ -74,7 +74,7 @@ const WikiPage = class extends require('./RedditContent') {
   * @returns {Promise} A Listing containing revisions of this page
   */
   get_revisions (options) {
-    return this._get({uri: `r/${this.subreddit.display_name}/wiki/revisions/${this.title}`, qs: options});
+    return this._get_listing({uri: `r/${this.subreddit.display_name}/wiki/revisions/${this.title}`, qs: options});
   }
   /**
   * @summary Hides the given revision from this page's public revision history.
@@ -106,7 +106,7 @@ const WikiPage = class extends require('./RedditContent') {
   * @returns {Promise} A Listing containing discussions about this page
   */
   get_discussions (options) {
-    return this._get({uri: `r/${this.subreddit.display_name}/wiki/discussions/${this.title}`, qs: options});
+    return this._get_listing({uri: `r/${this.subreddit.display_name}/wiki/discussions/${this.title}`, qs: options});
   }
 };
 

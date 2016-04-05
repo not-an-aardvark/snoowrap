@@ -6,16 +6,12 @@ const errors = require('../errors');
 
 const INTERNAL_DEFAULTS = {
   _query: {},
-  _show: 'all',
   _transform: _.identity,
   _method: 'get',
   _is_comment_list: false,
-  _limit: undefined,
   _link_id: undefined,
   _uri: undefined,
-  _more: undefined,
-  after: undefined,
-  before: undefined
+  _more: undefined
 };
 
 /**
@@ -31,12 +27,23 @@ original Listing.
 const Listing = class extends Array {
   constructor (options = {}, _ac) {
     super();
-    _.assign(this, options.children || []);
-    _.defaults(this, _.pick(options, _.keys(INTERNAL_DEFAULTS)), INTERNAL_DEFAULTS);
     this._ac = _ac;
+    _.assign(this, options.children || []);
+    _.defaultsDeep(this, _.pick(options, _.keys(INTERNAL_DEFAULTS)), INTERNAL_DEFAULTS);
+    _.assign(this._query, _.pick(options, ['before', 'after']));
     if (_.last(options.children) instanceof require('./more')) {
       this._more = this.pop();
       this._is_comment_list = true;
+    }
+  }
+  _set_uri (value) {
+    const parsed_uri = require('url').parse(value, true);
+    this._uri = parsed_uri.pathname;
+    _.defaultsDeep(this._query, parsed_uri.query);
+    if (parsed_uri.query.before) {
+      this._query.after = null;
+    } else {
+      this._query.before = null;
     }
   }
   /**
@@ -46,7 +53,7 @@ const Listing = class extends Array {
     if (this._more) {
       return !this._more.children.length;
     }
-    return !this._uri || this.after === null && this.before === null;
+    return !this._uri || this._query.after === null && this._query.before === null;
   }
   /**
   * @summary Fetches some more items
@@ -59,10 +66,14 @@ const Listing = class extends Array {
   * Internal details: When `skip_replies` is set to `true`, snoowrap uses reddit's `api/info` endpoint to fetch Comments. When
   `skip_replies` is set to `false`, snoowrap uses reddit's `api/morechildren` endpoint. It's worth noting that reddit does
   not allow concurrent requests to the `api/morechildren` endpoint by the same account.
-  * @returns {Promise} A new Listing containing all of the elements in this Listing followed by the newly-fetched elements
+  * @returns {Promise} A new Listing containing all of the elements in this Listing, in addition to the newly-fetched elements.
+  Under most circumstances, the newly-fetched elements will appear at the end of the new Listing. However, if reverse pagination
+  is enabled (i.e. if this Listing was created with a `before` query parameter), then the newly-fetched elements will appear
+  at the beginning. In either case, continuity is maintained, i.e. the order of items in the Listing will be the same as the
+  order in which they appear on reddit.
   */
   fetch_more (options) {
-    const parsed_options = _.defaults(_.isObject(options) ? options : {amount: options}, {skip_replies: false});
+    const parsed_options = _.defaults(_.isObject(options) ? _.clone(options) : {amount: options}, {skip_replies: false});
     if (!_.isNumber(parsed_options.amount)) {
       throw new errors.InvalidMethodCallError('Failed to fetch Listing. (No amount specified.)');
     }
@@ -71,16 +82,21 @@ const Listing = class extends Array {
     }
     return promise_wrap(this._more ? this._fetch_more_comments(parsed_options) : this._fetch_more_regular(parsed_options));
   }
-  async _fetch_more_regular (options) {
-    const limit = this._is_comment_list ? options.amount + 1 : options.amount;
+  _fetch_more_regular (options) {
     return this._ac[`_${this._method}`]({
       uri: this._uri,
-      qs: _.defaults({after: this.after, before: this.before, limit, show: this._show}, this._query)
+      qs: {...this._query, limit: this._is_comment_list ? options.amount + 1 : options.amount}
     }).then(this._transform).then(response => {
       const cloned = this._clone();
-      cloned.push(..._.toArray(response));
-      cloned.before = response.before;
-      cloned.after = response.after;
+      if (cloned._query.before) {
+        cloned.unshift(..._.toArray(response));
+        cloned._query.before = response._query.before;
+        cloned._query.after = null;
+      } else {
+        cloned.push(..._.toArray(response));
+        cloned._query.before = null;
+        cloned._query.after = response._query.after;
+      }
       return cloned.fetch_more({...options, amount: options.amount - response.length});
     });
   }
@@ -126,6 +142,7 @@ const Listing = class extends Array {
   }
   _clone () {
     const properties = _.pick(this, _.keys(INTERNAL_DEFAULTS));
+    properties._query = _.clone(properties._query);
     properties._more = this._more && this._more._clone();
     properties.children = _.toArray(this);
     return new Listing(properties, this._ac);

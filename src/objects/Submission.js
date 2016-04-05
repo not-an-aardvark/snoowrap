@@ -143,15 +143,22 @@ const Submission = class extends require('./VoteableContent') {
   * @returns {Promise} A Listing of other Submission objects
   */
   get_duplicates (options = {}) {
-    return this._get({uri: `duplicates/${this.name}`, qs: options});
+    return this._get_listing({uri: `duplicates/${this.name}`, qs: options});
   }
   /**
   * @summary Gets a Listing of Submissions that are related to this one.
+  * @deprecated This function uses the <code>/related/submission_id</code> endpoint, which was recently changed on reddit.com;
+  instead of returning a Listing containing related posts, the reddit API now simply returns the post itself. As such, this
+  function only exists for backwards compatability and should not be used in practice.
   * @param {object} [options={}] Options for the resulting Listing
-  * @returns {Promise} A Listing of other Submission objects
+  * @returns {Promise} ~~A Listing of other Submission objects~~ The submission in question.
   */
   get_related (options = {}) {
-    return this._get({uri: `related/${this.name}`, qs: options});
+    return this._get_listing({uri: `related/${this.name}`, qs: options}).tap(result => {
+      if (result.constructor.name === 'Submission') {
+        this._ac.log.warn('Submission.prototype.get_related has been deprecated upstream, and will not work as expected.');
+      }
+    });
   }
   /**
   * @summary Gets a list of flair template options for this post.

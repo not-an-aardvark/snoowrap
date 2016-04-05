@@ -62,6 +62,9 @@ const RedditContent = class {
   _transform_api_response (response_object) {
     return response_object;
   }
+  _get_listing (...args) {
+    return this._ac._get_listing(...args);
+  }
 };
 
 _.forEach(require('../constants').HTTP_VERBS, type => {

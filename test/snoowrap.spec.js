@@ -324,6 +324,16 @@ describe('snoowrap', function () {
     it('allows fetch_more() et al. to be chained', async () => {
       expect(await comments.fetch_more(1)[0]).to.exist();
     });
+    it('allows backwards pagination by supplying a `count` parameter to Listing fetches', async () => {
+      const top_twenty_posts = await r.get_top({time: 'all', limit: 20});
+      expect(top_twenty_posts).to.have.lengthOf(20);
+      const reverse_listing = await r.get_top({time: 'all', limit: 10, before: _.last(top_twenty_posts).name});
+      expect(reverse_listing).to.have.lengthOf(10);
+      expect(reverse_listing._query.before).to.exist();
+      const extended_reverse_listing = await reverse_listing.fetch_more(20);
+      expect(extended_reverse_listing).to.have.lengthOf(19);
+      expect(_.map(extended_reverse_listing, 'name').slice(-10)).to.eql(_.map(reverse_listing, 'name'));
+    });
   });
 
   describe('api/morechildren behavior', () => {

@@ -72,7 +72,7 @@ const RedditUser = class extends require('./RedditContent') {
   * @returns {Promise} A Listing containing Submissions and Comments
   */
   get_overview (options) {
-    return this._get({uri: `user/${this.name}/overview`, qs: options});
+    return this._get_listing({uri: `user/${this.name}/overview`, qs: options});
   }
   /**
   * @summary Gets a Listing of this user's submissions.
@@ -80,7 +80,7 @@ const RedditUser = class extends require('./RedditContent') {
   * @returns {Promise} A Listing containing Submissions
   */
   get_submissions (options) {
-    return this._get({uri: `user/${this.name}/submitted`, qs: options});
+    return this._get_listing({uri: `user/${this.name}/submitted`, qs: options});
   }
   /**
   * @summary Gets a Listing of this user's comments.
@@ -88,47 +88,47 @@ const RedditUser = class extends require('./RedditContent') {
   * @returns {Promise} A Listing containing Comments
   */
   get_comments (options) {
-    return this._get({uri: `user/${this.name}/comments`, qs: options});
+    return this._get_listing({uri: `user/${this.name}/comments`, qs: options});
   }
   /**
   * @summary Gets a Listing of the content that this user has upvoted.
-  * @desc **Note**: that this can only be used to view one's own upvoted content, unless the user in question has chosen to
+  * @desc **Note**: This can only be used to view one's own upvoted content, unless the user in question has chosen to
   make this information public in their preferences.
   * @param {object} [options] Options for the resulting Listing
   * @returns {Promise} A Listing containing Submissions and Comments
   */
   get_upvoted_content (options) {
-    return this._get({uri: `user/${this.name}/upvoted`, qs: options});
+    return this._get_listing({uri: `user/${this.name}/upvoted`, qs: options});
   }
   /**
   * @summary Gets a Listing of the content that this user has downvoted.
-  * @desc **Note**: that this can only be used to view one's own downvoted content, unless the user in question has chosen to
+  * @desc **Note**: This can only be used to view one's own downvoted content, unless the user in question has chosen to
   make this information public in their preferences.
   * @param {object} [options] Options for the resulting Listing
   * @returns {Promise} A Listing containing Submissions and Comments
   */
   get_downvoted_content (options) {
-    return this._get({uri: `user/${this.name}/downvoted`, qs: options});
+    return this._get_listing({uri: `user/${this.name}/downvoted`, qs: options});
   }
   /**
   * @summary Gets a Listing of the submissions that this user has hidden.
-  * @desc This can only be used to view one's own set of hidden posts, as reddit will return a 403 error when attempting to
-  view other users' hidden posts.
+  * @desc **Note**: This can only be used to view one's own set of hidden posts, as reddit will return a 403 error when
+  attempting to view another users' hidden posts.
   * @param {object} [options] Options for the resulting Listing
   * @returns {Promise} A Listing containing Submissions
   */
   get_hidden_content (options) {
-    return this._get({uri: `user/${this.name}/hidden`, qs: options});
+    return this._get_listing({uri: `user/${this.name}/hidden`, qs: options});
   }
   /**
   * @summary Gets a Listing of the content that this user has saved.
-  * @desc This can only be used to view one's own set of saved content, as reddit will return a 403 error when attempting to
-  view other users' saved content.
+  * @desc **Note**: This can only be used to view one's own set of saved content, as reddit will return a 403 error when
+  attempting to view other users' saved content.
   * @param {object} [options] Options for the resulting Listing
   * @returns {Promise} A Listing containing Submissions and Comments.
   */
   get_saved_content (options) {
-    return this._get({uri: `user/${this.name}/hidden`, qs: options});
+    return this._get_listing({uri: `user/${this.name}/hidden`, qs: options});
   }
   /**
   * @summary Gets a Listing of this user's content which has been gilded.
@@ -136,7 +136,7 @@ const RedditUser = class extends require('./RedditContent') {
   * @returns {Promise} A Listing containing Submissions and Comments
   */
   get_gilded_content (options) {
-    return this._get({uri: `user/${this.name}/gilded`, qs: options});
+    return this._get_listing({uri: `user/${this.name}/gilded`, qs: options});
   }
   /**
   * @summary Gets a multireddit belonging to this user.
@@ -146,6 +146,10 @@ const RedditUser = class extends require('./RedditContent') {
   get_multireddit (name) {
     return this._ac._new_object('MultiReddit', {name, curator: this}, false);
   }
+  /**
+  * @summary Gets an Array of all of this user's MultiReddits.
+  * @returns {Promise} A Promise that fulfills with an Array containing MultiReddits.
+  */
   get_multireddits () {
     return this._get({uri: `api/multi/user/${this.name}`, qs: {expand_srs: true}});
   }

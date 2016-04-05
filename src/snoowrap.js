@@ -420,7 +420,7 @@ const snoowrap = class {
       sub_name = undefined;
     }
     const parsed_options = _(opts).assign({t: opts.time, time: undefined}).omit('time').value();
-    return this._get({uri: (sub_name ? `r/${sub_name}/` : '') + sort_type, qs: parsed_options});
+    return this._get_listing({uri: (sub_name ? `r/${sub_name}/` : '') + sort_type, qs: parsed_options});
   }
   /**
   * @summary Gets a Listing of hot posts.
@@ -560,7 +560,7 @@ const snoowrap = class {
   * // ]
   */
   get_unread_messages (options = {}) {
-    return this._get({uri: 'message/unread', qs: options});
+    return this._get_listing({uri: 'message/unread', qs: options});
   }
   /**
   * @summary Gets the items in the authenticated user's inbox.
@@ -575,7 +575,7 @@ const snoowrap = class {
   * // ]
   */
   get_inbox (options = {}) {
-    return this._get({uri: 'message/inbox', qs: options});
+    return this._get_listing({uri: 'message/inbox', qs: options});
   }
   /**
   * @summary Gets the authenticated user's modmail.
@@ -590,7 +590,7 @@ const snoowrap = class {
   * // ]
   */
   get_modmail (options = {}) {
-    return this._get({uri: 'message/moderator', qs: options});
+    return this._get_listing({uri: 'message/moderator', qs: options});
   }
   /**
   * @summary Gets the user's sent messages.
@@ -605,7 +605,7 @@ const snoowrap = class {
   * // ]
   */
   get_sent_messages (options = {}) {
-    return this._get({uri: 'message/sent', qs: options});
+    return this._get_listing({uri: 'message/sent', qs: options});
   }
   /**
   * @summary Marks all of the user's messages as read.
@@ -713,7 +713,7 @@ const snoowrap = class {
     options.restrict_sr = options.restrict_sr || true;
     options.syntax = options.syntax || 'plain';
     const parsed_query = _(options).assign({t: options.time, q: options.query}).omit('time', 'query').value();
-    return this._get({uri: `${options.subreddit ? `r/${options.subreddit}/` : ''}search`, qs: parsed_query});
+    return this._get_listing({uri: `${options.subreddit ? `r/${options.subreddit}/` : ''}search`, qs: parsed_query});
   }
   /**
   * @summary Searches for subreddits given a query.
@@ -876,7 +876,7 @@ const snoowrap = class {
   * // ]
   */
   get_subscriptions (options) {
-    return this._get({uri: 'subreddits/mine/subscriber', qs: options});
+    return this._get_listing({uri: 'subreddits/mine/subscriber', qs: options});
   }
   /**
   * @summary Gets a list of subreddits in which the currently-authenticated user is an approved submitter.
@@ -895,7 +895,7 @@ const snoowrap = class {
   *
   */
   get_contributor_subreddits (options) {
-    return this._get({uri: 'subreddits/mine/contributor', qs: options});
+    return this._get_listing({uri: 'subreddits/mine/contributor', qs: options});
   }
   /**
   * @summary Gets a list of subreddits in which the currently-authenticated user is a moderator.
@@ -913,7 +913,7 @@ const snoowrap = class {
   * // ]
   */
   get_moderated_subreddits (options) {
-    return this._get({uri: 'subreddits/mine/moderator', qs: options});
+    return this._get_listing({uri: 'subreddits/mine/moderator', qs: options});
   }
   /**
   * @summary Searches subreddits by title and description.
@@ -923,7 +923,7 @@ const snoowrap = class {
   */
   search_subreddits (options) {
     options.q = options.query;
-    return this._get({uri: 'subreddits/search', qs: _.omit(options, 'query')});
+    return this._get_listing({uri: 'subreddits/search', qs: _.omit(options, 'query')});
   }
   /**
   * @summary Gets a list of subreddits, arranged by popularity.
@@ -931,7 +931,7 @@ const snoowrap = class {
   * @returns {Promise} A Listing containing Subreddits
   */
   get_popular_subreddits (options) {
-    return this._get({uri: 'subreddits/popular', qs: options});
+    return this._get_listing({uri: 'subreddits/popular', qs: options});
   }
   /**
   * @summary Gets a list of subreddits, arranged by age.
@@ -939,7 +939,7 @@ const snoowrap = class {
   * @returns {Promise} A Listing containing Subreddits
   */
   get_new_subreddits (options) {
-    return this._get({uri: 'subreddits/new', qs: options});
+    return this._get_listing({uri: 'subreddits/new', qs: options});
   }
   /**
   * @summary Gets a list of gold-exclusive subreddits.
@@ -947,7 +947,7 @@ const snoowrap = class {
   * @returns {Promise} A Listing containing Subreddits
   */
   get_gold_subreddits (options) {
-    return this._get({uri: 'subreddits/gold', qs: options});
+    return this._get_listing({uri: 'subreddits/gold', qs: options});
   }
   /**
   * @summary Gets a list of default subreddits.
@@ -955,7 +955,7 @@ const snoowrap = class {
   * @returns {Promise} A Listing containing Subreddits
   */
   get_default_subreddits (options) {
-    return this._get({uri: 'subreddits/default', qs: options});
+    return this._get_listing({uri: 'subreddits/default', qs: options});
   }
   /**
   * @summary Checks whether a given username is available for registration
@@ -1069,6 +1069,12 @@ const snoowrap = class {
   }
   _unfriend (options) {
     return this._post({uri: `${options.sub ? `r/${options.sub}/` : ''}api/unfriend`, form: _.assign(options, {api_type})});
+  }
+  _get_listing (...args) {
+    /* When the response type is expected to be a Listing, add a `count` parameter with a very high number.
+    This ensures that reddit returns a `before` property in the resulting Listing to enable pagination.
+    (Aside from the additional parameter, this function is equivalent to snoowrap.prototype._get) */
+    return promise_wrap(request_handler.oauth_request(this, 'get', args, {qs: {count: 9999}}));
   }
 };
 

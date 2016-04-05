@@ -134,7 +134,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Listing containing user flairs
   */
   get_user_flair_list (options) {
-    return this._get({uri: `r/${this.display_name}/api/flairlist`, qs: options}).users;
+    return this._get_listing({uri: `r/${this.display_name}/api/flairlist`, qs: options}).users;
   }
   /**
   * @summary Configures the flair settings for this subreddit.
@@ -298,7 +298,7 @@ const Subreddit = class extends require('./RedditContent') {
   */
   get_moderation_log (options = {}) {
     const parsed_options = _(options).assign({mod: options.mods && options.mods.join(',')}).omit('mods').value();
-    return this._get({uri: `r/${this.display_name}/about/log`, qs: parsed_options});
+    return this._get_listing({uri: `r/${this.display_name}/about/log`, qs: parsed_options});
   }
   /**
   * @summary Gets a list of reported items on this subreddit.
@@ -307,7 +307,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Listing containing reported items
   */
   get_reports (options = {}) {
-    return this._get({uri: `r/${this.display_name}/about/reports`, qs: options});
+    return this._get_listing({uri: `r/${this.display_name}/about/reports`, qs: options});
   }
   /**
   * @summary Gets a list of removed items on this subreddit.
@@ -316,7 +316,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Listing containing removed items
   */
   get_spam (options = {}) {
-    return this._get({uri: `r/${this.display_name}/about/spam`, qs: options});
+    return this._get_listing({uri: `r/${this.display_name}/about/spam`, qs: options});
   }
   /**
   * @summary Gets a list of items on the modqueue on this subreddit.
@@ -325,7 +325,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Listing containing items on the modqueue
   */
   get_modqueue (options = {}) {
-    return this._get({uri: `r/${this.display_name}/about/modqueue`, qs: options});
+    return this._get_listing({uri: `r/${this.display_name}/about/modqueue`, qs: options});
   }
   /**
   * @summary Gets a list of unmoderated items on this subreddit.
@@ -334,7 +334,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Listing containing unmoderated items
   */
   get_unmoderated (options = {}) {
-    return this._get({uri: `r/${this.display_name}/about/unmoderated`, qs: options});
+    return this._get_listing({uri: `r/${this.display_name}/about/unmoderated`, qs: options});
   }
   /**
   * @summary Gets a list of edited items on this subreddit.
@@ -343,7 +343,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Listing containing edited items
   */
   get_edited (options = {}) {
-    return this._get({uri: `r/${this.display_name}/about/edited`, qs: options});
+    return this._get_listing({uri: `r/${this.display_name}/about/edited`, qs: options});
   }
   /**
   * @summary Accepts an invite to become a moderator of this subreddit.
@@ -402,7 +402,7 @@ const Subreddit = class extends require('./RedditContent') {
   */
   get_banned_users (options) { // TODO: Return Listings containing RedditUser objects rather than normal objects with data
     const opts = typeof options === 'string' ? options : options && {name: options.name};
-    return this._get({uri: `r/${this.display_name}/about/banned`, qs: helpers.rename_key(opts, 'name', 'user')});
+    return this._get_listing({uri: `r/${this.display_name}/about/banned`, qs: helpers.rename_key(opts, 'name', 'user')});
   }
   /**
   * @summary Gets the list of muted users on this subreddit.
@@ -412,7 +412,7 @@ const Subreddit = class extends require('./RedditContent') {
   */
   get_muted_users (options) {
     const opts = typeof options === 'string' ? options : options && {name: options.name};
-    return this._get({uri: `r/${this.display_name}/about/muted`, qs: helpers.rename_key(opts, 'name', 'user')});
+    return this._get_listing({uri: `r/${this.display_name}/about/muted`, qs: helpers.rename_key(opts, 'name', 'user')});
   }
   /**
   * @summary Gets the list of users banned from this subreddit's wiki.
@@ -422,7 +422,7 @@ const Subreddit = class extends require('./RedditContent') {
   */
   get_wikibanned_users (options) {
     const opts = typeof options === 'string' ? options : options && {name: options.name};
-    return this._get({uri: `r/${this.display_name}/about/wikibanned`, qs: helpers.rename_key(opts, 'name', 'user')});
+    return this._get_listing({uri: `r/${this.display_name}/about/wikibanned`, qs: helpers.rename_key(opts, 'name', 'user')});
   }
   /**
   * @summary Gets the list of approved submitters on this subreddit.
@@ -432,7 +432,7 @@ const Subreddit = class extends require('./RedditContent') {
   */
   get_contributors (options) {
     const opts = typeof options === 'string' ? options : options && {name: options.name};
-    return this._get({uri: `r/${this.display_name}/about/contributors`, qs: helpers.rename_key(opts, 'name', 'user')});
+    return this._get_listing({uri: `r/${this.display_name}/about/contributors`, qs: helpers.rename_key(opts, 'name', 'user')});
   }
   /**
   * @summary Gets the list of approved wiki submitters on this subreddit .
@@ -442,7 +442,8 @@ const Subreddit = class extends require('./RedditContent') {
   */
   get_wiki_contributors (options) {
     const opts = typeof options === 'string' ? options : options && {name: options.name};
-    return this._get({uri: `r/${this.display_name}/about/wikicontributors`, qs: helpers.rename_key(opts, 'name', 'user')});
+    const query = helpers.rename_key(opts, 'name', 'user');
+    return this._get_listing({uri: `r/${this.display_name}/about/wikicontributors`, qs: query});
   }
   /**
   * @summary Gets the list of moderators on this subreddit.
@@ -859,7 +860,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Listing containing wiki revisions
   */
   get_wiki_revisions (options) {
-    return this._get({uri: `r/${this.display_name}/wiki/revisions`, qs: options});
+    return this._get_listing({uri: `r/${this.display_name}/wiki/revisions`, qs: options});
   }
 };
 

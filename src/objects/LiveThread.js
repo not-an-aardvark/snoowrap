@@ -191,10 +191,10 @@ const LiveThread = class extends require('./RedditContent') {
   /**
   * @summary Gets a Listing containing past updates to this LiveThread.
   * @param {object} [options] Options for the resulting Listing
-  * @returns {Promise} A Promise containing LiveUpdates
+  * @returns {Promise} A Listing containing LiveUpdates
   */
   get_recent_updates (options) {
-    return this._get({uri: `live/${this.id}`, qs: options});
+    return this._get_listing({uri: `live/${this.id}`, qs: options});
   }
   /**
   * @summary Gets a list of this LiveThread's contributors
@@ -209,7 +209,7 @@ const LiveThread = class extends require('./RedditContent') {
   * @returns {Promise} A Listing containing Submissions
   */
   get_discussions (options) {
-    return this._get({uri: `live/${this.id}/discussions`, qs: options});
+    return this._get_listing({uri: `live/${this.id}/discussions`, qs: options});
   }
   /**
   * @summary Stops listening for new updates on this LiveThread.
