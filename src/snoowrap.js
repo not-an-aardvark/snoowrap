@@ -1070,11 +1070,16 @@ const snoowrap = class {
   _unfriend (options) {
     return this._post({uri: `${options.sub ? `r/${options.sub}/` : ''}api/unfriend`, form: _.assign(options, {api_type})});
   }
-  _get_listing (...args) {
+  _get_listing ({uri, qs}) {
     /* When the response type is expected to be a Listing, add a `count` parameter with a very high number.
     This ensures that reddit returns a `before` property in the resulting Listing to enable pagination.
     (Aside from the additional parameter, this function is equivalent to snoowrap.prototype._get) */
-    return promise_wrap(request_handler.oauth_request(this, 'get', args, {qs: {count: 9999}}));
+    const merged_query = {count: 9999, ...qs};
+    if (qs && qs.limit) {
+      const new_listing = this._new_object('Listing', {_query: merged_query, _uri: uri});
+      return new_listing.fetch_more(qs.limit);
+    }
+    return this._get({uri, qs: merged_query});
   }
 };
 

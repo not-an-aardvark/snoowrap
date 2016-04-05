@@ -6,7 +6,7 @@ const constants = require('./constants');
 const errors = require('./errors');
 
 module.exports = {
-  async oauth_request (r, method, args, extra_defaults = {}, attempts = 0) {
+  async oauth_request (r, method, args, attempts = 0) {
     /* r._throttle is a timer that gets reset to r._config.request_delay whenever a request is sent. This ensures that
     requests are throttled correctly according to the user's config settings, and that no requests are lost. The await
     statement is wrapped in a loop to make sure that if the throttle promise resolves while multiple requests are pending,
@@ -51,7 +51,7 @@ module.exports = {
             response.request.uri.href}. ratelimit_remaining: ${r.ratelimit_remaining}`);
           return populated;
         }
-      }).defaults(extra_defaults)[method](...args);
+      })[method](...args);
     } catch (err) {
       if (err.statusCode === 401 && r.token_expiration - Date.now() < constants.MAX_TOKEN_LATENCY && r.refresh_token) {
         /* If the server returns a 401 error, it's possible that the access token expired during the latency period
@@ -60,13 +60,13 @@ module.exports = {
         reached the server. To handle this issue, invalidate the access token and call oauth_request again,
         automatically causing the token to be refreshed. */
         r.access_token = undefined;
-        return await module.exports.oauth_request(r, method, args, extra_defaults, attempts);
+        return await module.exports.oauth_request(r, method, args, attempts);
       }
       if (attempts + 1 >= r._config.max_retry_attempts || r._config.retry_error_codes.indexOf(err.statusCode) === -1) {
         throw err;
       }
       r.log.warn(`Received status code ${err.statusCode} from reddit. Retrying request...`);
-      return await module.exports.oauth_request(r, method, args, extra_defaults, attempts + 1);
+      return await module.exports.oauth_request(r, method, args, attempts + 1);
     }
   },
 

@@ -334,6 +334,10 @@ describe('snoowrap', function () {
       expect(extended_reverse_listing).to.have.lengthOf(19);
       expect(_.map(extended_reverse_listing, 'name').slice(-10)).to.eql(_.map(reverse_listing, 'name'));
     });
+    it('allows more than 100 items to be fetched initially by repeatedly making requests', async () => {
+      const lots_of_top_posts = await r.get_top({time: 'all', limit: 120});
+      expect(lots_of_top_posts).to.have.lengthOf(120);
+    });
   });
 
   describe('api/morechildren behavior', () => {
