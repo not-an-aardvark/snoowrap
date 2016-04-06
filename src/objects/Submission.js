@@ -167,7 +167,7 @@ const Submission = class extends require('./VoteableContent') {
     return this.subreddit.get_link_flair_templates(this.name);
   }
   /**
-  * @summary Assigns flair on this Submission (as a moderator; also see select_link_flair)
+  * @summary Assigns flair on this Submission (as a moderator; also see [select_flair]{@link Submission#select_flair})
   * @param {object} options
   * @param {string} options.text The text that this link's flair should have
   * @param {string} options.css_class The CSS class that the link's flair should have
@@ -181,7 +181,7 @@ const Submission = class extends require('./VoteableContent') {
   }
 
   /**
-  * @summary Selects a flair for this Submission (as the OP; also see assign_link_flair)
+  * @summary Selects a flair for this Submission (as the OP; also see [assign_flair]{@link Submission#assign_flair})
   * @param {object} options
   * @param {string} options.flair_template_id A flair template ID to use for this Submission. (This should be obtained
   beforehand using {@link get_link_flair_templates}.)
