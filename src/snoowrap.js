@@ -920,6 +920,10 @@ const snoowrap = class {
   * @param {object} options Options for the search. May also contain Listing parameters.
   * @param {string} options.query The search query
   * @returns {Promise} A Listing containing Subreddits
+  * @example
+  *
+  * r.search_subreddits({query: 'cookies'}).then(console.log)
+  * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
   */
   search_subreddits (options) {
     options.q = options.query;
@@ -929,6 +933,10 @@ const snoowrap = class {
   * @summary Gets a list of subreddits, arranged by popularity.
   * @param {object} [options] Options for the resulting Listing
   * @returns {Promise} A Listing containing Subreddits
+  * @example
+  *
+  * r.get_popular_subreddits().then(console.log)
+  * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
   */
   get_popular_subreddits (options) {
     return this._get_listing({uri: 'subreddits/popular', qs: options});
@@ -937,6 +945,10 @@ const snoowrap = class {
   * @summary Gets a list of subreddits, arranged by age.
   * @param {object} [options] Options for the resulting Listing
   * @returns {Promise} A Listing containing Subreddits
+  * @example
+  *
+  * r.get_new_subreddits().then(console.log)
+  * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
   */
   get_new_subreddits (options) {
     return this._get_listing({uri: 'subreddits/new', qs: options});
@@ -945,6 +957,10 @@ const snoowrap = class {
   * @summary Gets a list of gold-exclusive subreddits.
   * @param {object} [options] Options for the resulting Listing
   * @returns {Promise} A Listing containing Subreddits
+  * @example
+  *
+  * r.get_gold_subreddits().then(console.log)
+  * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
   */
   get_gold_subreddits (options) {
     return this._get_listing({uri: 'subreddits/gold', qs: options});
@@ -953,6 +969,10 @@ const snoowrap = class {
   * @summary Gets a list of default subreddits.
   * @param {object} [options] Options for the resulting Listing
   * @returns {Promise} A Listing containing Subreddits
+  * @example
+  *
+  * r.get_default_subreddits().then(console.log)
+  * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
   */
   get_default_subreddits (options) {
     return this._get_listing({uri: 'subreddits/default', qs: options});
@@ -961,6 +981,12 @@ const snoowrap = class {
   * @summary Checks whether a given username is available for registration
   * @param {string} name The username in question
   * @returns {Promise} A Promise that fulfills with a Boolean (`true` or `false`)
+  * @example
+  *
+  * r.check_username_availability('not_an_aardvark').then(console.log)
+  * // => false
+  * r.check_username_availability('eqwZAr9qunx7IHqzWVeF').then(console.log)
+  * // => true
   */
   check_username_availability (name) {
     // The oauth endpoint listed in reddit's documentation doesn't actually work, so just send an unauthenticated request.
@@ -977,6 +1003,10 @@ const snoowrap = class {
   * @param {string} [$0.resources] Information and useful links related to the thread. 120 characters max
   * @param {boolean} [$0.nsfw=false] Determines whether the thread is Not Safe For Work
   * @returns {Promise} A Promise that fulfills with the new LiveThread when the request is complete
+  * @example
+  *
+  * r.create_livethread({title: 'My livethread'}).then(console.log)
+  * // => LiveThread { id: 'wpimncm1f01j' }
   */
   create_livethread ({title, description, resources, nsfw = false}) {
     return promise_wrap(this._post({
@@ -987,6 +1017,10 @@ const snoowrap = class {
   /**
   * @summary Gets the user's own multireddits.
   * @returns {Promise} A Promise for an Array containing the requester's MultiReddits.
+  * @example
+  *
+  * r.get_my_multireddits().then(console.log)
+  * => [ MultiReddit { ... }, MultiReddit { ... }, ... ]
   */
   get_my_multireddits () {
     return this._get({uri: 'api/multi/mine', qs: {expand_srs: true}});
@@ -1005,6 +1039,14 @@ const snoowrap = class {
   * @param {string} [$0.key_color='#000000'] A six-digit RGB hex color, preceded by '#'
   * @param {string} [$0.weighting_scheme='classic'] One of 'classic', 'fresh'
   * @returns {Promise} A Promise for the newly-created MultiReddit object
+  * @example
+  *
+  * r.create_multireddit({
+  *   name: 'myMulti',
+  *   description: 'An example multireddit',
+  *   subreddits: ['snoowrap', 'snoowrap_testing']
+  * }).then(console.log)
+  * => MultiReddit { display_name: 'myMulti', ... }
   */
   create_multireddit ({name, description, subreddits, visibility = 'private', icon_name = '', key_color = '#000000',
       weighting_scheme = 'classic'}) {

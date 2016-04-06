@@ -54,7 +54,7 @@ const RedditContent = class {
   * @returns {object} A version of this object with all the private properties stripped
   */
   toJSON () {
-    return _.omitBy(this, (value, key) => key.startsWith('_'));
+    return _.pick(this, _.keys(this).filter(key => !key.startsWith('_')));
   }
   inspect () {
     return `${this.constructor.name} ${require('util').inspect(this.toJSON())}`;
