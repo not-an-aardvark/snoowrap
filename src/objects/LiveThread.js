@@ -43,7 +43,7 @@ const LiveThread = class extends require('./RedditContent') {
     const populated_stream = new EventEmitter();
     const raw_stream = new WebSocket(response_object.websocket_url);
     raw_stream.on('message', data => {
-      const parsed = helpers._populate(JSON.parse(data), this._ac);
+      const parsed = helpers._populate(JSON.parse(data), this._r);
       populated_stream.emit(parsed.type, parsed.payload);
     });
     return _.assign(response_object, {_websocket: raw_stream, stream: populated_stream});
@@ -146,7 +146,7 @@ const LiveThread = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills with this LiveThread when the request is complete
   */
   remove_contributor ({name}) {
-    return this._ac.get_user(name).id.then(user_id => this._post({
+    return this._r.get_user(name).id.then(user_id => this._post({
       uri: `api/live/${this.id}/rm_contributor`,
       form: {api_type, id: `t2_${user_id}`}
     })).then(helpers._handle_json_errors(this));
@@ -158,7 +158,7 @@ const LiveThread = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills with this LiveThread when the request is complete
   */
   revoke_contributor_invite ({name}) {
-    return this._ac.get_user(name).id.then(user_id => this._post({
+    return this._r.get_user(name).id.then(user_id => this._post({
       uri: `api/live/${this.id}/rm_contributor_invite`,
       form: {api_type, id: `t2_${user_id}`}
     })).then(helpers._handle_json_errors(this));

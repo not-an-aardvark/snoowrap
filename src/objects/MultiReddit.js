@@ -5,12 +5,12 @@ const _ = require('lodash');
 * @summary A class representing a multireddit.
 */
 const MultiReddit = class extends require('./RedditContent') {
-  constructor (options, _ac, _has_fetched) {
-    super(options, _ac, _has_fetched);
+  constructor (options, _r, _has_fetched) {
+    super(options, _r, _has_fetched);
     if (_has_fetched) {
-      this.curator = _ac.get_user(this.path.split('/')[2]);
+      this.curator = _r.get_user(this.path.split('/')[2]);
       this.subreddits = this.subreddits.map(item =>
-        this._ac._new_object('Subreddit', item.data || {display_name: item.name}, false)
+        this._r._new_object('Subreddit', item.data || {display_name: item.name}, false)
       );
     } else {
       this.path = `/user/${this.curator.name}/m/${this.name}`;
@@ -26,7 +26,7 @@ const MultiReddit = class extends require('./RedditContent') {
   * @returns {Promise} A Promise for the newly-copied multireddit
   */
   copy ({new_name}) {
-    return this._ac._get_my_name().then(name =>
+    return this._r._get_my_name().then(name =>
       this._post({
         uri: 'api/multi/copy',
         form: {from: this.path, to: `/user/${name}/m/${new_name}`, display_name: new_name}
@@ -41,7 +41,7 @@ const MultiReddit = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills with this multireddit
   */
   rename ({new_name}) {
-    return this._ac._get_my_name().then(my_name => this._post({
+    return this._r._get_my_name().then(my_name => this._post({
       uri: 'api/multi/rename',
       form: {from: this.path, to: `/user/${my_name}/m/${new_name}`, display_name: new_name}
     })).then(res => {

@@ -156,7 +156,7 @@ const Submission = class extends require('./VoteableContent') {
   get_related (options = {}) {
     return this._get_listing({uri: `related/${this.name}`, qs: options}).tap(result => {
       if (result.constructor.name === 'Submission') {
-        this._ac.log.warn('Submission.prototype.get_related has been deprecated upstream, and will not work as expected.');
+        this._r.log.warn('Submission.prototype.get_related has been deprecated upstream, and will not work as expected.');
       }
     });
   }
@@ -175,7 +175,7 @@ const Submission = class extends require('./VoteableContent') {
   * @returns {Promise} A Promise that fulfills with an updated version of this Submission
   */
   assign_flair (options) {
-    return this._ac._assign_flair(_.assign(options, {
+    return this._r._assign_flair(_.assign(options, {
       link: this.name, subreddit_name: this.subreddit.display_name
     })).then(() => {
       this.link_flair_text = options.text || null;
@@ -193,7 +193,7 @@ const Submission = class extends require('./VoteableContent') {
   * @returns {Promise} A Promise that fulfills with this objects after the request is complete
   */
   select_flair (options) {
-    return this._ac._select_flair(_.assign(options, {
+    return this._r._select_flair(_.assign(options, {
       link: this.name, subreddit_name: this.subreddit.display_name
     })).return(this);
   }

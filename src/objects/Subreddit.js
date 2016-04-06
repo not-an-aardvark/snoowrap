@@ -181,8 +181,8 @@ const Subreddit = class extends require('./RedditContent') {
   select_my_flair (options) {
     /* NOTE: This requires `identity` scope in addition to `flair` scope, since the reddit api needs to be passed a username.
     I'm not sure if there's a way to do this without requiring additional scope. */
-    return (this._ac.own_user_info ? Promise.resolve() : this._ac.get_me()).then(() =>
-      this._ac._select_flair(_.assign(options, {subreddit_name: this.display_name, name: this._ac.own_user_info.name}))
+    return (this._r.own_user_info ? Promise.resolve() : this._r.get_me()).then(() =>
+      this._r._select_flair(_.assign(options, {subreddit_name: this.display_name, name: this._r.own_user_info.name}))
     );
   }
   _set_my_flair_visibility (flair_enabled) {
@@ -214,7 +214,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} The newly-created Submission object
   */
   submit_selfpost (options) {
-    return this._ac.submit_selfpost(_.assign(options, {subreddit_name: this.display_name}));
+    return this._r.submit_selfpost(_.assign(options, {subreddit_name: this.display_name}));
   }
   /**
   * @summary Creates a new link submission on this subreddit.
@@ -230,7 +230,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} The newly-created Submission object
   */
   submit_link (options) {
-    return this._ac.submit_link(_.assign(options, {subreddit_name: this.display_name}));
+    return this._r.submit_link(_.assign(options, {subreddit_name: this.display_name}));
   }
   /**
   * @summary Gets a Listing of hot posts on this subreddit.
@@ -238,7 +238,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Listing containing the retrieved submissions
   */
   get_hot (options) {
-    return this._ac.get_hot(this.display_name, options);
+    return this._r.get_hot(this.display_name, options);
   }
   /**
   * @summary Gets a Listing of new posts on this subreddit.
@@ -246,7 +246,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Listing containing the retrieved submissions
   */
   get_new (options) {
-    return this._ac.get_new(this.display_name, options);
+    return this._r.get_new(this.display_name, options);
   }
   /**
   * @summary Gets a Listing of new comments on this subreddit.
@@ -254,7 +254,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Listing containing the retrieved comments
   */
   get_new_comments (options) {
-    return this._ac.get_new_comments(this.display_name, options);
+    return this._r.get_new_comments(this.display_name, options);
   }
   /**
   * @summary Gets a single random Submission from this subreddit.
@@ -262,7 +262,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} The retrieved Submission object
   */
   get_random_submission () {
-    return this._ac.get_random_submission(this.display_name);
+    return this._r.get_random_submission(this.display_name);
   }
   /**
   * @summary Gets a Listing of top posts on this subreddit.
@@ -272,7 +272,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Listing containing the retrieved submissions
   */
   get_top (options) {
-    return this._ac.get_top(this.display_name, options);
+    return this._r.get_top(this.display_name, options);
   }
   /**
   * @summary Gets a Listing of controversial posts on this subreddit.
@@ -282,7 +282,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Listing containing the retrieved submissions
   */
   get_controversial (options) {
-    return this._ac.get_controversial(this.display_name, options);
+    return this._r.get_controversial(this.display_name, options);
   }
   /**
   * @summary Gets the moderation log for this subreddit.
@@ -392,7 +392,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Listing containing the search results.
   */
   search (options) {
-    return this._ac.search(_.assign(options, {subreddit: this, restrict_sr: true}));
+    return this._r.search(_.assign(options, {subreddit: this, restrict_sr: true}));
   }
   /**
   * @summary Gets the list of banned users on this subreddit.
@@ -553,7 +553,7 @@ const Subreddit = class extends require('./RedditContent') {
   */
   edit_settings (options) {
     return Promise.join(this.get_settings(), this.name, (current_values, name) =>
-      this._ac._create_or_edit_subreddit(_.assign(current_values, options, {sr: name}))
+      this._r._create_or_edit_subreddit(_.assign(current_values, options, {sr: name}))
     ).return(this);
   }
   /**
@@ -689,11 +689,11 @@ const Subreddit = class extends require('./RedditContent') {
     return this._get({uri: `r/${this.display_name}/about/sticky`, qs: {num}});
   }
   _friend (options) {
-    return this._ac._friend(_.assign(options, {sub: this.display_name})).then(helpers._handle_json_errors(this))
+    return this._r._friend(_.assign(options, {sub: this.display_name})).then(helpers._handle_json_errors(this))
     ;
   }
   _unfriend (options) {
-    return this._ac._unfriend(_.assign(options, {sub: this.display_name})).then(helpers._handle_json_errors(this))
+    return this._r._unfriend(_.assign(options, {sub: this.display_name})).then(helpers._handle_json_errors(this))
     ;
   }
   /**
@@ -843,7 +843,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {WikiPage} An unfetched WikiPage object corresponding to the desired wiki page
   */
   get_wiki_page (title) {
-    return this._ac._new_object('WikiPage', {subreddit: this, title});
+    return this._r._new_object('WikiPage', {subreddit: this, title});
   }
   /**
   * @summary Gets the list of wiki pages on this subreddit.

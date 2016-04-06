@@ -35,7 +35,7 @@ const RedditUser = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills with the current user after the request is complete
   */
   assign_flair (options) {
-    return this._ac._assign_flair(_.assign(options, {name: this.name})).return(this);
+    return this._r._assign_flair(_.assign(options, {name: this.name})).return(this);
   }
   /**
   * @summary Adds this user as a friend, or modifies their friend note.
@@ -144,7 +144,7 @@ const RedditUser = class extends require('./RedditContent') {
   * @returns {Promise} An unfetched MultiReddit object
   */
   get_multireddit (name) {
-    return this._ac._new_object('MultiReddit', {name, curator: this}, false);
+    return this._r._new_object('MultiReddit', {name, curator: this}, false);
   }
   /**
   * @summary Gets an Array of all of this user's MultiReddits.

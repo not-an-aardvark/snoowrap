@@ -25,9 +25,9 @@ original Listing.
 * @extends Array
 */
 const Listing = class extends Array {
-  constructor (options = {}, _ac) {
+  constructor (options = {}, _r) {
     super();
-    this._ac = _ac;
+    this._r = _r;
     _.assign(this, options.children || []);
     _.defaultsDeep(this, _.pick(options, _.keys(INTERNAL_DEFAULTS)), INTERNAL_DEFAULTS);
     _.assign(this._query, _.pick(options, ['before', 'after']));
@@ -83,7 +83,7 @@ const Listing = class extends Array {
     return promise_wrap(this._more ? this._fetch_more_comments(parsed_options) : this._fetch_more_regular(parsed_options));
   }
   _fetch_more_regular (options) {
-    return this._ac[`_${this._method}`]({
+    return this._r[`_${this._method}`]({
       uri: this._uri,
       qs: {...this._query, limit: this._is_comment_list ? options.amount + 1 : options.amount}
     }).then(this._transform).then(response => {
@@ -145,7 +145,7 @@ const Listing = class extends Array {
     properties._query = _.clone(properties._query);
     properties._more = this._more && this._more._clone();
     properties.children = _.toArray(this);
-    return new Listing(properties, this._ac);
+    return new Listing(properties, this._r);
   }
 };
 

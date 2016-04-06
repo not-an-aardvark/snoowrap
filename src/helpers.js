@@ -2,26 +2,26 @@
 const _ = require('lodash');
 const constants = require('./constants');
 
-exports._populate = (response_tree, _ac) => {
+exports._populate = (response_tree, _r) => {
   if (typeof response_tree === 'object' && response_tree !== null) {
     // Map {kind: 't2', data: {name: 'some_username', ... }} to a RedditUser (e.g.) with the same properties
     if (_.keys(response_tree).length === 2 && response_tree.kind) {
-      const remainder_of_tree = exports._populate(response_tree.data, _ac);
+      const remainder_of_tree = exports._populate(response_tree.data, _r);
       if (constants.KINDS[response_tree.kind]) {
-        return _ac._new_object(constants.KINDS[response_tree.kind], remainder_of_tree, true);
+        return _r._new_object(constants.KINDS[response_tree.kind], remainder_of_tree, true);
       }
-      return _ac._new_object('RedditContent', remainder_of_tree, true);
+      return _r._new_object('RedditContent', remainder_of_tree, true);
     }
     const mapFunction = Array.isArray(response_tree) ? _.map : _.mapValues;
     const result = mapFunction(response_tree, (value, key) => {
       // Map {..., author: 'some_username', ...} to {..., author: RedditUser {}, ... } (e.g.)
       if (_.includes(constants.USER_KEYS, key) && value !== null) {
-        return _ac._new_object('RedditUser', {name: value}, false);
+        return _r._new_object('RedditUser', {name: value}, false);
       }
       if (_.includes(constants.SUBREDDIT_KEYS, key) && value !== null) {
-        return _ac._new_object('Subreddit', {display_name: value}, false);
+        return _r._new_object('Subreddit', {display_name: value}, false);
       }
-      return exports._populate(value, _ac);
+      return exports._populate(value, _r);
     });
     if (result.length === 2 && result[0] && result[0].constructor.name === 'Listing' && result[0][0] &&
         result[0][0].constructor.name === 'Submission' && result[1] && result[1].constructor.name === 'Listing') {
@@ -42,9 +42,9 @@ exports._add_empty_replies_listing = item => {
     const replies_query = {comment: item.name.slice(3)};
     const _transform = response => response.comments[0].replies;
     const params = {_uri: replies_uri, _query: replies_query, _transform, _link_id: item.link_id, _is_comment_list: true};
-    item.replies = item._ac._new_object('Listing', params);
+    item.replies = item._r._new_object('Listing', params);
   } else if (item.constructor.name === 'PrivateMessage') {
-    item.replies = item._ac._new_object('Listing');
+    item.replies = item._r._new_object('Listing');
   }
   return item;
 };

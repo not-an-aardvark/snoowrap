@@ -10,9 +10,9 @@ const promise_wrap = require('promise-chains');
 * A base class for content from reddit. With the expection of Listings, all content types extend this class.
 */
 const RedditContent = class {
-  constructor (options, _ac, _has_fetched) {
-    // _ac stands for 'authenticated client' -- it refers to the snoowrap requester that is used to fetch this content.
-    this._ac = _ac;
+  constructor (options, _r, _has_fetched) {
+    // _r refers to the snoowrap requester that is used to fetch this content.
+    this._r = _r;
     this._has_fetched = !!_has_fetched;
     _.assign(this, options);
     if (typeof Proxy !== 'undefined' && !this._has_fetched) {
@@ -35,7 +35,7 @@ const RedditContent = class {
   */
   fetch () {
     if (!this._fetch) {
-      this._fetch = promise_wrap(this._ac._get({uri: this._uri}).bind(this).then(this._transform_api_response));
+      this._fetch = promise_wrap(this._r._get({uri: this._uri}).bind(this).then(this._transform_api_response));
     }
     return this._fetch;
   }
@@ -63,13 +63,13 @@ const RedditContent = class {
     return response_object;
   }
   _get_listing (...args) {
-    return this._ac._get_listing(...args);
+    return this._r._get_listing(...args);
   }
 };
 
 _.forEach(require('../constants').HTTP_VERBS, type => {
   RedditContent.prototype[`_${type}`] = function (...args) {
-    return this._ac[`_${type}`](...args);
+    return this._r[`_${type}`](...args);
   };
 });
 
