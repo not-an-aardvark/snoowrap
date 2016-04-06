@@ -13,6 +13,12 @@ const Subreddit = class extends require('./RedditContent') {
   get _uri () {
     return `r/${this.display_name}/about`;
   }
+  _transform_api_response (response_obj) {
+    if (!(response_obj instanceof Subreddit)) {
+      throw new TypeError(`The subreddit /r/${this.display_name} does not exist.`);
+    }
+    return response_obj;
+  }
   _delete_flair_templates ({flair_type}) {
     return this._post({uri: `r/${this.display_name}/api/clearflairtemplates`, form: {api_type, flair_type}});
   }
@@ -589,10 +595,10 @@ const Subreddit = class extends require('./RedditContent') {
   }
 
   _set_subscribed (status) {
-    return this.fetch().get('name').then(name => this._post({
+    return this._post({
       uri: 'api/subscribe',
-      form: {action: status ? 'sub' : 'unsub', sr: name}
-    }).return(this));
+      form: {action: status ? 'sub' : 'unsub', sr_name: this.display_name}
+    }).return(this);
   }
   /**
   * @summary Subscribes to this subreddit.
@@ -606,7 +612,18 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   unsubscribe () {
-    return this._set_subscribed(false);
+    return this._set_subscribed(false).catch(err => {
+      /* Reddit returns a 404 error if the user attempts to unsubscribe to a subreddit that they weren't subscribed to in the
+      first place. It also (as one would expect) returns a 404 error if the subreddit in question does not exist. snoowrap
+      should swallow the first type of error internally, but it should raise the second type of error. Unfortunately, the errors
+      themselves are indistinguishable. So if a 404 error gets thrown, fetch the current subreddit to check if it exists. If it
+      does exist, then the 404 error was of the first type, so swallow it and return the current Subreddit object as usual. If
+      the subreddit doesn't exist, then the original error was of the second type, so throw it. */
+      if (err.statusCode === 404) {
+        return this.fetch().return(this).catchThrow(err);
+      }
+      throw err;
+    });
   }
   _upload_sr_img ({name, file, upload_type, image_type}) {
     if (typeof file !== 'string' && !(file instanceof require('stream').Readable)) {

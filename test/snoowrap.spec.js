@@ -229,6 +229,14 @@ describe('snoowrap', function () {
       await subreddit.unsubscribe();
       expect(await subreddit.refresh().user_is_subscriber).to.be.false();
     });
+    it('can unsubscribe twice from a subreddit without an error', async () => {
+      await subreddit.unsubscribe();
+      await subreddit.unsubscribe();
+    });
+    it('will still throw an error when attempting to unsubscribe from a nonexistent subreddit', async () => {
+      const gibberish = require('crypto').randomBytes(10).toString('hex');
+      await r.get_subreddit(gibberish).unsubscribe().then(expect.fail, err => expect(err.statusCode).to.equal(404));
+    });
     it('can upload images to a subreddit', async () => {
       await subreddit.upload_header_image({file: 'test/test_image.png'});
     });
