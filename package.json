@@ -30,7 +30,7 @@
   "homepage": "https://github.com/not-an-aardvark/snoowrap",
   "dependencies": {
     "bluebird": "^3.3.3",
-    "harmony-reflect": "^1.4.2",
+    "harmony-reflect": "^1.4.5",
     "lodash": "^4.5.1",
     "promise-chains": "^0.3.6",
     "request-promise": "^2.0.1",

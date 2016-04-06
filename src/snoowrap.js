@@ -91,7 +91,7 @@ const snoowrap = class {
   inspect () {
     // Hide confidential information (tokens, client IDs, etc.), as well as private properties, from the console.log output.
     const keys_for_hidden_values = ['client_secret', 'refresh_token', 'access_token'];
-    const formatted = _.mapValues(_.pick(this, _.keys(this).filter(key => !key.startsWith('_'))), (value, key) => {
+    const formatted = _.mapValues(_.omitBy(this, (value, key) => key.startsWith('_')), (value, key) => {
       return _.includes(keys_for_hidden_values, key) ? value && '(redacted)' : value;
     });
     return `${constants.MODULE_NAME} ${require('util').inspect(formatted)}`;
