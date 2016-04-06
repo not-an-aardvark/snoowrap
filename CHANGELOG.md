@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.11.1 (2016-04-06)
+
+* Fix an issue where certain Subreddit functions would throw errors if Proxies were disabled
+
 ## v0.11.0 (2016-04-05)
 
 This update contains a small number of breaking changes.
