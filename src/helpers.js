@@ -55,7 +55,7 @@ module.exports = {
       if (_.isEmpty(response) || !response.json.errors.length) {
         return returnValue;
       }
-      throw response.json.errors[0];
+      throw new Error(response.json.errors[0]);
     };
   },
 
