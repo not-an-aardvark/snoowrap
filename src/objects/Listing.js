@@ -71,6 +71,13 @@ const Listing = class extends Array {
   is enabled (i.e. if this Listing was created with a `before` query parameter), then the newly-fetched elements will appear
   at the beginning. In either case, continuity is maintained, i.e. the order of items in the Listing will be the same as the
   order in which they appear on reddit.
+  * @example
+  * r.get_hot({limit: 25}).then(my_listing => {
+  *   console.log(my_listing.length); // => 25
+  *   my_listing.fetch_more({amount: 10}).then(extended_listing => {
+  *     console.log(extended_listing.length); // => 35
+  *   })
+  * });
   */
   fetch_more (options) {
     const parsed_options = _.defaults(_.isObject(options) ? _.clone(options) : {amount: options}, {skip_replies: false});
@@ -118,20 +125,16 @@ const Listing = class extends Array {
   * @param {boolean} [options.skip_replies=false] See {@link Listing#fetch_more}
   * @returns {Promise} A new fully-fetched Listing. Keep in mind that this method has the potential to exhaust your
   ratelimit quickly if the Listing doesn't have a clear end (e.g. with posts on the front page), so use it with discretion.
+  * @example
+  *
+  * r.get_me().get_upvoted_content().fetch_all().then(console.log)
+  * // => Listing [ Submission { ... }, Submission { ... }, ... ]
   */
   fetch_all (options) {
     return this.fetch_more({...options, amount: Infinity});
   }
-  /**
-  * @summary Fetches items until a given length is reached.
-  * @param {object} options
-  * @param {number} options.length The maximum length that the Listing should have after completion. The length might end up
-  being less than this if the true number of available items in the Listing is less than `$0.length`. For example, this
-  can't fetch 200 comments on a Submission that only has 100 comments in total.
-  * @param {boolean} [options.skip_replies=false] See {@link Listing#fetch_more}
-  * @returns {Promise} A new Listing containing all of the elements in this Listing followed by the newly-fetched elements
-  */
   fetch_until (options) {
+    this._r.log.debug('Listing.prototype.fetch_until is deprecated -- use Listing.prototype.fetch_more instead.');
     if (!_.isNumber(options.length)) {
       throw new errors.InvalidMethodCallError('Failed to fetch Listing. (No amount specified.)');
     }

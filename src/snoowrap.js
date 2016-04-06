@@ -1118,8 +1118,7 @@ const snoowrap = class {
     (Aside from the additional parameter, this function is equivalent to snoowrap.prototype._get) */
     const merged_query = {count: 9999, ...qs};
     if (qs && qs.limit) {
-      const new_listing = this._new_object('Listing', {_query: merged_query, _uri: uri});
-      return new_listing.fetch_more(qs.limit);
+      return this._new_object('Listing', {_query: merged_query, _uri: uri}).fetch_more(qs.limit);
     }
     return this._get({uri, qs: merged_query});
   }
