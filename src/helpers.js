@@ -74,8 +74,8 @@ module.exports = {
     return all_permission_names.map(type => (_.includes(permissions_array, type) ? '+' : '-') + type).join(',');
   },
 
-  rename_key (obj, oldkey, newkey) {
-    return obj && _(_.clone(obj)).assign({[newkey]: obj[oldkey]}).omit(oldkey).value();
+  rename_key (obj, old_key, new_key) {
+    return obj && _.omit({...obj, [new_key]: obj[old_key]}, old_key);
   },
 
   /* When reddit returns private messages (or comments from the /api/morechildren endpoint), it arranges their in a very
