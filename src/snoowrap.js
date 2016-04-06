@@ -381,7 +381,7 @@ const snoowrap = class {
   * // (new selfpost created on reddit)
   */
   submit_selfpost (options) {
-    return this._submit(_.assign(options, {kind: 'self'}));
+    return this._submit({...options, kind: 'self'});
   }
   /**
   * @summary Creates a new link submission on the given subreddit.
@@ -407,7 +407,7 @@ const snoowrap = class {
   * // (new linkpost created on reddit)
   */
   submit_link (options) {
-    return this._submit(_.assign(options, {kind: 'link'}));
+    return this._submit({...options, kind: 'link'});
   }
   _get_sorted_frontpage (sort_type, subreddit_name, options = {}) {
     // Handle things properly if only a time parameter is provided but not the subreddit name
@@ -419,7 +419,7 @@ const snoowrap = class {
       opts = subreddit_name;
       sub_name = undefined;
     }
-    const parsed_options = _(opts).assign({t: opts.time, time: undefined}).omit('time').value();
+    const parsed_options = _.omit({...opts, t: opts.time}, 'time');
     return this._get_listing({uri: (sub_name ? `r/${sub_name}/` : '') + sort_type, qs: parsed_options});
   }
   /**
@@ -712,7 +712,7 @@ const snoowrap = class {
     }
     options.restrict_sr = options.restrict_sr || true;
     options.syntax = options.syntax || 'plain';
-    const parsed_query = _(options).assign({t: options.time, q: options.query}).omit('time', 'query').value();
+    const parsed_query = _.omit({...options, t: options.time, q: options.query}, ['time', 'query']);
     return this._get_listing({uri: `${options.subreddit ? `r/${options.subreddit}/` : ''}search`, qs: parsed_query});
   }
   /**
@@ -1065,10 +1065,10 @@ const snoowrap = class {
     return await this._post({uri: `r/${await subreddit_name}/api/flair`, form: {api_type, name, text, link, css_class}});
   }
   _friend (options) {
-    return this._post({uri: `${options.sub ? `r/${options.sub}/` : ''}api/friend`, form: _.assign(options, {api_type})});
+    return this._post({uri: `${options.sub ? `r/${options.sub}/` : ''}api/friend`, form: {...options, api_type}});
   }
   _unfriend (options) {
-    return this._post({uri: `${options.sub ? `r/${options.sub}/` : ''}api/unfriend`, form: _.assign(options, {api_type})});
+    return this._post({uri: `${options.sub ? `r/${options.sub}/` : ''}api/unfriend`, form: {...options, api_type}});
   }
   _get_listing ({uri, qs}) {
     /* When the response type is expected to be a Listing, add a `count` parameter with a very high number.

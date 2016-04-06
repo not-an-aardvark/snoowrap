@@ -1,5 +1,4 @@
 'use strict';
-const _ = require('lodash');
 const EventEmitter = require('events').EventEmitter;
 const WebSocket = require('ws');
 const helpers = require('../helpers');
@@ -46,7 +45,7 @@ const LiveThread = class extends require('./RedditContent') {
       const parsed = helpers._populate(JSON.parse(data), this._r);
       populated_stream.emit(parsed.type, parsed.payload);
     });
-    return _.assign(response_object, {_websocket: raw_stream, stream: populated_stream});
+    return {...response_object, _websocket: raw_stream, stream: populated_stream};
   }
   /**
   * @summary Adds a new update to this thread.

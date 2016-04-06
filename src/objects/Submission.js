@@ -1,5 +1,4 @@
 'use strict';
-const _ = require('lodash');
 const api_type = 'json';
 
 /**
@@ -175,9 +174,7 @@ const Submission = class extends require('./VoteableContent') {
   * @returns {Promise} A Promise that fulfills with an updated version of this Submission
   */
   assign_flair (options) {
-    return this._r._assign_flair(_.assign(options, {
-      link: this.name, subreddit_name: this.subreddit.display_name
-    })).then(() => {
+    return this._r._assign_flair({...options, link: this.name, subreddit_name: this.subreddit.display_name}).then(() => {
       this.link_flair_text = options.text || null;
       this.link_flair_css_class = options.css_class || null;
     }).return(this);
@@ -193,9 +190,7 @@ const Submission = class extends require('./VoteableContent') {
   * @returns {Promise} A Promise that fulfills with this objects after the request is complete
   */
   select_flair (options) {
-    return this._r._select_flair(_.assign(options, {
-      link: this.name, subreddit_name: this.subreddit.display_name
-    })).return(this);
+    return this._r._select_flair({...options, link: this.name, subreddit_name: this.subreddit.display_name}).return(this);
   }
 };
 

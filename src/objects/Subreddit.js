@@ -58,7 +58,7 @@ const Subreddit = class extends require('./RedditContent') {
   when it has this template
   */
   create_user_flair_template (options) {
-    return this._create_flair_template(_.assign(options, {flair_type: 'USER_FLAIR'}));
+    return this._create_flair_template({...options, flair_type: 'USER_FLAIR'});
   }
   /**
   * @summary Creates a new link flair template for this subreddit
@@ -70,7 +70,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills with this Subredit when the request is complete.
   */
   create_link_flair_template (options) {
-    return this._create_flair_template(_.assign(options, {flair_type: 'LINK_FLAIR'}));
+    return this._create_flair_template({...options, flair_type: 'LINK_FLAIR'});
   }
   _get_flair_options ({name, link} = {}) { // TODO: Add shortcuts for this on RedditUser and Submission
     return this._post({uri: `r/${this.display_name}/api/flairselector`, form: {name, link}});
@@ -181,9 +181,9 @@ const Subreddit = class extends require('./RedditContent') {
   select_my_flair (options) {
     /* NOTE: This requires `identity` scope in addition to `flair` scope, since the reddit api needs to be passed a username.
     I'm not sure if there's a way to do this without requiring additional scope. */
-    return (this._r.own_user_info ? Promise.resolve() : this._r.get_me()).then(() =>
-      this._r._select_flair(_.assign(options, {subreddit_name: this.display_name, name: this._r.own_user_info.name}))
-    );
+    return (this._r.own_user_info ? Promise.resolve() : this._r.get_me()).then(() => {
+      return this._r._select_flair({...options, subreddit_name: this.display_name, name: this._r.own_user_info.name});
+    });
   }
   _set_my_flair_visibility (flair_enabled) {
     return this._post({uri: `r/${this.display_name}/api/setflairenabled`, form: {api_type, flair_enabled}});
@@ -214,7 +214,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} The newly-created Submission object
   */
   submit_selfpost (options) {
-    return this._r.submit_selfpost(_.assign(options, {subreddit_name: this.display_name}));
+    return this._r.submit_selfpost({...options, subreddit_name: this.display_name});
   }
   /**
   * @summary Creates a new link submission on this subreddit.
@@ -230,7 +230,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} The newly-created Submission object
   */
   submit_link (options) {
-    return this._r.submit_link(_.assign(options, {subreddit_name: this.display_name}));
+    return this._r.submit_link({...options, subreddit_name: this.display_name});
   }
   /**
   * @summary Gets a Listing of hot posts on this subreddit.
@@ -392,7 +392,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Listing containing the search results.
   */
   search (options) {
-    return this._r.search(_.assign(options, {subreddit: this, restrict_sr: true}));
+    return this._r.search({...options, subreddit: this, restrict_sr: true});
   }
   /**
   * @summary Gets the list of banned users on this subreddit.
@@ -552,9 +552,9 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
   */
   edit_settings (options) {
-    return Promise.join(this.get_settings(), this.name, (current_values, name) =>
-      this._r._create_or_edit_subreddit(_.assign(current_values, options, {sr: name}))
-    ).return(this);
+    return Promise.join(this.get_settings(), this.name, (current_values, name) => {
+      return this._r._create_or_edit_subreddit({...current_values, ...options, sr: name});
+    }).return(this);
   }
   /**
   * @summary Gets a list of recommended other subreddits given this one.
@@ -689,12 +689,11 @@ const Subreddit = class extends require('./RedditContent') {
     return this._get({uri: `r/${this.display_name}/about/sticky`, qs: {num}});
   }
   _friend (options) {
-    return this._r._friend(_.assign(options, {sub: this.display_name})).then(helpers._handle_json_errors(this))
+    return this._r._friend({...options, sub: this.display_name}).then(helpers._handle_json_errors(this))
     ;
   }
   _unfriend (options) {
-    return this._r._unfriend(_.assign(options, {sub: this.display_name})).then(helpers._handle_json_errors(this))
-    ;
+    return this._r._unfriend({...options, sub: this.display_name}).then(helpers._handle_json_errors(this));
   }
   /**
   * @summary Invites the given user to be a moderator of this subreddit.
