@@ -15,15 +15,15 @@ const RedditContent = class {
     this._ac = _ac;
     this._has_fetched = !!_has_fetched;
     _.assign(this, options);
-    if (typeof Proxy !== 'undefined') {
-      return new Proxy(this, {get: (target, key) => {
+    if (typeof Proxy !== 'undefined' && !this._has_fetched) {
+      return new Proxy(this, {get (target, key) {
         if (key === '_raw') {
           return target;
         }
-        if (key in target || key === 'length' || key in Promise.prototype || target._has_fetched) {
+        if (key in target || key === 'length' || key in Promise.prototype) {
           return target[key];
         }
-        return this.fetch()[key];
+        return target.fetch()[key];
       }});
     }
   }
