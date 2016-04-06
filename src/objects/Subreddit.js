@@ -360,7 +360,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Promise for this subreddit.
   */
   leave_moderator () {
-    return this.name.then(name =>
+    return this.fetch().get('name').then(name =>
       this._post({uri: 'api/leavemoderator', form: {id: name}}).then(helpers._handle_json_errors(this))
     );
   }
@@ -369,7 +369,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} A Promise that resolves with this subreddit when the request is complete.
   */
   leave_contributor () {
-    return this.name.then(name =>
+    return this.fetch().get('name').then(name =>
       this._post({uri: 'api/leavecontributor', form: {id: name}}).return(this)
     );
   }
@@ -589,7 +589,7 @@ const Subreddit = class extends require('./RedditContent') {
   }
 
   _set_subscribed (status) {
-    return this.name.then(name => this._post({
+    return this.fetch().get('name').then(name => this._post({
       uri: 'api/subscribe',
       form: {action: status ? 'sub' : 'unsub', sr: name}
     }).return(this));
