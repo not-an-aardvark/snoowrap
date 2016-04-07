@@ -204,10 +204,10 @@ const snoowrap = class {
   * // => RedditUser { is_employee: false, has_mail: false, name: 'snoowrap_testing', ... }
   */
   get_me () {
-    return promise_wrap(this._get('api/v1/me').then(result => {
+    return this._get('api/v1/me').then(result => {
       this.own_user_info = this._new_object('RedditUser', result, true);
       return this.own_user_info;
-    }));
+    });
   }
   _get_my_name () {
     return Promise.resolve(this.own_user_info ? this.own_user_info.name : this.get_me().get('name'));
@@ -314,7 +314,7 @@ const snoowrap = class {
   * // => 'o5M18uy4mk0IW4hs0fu2GNPdXb1Dxe9d'
   */
   get_new_captcha_identifier () {
-    return promise_wrap(this._post({uri: 'api/new_captcha', form: {api_type}}).then(res => res.json.data.iden));
+    return this._post({uri: 'api/new_captcha', form: {api_type}}).then(res => res.json.data.iden);
   }
   /**
   * @summary Gets an image for a given captcha identifier.
@@ -354,10 +354,10 @@ const snoowrap = class {
     return this._post({uri: 'api/store_visits', links: _.map(links, 'name').join(',')});
   }
   _submit ({captcha_response, captcha_iden, kind, resubmit = true, send_replies = true, text, title, url, subreddit_name}) {
-    return promise_wrap(this._post({uri: 'api/submit', form: {
+    return this._post({uri: 'api/submit', form: {
       api_type, captcha: captcha_response, iden: captcha_iden, sendreplies: send_replies, sr: subreddit_name, kind, resubmit,
       text, title, url
-    }}).tap(helpers._handle_json_errors(this)).then(result => this.get_submission(result.json.data.id)));
+    }}).tap(helpers._handle_json_errors(this)).then(result => this.get_submission(result.json.data.id));
   }
   /**
   * @summary Creates a new selfpost on the given subreddit.
@@ -680,7 +680,7 @@ const snoowrap = class {
   * // }
   */
   get_oauth_scope_list () {
-    return promise_wrap(this._get({uri: 'api/v1/scopes'}));
+    return this._get({uri: 'api/v1/scopes'});
   }
   /**
   * @summary Conducts a search of reddit submissions.
@@ -767,12 +767,12 @@ const snoowrap = class {
     wiki_edit_karma,
     wikimode = 'modonly'
   }) {
-    return promise_wrap(this._post({uri: 'api/site_admin', form: {
+    return this._post({uri: 'api/site_admin', form: {
       allow_top, api_type, captcha, collapse_deleted_comments, comment_score_hide_mins, description, exclude_banned_modqueue,
       'header-title': header_title, hide_ads, iden: captcha_iden, lang, link_type, name, over_18, public_description,
       public_traffic, show_media, spam_comments, spam_links, spam_selfposts, sr, submit_link_label, submit_text,
       submit_text_label, suggested_comment_sort, title, type: subreddit_type || type, wiki_edit_age, wiki_edit_karma, wikimode
-    }}).then(helpers._handle_json_errors(this.get_subreddit(name))));
+    }}).then(helpers._handle_json_errors(this.get_subreddit(name)));
   }
   /**
   * @summary Creates a new subreddit.
@@ -851,9 +851,9 @@ const snoowrap = class {
   * // ]
   */
   search_subreddit_topics ({query}) {
-    return promise_wrap(this._get({uri: 'api/subreddits_by_topic', qs: {query}}).then(results =>
+    return this._get({uri: 'api/subreddits_by_topic', qs: {query}}).then(results =>
       _.map(results, 'name').map(this.get_subreddit.bind(this))
-    ));
+    );
   }
   /**
   * @summary Gets a list of subreddits that the currently-authenticated user is subscribed to.
@@ -1009,10 +1009,10 @@ const snoowrap = class {
   * // => LiveThread { id: 'wpimncm1f01j' }
   */
   create_livethread ({title, description, resources, nsfw = false}) {
-    return promise_wrap(this._post({
+    return this._post({
       uri: 'api/live/create',
       form: {api_type, description, nsfw, resources, title}
-    }).tap(helpers._handle_json_errors(this)).then(result => this.get_livethread(result.json.data.id)));
+    }).tap(helpers._handle_json_errors(this)).then(result => this.get_livethread(result.json.data.id));
   }
   /**
   * @summary Gets the user's own multireddits.
