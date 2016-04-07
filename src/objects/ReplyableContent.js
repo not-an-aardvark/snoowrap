@@ -62,6 +62,16 @@ const ReplyableContent = class extends require('./RedditContent') {
       form: {api_type, text, thing_id: this.name}
     }).tap(helpers._handle_json_errors(this)).then(res => res.json.data.things[0]);
   }
+  /**
+  * @summary Blocks the author of this content.
+  * @desc **Note:** In order for this function to have an effect, this item **must** be in the authenticated account's inbox or
+  modmail somewhere. The reddit API gives no outward indication of whether this condition is satisfied, so the returned Promise
+  will fulfill even if this is not the case.
+  * @returns {Promise} A Promise that fulfills with this message after the request is complete
+  */
+  block_author () {
+    return this._post({uri: 'api/block', form: {id: this.name}}).return(this);
+  }
 };
 
 module.exports = ReplyableContent;

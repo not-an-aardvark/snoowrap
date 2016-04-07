@@ -15,13 +15,6 @@ const PrivateMessage = class extends require('./ReplyableContent') {
   }
   // TODO: Get rid of the repeated code here, most of these methods are exactly the same with the exception of the URIs
   /**
-  * @summary Blocks the author of this private message.
-  * @returns {Promise} A Promise that fulfills with this message after the request is complete
-  */
-  block_author () {
-    return this._post({uri: 'api/block', form: {id: this.name}}).return(this);
-  }
-  /**
   * @summary Marks this message as read.
   * @returns {Promise} A Promise that fulfills with this message after the request is complete
   */
