@@ -137,8 +137,9 @@ r.get_submission('47v7tm').comments[0].upvote();
 // ----------
 
 // This is equivalent and works on all platforms, but the syntax isn't as nice.
-// Note: .get() and .call() are the standard bluebird utility methods.
-r.get_submission('47v7tm').fetch().get('comments').get(0).call('upvote');
+r.get_submission('47v7tm').fetch().then(submission => {
+  return submission.comments[0].upvote();
+});
 
 ```
 
