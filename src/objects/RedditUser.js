@@ -5,6 +5,10 @@ const errors = require('../errors');
 /**
 * A class representing a reddit user
 * @extends ReplyableContent
+* @example
+*
+* // Get a user with the given username
+* r.get_user('spez')
 */
 const RedditUser = class extends require('./RedditContent') {
   get _uri () {

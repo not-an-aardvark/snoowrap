@@ -5,7 +5,11 @@ const helpers = require('../helpers');
 const api_type = 'json';
 
 /**
-* @summary A class representing a live reddit thread
+* A class representing a live reddit thread
+* @example
+*
+* // Get a livethread with the given ID
+* r.get_livethread('whrdxo8dg9n0')
 * @desc For the most part, reddit distributes the content of live threads via websocket, rather than through the REST API.
 As such, snoowrap assigns each fetched LiveThread object a `stream` property, which takes the form of an
 [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter). To listen for new thread updates, simply

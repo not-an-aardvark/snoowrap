@@ -8,6 +8,8 @@ const promise_wrap = require('promise-chains');
 
 /**
 * A base class for content from reddit. With the expection of Listings, all content types extend this class.
+* This class should be considered 'abstract', to the extend that JavaScript classes can be -- it should not be necessary to
+* instantiate it directly.
 */
 const RedditContent = class {
   constructor (options, _r, _has_fetched) {

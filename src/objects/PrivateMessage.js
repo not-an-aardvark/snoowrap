@@ -3,6 +3,10 @@ const helpers = require('../helpers');
 
 /**
 * A class representing a private message or a modmail.
+* @example
+*
+* // Get a Private Message with a given ID
+* r.get_message('51shnw')
 * @extends ReplyableContent
 */
 const PrivateMessage = class extends require('./ReplyableContent') {

@@ -11,6 +11,10 @@ const WikiPage = class extends require('./RedditContent') {
   /**
   * @summary Gets the current settings for this wiki page.
   * @returns {Promise} An Object representing the settings for this page
+  * @example
+  *
+  * // Get a wiki page on a given subreddit by name
+  * r.get_subreddit('AskReddit').get_wiki_page('rules')
   */
   get_settings () {
     return this._get({uri: `r/${this.subreddit.display_name}/wiki/settings/${this.title}`});

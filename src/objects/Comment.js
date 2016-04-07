@@ -2,6 +2,10 @@
 const helpers = require('../helpers');
 /**
 * A class representing a reddit comment
+* @example
+*
+* // Get a comment with the given ID
+* r.get_comment('c0hkuyq')
 * @extends VoteableContent
 */
 const Comment = class extends require('./VoteableContent') {

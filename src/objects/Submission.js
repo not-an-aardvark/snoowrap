@@ -4,6 +4,10 @@ const api_type = 'json';
 /**
 * A class representing a reddit submission
 * @extends VoteableContent
+* @example
+*
+* // Get a submission by ID
+* r.get_submission('2np694')
 */
 const Submission = class extends require('./VoteableContent') {
   get _uri () {

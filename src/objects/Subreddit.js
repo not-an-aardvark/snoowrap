@@ -8,6 +8,10 @@ const api_type = 'json';
 /**
 * A class representing a subreddit
 * @extends RedditContent
+* @example
+*
+* // Get a subreddit by name
+* r.get_subreddit('AskReddit')
 */
 const Subreddit = class extends require('./RedditContent') {
   get _uri () {
