@@ -28,6 +28,7 @@ const MultiReddit = class extends require('./RedditContent') {
   * @param {object} $0
   * @param {string} $0.new_name The new name for the copied multireddit
   * @returns {Promise} A Promise for the newly-copied multireddit
+  * @example r.get_user('multi-mod').get_multireddit('coding_languages').copy({new_name: 'my_coding_languages_copy'})
   */
   copy ({new_name}) {
     return this._r._get_my_name().then(name =>
@@ -43,6 +44,7 @@ const MultiReddit = class extends require('./RedditContent') {
   * @param {object} $0
   * @param {string} $0.new_name The new name for this multireddit.
   * @returns {Promise} A Promise that fulfills with this multireddit
+  * @example r.get_user('multi-mod').get_multireddit('coding_languages').copy({new_name: 'cookie_languages '})
   */
   rename ({new_name}) {
     return this._r._get_my_name().then(my_name => this._post({
@@ -58,6 +60,7 @@ const MultiReddit = class extends require('./RedditContent') {
   /**
   * @summary Deletes this multireddit.
   * @returns {Promise} A Promise that fulfills when this request is complete
+  * @example r.get_user('not_an_aardvark').get_multireddit('cookie_languages').delete()
   */
   delete () {
     return this._del({uri: `api/multi${this.path}`});
@@ -76,6 +79,7 @@ const MultiReddit = class extends require('./RedditContent') {
   * @param {string} [$0.key_color] A six-digit RGB hex color, preceded by '#'
   * @param {string} [$0.weighting_scheme] One of 'classic', 'fresh'
   * @returns {Promise} The updated version of this multireddit
+  * @example r.get_user('not_an_aardvark').get_multireddit('cookie_languages').edit({visibility: 'hidden'})
   */
   edit ({description, icon_name, key_color, visibility, weighting_scheme}) {
     return this._put({uri: `api/multi${this.path}`, form: {model: JSON.stringify({
@@ -91,6 +95,7 @@ const MultiReddit = class extends require('./RedditContent') {
   * @summary Adds a subreddit to this multireddit.
   * @param {Subreddit} sub The Subreddit object to add (or a string representing a subreddit name)
   * @returns {Promise} A Promise that fulfills with this multireddit when the reuqest is complete
+  * @example r.get_user('not_an_aardvark').get_multireddit('cookie_languages').add_subreddit('cookies')
   */
   add_subreddit (sub) {
     const sub_name = _.isString(sub) ? sub : sub.display_name;
@@ -103,6 +108,7 @@ const MultiReddit = class extends require('./RedditContent') {
   * @summary Removes a subreddit from this multireddit.
   * @param {Subreddit} sub The Subreddit object to remove (or a string representing a subreddit name)
   * @returns {Promise} A Promise that fulfills with this multireddit when the request is complete
+  * @example r.get_user('not_an_aardvark').get_multireddit('cookie_languages').remove_subreddit('cookies')
   */
   remove_subreddit (sub) {
     return this._del({uri: `api/multi${this.path}/r/${_.isString(sub) ? sub : sub.display_name}`}).return(this);
