@@ -33,9 +33,28 @@ const RedditContent = class {
   }
   /**
   * @summary Fetches this content from reddit.
+  * @desc This will not mutate the original content object; all Promise properties will remain as Promises after the content has
+  * been fetched. However, the information on this object will be cached, so it may become out-of-date with the content on
+  * reddit. To clear the cache and fetch this object from reddit again, use `refresh()`.
+  *
+  * If snoowrap is running in an environment that supports ES2015 Proxies (e.g. Chrome 49+), then `fetch()` will get
+  * automatically called when an unknown property is accessed on an unfetched content object.
   * @returns {Promise} A version of this object with all of its fetched properties from reddit. This will not mutate the
   object. Once an object has been fetched once, its properties will be cached, so they might end up out-of-date if this
   function is called again. To refresh an object, use refresh().
+  * @example
+  *
+  * r.get_user('not_an_aardvark').fetch().then(user_info => {
+  *   console.log(user_info.name); // 'not_an_aardvark'
+  *   console.log(user_info.created_utc); // 1419104352
+  * });
+  *
+  * r.get_comment('d1xchqn').fetch().then(comment => comment.body).then(console.log)
+  * // => 'This is a little too interesting for my liking'
+  *
+  * // In environments that support ES2015 Proxies, the above line is equivalent to:
+  * r.get_comment('d1xchqn').body.then(console.log);
+  * // => 'This is a little too interesting for my liking'
   */
   fetch () {
     if (!this._fetch) {
@@ -46,6 +65,18 @@ const RedditContent = class {
   /**
   * @summary Refreshes this content.
   * @returns {Promise} A newly-fetched version of this content
+  * @example
+  *
+  * var some_comment = r.get_comment('cmfkyus');
+  * var initial_comment_body = some_comment.fetch().then(comment => comment.body);
+  *
+  * setTimeout(() => {
+  *   some_comment.refresh().then(refreshed_comment => {
+  *     if (initial_comment_body.value() !== refreshed_comment.body) {
+  *       console.log('This comment has changed since 10 seconds ago.');
+  *     }
+  *   });
+  * }, 10000);
   */
   refresh () {
     this._fetch = undefined;
@@ -56,6 +87,10 @@ const RedditContent = class {
   * @desc It is usually not necessary to call this method directly; simply running JSON.stringify(some_object) will strip the
   private properties anyway.
   * @returns {object} A version of this object with all the private properties stripped
+  * @example
+  *
+  * var user = r.get_user('not_an_aardvark');
+  * JSON.stringify(user) // => '{"name":"not_an_aardvark"}'
   */
   toJSON () {
     return _.pick(this, _.keys(this).filter(key => !key.startsWith('_')));
