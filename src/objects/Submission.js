@@ -20,57 +20,42 @@ const Submission = class extends require('./VoteableContent') {
   * @returns {Promise} The updated version of this Submission
   */
   hide () {
-    return this._post({uri: 'api/hide', form: {id: this.name}}).then(() => {
-      this.hidden = true;
-      return this;
-    });
+    return this._post({uri: 'api/hide', form: {id: this.name}}).return(this);
   }
   /**
   * @summary Unhides this Submission, allowing it to reappear on most Listings.
   * @returns {Promise} The updated version of this Submission
   */
   unhide () {
-    return this._post({uri: 'api/unhide', form: {id: this.name}}).then(() => {
-      this.hidden = false;
-      return this;
-    });
+    return this._post({uri: 'api/unhide', form: {id: this.name}}).return(this);
   }
   /**
   * @summary Locks this Submission, preventing new comments from being posted on it.
   * @returns {Promise} The updated version of this Submission
   */
   lock () {
-    return this._post({uri: 'api/lock', form: {id: this.name}}).then(() => {
-      this.locked = true;
-      return this;
-    });
+    return this._post({uri: 'api/lock', form: {id: this.name}}).return(this);
   }
   /**
   * @summary Unlocks this Submission, allowing comments to be posted on it again.
   * @returns {Promise} The updated version of this Submission
   */
   unlock () {
-    return this._post({uri: 'api/unlock', form: {id: this.name}}).then(() => {
-      this.locked = false;
-    }).return(this);
+    return this._post({uri: 'api/unlock', form: {id: this.name}}).return(this);
   }
   /**
   * @summary Marks this Submission as NSFW (Not Safe For Work).
   * @returns {Promise} The updated version of this Submission
   */
   mark_nsfw () {
-    return this._post({uri: 'api/marknsfw', form: {id: this.name}}).then(() => {
-      this.over_18 = true;
-    }).return(this);
+    return this._post({uri: 'api/marknsfw', form: {id: this.name}}).return(this);
   }
   /**
   * @summary Unmarks this Submission as NSFW (Not Safe For Work).
   * @returns {Promise} The updated version of this Submission
   */
   unmark_nsfw () {
-    return this._post({uri: 'api/unmarknsfw', form: {id: this.name}}).then(() => {
-      this.over_18 = false;
-    }).return(this);
+    return this._post({uri: 'api/unmarknsfw', form: {id: this.name}}).return(this);
   }
   /**
   * @summary Sets the contest mode status of this submission.
@@ -102,8 +87,6 @@ const Submission = class extends require('./VoteableContent') {
     return this._post({
       uri: 'api/set_subreddit_sticky',
       form: {api_type, state, num, id: this.name}
-    }).then(() => {
-      this.stickied = state;
     }).return(this);
   }
   /**
@@ -129,9 +112,7 @@ const Submission = class extends require('./VoteableContent') {
   * @returns {Promise} The updated version of this Submission
   */
   set_suggested_sort (sort) {
-    return this._post({uri: 'api/set_suggested_sort', form: {api_type, id: this.name, sort}}).then(() => {
-      this.suggested_sort = sort;
-    }).return(this);
+    return this._post({uri: 'api/set_suggested_sort', form: {api_type, id: this.name, sort}}).return(this);
   }
   /**
   * @summary Marks this submission as 'visited'.
@@ -179,10 +160,7 @@ const Submission = class extends require('./VoteableContent') {
   * @returns {Promise} A Promise that fulfills with an updated version of this Submission
   */
   assign_flair (options) {
-    return this._r._assign_flair({...options, link: this.name, subreddit_name: this.subreddit.display_name}).then(() => {
-      this.link_flair_text = options.text || null;
-      this.link_flair_css_class = options.css_class || null;
-    }).return(this);
+    return this._r._assign_flair({...options, link: this.name, subreddit_name: this.subreddit.display_name}).return(this);
   }
 
   /**

@@ -635,23 +635,23 @@ describe('snoowrap', function () {
     });
     it('can distinguish/undistinguish/sticky a comment', async () => {
       await comment.distinguish();
-      expect(comment.distinguished).to.equal('moderator');
-      expect(comment.stickied).to.be.false();
-      await comment.distinguish({sticky: true});
-      expect(comment.distinguished).to.equal('moderator');
-      expect(comment.stickied).to.be.true();
-      await comment.undistinguish();
-      expect(comment.distinguished).to.be.null();
+      expect(await comment.distinguished).to.equal('moderator');
+      expect(await comment.stickied).to.be.false();
+      await comment.distinguish({sticky: true}).refresh();
+      expect(await comment.distinguished).to.equal('moderator');
+      expect(await comment.stickied).to.be.true();
+      await comment.undistinguish().refresh();
+      expect(await comment.distinguished).to.be.null();
     });
     it('can save/unsave a post', async () => {
-      await post.save().refresh();
-      expect(post.saved).to.be.true();
+      await post.save();
+      expect(await post.saved).to.be.true();
       await post.unsave().refresh();
-      expect(post.saved).to.be.false();
+      expect(await post.saved).to.be.false();
     });
     it('can save/unsave a comment', async () => {
-      await comment.save().refresh();
-      expect(comment.saved).to.be.true();
+      await comment.save();
+      expect(await comment.saved).to.be.true();
       await comment.unsave().refresh();
       expect(await comment.saved).to.be.false();
     });

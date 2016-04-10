@@ -55,20 +55,14 @@ const VoteableContent = class extends require('./ReplyableContent') {
   * @returns {Promise} A Promise that fulfills when the request is complete
   */
   save () {
-    return this._post({uri: 'api/save', form: {id: this.name}}).then(() => {
-      this.saved = true;
-      return this;
-    });
+    return this._post({uri: 'api/save', form: {id: this.name}}).return(this);
   }
   /**
   * @summary Unsaves this item
   * @returns {Promise} A Promise that fulfills when the request is complete
   */
   unsave () {
-    return this._post({uri: 'api/unsave', form: {id: this.name}}).then(() => {
-      this.saved = false;
-      return this;
-    });
+    return this._post({uri: 'api/unsave', form: {id: this.name}}).return(this);
   }
   /**
   * @summary Distinguishes this Comment or Submission with a sigil.
@@ -86,17 +80,14 @@ const VoteableContent = class extends require('./ReplyableContent') {
       how: status === true ? 'yes' : status === false ? 'no' : status,
       sticky,
       id: this.name
-    }}).then(response => {
-      this._fetch = response.json.data.things[0];
-      return this;
-    });
+    }}).return(this);
   }
   /**
   * @summary Undistinguishes this Comment or Submission. Alias for distinguish({status: false})
   * @returns {Promise} A Promise that fulfills when the request is complete.
   */
   undistinguish () {
-    return this.distinguish({status: false, sticky: false});
+    return this.distinguish({status: false, sticky: false}).return(this);
   }
   /**
   * @summary Edits this Comment or Submission.
@@ -107,10 +98,7 @@ const VoteableContent = class extends require('./ReplyableContent') {
     return this._post({
       uri: 'api/editusertext',
       form: {api_type, text: updated_text, thing_id: this.name}
-    }).tap(helpers._handle_json_errors(this)).then(response => {
-      this._fetch = Promise.resolve(response.json.data.things[0]);
-      return this;
-    });
+    }).tap(helpers._handle_json_errors(this));
   }
   /**
   * @summary Gives reddit gold to the author of this Comment or Submission.

@@ -25,18 +25,18 @@ const Subreddit = class extends require('./RedditContent') {
     return response_obj;
   }
   _delete_flair_templates ({flair_type}) {
-    return this._post({uri: `r/${this.display_name}/api/clearflairtemplates`, form: {api_type, flair_type}});
+    return this._post({uri: `r/${this.display_name}/api/clearflairtemplates`, form: {api_type, flair_type}}).return(this);
   }
   /**
   * @summary Deletes all of this subreddit's user flair templates
-  * @returns {Promise} A Promise that fulfills when the request is complete
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   delete_all_user_flair_templates () {
     return this._delete_flair_templates({flair_type: 'USER_FLAIR'});
   }
   /**
   * @summary Deletes all of this subreddit's link flair templates
-  * @returns {Promise} A Promise that fulfills when the request is complete
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   delete_all_link_flair_templates () {
     return this._delete_flair_templates({flair_type: 'LINK_FLAIR'});
@@ -65,8 +65,8 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {string} options.text The flair text for this template
   * @param {string} [options.css_class=''] The CSS class for this template
   * @param {boolean} [options.text_editable=false] Determines whether users should be able to edit their flair text
-  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
   when it has this template
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
   */
   create_user_flair_template (options) {
     return this._create_flair_template({...options, flair_type: 'USER_FLAIR'});
@@ -92,22 +92,22 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} An Array of flair template options
   */
   get_link_flair_templates (link_id) {
-    return this._get_flair_options({link: link_id}).choices;
+    return this._get_flair_options({link: link_id}).get('choices');
   }
   /**
   * @summary Gets the list of user flair templates on this subreddit.
   * @returns {Promise} An Array of user flair templates
   */
   get_user_flair_templates () {
-    return this._get_flair_options().choices;
+    return this._get_flair_options().get('choices');
   }
   /**
   * @summary Clears a user's flair on this subreddit.
   * @param {string} name The user's name
-  * @returns {Promise} A Promise that fulfills when the request is complete
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   delete_user_flair (name) {
-    return this._post({uri: `r/${this.display_name}/api/deleteflair`, form: {api_type, name}});
+    return this._post({uri: `r/${this.display_name}/api/deleteflair`, form: {api_type, name}}).return(this);
   }
   /**
   * @summary Gets a user's flair on this subreddit.
@@ -115,7 +115,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @returns {Promise} An object representing the user's flair
   */
   get_user_flair (name) {
-    return this._get_flair_options({name}).current;
+    return this._get_flair_options({name}).get('current');
   }
   _set_flair_from_csv (flair_csv) {
     return this._post({uri: `r/${this.display_name}/api/flaircsv`, form: {flair_csv}});
@@ -126,9 +126,10 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {string} flair_array[].name A user's name
   * @param {string} flair_array[].text The flair text to assign to this user
   * @param {string} flair_array[].css_class The flair CSS class to assign to this user
-  * @returns {Promise} A Promise that fulfills when the request is complete
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
-  set_multiple_user_flairs (flair_array) {
+  set_multiple_user_flairs (flair_array_orig) {
+    const flair_array = _.clone(flair_array_orig);
     const requests = [];
     while (flair_array.length > 0) {
       // The endpoint only accepts at most 100 lines of csv at a time, so split the array into chunks of 100.
@@ -139,13 +140,12 @@ const Subreddit = class extends require('./RedditContent') {
     return Promise.all(requests).return(this);
   }
   /**
-  * @summary Gets a Listing all user flairs on this subreddit.
-  * @param {object} [options={}] Options for the resulting Listing
+  * @summary Gets a list of all user flairs on this subreddit.
   * @param {string} [options.name] A specific username to jump to
-  * @returns {Promise} A Listing containing user flairs
+  * @returns {Promise} A Array containing user flairs
   */
-  get_user_flair_list (options) {
-    return this._get_listing({uri: `r/${this.display_name}/api/flairlist`, qs: options}).users;
+  get_user_flair_list () {
+    return this._get({uri: `r/${this.display_name}/api/flairlist`}).get('users');
   }
   /**
   * @summary Configures the flair settings for this subreddit.
@@ -158,7 +158,7 @@ const Subreddit = class extends require('./RedditContent') {
   be either 'left' or 'right'.
   * @param {boolean} options.link_flair_self_assign_enabled Determines whether users should be able to edit the flair of their
   submissions.
-  * @returns {Promise} A Promise that fulfills when the request is complete
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   configure_flair (options) {
     return this._post({
@@ -171,14 +171,14 @@ const Subreddit = class extends require('./RedditContent') {
         link_flair_position: options.link_flair_position,
         link_flair_self_assign_enabled: options.link_flair_self_assign_enabled
       }
-    });
+    }).return(this);
   }
   /**
   * @summary Gets the requester's flair on this subreddit.
   * @returns {Promise} An object representing the requester's current flair
   */
   get_my_flair () {
-    return this._get_flair_options().current;
+    return this._get_flair_options().get('current');
   }
   /**
   * @summary Sets the requester's flair on this subreddit.
@@ -187,28 +187,28 @@ const Subreddit = class extends require('./RedditContent') {
   {@link get_user_flair_templates}.)
   * @param {string} [options.text] The flair text to use. (This is only necessary/useful if the given flair
   template has the `text_editable` property set to `true`.)
-  * @returns {Promise} A Promise that fulfills when the request is complete
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   select_my_flair (options) {
     /* NOTE: This requires `identity` scope in addition to `flair` scope, since the reddit api needs to be passed a username.
     I'm not sure if there's a way to do this without requiring additional scope. */
     return (this._r.own_user_info ? Promise.resolve() : this._r.get_me()).then(() => {
       return this._r._select_flair({...options, subreddit_name: this.display_name, name: this._r.own_user_info.name});
-    });
+    }).return(this);
   }
   _set_my_flair_visibility (flair_enabled) {
-    return this._post({uri: `r/${this.display_name}/api/setflairenabled`, form: {api_type, flair_enabled}});
+    return this._post({uri: `r/${this.display_name}/api/setflairenabled`, form: {api_type, flair_enabled}}).return(this);
   }
   /**
   * @summary Makes the requester's flair visible on this subreddit.
-  * @returns {Promise} A Promise that will resolve when the request is complete
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   show_my_flair () {
     return this._set_my_flair_visibility(true);
   }
   /**
   * @summary Makes the requester's flair invisible on this subreddit.
-  * @returns {Promise} A Promise that will resolve when the request is complete
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   hide_my_flair () {
     return this._set_my_flair_visibility(false);
@@ -358,7 +358,7 @@ const Subreddit = class extends require('./RedditContent') {
   }
   /**
   * @summary Accepts an invite to become a moderator of this subreddit.
-  * @returns {Promise} A Promise that fulfills with this subreddit when the request is complete
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   accept_moderator_invite () {
     return this._post({
@@ -368,7 +368,7 @@ const Subreddit = class extends require('./RedditContent') {
   }
   /**
   * @summary Abdicates moderator status on this subreddit.
-  * @returns {Promise} A Promise for this subreddit.
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
   */
   leave_moderator () {
     return this.fetch().get('name').then(name =>
@@ -377,7 +377,7 @@ const Subreddit = class extends require('./RedditContent') {
   }
   /**
   * @summary Abdicates approved submitter status on this subreddit.
-  * @returns {Promise} A Promise that resolves with this subreddit when the request is complete.
+  * @returns {Promise} A Promise that resolves with this Subreddit when the request is complete.
   */
   leave_contributor () {
     return this.fetch().get('name').then(name =>
@@ -520,7 +520,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} options An Object containing {[option name]: new value} mappings of the options that should be modified.
   Any omitted option names will simply retain their previous values.
   * @param {string} options.title The text that should appear in the header of the subreddit
-  * @param {string} options.public_description The text that appears with this subreddit on the search page, or on the
+  * @param {string} options.public_description The text that appears with this Subreddit on the search page, or on the
   blocked-access page if this subreddit is private. (500 characters max)
   * @param {string} options.description The sidebar text for the subreddit. (5120 characters max)
   * @param {string} [options.submit_text=''] The text to show below the submission page (1024 characters max)
@@ -648,7 +648,7 @@ const Subreddit = class extends require('./RedditContent') {
   image file, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) in environments (e.g.
   browsers) where the filesystem is unavailable.
   * @param {string} [$0.image_type='png'] Determines how the uploaded image should be stored. One of `png, jpg`
-  * @returns {Promise} A Promise that fulfills with this subreddit when the request is complete.
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
   */
   upload_stylesheet_image ({name, file, image_type = 'png'}) {
     return this._upload_sr_img({name, file, image_type, upload_type: 'img'});
@@ -660,7 +660,7 @@ const Subreddit = class extends require('./RedditContent') {
   image file, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) for environments (e.g.
   browsers) where the filesystem is unavailable.
   * @param {string} [$0.image_type='png'] Determines how the uploaded image should be stored. One of `png, jpg`
-  * @returns {Promise} A Promise that fulfills with this subreddit when the request is complete.
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
   */
   upload_header_image ({file, image_type = 'png'}) {
     return this._upload_sr_img({file, image_type, upload_type: 'header'});
@@ -672,7 +672,7 @@ const Subreddit = class extends require('./RedditContent') {
   image file, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) for environments (e.g.
   browsers) where the filesystem is unavailable.
   * @param {string} [$0.image_type='png'] Determines how the uploaded image should be stored. One of `png, jpg`
-  * @returns {Promise} A Promise that fulfills with this subreddit when the request is complete.
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
   */
   upload_icon ({file, image_type = 'png'}) {
     return this._upload_sr_img({file, image_type, upload_type: 'icon'});
@@ -684,7 +684,7 @@ const Subreddit = class extends require('./RedditContent') {
   image file, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) for environments (e.g.
   browsers) where the filesystem is unavailable.
   * @param {string} [$0.image_type='png'] Determines how the uploaded image should be stored. One of `png, jpg`
-  * @returns {Promise} A Promise that fulfills with this subreddit when the request is complete.
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
   */
   upload_banner_image ({file, image_type = 'png'}) {
     return this._upload_sr_img({file, image_type, upload_type: 'banner'});
@@ -698,7 +698,7 @@ const Subreddit = class extends require('./RedditContent') {
   }
   /**
   * @summary Gets the stickied post on this subreddit, or throws a 404 error if none exists.
-  * @param {object} $0
+  * @param {object} [$0]
   * @param {number} [$0.num=1] The number of the sticky to get. Should be either `1` (first sticky) or `2` (second sticky).
   * @returns {Promise} A Submission object representing this subreddit's stickied submission
   */
@@ -775,7 +775,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {number} [$0.duration] The duration of the ban, in days. For a permanent ban, omit this parameter.
   * @param {string} [$0.ban_note] A note that appears on the moderation log, usually used to indicate the reason for the
   ban. This is not visible to the banned user. (300 characters max)
-  * @returns {Promise} A Promise that fulfills with this subreddit when the request is complete
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   ban_user ({name, ban_message, ban_reason, duration, ban_note}) {
     return this._friend({name, ban_message, ban_reason, duration, note: ban_note, type: 'banned'});
@@ -793,7 +793,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @summary Mutes the given user from messaging this subreddit for 72 hours.
   * @param {object} $0
   * @param {string} $0.name The username of the account that should be muted
-  * @returns {Promise} A Promise that fulfills with this subreddit when the request is complete
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   mute_user ({name}) {
     return this._friend({name, type: 'muted'});
@@ -802,7 +802,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @summary Unmutes the given user from messaging this subreddit.
   * @param {object} $0
   * @param {string} $0.name The username of the account that should be muted
-  * @returns {Promise} A Promise that fulfills with this subreddit when the request is complete
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   unmute_user ({name}) {
     return this._unfriend({name, type: 'muted'});
@@ -811,7 +811,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @summary Bans the given user from editing this subreddit's wiki.
   * @param {object} $0
   * @param {string} $0.name The username of the account that should be wikibanned
-  * @returns {Promise} A Promise that fulfills with this subreddit when the request is complete
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   wikiban_user ({name}) {
     return this._friend({name, type: 'wikibanned'});
@@ -820,7 +820,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @summary Unbans the given user from editing this subreddit's wiki.
   * @param {object} $0
   * @param {string} $0.name The username of the account that should be unwikibanned
-  * @returns {Promise} A Promise that fulfills with this subreddit when the request is complete
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   unwikiban_user ({name}) {
     return this._unfriend({name, type: 'wikibanned'});
@@ -829,7 +829,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @summary Adds the given user to this subreddit's list of approved wiki editors.
   * @param {object} $0
   * @param {string} $0.name The username of the account that should be given approved editor status
-  * @returns {Promise} A Promise that fulfills with this subreddit when the request is complete
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   add_wiki_contributor ({name}) {
     return this._friend({name, type: 'wikicontributor'});
@@ -838,7 +838,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @summary Removes the given user from this subreddit's list of approved wiki editors.
   * @param {object} $0
   * @param {string} $0.name The username of the account whose approved editor status should be revoked
-  * returns {Promise} A Promise that fulfills with this subreddit when the request is complete
+  * returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   */
   remove_wiki_contributor ({name}) {
     return this._unfriend({name, type: 'wikicontributor'});
@@ -856,7 +856,7 @@ const Subreddit = class extends require('./RedditContent') {
     return this._post({
       uri: `r/${this.display_name}/api/setpermissions`,
       form: {api_type, name, permissions: helpers._format_mod_permissions(permissions), type: 'moderator'}
-    }).tap(helpers._handle_json_errors(this));
+    }).then(helpers._handle_json_errors(this));
   }
   /**
   * @summary Gets a given wiki page on this subreddit.
