@@ -16,7 +16,7 @@ const PrivateMessage = class extends require('./ReplyableContent') {
   }
   _transform_api_response (response_obj) {
     response_obj[0].replies = helpers._build_replies_tree(response_obj[0].replies);
-    return helpers.find_message_in_tree(this.name, response_obj[0]);
+    return helpers._find_message_in_tree(this.name, response_obj[0]);
   }
   // TODO: Get rid of the repeated code here, most of these methods are exactly the same with the exception of the URIs
   /**

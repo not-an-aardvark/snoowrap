@@ -60,11 +60,11 @@ module.exports = {
   },
 
   // Performs a depth-first search of a tree of private messages, in order to find a message with a given name.
-  find_message_in_tree (desired_message_name, current_message) {
+  _find_message_in_tree (desired_message_name, current_message) {
     if (current_message.name === desired_message_name) {
       return current_message;
     }
-    return _.find(current_message.replies.map(_.partial(module.exports.find_message_in_tree, desired_message_name)));
+    return _.find(current_message.replies.map(_.partial(module.exports._find_message_in_tree, desired_message_name)));
   },
 
   _format_permissions (all_permission_names, permissions_array) {
@@ -74,7 +74,7 @@ module.exports = {
     return all_permission_names.map(type => (_.includes(permissions_array, type) ? '+' : '-') + type).join(',');
   },
 
-  rename_key (obj, old_key, new_key) {
+  _rename_key (obj, old_key, new_key) {
     return obj && _.omit({...obj, [new_key]: obj[old_key]}, old_key);
   },
 
