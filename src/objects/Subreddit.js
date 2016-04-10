@@ -706,8 +706,7 @@ const Subreddit = class extends require('./RedditContent') {
     return this._get({uri: `r/${this.display_name}/about/sticky`, qs: {num}});
   }
   _friend (options) {
-    return this._r._friend({...options, sub: this.display_name}).then(helpers._handle_json_errors(this))
-    ;
+    return this._r._friend({...options, sub: this.display_name}).then(helpers._handle_json_errors(this));
   }
   _unfriend (options) {
     return this._r._unfriend({...options, sub: this.display_name}).then(helpers._handle_json_errors(this));
