@@ -702,10 +702,8 @@ describe('snoowrap', function () {
     it('can get replies to a message', async () => {
       expect(await message1.replies[0].name).to.equal(message2.name);
     });
-    it('can mark a message as unread', async () => {
+    it('can mark a message as unread/read', async () => {
       expect(await message3.mark_as_unread().refresh().new).to.be.true();
-    });
-    it('can mark a message as read', async () => {
       expect(await message3.mark_as_read().refresh().new).to.be.false();
     });
   });
