@@ -24,6 +24,7 @@ const VoteableContent = class extends require('./ReplyableContent') {
   but bots deciding how to vote on content or amplifying a human's vote are not. See the
   [reddit rules](https://reddit.com/rules) for more details on what constitutes vote cheating. (This guideline is quoted from
   [the official reddit API documentation page](https://www.reddit.com/dev/api#POST_api_vote).)
+  * @example r.get_submission('4e62ml').upvote()
   */
   upvote () {
     return this._vote(1);
@@ -35,6 +36,7 @@ const VoteableContent = class extends require('./ReplyableContent') {
   bots deciding how to vote on content or amplifying a human's vote are not. See the [reddit rules](https://reddit.com/rules)
   for more details on what constitutes vote cheating. (This guideline is quoted from
   [the official reddit API documentation page](https://www.reddit.com/dev/api#POST_api_vote).)
+  * @example r.get_submission('4e62ml').downvote()
   */
   downvote () {
     return this._vote(-1);
@@ -46,6 +48,7 @@ const VoteableContent = class extends require('./ReplyableContent') {
   bots deciding how to vote on content or amplifying a human's vote are not. See the [reddit rules](https://reddit.com/rules)
   for more details on what constitutes vote cheating. (This guideline is quoted from
   [the official reddit API documentation page](https://www.reddit.com/dev/api#POST_api_vote).)
+  * @example r.get_submission('4e62ml').unvote()
   */
   unvote () {
     return this._vote(0);
@@ -53,6 +56,7 @@ const VoteableContent = class extends require('./ReplyableContent') {
   /**
   * @summary Saves this Comment or Submission (i.e. adds it to the list at reddit.com/saved)
   * @returns {Promise} A Promise that fulfills when the request is complete
+  * @example r.get_submission('4e62ml').save()
   */
   save () {
     return this._post({uri: 'api/save', form: {id: this.name}}).return(this);
@@ -60,19 +64,22 @@ const VoteableContent = class extends require('./ReplyableContent') {
   /**
   * @summary Unsaves this item
   * @returns {Promise} A Promise that fulfills when the request is complete
+  * @example r.get_submission('4e62ml').unsave()
   */
   unsave () {
     return this._post({uri: 'api/unsave', form: {id: this.name}}).return(this);
   }
   /**
   * @summary Distinguishes this Comment or Submission with a sigil.
+  * @desc **Note:** This function will only work if the requester is the author of this Comment/Submission.
   * @param {boolean|string} [$0.status=true] Determines how the item should be distinguished.
   `true` (default) signifies that the item should be moderator-distinguished, and
   `false` signifies that the item should not be distinguished. Passing a string (e.g.
   `admin`) will cause the item to get distinguished with that string, if possible.
   * @param {boolean} [$0.sticky=false] Determines whether this item should be stickied in addition to being
-  distinguished. (This only applies to comments; to sticky a submission, use the {@link objects.Submission.sticky} method.)
+  distinguished. (This only applies to comments; to sticky a submission, use {@link Submission#sticky} instead.)
   * @returns {Promise} A Promise that fulfills when the request is complete.
+  * @example r.get_comment('d1xclfo').distinguish({status: true, sticky: true})
   */
   distinguish ({status = true, sticky = false} = {}) {
     return this._post({uri: 'api/distinguish', form: {
@@ -85,6 +92,7 @@ const VoteableContent = class extends require('./ReplyableContent') {
   /**
   * @summary Undistinguishes this Comment or Submission. Alias for distinguish({status: false})
   * @returns {Promise} A Promise that fulfills when the request is complete.
+  * @example r.get_submission('4e62ml').undistinguish()
   */
   undistinguish () {
     return this.distinguish({status: false, sticky: false}).return(this);
@@ -93,6 +101,7 @@ const VoteableContent = class extends require('./ReplyableContent') {
   * @summary Edits this Comment or Submission.
   * @param {string} updated_text The updated markdown text to use
   * @returns {Promise} A Promise that fulfills when this request is complete.
+  * @example r.get_comment('coip909').edit('Blah blah blah this is new updated text')
   */
   edit (updated_text) {
     return this._post({
@@ -103,6 +112,7 @@ const VoteableContent = class extends require('./ReplyableContent') {
   /**
   * @summary Gives reddit gold to the author of this Comment or Submission.
   * @returns {Promise} A Promise that fullfills with this Comment/Submission when this request is complete
+  * @example r.get_comment('coip909').gild()
   */
   gild () {
     return this._post({uri: `api/v1/gold/gild/${this.name}`}).return(this);
@@ -110,6 +120,7 @@ const VoteableContent = class extends require('./ReplyableContent') {
   /**
   * @summary Deletes this Comment or Submission
   * @returns {Promise} A Promise that fulfills with this Comment/Submission when this request is complete
+  * @example r.get_comment('coip909').delete()
   */
   delete () {
     return this._post({uri: 'api/del', form: {id: this.name}}).return(this);
@@ -120,6 +131,7 @@ const VoteableContent = class extends require('./ReplyableContent') {
   /**
   * @summary Enables inbox replies on this Comment or Submission
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
+  * @example r.get_comment('coip909').enable_inbox_replies()
   */
   enable_inbox_replies () {
     return this._set_inbox_replies_enabled(true).return(this);
@@ -127,6 +139,7 @@ const VoteableContent = class extends require('./ReplyableContent') {
   /**
   * @summary Disables inbox replies on this Comment or Submission
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
+  * @example r.get_comment('coip909').disable_inbox_replies()
   */
   disable_inbox_replies () {
     return this._set_inbox_replies_enabled(false).return(this);
