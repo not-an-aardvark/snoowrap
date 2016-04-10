@@ -101,7 +101,9 @@ const LiveThread = class extends require('./RedditContent') {
   * // ]
   */
   get_contributors () {
-    return this._get({uri: `live/${this.id}/contributors`});
+    return this._get({uri: `live/${this.id}/contributors`}).then(contributors => {
+      return Array.isArray(contributors[0]) ? contributors[0] : contributors;
+    });
   }
   /**
   * @summary Invites a contributor to this LiveThread.
