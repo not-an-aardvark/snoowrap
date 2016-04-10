@@ -22,6 +22,7 @@ const PrivateMessage = class extends require('./ReplyableContent') {
   /**
   * @summary Marks this message as read.
   * @returns {Promise} A Promise that fulfills with this message after the request is complete
+  * @example r.get_message('51shxv').mark_as_read()
   */
   mark_as_read () {
     return this._post({uri: 'api/read_message', form: {id: this.name}}).return(this);
@@ -29,13 +30,15 @@ const PrivateMessage = class extends require('./ReplyableContent') {
   /**
   * @summary Marks this message as unread.
   * @returns {Promise} A Promise that fulfills with this message after the request is complete
+  * @example r.get_message('51shxv').mark_as_unread()
   */
   mark_as_unread () {
     return this._post({uri: 'api/unread_message', form: {id: this.name}}).return(this);
   }
   /**
-  * @summary Mutes the author of this message for 72 hours. This should only be used on moderator mail.
+  * @summary Mutes the author of this message for 72 hours. This can only be used on moderator mail.
   * @returns {Promise} A Promise that fulfills with this message after the request is complete
+  * @example r.get_message('51shxv').mute_author()
   */
   mute_author () {
     return this._post({uri: 'api/mute_message_author', form: {id: this.name}}).return(this);
@@ -43,6 +46,7 @@ const PrivateMessage = class extends require('./ReplyableContent') {
   /**
   * @summary Unmutes the author of this message.
   * @returns {Promise} A Promise that fulfills with this message after the request is complete
+  * @example r.get_message('51shxv').unmute_author()
   */
   unmute_author () {
     return this._post({uri: 'api/unmute_message_author', form: {id: this.name}}).return(this);
