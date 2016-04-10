@@ -150,7 +150,7 @@ const Submission = class extends require('./VoteableContent') {
   * @returns {Promise} An Array of flair templates
   */
   get_link_flair_templates () {
-    return this.subreddit.get_link_flair_templates(this.name);
+    return this.fetch().get('subreddit').get_link_flair_templates(this.name);
   }
   /**
   * @summary Assigns flair on this Submission (as a moderator; also see [select_flair]{@link Submission#select_flair})
