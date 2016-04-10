@@ -1103,8 +1103,10 @@ const snoowrap = class {
       api_type, flair_template_id, link, name, text}
     });
   }
-  async _assign_flair ({css_class, link, name, text, subreddit_name}) {
-    return await this._post({uri: `r/${await subreddit_name}/api/flair`, form: {api_type, name, text, link, css_class}});
+  _assign_flair ({css_class, link, name, text, subreddit_name}) {
+    return promise_wrap(Promise.resolve(subreddit_name).then(display_name => {
+      return this._post({uri: `r/${display_name}/api/flair`, form: {api_type, name, text, link, css_class}});
+    }));
   }
   _get_listing ({uri, qs}) {
     /* When the response type is expected to be a Listing, add a `count` parameter with a very high number.
