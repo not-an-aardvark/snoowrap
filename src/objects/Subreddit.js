@@ -706,10 +706,16 @@ const Subreddit = class extends require('./RedditContent') {
     return this._get({uri: `r/${this.display_name}/about/sticky`, qs: {num}});
   }
   _friend (options) {
-    return this._r._friend({...options, sub: this.display_name}).then(helpers._handle_json_errors(this));
+    return this._post({
+      uri: `r/${this.display_name}/api/friend`,
+      form: {...options, api_type}
+    }).then(helpers._handle_json_errors(this));
   }
   _unfriend (options) {
-    return this._r._unfriend({...options, sub: this.display_name}).then(helpers._handle_json_errors(this));
+    return this._post({
+      uri: `r/${this.display_name}/api/unfriend`,
+      form: {...options, api_type}
+    }).then(helpers._handle_json_errors(this));
   }
   /**
   * @summary Invites the given user to be a moderator of this subreddit.
