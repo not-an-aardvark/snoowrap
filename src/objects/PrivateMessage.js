@@ -3,6 +3,7 @@ const helpers = require('../helpers');
 
 /**
 * A class representing a private message or a modmail.
+* <style> #PrivateMessage {display: none} </style>
 * @example
 *
 * // Get a Private Message with a given ID

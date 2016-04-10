@@ -22,6 +22,7 @@ an Array (length, forEach, etc.) in addition to some added methods. The Listing 
 original Listing.
 
 * Most methods that return Listings will also accept `limit`, `after`, `before`, `show`, and `count` properties.
+* <style> #Listing {display: none} </style>
 * @extends Array
 */
 const Listing = class extends Array {

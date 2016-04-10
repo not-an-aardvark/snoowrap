@@ -3,6 +3,10 @@ const _ = require('lodash');
 
 /**
 * @summary A class representing a multireddit.
+* <style> #MultiReddit {display: none} </style>
+*
+* // Get a multireddit belonging to a specific user
+* r.get_user('multi-mod').get_multireddit('coding_languages')
 */
 const MultiReddit = class extends require('./RedditContent') {
   constructor (options, _r, _has_fetched) {

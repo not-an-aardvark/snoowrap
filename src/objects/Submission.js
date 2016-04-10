@@ -3,6 +3,7 @@ const api_type = 'json';
 
 /**
 * A class representing a reddit submission
+* <style> #Submission {display: none} </style>
 * @extends VoteableContent
 * @example
 *

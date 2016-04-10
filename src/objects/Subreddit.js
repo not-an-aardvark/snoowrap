@@ -7,6 +7,7 @@ const api_type = 'json';
 
 /**
 * A class representing a subreddit
+* <style> #Subreddit {display: none} </style>
 * @extends RedditContent
 * @example
 *

@@ -4,6 +4,7 @@ const api_type = 'json';
 
 /**
 * A set of mixin functions that apply to Submissions, Comments, and PrivateMessages
+* <style> #ReplyableContent {display: none} </style>
 * @extends RedditContent
 */
 const ReplyableContent = class extends require('./RedditContent') {

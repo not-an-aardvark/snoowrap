@@ -6,6 +6,7 @@ const api_type = 'json';
 
 /**
 * A class representing a live reddit thread
+* <style> #LiveThread {display: none} </style>
 * @example
 *
 * // Get a livethread with the given ID

@@ -4,6 +4,7 @@ const errors = require('../errors');
 
 /**
 * A class representing a reddit user
+* <style> #RedditUser {display: none} </style>
 * @extends ReplyableContent
 * @example
 *

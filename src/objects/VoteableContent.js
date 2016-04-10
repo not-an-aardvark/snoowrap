@@ -4,6 +4,7 @@ const api_type = 'json';
 
 /**
 * A set of mixin functions that apply to Submissions and Comments.
+* <style> #VoteableContent {display: none} </style>
 * @extends ReplyableContent
 */
 const VoteableContent = class extends require('./ReplyableContent') {
