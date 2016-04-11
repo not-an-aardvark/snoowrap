@@ -686,7 +686,7 @@ const snoowrap = class {
   * @summary Conducts a search of reddit submissions.
   * @param {object} options Search options. Can also contain options for the resulting Listing.
   * @param {string} options.query The search query
-  * @param {string} [options.time] Describes the timespan that posts should be retrieved frome. One of
+  * @param {string} [options.time] Describes the timespan that posts should be retrieved from. One of
   `hour, day, week, month, year, all`
   * @param {Subreddit|string} [options.subreddit] The subreddit to conduct the search on.
   * @param {boolean} [options.restrict_sr=true] Restricts search results to the given subreddit
