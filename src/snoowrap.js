@@ -1142,4 +1142,10 @@ _.forOwn(snoowrap.objects, (value, key) => {
 snoowrap.helpers = helpers;
 snoowrap.constants = constants;
 snoowrap.errors = errors;
+
+if (process.browser) { // check if the code is being run in a browser through browserify
+  /* global window */
+  window.snoowrap = snoowrap;
+}
+
 module.exports = snoowrap;
