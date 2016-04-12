@@ -8,7 +8,7 @@
     "outputSourceFiles": false,
     "outputSourcePath": false,
     "systemName": "snoowrap",
-    "footer": "",
+    "footer": "<script src=\"snoowrap.js\"></script>",
     "copyright": "",
     "navType": "vertical",
     "theme": "yeti",
