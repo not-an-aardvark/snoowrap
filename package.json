@@ -32,7 +32,7 @@
     "bluebird": "^3.3.3",
     "harmony-reflect": "^1.4.5",
     "lodash": "^4.5.1",
-    "promise-chains": "^0.3.7",
+    "promise-chains": "^0.3.8",
     "request-promise": "^2.0.1",
     "ws": "^1.0.1"
   },
