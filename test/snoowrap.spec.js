@@ -633,7 +633,7 @@ describe('snoowrap', function () {
       await comment.edit(new_text);
       expect(await comment.refresh().body).to.equal(new_text);
     });
-    it('can distinguish/undistinguish/sticky a comment', async () => {
+    it.skip('can distinguish/undistinguish/sticky a comment', async () => {
       await comment.distinguish();
       expect(await comment.distinguished).to.equal('moderator');
       expect(await comment.stickied).to.be.false();
