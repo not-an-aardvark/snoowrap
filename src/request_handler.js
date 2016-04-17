@@ -40,18 +40,21 @@ module.exports = {
         baseUrl: `https://oauth.${r._config.endpoint_domain}`,
         qs: {raw_json: 1},
         auth: {bearer: r.access_token},
-        resolveWithFullResponse: true
-      })[method](...args).then(response => {
-        r.ratelimit_remaining = +response.headers['x-ratelimit-remaining'];
-        r.ratelimit_expiration = Date.now() + response.headers['x-ratelimit-reset'] * 1000;
-        const populated = helpers._populate(response.body, r);
-        if (populated && populated.constructor && populated.constructor.name === 'Listing') {
-          populated._set_uri(response.request.uri.path);
+        transform (body, response) {
+          r.ratelimit_remaining = +response.headers['x-ratelimit-remaining'];
+          r.ratelimit_expiration = Date.now() + response.headers['x-ratelimit-reset'] * 1000;
+          if (!response.statusCode.toString().startsWith(2)) {
+            return response;
+          }
+          const populated = helpers._populate(body, r);
+          if (populated && populated.constructor && populated.constructor.name === 'Listing') {
+            populated._set_uri(response.request.uri.path);
+          }
+          r.log.debug(`Received a ${response.statusCode} status code from a \`${method.toUpperCase()}\` request sent to ${
+            response.request.uri.href}. ratelimit_remaining: ${r.ratelimit_remaining}`);
+          return populated;
         }
-        r.log.debug(`Received a ${response.statusCode} status code from a \`${method.toUpperCase()}\` request sent to ${
-          response.request.uri.href}. ratelimit_remaining: ${r.ratelimit_remaining}`);
-        return populated;
-      });
+      })[method](...args);
     } catch (err) {
       if (err.statusCode === 401 && r.token_expiration - Date.now() < constants.MAX_TOKEN_LATENCY && r.refresh_token) {
         /* If the server returns a 401 error, it's possible that the access token expired during the latency period
