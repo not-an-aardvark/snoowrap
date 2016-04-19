@@ -1032,12 +1032,12 @@ const snoowrap = class {
   * @param {string} $0.description A description for the new multireddit, in markdown.
   * @param {Array} $0.subreddits An Array of Subreddit objects (or subreddit names) that this multireddit should compose of.
   * @param {string} [$0.visibility='private'] The multireddit's visibility setting. One of `private`, `public`, `hidden`.
-  * @param {string} [$0.icon_name=''] One of `'art and design'`, `ask`, `books`, `business`, `cars`, `comics`, `cute animals`,
+  * @param {string} [$0.icon_name=''] One of `art and design`, `ask`, `books`, `business`, `cars`, `comics`, `cute animals`,
   `diy`, `entertainment`, `food and drink`, `funny`, `games`, `grooming`, `health`, `life advice`, `military`, `models pinup`,
   `music`, `news`, `philosophy`, `pictures and gifs`, `science`, `shopping`, `sports`, `style`, `tech`, `travel`,
   `unusual stories`, `video`, `None`
   * @param {string} [$0.key_color='#000000'] A six-digit RGB hex color, preceded by '#'
-  * @param {string} [$0.weighting_scheme='classic'] One of 'classic', 'fresh'
+  * @param {string} [$0.weighting_scheme='classic'] One of `classic`, `fresh`
   * @returns {Promise} A Promise for the newly-created MultiReddit object
   * @example
   *
