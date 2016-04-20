@@ -8,10 +8,7 @@ module.exports = {
       // Map {kind: 't2', data: {name: 'some_username', ... }} to a RedditUser (e.g.) with the same properties
       if (_.keys(response_tree).length === 2 && response_tree.kind) {
         const remainder_of_tree = module.exports._populate(response_tree.data, _r);
-        if (constants.KINDS[response_tree.kind]) {
-          return _r._new_object(constants.KINDS[response_tree.kind], remainder_of_tree, true);
-        }
-        return _r._new_object('RedditContent', remainder_of_tree, true);
+        return _r._new_object(constants.KINDS[response_tree.kind] || 'RedditContent', remainder_of_tree, true);
       }
       const mapFunction = Array.isArray(response_tree) ? _.map : _.mapValues;
       const result = mapFunction(response_tree, (value, key) => {
@@ -26,7 +23,7 @@ module.exports = {
       });
       if (result.length === 2 && result[0] && result[0].constructor.name === 'Listing' && result[0][0] &&
           result[0][0].constructor.name === 'Submission' && result[1] && result[1].constructor.name === 'Listing') {
-        if (result[1]._more) {
+        if (result[1]._more && !result[1]._more.link_id) {
           result[1]._more.link_id = result[0][0].name;
         }
         result[0][0].comments = result[1];
@@ -37,16 +34,19 @@ module.exports = {
     return response_tree;
   },
 
-  _add_empty_replies_listing (item) {
-    if (item.constructor.name === 'Comment') {
+  _get_empty_replies_listing (item) {
+    if (item.link_id) {
       const replies_uri = `comments/${item.link_id.slice(3)}`;
       const replies_query = {comment: item.name.slice(3)};
       const _transform = response => response.comments[0].replies;
       const params = {_uri: replies_uri, _query: replies_query, _transform, _link_id: item.link_id, _is_comment_list: true};
-      item.replies = item._r._new_object('Listing', params);
-    } else if (item.constructor.name === 'PrivateMessage') {
-      item.replies = item._r._new_object('Listing');
+      return item._r._new_object('Listing', params);
     }
+    return item._r._new_object('Listing');
+  },
+
+  _add_empty_replies_listing (item) {
+    item.replies = module.exports._get_empty_replies_listing(item);
     return item;
   },
 
