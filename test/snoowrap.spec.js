@@ -989,7 +989,7 @@ describe('snoowrap', function () {
     });
   });
 
-  describe('Creating new content', () => {
+  describe('Creating new content (tests skipped by default to avoid spam)', () => {
     // These should all pass, but they're skipped by default to avoid spam since they permanently write content to reddit.
     it.skip('can create a linkpost given a subreddit object, and then delete the post', async () => {
       const title = `snoowrap unit tests: ${moment().format()}`;
