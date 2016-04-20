@@ -419,7 +419,7 @@ const snoowrap = class {
       opts = subreddit_name;
       sub_name = undefined;
     }
-    const parsed_options = _.omit({...opts, t: opts.time}, 'time');
+    const parsed_options = _.omit({...opts, t: opts.time || opts.t}, 'time');
     return this._get_listing({uri: (sub_name ? `r/${sub_name}/` : '') + sort_type, qs: parsed_options});
   }
   /**
