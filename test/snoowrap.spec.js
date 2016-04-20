@@ -380,10 +380,10 @@ describe('snoowrap', function () {
       expect(r.ratelimit_remaining).to.equal(initial_ratelimit_remaining - 2);
     });
     it("correctly handles deep comment chains containing 'continue this thread' messages", async () => {
-      // TODO: Add comments
-      // (this todo won't be around for too long, ideally, but if you're still reading this in the distant future, I apologize.)
       const top_comment = r.get_comment('d1apujx');
       const reps = await top_comment.replies.fetch_all();
+      /* `l` is the replies Listing for the last visible comment in the chain; further replies must be fetched from
+      the `continue this thread` link. */
       const l = reps[0].replies[0].replies[0].replies[0].replies[0].replies[0].replies[0].replies[0].replies[0].replies;
       expect(l).to.be.an.instanceof(snoowrap.objects.Listing);
       const check_l_immutable_props = () => {
@@ -393,15 +393,19 @@ describe('snoowrap', function () {
       };
       check_l_immutable_props();
       expect(l._more._continued_replies_cache).to.be.null();
+      /* Fetch more items from `l` and store the result in next_comment_list. Ensure that `l` itself remains unchanged,
+      with the exception of the cache expansion. */
       const next_comment_list = await l.fetch_more({amount: 1});
       check_l_immutable_props();
       expect(l._more._continued_replies_cache).to.be.an.instanceof(snoowrap.objects.Listing);
       expect(l._more._continued_replies_cache).to.have.lengthOf(1);
       expect(l._more._continued_replies_cache[0]).to.be.an.instanceof(snoowrap.objects.Comment);
+      // Check that next_comment_list contains the new elements, shares a cache, and has an increased start index.
       expect(next_comment_list).to.be.an.instanceof(snoowrap.objects.Listing);
       expect(next_comment_list).to.have.lengthOf(1);
       expect(next_comment_list[0]).to.equal(l._more._continued_replies_cache[0]);
       expect(next_comment_list._more._continued_start_index).to.equal(1);
+      // Check that next_comment_list can also fetch items and store them accordingly
       expect((await next_comment_list.fetch_more({amount: 1}))[0]).to.equal(next_comment_list[0]);
     });
   });
