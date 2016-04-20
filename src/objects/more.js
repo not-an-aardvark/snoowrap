@@ -4,10 +4,31 @@ const helpers = require('../helpers');
 const constants = require('../constants');
 const api_type = 'json';
 
+/**
+* The `more` class is a helper representing reddit's exposed `more` type in comment threads, used to fetch additional comments
+on a thread.
+* No instances of the `more` class are exposed externally by snoowrap; instead, comment lists are exposed as Listings.
+Additional replies on an item can be fetched by calling `fetch_more` on a Listing, in the same manner as what would be done
+with a Listing of posts. snoowrap should handle the differences internally, and expose a nearly-identical interface for the
+two use-cases.
+
+Combining reddit's `Listing` and `more` objects has the advantage of having a more consistent exposed interface; for example,
+if a consumer iterates over the comments on a Submission, all of the iterated items will actually be Comment objects, so the
+consumer won't encounter an unexpected `more` object at the end. However, there are a few disadvantages, namely that (a) this
+leads to an increase in internal complexity, and (b) there are a few cases where reddit's `more` objects have different amounts
+of available information (e.g. all the child IDs of a `more` object are known on creation), which leads to different optimal
+behavior.
+*/
+
 const more = class {
   constructor (options, _r) {
     _.assign(this, options);
     this._r = _r;
+    /* Reddit's `more` objects behave a bit differently for deep comment chains -- at a certain point, the `more` objects
+    become empty, with name `t1__`. At this point, it is necessary to load the parent comment manually in order to continue
+    traversing the comment tree. (On the HTML site, this is what occurs when a "Continue this thread" link appears.)
+    Items in these "continued threads" need to be fetched a bit differently, since the child IDs aren't already provided by
+    the reddit site. */
     this._is_continued_thread = this.name === 't1__';
     this._continued_replies_cache = null;
     this._continued_start_index = 0;
@@ -20,12 +41,27 @@ const more = class {
       return [];
     }
     if (this._is_continued_thread) {
+      /* Cache the replies to continued threads to avoid having to make repeated requests. `this._continued_replies_cache`
+      will be a Listing containing Comment objects which are children of the current `more` object. `this._continued_start_index
+      is a number (default 0) determining where in the cache this `more` object should start reading comments. (For
+      example, a `this._continued_start_index` of 2 indicates that when this.fetch_more() is called, the first element in the
+      returned list of comments will be the element at index 2 in the cache.) This is necessary because if fetch_more() is
+      called from a Listing, the new Listing that gets returned must have a different `more` object internally (since it should
+      fetch items starting at a different point), but it can still retain the same cache, so it is easiest to represent the
+      difference with a numerical offset in the cache. */
       if (!this._continued_replies_cache) {
+        // If the cache doesn't exist yet, initialize it by fetching a listing of replies to the given parent.
         this._continued_replies_cache = await this._r.get_comment(this.parent_id.slice(3)).fetch().get('replies');
       }
       if (this._continued_replies_cache.length - this._continued_start_index < options.amount) {
+        /* It's possible that the cache will not contain enough elements to satisfy the desired amount, so update
+        the cache to fetch the remaining elements. The total number of items to return should be `options.amount`, and
+        the number of cached replies that will be returned in this batch is the total number of cached items minus the start
+        index, i.e. `this._continued_replies_cache.length - this._continued_start_index`. Therefore, the number of additional
+        items that should be fetched is `options.amount - (this._continued_replies_cache.length - this._continued_start_index)`
+        ` = options.amount - this._continued_replies_cache.length + this._continued_start_index`. */
         this._continued_replies_cache = await this._continued_replies_cache.fetch_more({
-          amount: options.amount - this._continued_replies_cache.length - this._continued_start_index
+          amount: options.amount - this._continued_replies_cache.length + this._continued_start_index
         });
       }
       const end_index = this._continued_start_index + options.amount;
