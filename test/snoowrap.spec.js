@@ -379,6 +379,9 @@ describe('snoowrap', function () {
       expect(expanded_comments.length).to.be.above(initial_length + 20);
       expect(r.ratelimit_remaining).to.equal(initial_ratelimit_remaining - 2);
     });
+  });
+
+  describe("getting Listings containing 'continue this thread' messages", () => {
     it("correctly handles deep comment chains containing 'continue this thread' messages", async () => {
       const top_comment = r.get_comment('d1apujx');
       const reps = await top_comment.replies.fetch_all();
@@ -403,10 +406,29 @@ describe('snoowrap', function () {
       // Check that next_comment_list contains the new elements, shares a cache, and has an increased start index.
       expect(next_comment_list).to.be.an.instanceof(snoowrap.objects.Listing);
       expect(next_comment_list).to.have.lengthOf(1);
+      expect(l._more._continued_replies_cache).to.eql(next_comment_list._more._continued_replies_cache);
       expect(next_comment_list[0]).to.equal(l._more._continued_replies_cache[0]);
       expect(next_comment_list._more._continued_start_index).to.equal(1);
       // Check that next_comment_list can also fetch items and store them accordingly
       expect((await next_comment_list.fetch_more({amount: 1}))[0]).to.equal(next_comment_list[0]);
+    });
+    it('allows continued listings to be sequentially fetched', async () => {
+      const reps = await r.get_submission('4fp36y').comments[0].replies;
+      const l = reps[0].replies[0].replies[0].replies[0].replies[0].replies[0].replies[0].replies[0].replies[0].replies;
+      expect(l).to.be.an.instanceof(snoowrap.objects.Listing);
+      expect(l.is_finished).to.be.false();
+      expect(l._more._is_continued_thread).to.be.true();
+      expect(l._more._continued_start_index).to.equal(0);
+      const l2 = await l.fetch_more({amount: 2});
+      expect(l2).to.be.an.instanceof(snoowrap.objects.Listing);
+      expect(l2.length).to.equal(2);
+      expect(_.map(l2, 'body')).to.eql(['Comment 11 (re: Comment 10)', 'Comment 12 (re: Comment 10)']);
+      expect(l2.is_finished).to.be.false();
+      expect(l2._more._is_continued_thread).to.be.true();
+      expect(_.toArray(l2._more._continued_replies_cache)).to.eql(_.toArray(l2));
+      const l3 = await l.fetch_more({amount: 3});
+      const l21 = await l2.fetch_more({amount: 1});
+      expect(_.toArray(l3)).to.eql(_.toArray(l21));
     });
   });
 

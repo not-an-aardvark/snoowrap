@@ -30,7 +30,7 @@ const more = class {
     Items in these "continued threads" need to be fetched a bit differently, since the child IDs aren't already provided by
     the reddit site. */
     this._is_continued_thread = this.name === 't1__';
-    this._continued_replies_cache = null;
+    this._continued_replies_cache = this._continued_replies_cache || null;
     this._continued_start_index = 0;
   }
   /* Requests to /api/morechildren are capped at 20 comments at a time, but requests to /api/info are capped at 100, so

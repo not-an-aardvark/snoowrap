@@ -9,9 +9,10 @@ const INTERNAL_DEFAULTS = {
   _transform: _.identity,
   _method: 'get',
   _is_comment_list: false,
-  _link_id: undefined,
-  _uri: undefined,
-  _more: undefined
+  _link_id: null,
+  _uri: null,
+  _more: null,
+  _cached_lookahead: null
 };
 
 /**
@@ -30,6 +31,7 @@ const Listing = class extends Array {
     super();
     this._r = _r;
     _.assign(this, options.children || []);
+    _.defaults(this, {_cached_lookahead: options._cached_lookahead});
     _.defaultsDeep(this, _.pick(options, _.keys(INTERNAL_DEFAULTS)), INTERNAL_DEFAULTS);
     _.assign(this._query, _.pick(options, ['before', 'after']));
     if (_.last(options.children) instanceof require('./more')) {
@@ -51,7 +53,13 @@ const Listing = class extends Array {
   * @summary This is a getter that is true if there are no more items left to fetch, and false otherwise.
   */
   get is_finished () {
-    return this._more ? this._more.is_finished : !this._uri || this._query.after === null && this._query.before === null;
+    if (this._more) {
+      return this._more.is_finished;
+    }
+    if (this._cached_lookahead && this._cached_lookahead.length) {
+      return false;
+    }
+    return !this._uri || this._query.after === null && this._query.before === null;
   }
   /**
   * @summary Fetches some more items
@@ -85,12 +93,17 @@ const Listing = class extends Array {
     if (parsed_options.amount <= 0 || this.is_finished) {
       return promise_wrap(Promise.resolve(this._clone()));
     }
+    if (this._cached_lookahead) {
+      const cloned = this._clone();
+      cloned.push(...cloned._cached_lookahead.splice(0, parsed_options.amount));
+      return cloned.fetch_more(parsed_options.amount - cloned.length + this.length);
+    }
     return promise_wrap(this._more ? this._fetch_more_comments(parsed_options) : this._fetch_more_regular(parsed_options));
   }
   _fetch_more_regular (options) {
     return this._r[`_${this._method}`]({
       uri: this._uri,
-      qs: {...this._query, limit: this._is_comment_list ? options.amount + 1 : options.amount}
+      qs: {...this._query, limit: this._is_comment_list ? undefined : options.amount}
     }).then(this._transform).then(response => {
       const cloned = this._clone();
       if (cloned._query.before) {
@@ -101,6 +114,9 @@ const Listing = class extends Array {
         cloned.push(..._.toArray(response));
         cloned._query.before = null;
         cloned._query.after = response._query.after;
+      }
+      if (this._is_comment_list && response.length > options.amount) {
+        cloned._cached_lookahead = cloned.splice(options.amount);
       }
       return cloned.fetch_more({...options, amount: options.amount - response.length});
     });
@@ -145,6 +161,7 @@ const Listing = class extends Array {
   _clone () {
     const properties = _.pick(this, _.keys(INTERNAL_DEFAULTS));
     properties._query = _.clone(properties._query);
+    properties._cached_lookahead = _.clone(properties._cached_lookahead);
     properties._more = this._more && this._more._clone();
     properties.children = _.toArray(this);
     return new Listing(properties, this._r);
