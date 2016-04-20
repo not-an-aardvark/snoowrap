@@ -1063,4 +1063,13 @@ describe('snoowrap', function () {
       expect(await submission.refresh().gilded).to.be.above(initial_gilding_amount);
     });
   });
+  describe('internal helpers', () => {
+    it('can clone a RedditContent instance', () => {
+      const some_user = r.get_user('someone');
+      const cloned_user = some_user._clone();
+      expect(some_user.name).to.equal(cloned_user.name);
+      expect(cloned_user).to.be.an.instanceof(snoowrap.objects.RedditUser);
+      expect(cloned_user._has_fetched).to.be.false();
+    });
+  });
 });

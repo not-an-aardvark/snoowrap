@@ -101,6 +101,10 @@ const RedditContent = class {
   _transform_api_response (response_object) {
     return response_object;
   }
+  _clone () {
+    const props = _.pick(this, Object.getOwnPropertyNames(this));
+    return this._r._new_object(this.constructor.name, _.cloneDeep(props), this._has_fetched);
+  }
   _get_listing (...args) {
     return this._r._get_listing(...args);
   }
