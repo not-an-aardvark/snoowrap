@@ -51,10 +51,7 @@ const Listing = class extends Array {
   * @summary This is a getter that is true if there are no more items left to fetch, and false otherwise.
   */
   get is_finished () {
-    if (this._more) {
-      return !this._more.children.length;
-    }
-    return !this._uri || this._query.after === null && this._query.before === null;
+    return this._more ? this._more.is_finished : !this._uri || this._query.after === null && this._query.before === null;
   }
   /**
   * @summary Fetches some more items
@@ -112,13 +109,14 @@ const Listing = class extends Array {
   within a Listing, reddit sends the last comment in the list as as a `more` object, with links to all the remaining comments
   in the thread. */
   async _fetch_more_comments (...args) {
-    const cloned = this._clone();
     if (this._more) {
       const more_comments = await this._more.fetch_more(...args);
+      const cloned = this._clone();
       cloned.push(..._.toArray(more_comments));
-      cloned._more.children.splice(0, cloned.length - this.length);
+      cloned._more._remove_leading_children(cloned.length - this.length);
+      return cloned;
     }
-    return cloned;
+    return this._clone();
   }
   /**
   * @summary Fetches all of the items in this Listing, only stopping when there are none left.

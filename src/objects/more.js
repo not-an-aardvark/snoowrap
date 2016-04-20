@@ -8,13 +8,28 @@ const more = class {
   constructor (options, _r) {
     _.assign(this, options);
     this._r = _r;
+    this._is_continued_thread = this.name === 't1__';
+    this._continued_replies_cache = null;
+    this._continued_start_index = 0;
   }
   /* Requests to /api/morechildren are capped at 20 comments at a time, but requests to /api/info are capped at 100, so
   it's easier to send to the latter. The disadvantage is that comment replies are not automatically sent from requests
   to /api/info. */
   async fetch_more (options, start_index = 0) {
-    if (options.amount <= 0 || start_index >= this.children.length) {
+    if (options.amount <= 0 || !this._is_continued_thread && start_index >= this.children.length) {
       return [];
+    }
+    if (this._is_continued_thread) {
+      if (!this._continued_replies_cache) {
+        this._continued_replies_cache = await this._r.get_comment(this.parent_id.slice(3)).fetch().get('replies');
+      }
+      if (this._continued_replies_cache.length - this._continued_start_index < options.amount) {
+        this._continued_replies_cache = await this._continued_replies_cache.fetch_more({
+          amount: options.amount - this._continued_replies_cache.length - this._continued_start_index
+        });
+      }
+      const end_index = this._continued_start_index + options.amount;
+      return _.toArray(this._continued_replies_cache).slice(this._continued_start_index, end_index);
     }
     if (!options.skip_replies) {
       return this.fetch_tree(options, start_index);
@@ -42,14 +57,22 @@ const more = class {
     return _.toArray(result_trees).concat(await this.fetch_more(next_request_options, start_index + ids.length));
   }
   _clone () {
-    return new more({
-      count: this.count,
-      link_id: this.link_id,
-      parent_id: this.parent_id,
-      id: this.id,
-      name: this.name,
-      children: _.clone(this.children)
-    }, this._r);
+    return new more(_.clone(_.pick(this, Object.getOwnPropertyNames(this))), this._r);
+  }
+  _remove_leading_children (new_start_index) {
+    if (this._is_continued_thread) {
+      this._continued_start_index += new_start_index;
+    } else {
+      this.children = this.children.slice(new_start_index);
+    }
+  }
+  get is_finished () {
+    if (this._is_continued_thread) {
+      return !!this._continued_replies_cache
+        && this._continued_replies_cache.length === this._continued_start_index
+        && this._continued_replies_cache.is_finished;
+    }
+    return !this.children.length;
   }
   _get_id_slice (amount, start_index) {
     return this.children.slice(start_index, start_index + amount);
