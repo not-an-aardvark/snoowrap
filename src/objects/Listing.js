@@ -135,7 +135,7 @@ const Listing = class extends Array {
     return this.fetch_more({...options, amount: Infinity});
   }
   fetch_until (options) {
-    this._r.log.debug('Listing.prototype.fetch_until is deprecated -- use Listing.prototype.fetch_more instead.');
+    this._r.log.warn('Listing.prototype.fetch_until is deprecated -- use Listing.prototype.fetch_more instead.');
     if (!_.isNumber(options.length)) {
       throw new errors.InvalidMethodCallError('Failed to fetch Listing. (No amount specified.)');
     }
