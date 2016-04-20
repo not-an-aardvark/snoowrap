@@ -97,6 +97,7 @@ const snoowrap = class {
     return `${constants.MODULE_NAME} ${require('util').inspect(formatted)}`;
   }
   get log () {
+    /* eslint-disable no-console */
     return {
       warn: (...args) => {
         if (!this._config.suppress_warnings) {
@@ -109,6 +110,7 @@ const snoowrap = class {
         }
       }
     };
+    /* eslint-enable no-console */
   }
   /**
   * @summary Gets information on a reddit user with a given name.
