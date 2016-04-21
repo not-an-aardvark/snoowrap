@@ -86,6 +86,10 @@ const snoowrap = class {
   * // sets the request delay to 1000 milliseconds, and suppresses warnings.
   */
   config (options) {
+    const invalid_key = _.findKey(options, (value, key) => !this._config.hasOwnProperty(key));
+    if (invalid_key) {
+      throw new TypeError(`Invalid config option '${invalid_key}'`);
+    }
     return _.assign(this._config, options);
   }
   inspect () {

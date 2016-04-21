@@ -62,6 +62,9 @@ describe('snoowrap', function () {
       await r.get_me();
       expect(r.ratelimit_remaining).to.be.a('number');
     });
+    it('throws a TypeError if an invalid config option is set', () => {
+      expect(() => r.config({invalid_config_option: true})).to.throw(TypeError);
+    });
     after(() => {
       r.config({request_delay: 0});
     });
