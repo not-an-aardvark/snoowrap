@@ -20,10 +20,14 @@ const Comment = class extends require('./VoteableContent') {
     if (_has_fetched && this.replies instanceof Listing && !this.replies.length
         && this.replies._more && this.replies._more.name === 't1__') {
       this.replies = helpers._get_empty_replies_listing(this);
+    } else if (this.replies === '') {
+      /* If a comment has no replies, reddit returns an empty string as its `replies` property rather than an empty Listing.
+      This behavior is unexpected, so replace the empty string with an empty Listing. */
+      this.replies = this._r._new_object('Listing');
     }
   }
   _transform_api_response (response_obj) {
-    return response_obj[0].replies ? response_obj[0] : helpers._add_empty_replies_listing(response_obj[0]);
+    return helpers._add_empty_replies_listing(response_obj[0]);
   }
   get _uri () {
     return `api/info?id=${this.name}`;

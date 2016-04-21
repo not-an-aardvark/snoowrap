@@ -103,9 +103,12 @@ const RedditContent = class {
   _transform_api_response (response_object) {
     return response_object;
   }
-  _clone () {
+  _clone ({deep = false} = {}) {
     const cloned_props = _.mapValues(this, value => {
-      return value instanceof RedditContent || value instanceof Listing ? value._clone() : _.cloneDeep(value);
+      if (deep) {
+        return value instanceof RedditContent || value instanceof Listing ? value._clone({deep}) : _.cloneDeep(value);
+      }
+      return value;
     });
     return this._r._new_object(this.constructor.name, cloned_props, this._has_fetched);
   }

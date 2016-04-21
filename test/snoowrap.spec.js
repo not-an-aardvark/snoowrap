@@ -395,7 +395,6 @@ describe('snoowrap', function () {
       expect(l.is_finished).to.be.false();
       const next_comment_list = await l.fetch_more({amount: 1});
       expect(l.is_finished).to.be.false();
-      // Check that next_comment_list contains the new elements, shares a cache, and has an increased start index.
       expect(next_comment_list).to.be.an.instanceof(snoowrap.objects.Listing);
       expect(next_comment_list).to.have.lengthOf(1);
       // Check that next_comment_list can also fetch items and store them accordingly
@@ -414,6 +413,65 @@ describe('snoowrap', function () {
       const l3 = await l.fetch_more({amount: 3});
       const l21 = await l2.fetch_more({amount: 1});
       expect(_.map(l3, 'body')).to.eql(_.map(l21, 'body'));
+    });
+  });
+
+  describe('expanding replies on an item', () => {
+    it('can fetch all comments on a Submission', async () => {
+      const sub = await r.get_submission('4fp36y').fetch();
+      const stripped_sub = sub.toJSON();
+      const expanded = await sub.expand_replies();
+      // Ensure that the original submission is unchanged.
+      // Test the stringified versions rather than doing a deep comparison, because some private properties might have changed
+      expect(sub.toJSON()).to.eql(stripped_sub);
+      expect(expanded.toJSON()).to.not.eql(stripped_sub);
+      expect(expanded.comments).to.be.an.instanceof(snoowrap.objects.Listing);
+      expect(expanded.comments.is_finished).to.be.true();
+      expect(expanded.comments[0].replies).to.be.an.instanceof(snoowrap.objects.Listing);
+      expect(expanded.comments[0].replies.is_finished).to.be.true();
+      const last_visible_path = `comments[0]${_.repeat('.replies[0]', 9)}`;
+      const last_comment_on_original = _.get(sub, last_visible_path);
+      const matching_comment_on_expanded = _.get(expanded, last_visible_path);
+      expect(last_comment_on_original.body).to.equal(matching_comment_on_expanded.body);
+      expect(last_comment_on_original.replies).to.be.an.instanceof(snoowrap.objects.Listing);
+      expect(last_comment_on_original.replies.is_finished).to.be.false();
+      expect(matching_comment_on_expanded.replies).to.be.an.instanceof(snoowrap.objects.Listing);
+      expect(matching_comment_on_expanded.replies.is_finished).to.be.true();
+      expect(matching_comment_on_expanded.replies[0]).to.be.an.instanceof(snoowrap.objects.Comment);
+      // recursively check that all `replies` listings are finished
+      const check_replies_finished = item => item.replies.is_finished && item.replies.every(check_replies_finished);
+      expect(expanded.comments.every(check_replies_finished)).to.be.true();
+      expect(sub.comments.every(check_replies_finished)).to.be.false();
+    });
+    it('can specify a depth limit when expanding replies', async () => {
+      const sub = await r.get_submission('4fp36y').fetch();
+      const expanded_sub = await sub.expand_replies({depth: 10});
+      const last_visible_path = `comments[0]${_.repeat('.replies[0]', 9)}`;
+      const last_replies_listing = _.get(expanded_sub, last_visible_path).replies;
+      expect(last_replies_listing).to.be.empty();
+      expect(last_replies_listing.is_finished).to.be.false();
+      const deeper_expanded_sub = await sub.expand_replies({depth: 11});
+      const matching_last_listing = _.get(deeper_expanded_sub, last_visible_path).replies;
+      expect(matching_last_listing).to.not.be.empty();
+      expect(matching_last_listing.is_finished).to.be.true();
+    });
+    it('can specify a length limit when expanding replies', async () => {
+      // TODO: Fix this test -- it's currently failing as a result of a bug
+      const sub = r.get_submission('2np694');
+      const expanded_sub = await sub.expand_replies({limit: 2, depth: 20});
+      const last_visible_path = _.repeat('.replies[0]', 9);
+      const first_comment_deep_child = _.get(sub.comments[0], last_visible_path);
+      const first_comment_expanded_deep_child = _.get(expanded_sub.comments[0], last_visible_path);
+      const second_comment_deep_child = _.get(sub.comments[1], last_visible_path);
+      const second_comment_expanded_deep_child = _.get(expanded_sub.comments[1], last_visible_path);
+      const third_comment_deep_child = _.get(sub.comments[2], last_visible_path);
+      const third_comment_expanded_deep_child = _.get(expanded_sub.comments[2], last_visible_path);
+      expect(first_comment_deep_child.replies).to.be.empty();
+      expect(first_comment_expanded_deep_child.replies).to.not.be.empty();
+      expect(second_comment_deep_child.replies).to.be.empty();
+      expect(second_comment_expanded_deep_child.replies).to.not.be.empty();
+      expect(third_comment_deep_child.replies).to.be.empty();
+      expect(third_comment_expanded_deep_child.replies).to.be.empty();
     });
   });
 
@@ -1100,12 +1158,30 @@ describe('snoowrap', function () {
     });
   });
   describe('internal helpers', () => {
-    it('can clone a RedditContent instance', () => {
+    it('can deeply clone a RedditContent instance', async () => {
       const some_user = r.get_user('someone');
-      const cloned_user = some_user._clone();
+      const cloned_user = some_user._clone({deep: true});
       expect(some_user.name).to.equal(cloned_user.name);
       expect(cloned_user).to.be.an.instanceof(snoowrap.objects.RedditUser);
       expect(cloned_user._has_fetched).to.be.false();
+
+      const sub = await r.get_submission('4fp36y').fetch();
+      const cloned = sub._clone({deep: true});
+      expect(sub).to.not.equal(cloned);
+      expect(sub.comments).to.not.equal(cloned.comments);
+      expect(sub.comments[0]).to.not.equal(cloned.comments[0]);
+      expect(sub.comments[0].replies).to.not.equal(cloned.comments[0].replies);
+      expect(sub.comments[0].replies[0]).to.not.equal(cloned.comments[0].replies[0]);
+    });
+    it('can convert a RedditContent instance to JSON', async () => {
+      const some_user = r.get_user('someone');
+      expect(JSON.stringify(some_user)).to.equal('{"name":"someone"}');
+      const fetched_user = await r.get_user('snoowrap_testing').fetch();
+      const reparsed = JSON.parse(JSON.stringify(fetched_user));
+      expect(fetched_user).to.have.property('_r');
+      expect(reparsed).to.not.have.property('_r');
+      expect(reparsed.name).to.equal(fetched_user.name);
+      expect(reparsed.created_utc).to.equal(fetched_user.created_utc);
     });
   });
 });

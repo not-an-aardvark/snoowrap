@@ -36,8 +36,7 @@ const Listing = class extends Array {
     _.defaultsDeep(this, _.pick(options, _.keys(INTERNAL_DEFAULTS)), INTERNAL_DEFAULTS);
     _.assign(this._query, _.pick(options, ['before', 'after']));
     if (_.last(options.children) instanceof More) {
-      this._more = this.pop();
-      this._is_comment_list = true;
+      this._set_more(this.pop());
     }
   }
   _set_uri (value) {
@@ -88,8 +87,8 @@ const Listing = class extends Array {
   */
   fetch_more (options) {
     const parsed_options = _.defaults(_.isObject(options) ? _.clone(options) : {amount: options}, {skip_replies: false});
-    if (!_.isNumber(parsed_options.amount)) {
-      throw new errors.InvalidMethodCallError('Failed to fetch Listing. (No amount specified.)');
+    if (!_.isNumber(parsed_options.amount) || Number.isNaN(parsed_options.amount)) {
+      throw new errors.InvalidMethodCallError('Failed to fetch Listing. (`amount` parameter was missing or invalid)');
     }
     if (parsed_options.amount <= 0 || this.is_finished) {
       return promise_wrap(Promise.resolve(this._clone()));
@@ -159,13 +158,20 @@ const Listing = class extends Array {
   inspect () {
     return `Listing ${require('util').inspect(_.toArray(this))}`;
   }
-  _clone () {
+  _clone ({deep = false} = {}) {
     const properties = _.pick(this, _.keys(INTERNAL_DEFAULTS));
     properties._query = _.clone(properties._query);
     properties._cached_lookahead = _.clone(properties._cached_lookahead);
     properties._more = this._more && this._more._clone();
-    properties.children = _.toArray(this);
+    const shallow_children = _.toArray(this);
+    properties.children = deep ? shallow_children.map(item => {
+      return '_clone' in item && _.isFunction(item._clone) ? item._clone({deep}) : item;
+    }) : shallow_children;
     return new Listing(properties, this._r);
+  }
+  _set_more (more_obj) {
+    this._more = more_obj;
+    this._is_comment_list = true;
   }
   toJSON () {
     return _.toArray(this).map(item => item && item.toJSON ? item.toJSON() : item);

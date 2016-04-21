@@ -1,4 +1,5 @@
 'use strict';
+const promise_wrap = require('promise-chains');
 const helpers = require('../helpers.js');
 const api_type = 'json';
 
@@ -143,6 +144,22 @@ const VoteableContent = class extends require('./ReplyableContent') {
   */
   disable_inbox_replies () {
     return this._set_inbox_replies_enabled(false).return(this);
+  }
+  async _mutate_and_expand_replies ({limit, depth}) {
+    if (depth <= 0) {
+      return this;
+    }
+    const replies_key = this.constructor.name === 'Submission' ? 'comments' : 'replies';
+    this[replies_key] = await this[replies_key].fetch_more({amount: limit - this[replies_key].length});
+    for (let i = 0; i < this[replies_key].length && i < limit; i++) {
+      await this[replies_key][i]._mutate_and_expand_replies({limit, depth: depth - 1});
+    }
+    return this;
+  }
+  expand_replies ({limit = Infinity, depth = Infinity} = {}) {
+    return promise_wrap(this.fetch().then(result => {
+      return result._clone({deep: true})._mutate_and_expand_replies({limit, depth});
+    }));
   }
 };
 
