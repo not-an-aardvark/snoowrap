@@ -167,6 +167,9 @@ const Listing = class extends Array {
     properties.children = _.toArray(this);
     return new Listing(properties, this._r);
   }
+  toJSON () {
+    return _.toArray(this).map(item => item && item.toJSON ? item.toJSON() : item);
+  }
 };
 
 module.exports = Listing;

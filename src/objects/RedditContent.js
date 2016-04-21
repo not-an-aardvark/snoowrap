@@ -5,6 +5,7 @@ if (typeof Proxy !== 'undefined' && typeof Reflect === 'undefined') {
 const Promise = require('bluebird');
 const _ = require('lodash');
 const promise_wrap = require('promise-chains');
+const Listing = require('./Listing');
 
 /**
 * A base class for content from reddit. With the expection of Listings, all content types extend this class.
@@ -93,7 +94,8 @@ const RedditContent = class {
   * JSON.stringify(user) // => '{"name":"not_an_aardvark"}'
   */
   toJSON () {
-    return _.pick(this, _.keys(this).filter(key => !key.startsWith('_')));
+    const stripped_props = _.pick(this, _.keys(this).filter(key => !key.startsWith('_')));
+    return _.mapValues(stripped_props, item => item && item.toJSON ? item.toJSON() : item);
   }
   inspect () {
     return `${this.constructor.name} ${require('util').inspect(this.toJSON())}`;
@@ -102,8 +104,10 @@ const RedditContent = class {
     return response_object;
   }
   _clone () {
-    const props = _.pick(this, Object.getOwnPropertyNames(this));
-    return this._r._new_object(this.constructor.name, _.cloneDeep(props), this._has_fetched);
+    const cloned_props = _.mapValues(this, value => {
+      return value instanceof RedditContent || value instanceof Listing ? value._clone() : _.cloneDeep(value);
+    });
+    return this._r._new_object(this.constructor.name, cloned_props, this._has_fetched);
   }
   _get_listing (...args) {
     return this._r._get_listing(...args);
