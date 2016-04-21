@@ -12,5 +12,5 @@ exports.Subreddit = require('./Subreddit');
 exports.MultiReddit = require('./MultiReddit');
 exports.WikiPage = require('./WikiPage');
 exports.Listing = require('./Listing');
-exports.more = require('./more');
+exports.More = require('./More');
 exports.UserList = require('./UserList');

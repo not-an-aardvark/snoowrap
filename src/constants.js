@@ -16,7 +16,7 @@ module.exports = {
     t6: 'Trophy',
     t8: 'PromoCampaign',
     Listing: 'Listing',
-    more: 'more',
+    more: 'More',
     UserList: 'UserList',
     KarmaList: 'KarmaList',
     TrophyList: 'TrophyList',

@@ -5,9 +5,9 @@ const constants = require('../constants');
 const api_type = 'json';
 
 /**
-* The `more` class is a helper representing reddit's exposed `more` type in comment threads, used to fetch additional comments
+* The `More` class is a helper representing reddit's exposed `more` type in comment threads, used to fetch additional comments
 on a thread.
-* No instances of the `more` class are exposed externally by snoowrap; instead, comment lists are exposed as Listings.
+* No instances of the `More` class are exposed externally by snoowrap; instead, comment lists are exposed as Listings.
 Additional replies on an item can be fetched by calling `fetch_more` on a Listing, in the same manner as what would be done
 with a Listing of posts. snoowrap should handle the differences internally, and expose a nearly-identical interface for the
 two use-cases.
@@ -20,7 +20,7 @@ of available information (e.g. all the child IDs of a `more` object are known on
 behavior.
 */
 
-const more = class {
+const More = class {
   constructor (options, _r) {
     _.assign(this, options);
     this._r = _r;
@@ -58,7 +58,7 @@ const more = class {
     return _.toArray(result_trees).concat(await this.fetch_more(next_request_options, start_index + ids.length));
   }
   _clone () {
-    return new more(_.clone(_.pick(this, Object.getOwnPropertyNames(this))), this._r);
+    return new More(_.clone(_.pick(this, Object.getOwnPropertyNames(this))), this._r);
   }
   _remove_leading_children (new_start_index) {
     this.children = this.children.slice(new_start_index);
@@ -68,4 +68,4 @@ const more = class {
   }
 };
 
-module.exports = more;
+module.exports = More;

@@ -3,7 +3,7 @@ const _ = require('lodash');
 const Promise = require('bluebird');
 const promise_wrap = require('promise-chains');
 const errors = require('../errors');
-const more = require('./more');
+const More = require('./More');
 
 const INTERNAL_DEFAULTS = {
   _query: {},
@@ -35,7 +35,7 @@ const Listing = class extends Array {
     _.defaults(this, {_cached_lookahead: options._cached_lookahead});
     _.defaultsDeep(this, _.pick(options, _.keys(INTERNAL_DEFAULTS)), INTERNAL_DEFAULTS);
     _.assign(this._query, _.pick(options, ['before', 'after']));
-    if (_.last(options.children) instanceof more) {
+    if (_.last(options.children) instanceof More) {
       this._more = this.pop();
       this._is_comment_list = true;
     }
