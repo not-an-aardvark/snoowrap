@@ -30,6 +30,7 @@ const Subreddit = class extends require('./RedditContent') {
   /**
   * @summary Deletes all of this subreddit's user flair templates
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').delete_all_user_flair_templates()
   */
   delete_all_user_flair_templates () {
     return this._delete_flair_templates({flair_type: 'USER_FLAIR'});
@@ -37,6 +38,7 @@ const Subreddit = class extends require('./RedditContent') {
   /**
   * @summary Deletes all of this subreddit's link flair templates
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').delete_all_link_flair_templates()
   */
   delete_all_link_flair_templates () {
     return this._delete_flair_templates({flair_type: 'LINK_FLAIR'});
@@ -46,6 +48,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} options
   * @param {string} options.flair_template_id The ID of the template that should be deleted
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').delete_flair_template({flair_template_id: 'fdfd8532-c91e-11e5-b4d4-0e082084d721'})
   */
   delete_flair_template (options) {
     return this._post({
@@ -67,6 +70,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {boolean} [options.text_editable=false] Determines whether users should be able to edit their flair text
   when it has this template
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
+  * @example r.get_subreddit('snoowrap').create_user_flair_template({text: 'Some Flair Text', css_class: 'some-css-class'})
   */
   create_user_flair_template (options) {
     return this._create_flair_template({...options, flair_type: 'USER_FLAIR'});
@@ -79,6 +83,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {boolean} [options.text_editable=false] Determines whether users should be able to edit the flair text of their
   links when it has this template
   * @returns {Promise} A Promise that fulfills with this Subredit when the request is complete.
+  * @example r.get_subreddit('snoowrap').create_link_flair_template({text: 'Some Flair Text', css_class: 'some-css-class'})
   */
   create_link_flair_template (options) {
     return this._create_flair_template({...options, flair_type: 'LINK_FLAIR'});
@@ -90,6 +95,21 @@ const Subreddit = class extends require('./RedditContent') {
   * @summary Gets the flair templates for a given link.
   * @param {string} link_id The link's base36 ID
   * @returns {Promise} An Array of flair template options
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_link_flair_templates('4fp36y').then(console.log)
+  // => [ { flair_css_class: '',
+  //  flair_template_id: 'fdfd8532-c91e-11e5-b4d4-0e082084d721',
+  //  flair_text_editable: true,
+  //  flair_position: 'right',
+  //  flair_text: '' },
+  //  { flair_css_class: '',
+  //  flair_template_id: '03821f62-c920-11e5-b608-0e309fbcf863',
+  //  flair_text_editable: true,
+  //  flair_position: 'right',
+  //  flair_text: '' },
+  //  ...
+  // ]
   */
   get_link_flair_templates (link_id) {
     return this._get_flair_options({link: link_id}).get('choices');
@@ -97,6 +117,21 @@ const Subreddit = class extends require('./RedditContent') {
   /**
   * @summary Gets the list of user flair templates on this subreddit.
   * @returns {Promise} An Array of user flair templates
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_user_flair_templates().then(console.log)
+  // => [ { flair_css_class: '',
+  //  flair_template_id: 'fdfd8532-c91e-11e5-b4d4-0e082084d721',
+  //  flair_text_editable: true,
+  //  flair_position: 'right',
+  //  flair_text: '' },
+  //  { flair_css_class: '',
+  //  flair_template_id: '03821f62-c920-11e5-b608-0e309fbcf863',
+  //  flair_text_editable: true,
+  //  flair_position: 'right',
+  //  flair_text: '' },
+  //  ...
+  // ]
   */
   get_user_flair_templates () {
     return this._get_flair_options().get('choices');
@@ -105,6 +140,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @summary Clears a user's flair on this subreddit.
   * @param {string} name The user's name
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').delete_user_flair('actually_an_aardvark')
   */
   delete_user_flair (name) {
     return this._post({uri: `r/${this.display_name}/api/deleteflair`, form: {api_type, name}}).return(this);
@@ -113,6 +149,14 @@ const Subreddit = class extends require('./RedditContent') {
   * @summary Gets a user's flair on this subreddit.
   * @param {string} name The user's name
   * @returns {Promise} An object representing the user's flair
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_user_flair('actually_an_aardvark').then(console.log)
+  // => { flair_css_class: '',
+  //  flair_template_id: 'fdfd8532-c91e-11e5-b4d4-0e082084d721',
+  //  flair_text: '',
+  //  flair_position: 'right'
+  // }
   */
   get_user_flair (name) {
     return this._get_flair_options({name}).get('current');
@@ -127,6 +171,11 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {string} flair_array[].text The flair text to assign to this user
   * @param {string} flair_array[].css_class The flair CSS class to assign to this user
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example
+  r.get_subreddit('snoowrap').set_multiple_user_flairs([
+    {name: 'actually_an_aardvark', 'text': "this is /u/actually_an_aardvark's flair text", css_class: 'some-css-class'},
+    {name: 'snoowrap_testing', 'text': "this is /u/snoowrap_testing's flair text", css_class: 'some-css-class'}
+  * ])
   */
   set_multiple_user_flairs (flair_array_orig) {
     const flair_array = _.clone(flair_array_orig);
@@ -143,9 +192,23 @@ const Subreddit = class extends require('./RedditContent') {
   * @summary Gets a list of all user flairs on this subreddit.
   * @param {string} [options.name] A specific username to jump to
   * @returns {Promise} A Array containing user flairs
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_user_flair_list().then(console.log)
+  // => [
+  //  { flair_css_class: null,
+  //  user: 'not_an_aardvark',
+  //  flair_text: 'Isn\'t an aardvark' },
+  //  { flair_css_class: 'some-css-class',
+  //    user: 'actually_an_aardvark',
+  //    flair_text: 'this is /u/actually_an_aardvark\'s flair text' },
+  //  { flair_css_class: 'some-css-class',
+  //    user: 'snoowrap_testing',
+  //    flair_text: 'this is /u/snoowrap_testing\'s flair text' }
+  // ]
   */
-  get_user_flair_list () {
-    return this._get({uri: `r/${this.display_name}/api/flairlist`}).get('users');
+  get_user_flair_list (options) {
+    return this._get({uri: `r/${this.display_name}/api/flairlist`, qs: options}).get('users');
   }
   /**
   * @summary Configures the flair settings for this subreddit.
@@ -159,6 +222,13 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {boolean} options.link_flair_self_assign_enabled Determines whether users should be able to edit the flair of their
   submissions.
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').configure_flair({
+    user_flair_enabled: true,
+    user_flair_position: 'left',
+    user_flair_self_assign_enabled: false,
+    link_flair_position: 'right',
+    link_flair_self_assign_enabled: false
+  * })
   */
   configure_flair (options) {
     return this._post({
@@ -176,6 +246,14 @@ const Subreddit = class extends require('./RedditContent') {
   /**
   * @summary Gets the requester's flair on this subreddit.
   * @returns {Promise} An object representing the requester's current flair
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_my_flair().then(console.log)
+  // => { flair_css_class: 'some-css-class',
+  //  flair_template_id: null,
+  //  flair_text: 'this is /u/snoowrap_testing\'s flair text',
+  //  flair_position: 'right'
+  // }
   */
   get_my_flair () {
     return this._get_flair_options().get('current');
