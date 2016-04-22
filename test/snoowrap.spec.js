@@ -382,6 +382,16 @@ describe('snoowrap', function () {
       expect(expanded_comments.length).to.be.above(initial_length + 20);
       expect(r.ratelimit_remaining).to.equal(initial_ratelimit_remaining - 2);
     });
+    it('correctly handles `more` objects in non-top-level comments', async () => {
+      const initial_comment = await r._get({uri: 'comments/4fp36y/-/d2c5bbk', qs: {limit: 2}}).comments[0];
+      expect(initial_comment.replies).to.be.an.instanceof(snoowrap.objects.Listing);
+      expect(initial_comment.replies.length).to.equal(1);
+      expect(initial_comment.replies.is_finished).to.be.false();
+      const expanded_replies = await initial_comment.replies.fetch_all();
+      expect(expanded_replies).to.be.an.instanceof(snoowrap.objects.Listing);
+      expect(expanded_replies.length).to.be.at.least(2);
+      expect(expanded_replies.is_finished).to.be.true();
+    });
   });
 
   describe("getting Listings containing 'continue this thread' messages", () => {
