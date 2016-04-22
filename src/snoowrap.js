@@ -1148,6 +1148,7 @@ _.forOwn(snoowrap.objects, (value, key) => {
 snoowrap.helpers = helpers;
 snoowrap.constants = constants;
 snoowrap.errors = errors;
+snoowrap.request_handler = request_handler;
 
 if (!module.parent && typeof window !== 'undefined') { // check if the code is being run in a browser through browserify
   /* global window */

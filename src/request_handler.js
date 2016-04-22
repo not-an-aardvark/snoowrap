@@ -6,6 +6,7 @@ const constants = require('./constants');
 const errors = require('./errors');
 
 module.exports = {
+  request,
   async oauth_request (r, method, args, attempts = 0) {
     /* r._throttle is a timer that gets reset to r._config.request_delay whenever a request is sent. This ensures that
     requests are throttled correctly according to the user's config settings, and that no requests are lost. The await
