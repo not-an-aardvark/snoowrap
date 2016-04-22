@@ -69,7 +69,6 @@
     "no-unneeded-ternary": 2,
     "no-unused-expressions": 2,
     "no-unused-vars": 1,
-    "no-use-before-define": 2,
     "no-useless-call": 2,
     "no-useless-concat": 2,
     "no-useless-constructor": 2,
@@ -88,7 +87,6 @@
     "prefer-const": 1,
     "prefer-rest-params": 2,
     "prefer-spread": 2,
-    "prefer-template": 2,
     "quote-props": [
       2,
       "as-needed"

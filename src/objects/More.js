@@ -66,6 +66,11 @@ const More = class {
   _get_id_slice (amount, start_index) {
     return this.children.slice(start_index, start_index + amount);
   }
+  static empty_children () {
+    return empty_children;
+  }
 };
+
+const empty_children = new More({children: []});
 
 module.exports = More;

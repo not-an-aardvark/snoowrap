@@ -82,9 +82,21 @@ module.exports = {
   nonintuitive way (see https://github.com/not-an-aardvark/snoowrap/issues/15 for details). This function rearranges the message
   tree so that replies are threaded properly. */
   _build_replies_tree (child_list) {
+    const More = require('./objects/More');
     const child_map = _.keyBy(child_list, 'name');
     child_list.forEach(module.exports._add_empty_replies_listing);
-    _.remove(child_list, child => child_map[child.parent_id]).forEach(child => child_map[child.parent_id].replies.push(child));
+    child_list.forEach(child => {
+      if (child.constructor.name === 'Comment') {
+        child.replies._more = More.empty_children();
+      }
+    });
+    _.remove(child_list, child => child_map[child.parent_id]).forEach(child => {
+      if (child instanceof More) {
+        child_map[child.parent_id].replies._set_more(child);
+      } else {
+        child_map[child.parent_id].replies.push(child);
+      }
+    });
     return child_list;
   }
 };

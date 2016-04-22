@@ -465,17 +465,22 @@ describe('snoowrap', function () {
       expect(matching_last_listing).to.not.be.empty();
       expect(matching_last_listing.is_finished).to.be.true();
     });
-    it.skip('can specify a length limit when expanding replies', async () => {
-      // TODO: Fix this test -- it's currently failing as a result of a bug
+    it('can specify a length limit when expanding replies', async () => {
       const sub = r.get_submission('2np694');
       const expanded_sub = await sub.expand_replies({limit: 2, depth: 20});
-      const last_visible_path = _.repeat('.replies[0]', 9);
-      const first_comment_deep_child = _.get(sub.comments[0], last_visible_path);
-      const first_comment_expanded_deep_child = _.get(expanded_sub.comments[0], last_visible_path);
-      const second_comment_deep_child = _.get(sub.comments[1], last_visible_path);
-      const second_comment_expanded_deep_child = _.get(expanded_sub.comments[1], last_visible_path);
-      const third_comment_deep_child = _.get(sub.comments[2], last_visible_path);
-      const third_comment_expanded_deep_child = _.get(expanded_sub.comments[2], last_visible_path);
+      const fetched_sub = await sub.fetch();
+      const get_last_visible_path = comment => {
+        return comment.replies.length ? '.replies[0]' + get_last_visible_path(comment.replies[0]) : '';
+      };
+      const first_path = get_last_visible_path(fetched_sub.comments[0]);
+      const second_path = get_last_visible_path(fetched_sub.comments[1]);
+      const third_path = get_last_visible_path(fetched_sub.comments[2]);
+      const first_comment_deep_child = _.get(fetched_sub.comments[0], first_path);
+      const first_comment_expanded_deep_child = _.get(expanded_sub.comments[0], first_path);
+      const second_comment_deep_child = _.get(fetched_sub.comments[1], second_path);
+      const second_comment_expanded_deep_child = _.get(expanded_sub.comments[1], second_path);
+      const third_comment_deep_child = _.get(fetched_sub.comments[2], third_path);
+      const third_comment_expanded_deep_child = _.get(expanded_sub.comments[2], third_path);
       expect(first_comment_deep_child.replies).to.be.empty();
       expect(first_comment_expanded_deep_child.replies).to.not.be.empty();
       expect(second_comment_deep_child.replies).to.be.empty();
