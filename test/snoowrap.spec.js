@@ -392,6 +392,10 @@ describe('snoowrap', function () {
       expect(expanded_replies.length).to.be.at.least(2);
       expect(expanded_replies.is_finished).to.be.true();
     });
+    it('correctly handles cases where retrieving all the top-level comments request more than two requests', async () => {
+      const comments = await r.get_submission('4fy9o0').comments.fetch_more({amount: 20});
+      expect(comments.every(c => c instanceof snoowrap.objects.Comment)).to.be.true();
+    });
   });
 
   describe("getting Listings containing 'continue this thread' messages", () => {

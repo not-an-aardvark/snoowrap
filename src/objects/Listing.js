@@ -129,7 +129,11 @@ const Listing = class extends Array {
       const more_comments = await this._more.fetch_more(...args);
       const cloned = this._clone();
       cloned.push(..._.toArray(more_comments));
-      cloned._more._remove_leading_children(cloned.length - this.length);
+      if (_.last(cloned) instanceof More) {
+        cloned._set_more(cloned.pop());
+      } else {
+        cloned._more._remove_leading_children(cloned.length - this.length);
+      }
       return cloned;
     }
     return this._clone();

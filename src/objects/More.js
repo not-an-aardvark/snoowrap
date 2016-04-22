@@ -50,7 +50,7 @@ const More = class {
     const ids = this._get_id_slice(Math.min(options.amount, constants.MAX_API_MORECHILDREN_AMOUNT), start_index);
     const result_trees = await this._r._get({
       uri: 'api/morechildren',
-      qs: {api_type, children: ids.join(','), link_id: this.link_id}
+      qs: {api_type, children: ids.join(','), link_id: this.link_id || this.parent_id}
     }).tap(helpers._handle_json_errors).then(res => {
       return res.json.data.things;
     }).mapSeries(helpers._add_empty_replies_listing).then(helpers._build_replies_tree);
