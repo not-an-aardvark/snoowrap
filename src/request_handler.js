@@ -66,6 +66,8 @@ module.exports = {
         return await module.exports.oauth_request(r, method, args, attempts);
       }
       if (attempts + 1 >= r._config.max_retry_attempts || r._config.retry_error_codes.indexOf(err.statusCode) === -1) {
+        r.log.debug(`Received a ${err.statusCode} status code from a \`${method.toUpperCase()}\` request sent to ${
+          err.response.request.uri.href}. ratelimit_remaining: ${r.ratelimit_remaining}`);
         throw err;
       }
       r.log.warn(`Received status code ${err.statusCode} from reddit. Retrying request...`);
