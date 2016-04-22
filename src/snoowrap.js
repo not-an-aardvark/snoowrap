@@ -34,7 +34,7 @@ const snoowrap = class {
   client ID/client secret/refresh token are not required. Note that all access tokens expire one hour after being
   generated; if you want to retain access for longer than that, provide the other credentials instead.
   */
-  constructor ({user_agent, client_id, client_secret, refresh_token, access_token}) {
+  constructor ({user_agent, client_id, client_secret, refresh_token, access_token} = {}) {
     if (!user_agent) {
       throw new errors.MissingUserAgentError();
     }
