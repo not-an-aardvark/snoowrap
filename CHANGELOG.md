@@ -1,8 +1,24 @@
 # Changelog
 
+## v0.11.2 (2016-04-22)
+
+This update contains a few new features and bugfixes.
+
+* Added a `VoteableContent#expand_replies` function, which makes it easier to fetch and enumerate large comment trees
+* Added support for fetching deep comment chains in which a "Continue this thread" link appears on the main site
+* Improved the documentation pages:
+  * Almost all functions now have usage examples
+  * A `snoowrap` global is exposed for use in the dev console
+* Improved the validation for `snoowrap#config` parameters
+* Added the ability to block the author of any `ReplyableContent` object
+* Fixed an issue where unsubscribing from a Subreddit would return a 404 error if the user wasn't subscribed in the first place
+* Fixed an issue where `Submission#get_link_flair_templates` would throw errors if Proxies were disabled
+* Fixed an issue where `LiveThread#get_contributors` would have an inconsistent structure if there were any pending contributor invitations
+* Fixed an issue where `Subreddit#assign_flair` was not returning a chained Promise
+
 ## v0.11.1 (2016-04-06)
 
-* Fix an issue where certain Subreddit functions would throw errors if Proxies were disabled
+* Fixed an issue where certain Subreddit functions would throw errors if Proxies were disabled
 
 ## v0.11.0 (2016-04-05)
 
