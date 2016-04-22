@@ -93,6 +93,7 @@ module.exports = {
     _.remove(child_list, child => child_map[child.parent_id]).forEach(child => {
       if (child instanceof More) {
         child_map[child.parent_id].replies._set_more(child);
+        child.link_id = child_map[child.parent_id].link_id;
       } else {
         child_map[child.parent_id].replies.push(child);
       }
