@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.11.4 (2016-04-22)
+
+* Fixed an issue where small comment reply chains were never considered 'finished'
+
 ## v0.11.3 (2016-04-22)
 
 * Fixed an issue where Submissions and Comments with a large number of top-level replies could end up with internally-used 'MoreComments' objects in the replies Listing.
