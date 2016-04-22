@@ -156,6 +156,35 @@ const VoteableContent = class extends require('./ReplyableContent') {
     }
     return this;
   }
+  /**
+  * @summary Expands the reply Listings on this Comment/Submission.
+  * @desc This is useful in cases where one wants to enumerate all comments on a
+  thread, even the ones that are initially hidden when viewing it (e.g. long comment chains).
+  *
+  * This function accepts two optional parameters `options.limit` and `options.depth`. `options.limit` sets an upper bound
+  for the branching factor of the resulting replies tree, i.e. the number of comments that are fetched in reply to any given
+  item. `options.depth` sets an upper bound for the depth of the resulting replies tree (where a depth of 0 signifies that no
+  replies should be fetched at all).
+  *
+  * Note that regardless of the `limit` and `depth` parameters used, any reply that appeared in the original reply tree will
+  appear in the expanded reply tree. In certain cases, the depth of the resulting tree may also be larger than `options.depth`,
+  if the reddit API returns more of a comment tree than needed.
+  *
+  * These parameters should primarily be used to keep the request count low; if a precise limit and depth are needed, it is
+  recommended to manually verify the comments in the tree afterwards.
+  *
+  * Both parameters default to `Infinity` if omitted, i.e. the resulting tree contains every single comment available. It should
+  be noted that depending on the size and depth of the thread, fetching every single comment can use up a significant number
+  of ratelimited requests. (To give an intuitive estimate, consider how many clicks would be needed to view all the
+  comments on the thread using the HTML site.)
+  * @param {object} [options={}]
+  * @param {number} [options.limit=Infinity] An upper-bound for the branching factor of the resulting tree of replies
+  * @param {number} [options.depth=Infinity] An upper-bound for the depth of the resulting tree of replies
+  * @returns {Promise} A Promise that fulfills with a new version of this object that has an expanded reply tree. The original
+  object is not modified
+  * @example r.get_submission('4fuq26').expand_replies().then(console.log)
+  * // => (a very large comment tree containing every viewable comment on this thread)
+  */
   expand_replies ({limit = Infinity, depth = Infinity} = {}) {
     return promise_wrap(this.fetch().then(result => {
       return result._clone({deep: true})._mutate_and_expand_replies({limit, depth});
