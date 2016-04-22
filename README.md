@@ -6,9 +6,9 @@ A simple Node.js wrapper for the reddit API. ([Documentation](https://not-an-aar
 
 snoowrap provides a simple interface to access every reddit API endpoint. The method to get a user profile is just `get_user()`, and the method to upvote something is just `upvote()`. There's no need to look up REST endpoints or deal directly with HTTP requests.
 
-If you've used [PRAW](https://praw.readthedocs.org/en/stable/), you'll probably find a lot of snoowrap's syntax to be somewhat familiar. However, aside from being written in a different language, there are a few important differences:
-* snoowrap is non-blocking; all API calls are async and return bluebird Promises. This means that you can handle asynchronous events however you want to, and you can use snoowrap as part of a larger process without it holding everything back.
-* Each snoowrap object is completely independent. If you want, you can have scripts from separate accounts make requests at the same time.
+If you've used [PRAW](https://praw.readthedocs.org/en/stable/), you'll probably find a lot of snoowrap's syntax to be somewhat familiar.
+
+snoowrap is non-blocking; all API calls are async and return bluebird Promises. This means that you can handle asynchronous events however you want to, and you can use snoowrap as part of a larger process without it holding everything back.
 
 ---
 
@@ -42,6 +42,7 @@ r.get_subreddit('snoowrap')
 ```
 
 snoowrap handles all API interactions such as authentication, ratelimiting, error recovery, and HTTP requests under the hood. That way, you can write less boilerplate code and focus more on doing what you actually want to do.
+ * Each snoowrap object is completely independent. If you want, you can have scripts from separate accounts make requests at the same time.
  * After you provide a token once, snoowrap will refresh it on its own from then on -- you won't have to worry about authentication again.
  * snoowrap uses lazy objects, so it never fetches more than it needs to.
  * snoowrap has built-in ratelimit protection. If you hit reddit's ratelimit, you can choose to queue the request, and then run it after the current ratelimit period runs out. That way you won't lose a request if you go a bit too fast.
