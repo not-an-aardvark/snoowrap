@@ -1210,5 +1210,15 @@ describe('snoowrap', function () {
       expect(reparsed.name).to.equal(fetched_user.name);
       expect(reparsed.created_utc).to.equal(fetched_user.created_utc);
     });
+    it('de-populates a RedditContent object when converting it to JSON', async () => {
+      const some_submission = await r.get_submission('4abn1k').fetch();
+      expect(some_submission.author).to.be.an('object');
+      expect(some_submission.subreddit).to.be.an('object');
+      const jsonified = some_submission.toJSON();
+      expect(jsonified.author).to.be.a('string');
+      expect(jsonified.author).to.equal(some_submission.author.name);
+      expect(jsonified.subreddit).to.be.a('string');
+      expect(jsonified.subreddit).to.equal(some_submission.subreddit.display_name);
+    });
   });
 });

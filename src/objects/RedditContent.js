@@ -5,6 +5,7 @@ if (typeof Proxy !== 'undefined' && typeof Reflect === 'undefined') {
 const Promise = require('bluebird');
 const _ = require('lodash');
 const promise_wrap = require('promise-chains');
+const constants = require('../constants');
 const Listing = require('./Listing');
 
 /**
@@ -95,7 +96,17 @@ const RedditContent = class {
   */
   toJSON () {
     const stripped_props = _.pick(this, _.keys(this).filter(key => !key.startsWith('_')));
-    return _.mapValues(stripped_props, item => item && item.toJSON ? item.toJSON() : item);
+    return _.mapValues(stripped_props, (value, key) => {
+      if (value instanceof RedditContent && !value._has_fetched) {
+        if (value.constructor.name === 'RedditUser' && _.includes(constants.USER_KEYS, key)) {
+          return value.name;
+        }
+        if (value.constructor.name === 'Subreddit' && _.includes(constants.SUBREDDIT_KEYS, key)) {
+          return value.display_name;
+        }
+      }
+      return value && value.toJSON ? value.toJSON() : value;
+    });
   }
   inspect () {
     return `${this.constructor.name} ${require('util').inspect(this.toJSON())}`;
