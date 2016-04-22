@@ -197,6 +197,14 @@ describe('snoowrap', function () {
     it('should be able to fetch replies to comments', async () => {
       expect(await comment.replies.fetch_until({length: 1})[0].body).to.equal("Let's knock the humor down to 65%.");
     });
+    it('should correctly identify when a comment has no more replies to fetch', async () => {
+      if (!r.ratelimit_remaining) {
+        await r.get_me();
+      }
+      const initial_remaining = r.ratelimit_remaining;
+      expect(await r.get_comment('d2dof1c').expand_replies().replies.is_finished).to.be.true();
+      expect(r.ratelimit_remaining).to.equal(initial_remaining - 2);
+    });
   });
 
   describe("getting a subreddit's information", () => {

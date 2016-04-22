@@ -42,8 +42,10 @@ module.exports = {
         qs: {raw_json: 1},
         auth: {bearer: r.access_token},
         transform (body, response) {
-          r.ratelimit_remaining = +response.headers['x-ratelimit-remaining'];
-          r.ratelimit_expiration = Date.now() + response.headers['x-ratelimit-reset'] * 1000;
+          if (response.headers['x-ratelimit-remaining']) {
+            r.ratelimit_remaining = +response.headers['x-ratelimit-remaining'];
+            r.ratelimit_expiration = Date.now() + response.headers['x-ratelimit-reset'] * 1000;
+          }
           if (!response.statusCode.toString().startsWith(2)) {
             return response;
           }

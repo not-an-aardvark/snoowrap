@@ -59,6 +59,9 @@ const Listing = class extends Array {
     if (this._cached_lookahead && this._cached_lookahead.length) {
       return false;
     }
+    if (this._is_comment_list && this.length) {
+      return true;
+    }
     return !this._uri || this._query.after === null && this._query.before === null;
   }
   /**
