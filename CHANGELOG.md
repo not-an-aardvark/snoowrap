@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.11.5 (2016-04-23)
+
+* Fixed an issue where `Listing#fetch_all()` would sometimes return an incomplete Listing when fetching Comment replies
+* Fixed an issue where the snoowrap constructor was not allowing the `client_secret` parameter to be an empty string
+* Fixed an issue where RedditContent objects were being converted to JSON incorrectly
+
 ## v0.11.4 (2016-04-22)
 
 * Fixed an issue where small comment reply chains were never considered 'finished'
