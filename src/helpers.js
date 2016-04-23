@@ -35,12 +35,21 @@ module.exports = {
   },
 
   _get_empty_replies_listing (item) {
-    if (item.link_id) {
-      const replies_uri = `comments/${item.link_id.slice(3)}`;
-      const replies_query = {comment: item.name.slice(3)};
-      const _transform = response => response.comments[0].replies;
-      const params = {_uri: replies_uri, _query: replies_query, _transform, _link_id: item.link_id, _is_comment_list: true};
-      return item._r._new_object('Listing', params);
+    if (item.constructor.name === 'Comment') {
+      return item._r._new_object('Listing', {
+        _uri: `comments/${item.link_id.slice(3)}`,
+        _query: {comment: item.name.slice(3)},
+        _transform: _.property('comments[0].replies'),
+        _link_id: item.link_id,
+        _is_comment_list: true
+      });
+    }
+    if (item.constructor.name === 'Submission') {
+      return item._r._new_object('Listing', {
+        _uri: `comments/${item.id}`,
+        _transform: _.property('comments'),
+        _is_comment_list: true
+      });
     }
     return item._r._new_object('Listing');
   },

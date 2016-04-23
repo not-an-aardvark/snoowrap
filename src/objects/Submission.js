@@ -1,4 +1,5 @@
 'use strict';
+const helpers = require('../helpers');
 const api_type = 'json';
 
 /**
@@ -11,6 +12,13 @@ const api_type = 'json';
 * r.get_submission('2np694')
 */
 const Submission = class extends require('./VoteableContent') {
+  constructor (data, _r, _has_fetched) {
+    super(data, _r, _has_fetched);
+    this.comments = this.comments || helpers._get_empty_replies_listing(this);
+    if (!this.comments) {
+      this.comments = helpers._get_empty_replies_listing(this);
+    }
+  }
   get _uri () {
     return `comments/${this.name.slice(3)}`;
   }

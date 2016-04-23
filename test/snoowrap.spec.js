@@ -537,6 +537,24 @@ describe('snoowrap', function () {
       expect(await r.get_controversial('AskReddit')).to.have.length.above(2);
       expect(await r.get_new({limit: 3})).to.have.lengthOf(3);
     });
+    it('adds empty comment listings to a submission on the front page', async () => {
+      const list = await r.get_top('gifs', {limit: 2});
+      expect(list).to.have.lengthOf(2);
+      expect(list[0]).to.be.an.instanceof(snoowrap.objects.Submission);
+      expect(list[0].comments).to.be.an.instanceof(snoowrap.objects.Listing);
+      expect(list[0].comments).to.be.empty();
+      expect(list[0].comments.is_finished).to.be.false();
+      const comments = await list[0].comments.fetch_more({amount: 1});
+      expect(comments).to.be.an.instanceof(snoowrap.objects.Listing);
+      expect(comments).to.have.lengthOf(1);
+      expect(comments[0]).to.be.an.instanceof(snoowrap.objects.Comment);
+      expect(comments.is_finished).to.be.false();
+      const additional_comments = await comments.fetch_more({amount: 1});
+      expect(additional_comments).to.be.an.instanceof(snoowrap.objects.Listing);
+      expect(additional_comments).to.have.lengthOf(2);
+      expect(additional_comments.is_finished).to.be.false();
+      expect(additional_comments._cached_lookahead).to.have.lengthOf(comments._cached_lookahead.length - 1);
+    });
   });
 
   describe('self-property fetching', () => {
