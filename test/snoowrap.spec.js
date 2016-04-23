@@ -511,7 +511,7 @@ describe('snoowrap', function () {
     });
     it('can get new posts from the front page', async () => {
       const posts = await r.get_new();
-      expect(moment.unix(posts[0].created_utc).add(30, 'minutes').isAfter()).to.be.true();
+      expect(moment.unix(posts[0].created_utc).add(60, 'minutes').isAfter()).to.be.true();
       // i.e. the first post should be newer than 1 hour old, to be sure that this is actually the 'new' listing
     });
     it('can get top posts from the front page or a subreddit given a certain timespan', async () => {
@@ -1219,6 +1219,14 @@ describe('snoowrap', function () {
       expect(jsonified.author).to.equal(some_submission.author.name);
       expect(jsonified.subreddit).to.be.a('string');
       expect(jsonified.subreddit).to.equal(some_submission.subreddit.display_name);
+    });
+    it('does not de-populate a RedditContent object when inspecting it', async () => {
+      const some_submission = await r.get_submission('4abn1k').fetch();
+      expect(some_submission.author).to.be.an('object');
+      expect(some_submission.subreddit).to.be.an('object');
+      const inspected = some_submission.inspect();
+      expect(inspected).to.be.a('string');
+      expect(_.includes(inspected, "author: RedditUser { name: 'not_an_aardvark' }")).to.be.true();
     });
   });
 });

@@ -95,8 +95,7 @@ const RedditContent = class {
   * JSON.stringify(user) // => '{"name":"not_an_aardvark"}'
   */
   toJSON () {
-    const stripped_props = _.pick(this, _.keys(this).filter(key => !key.startsWith('_')));
-    return _.mapValues(stripped_props, (value, key) => {
+    return _.mapValues(this._strip_private_props(), (value, key) => {
       if (value instanceof RedditContent && !value._has_fetched) {
         if (value.constructor.name === 'RedditUser' && _.includes(constants.USER_KEYS, key)) {
           return value.name;
@@ -109,7 +108,10 @@ const RedditContent = class {
     });
   }
   inspect () {
-    return `${this.constructor.name} ${require('util').inspect(this.toJSON())}`;
+    return `${this.constructor.name} ${require('util').inspect(this._strip_private_props())}`;
+  }
+  _strip_private_props () {
+    return _.pick(this, _.keys(this).filter(key => !key.startsWith('_')));
   }
   _transform_api_response (response_object) {
     return response_object;
