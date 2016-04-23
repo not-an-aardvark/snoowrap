@@ -63,7 +63,7 @@ const MultiReddit = class extends require('./RedditContent') {
   * @example r.get_user('not_an_aardvark').get_multireddit('cookie_languages').delete()
   */
   delete () {
-    return this._del({uri: `api/multi${this.path}`});
+    return this._delete({uri: `api/multi${this.path}`});
   }
   /**
   * @summary Edits the properties of this multireddit.
@@ -111,7 +111,7 @@ const MultiReddit = class extends require('./RedditContent') {
   * @example r.get_user('not_an_aardvark').get_multireddit('cookie_languages').remove_subreddit('cookies')
   */
   remove_subreddit (sub) {
-    return this._del({uri: `api/multi${this.path}/r/${_.isString(sub) ? sub : sub.display_name}`}).return(this);
+    return this._delete({uri: `api/multi${this.path}/r/${_.isString(sub) ? sub : sub.display_name}`}).return(this);
   }
   /* Note: The endpoints GET/PUT /api/multi/multipath/description and GET /api/multi/multipath/r/srname are intentionally not
   included, because they're redundant and the same thing can be achieved by simply using fetch() and edit(). */

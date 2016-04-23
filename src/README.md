@@ -95,7 +95,7 @@ r._get({uri: 'r/snoowrap/about/moderators'})
 r._post({uri: 'api/remove', form: {id: 't3_2np694'}})
 ```
 
-The helper functions are `_get`, `_post`, `_put`, `_del`, etc., corresponding to all the HTTP verbs. Parameters from these functions are passed directly to [request-promise](https://github.com/request/request-promise), so all of the request options from the [request API](https://www.npmjs.com/package/request) are easily available. Note that `request_handlers.js` already provides the following default options:
+The helper functions are `_get`, `_post`, `_put`, `_delete`, etc., corresponding to all the HTTP verbs. Parameters from these functions are passed directly to [request-promise](https://github.com/request/request-promise), so all of the request options from the [request API](https://www.npmjs.com/package/request) are easily available. Note that `request_handlers.js` already provides the following default options:
 
 ```js
 {

@@ -60,7 +60,7 @@ const RedditUser = class extends require('./RedditContent') {
   * @example r.get_user('actually_an_aardvark').unfriend()
   */
   unfriend () {
-    return this._del({uri: `api/v1/me/friends/${this.name}`});
+    return this._delete({uri: `api/v1/me/friends/${this.name}`});
   }
   /**
   * @summary Gets information on this user related to their presence on the friend list.

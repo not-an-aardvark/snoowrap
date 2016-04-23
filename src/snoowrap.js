@@ -210,7 +210,7 @@ const snoowrap = class {
   * // => RedditUser { is_employee: false, has_mail: false, name: 'snoowrap_testing', ... }
   */
   get_me () {
-    return this._get('api/v1/me').then(result => {
+    return this._get({uri: 'api/v1/me'}).then(result => {
       this.own_user_info = this._new_object('RedditUser', result, true);
       return this.own_user_info;
     });
@@ -996,10 +996,7 @@ const snoowrap = class {
   */
   check_username_availability (name) {
     // The oauth endpoint listed in reddit's documentation doesn't actually work, so just send an unauthenticated request.
-    return request_handler.unauthenticated_request(this, 'get', [{
-      uri: 'api/username_available.json',
-      qs: {user: name}
-    }]);
+    return request_handler.unauthenticated_request(this, {uri: 'api/username_available.json', qs: {user: name}});
   }
   /**
   * @summary Creates a new LiveThread.
@@ -1067,7 +1064,7 @@ const snoowrap = class {
     })}});
   }
   _revoke_token (token) {
-    return request_handler.base_client_request(this, 'post', [{uri: 'api/v1/revoke_token', form: {token}}]);
+    return request_handler.base_client_request(this, {uri: 'api/v1/revoke_token', form: {token}, method: 'post'});
   }
   /**
   * @summary Invalidates the current access token.
@@ -1126,9 +1123,9 @@ const snoowrap = class {
   }
 };
 
-_.forEach(constants.HTTP_VERBS, type => {
-  snoowrap.prototype[`_${type}`] = function (...args) {
-    return promise_wrap(request_handler.oauth_request(this, type, args));
+_.forEach(constants.HTTP_VERBS, method => {
+  snoowrap.prototype[`_${method}`] = function (options) {
+    return promise_wrap(request_handler.oauth_request(this, {...options, method}));
   };
 });
 
