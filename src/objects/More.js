@@ -1,5 +1,6 @@
 'use strict';
 const _ = require('lodash');
+const Promise = require('bluebird');
 const helpers = require('../helpers');
 const constants = require('../constants');
 const api_type = 'json';
@@ -54,6 +55,15 @@ const More = class {
     }).tap(helpers._handle_json_errors).then(res => {
       return res.json.data.things;
     }).mapSeries(helpers._add_empty_replies_listing).then(helpers._build_replies_tree);
+    /* Sometimes, when sending a request to reddit to get multiple comments from a `more` object, reddit decides to only send
+    some of the requested comments, and then stub out the remaining ones in a smaller `more` object. ( ¯\_(ツ)_/¯ )
+    In these cases, recursively fetch the smaller `more` objects as well. */
+    const child_mores = _.remove(result_trees, c => c instanceof More);
+    _.forEach(child_mores, c => {
+      c.link_id = this.link_id || this.parent_id;
+    });
+    const expanded_child_mores = await Promise.mapSeries(child_mores, c => c.fetch_tree({...options, amount: Infinity}, 0));
+    result_trees.push(..._.flatten(expanded_child_mores));
     const next_request_options = {...options, amount: options.amount - ids.length};
     return _.toArray(result_trees).concat(await this.fetch_more(next_request_options, start_index + ids.length));
   }

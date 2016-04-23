@@ -127,17 +127,12 @@ const Listing = class extends Array {
   /* Pagination for comments works differently than it does for most other things; rather than sending a link to the next page
   within a Listing, reddit sends the last comment in the list as as a `more` object, with links to all the remaining comments
   in the thread. */
-  async _fetch_more_comments (...args) {
+  async _fetch_more_comments (options) {
     if (this._more) {
-      const more_comments = await this._more.fetch_more(...args);
+      const more_comments = await this._more.fetch_more(options);
       const cloned = this._clone();
-      const mores = _.remove(more_comments, c => c instanceof More);
       cloned.push(..._.toArray(more_comments));
-      if (mores.length === 1) {
-        cloned._set_more(mores[0]);
-      } else {
-        cloned._more._remove_leading_children(cloned.length - this.length);
-      }
+      cloned._more._remove_leading_children(options.amount);
       return cloned;
     }
     return this._clone();
