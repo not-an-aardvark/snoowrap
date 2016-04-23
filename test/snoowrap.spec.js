@@ -388,7 +388,7 @@ describe('snoowrap', function () {
       const initial_ratelimit_remaining = r.ratelimit_remaining;
       const expanded_comments = await comments.fetch_more(25);
       expect(expanded_comments.length).to.be.above(initial_length + 20);
-      expect(r.ratelimit_remaining).to.equal(initial_ratelimit_remaining - 2);
+      expect(r.ratelimit_remaining).to.be.below(initial_ratelimit_remaining - 1);
     });
     it('correctly handles `more` objects in non-top-level comments', async () => {
       const initial_comment = await r._get({uri: 'comments/4fp36y/-/d2c5bbk', qs: {limit: 2}}).comments[0];
