@@ -39,6 +39,9 @@ describe('snoowrap', function () {
     it('does not throw an error if a user_agent, client_id, client_secret, and refresh_token are provided', () => {
       expect(() => new snoowrap({user_agent: 'a', client_id: 'b', client_secret: 'c', refresh_token: 'd'})).not.to.throw();
     });
+    it('allows the client_secret to be an empty string', () => {
+      expect(() => new snoowrap({user_agent: 'a', client_id: 'b', client_secret: '', refresh_token: 'd'})).not.to.throw();
+    });
   });
 
   describe('general snoowrap behavior', () => {

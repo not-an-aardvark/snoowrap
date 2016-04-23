@@ -38,7 +38,7 @@ const snoowrap = class {
     if (!user_agent) {
       throw new errors.MissingUserAgentError();
     }
-    if (!access_token && !(client_id && client_secret && refresh_token)) {
+    if (!access_token && (_.isUndefined(client_id) || _.isUndefined(client_secret) || _.isUndefined(refresh_token))) {
       throw new errors.NoCredentialsError();
     }
     _.assign(this, {user_agent, client_id, client_secret, refresh_token, access_token});
