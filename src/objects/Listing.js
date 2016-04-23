@@ -131,9 +131,10 @@ const Listing = class extends Array {
     if (this._more) {
       const more_comments = await this._more.fetch_more(...args);
       const cloned = this._clone();
+      const mores = _.remove(more_comments, c => c instanceof More);
       cloned.push(..._.toArray(more_comments));
-      if (_.last(cloned) instanceof More) {
-        cloned._set_more(cloned.pop());
+      if (mores.length === 1) {
+        cloned._set_more(mores[0]);
       } else {
         cloned._more._remove_leading_children(cloned.length - this.length);
       }
