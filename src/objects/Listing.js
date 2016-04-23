@@ -118,8 +118,11 @@ const Listing = class extends Array {
         cloned._query.before = null;
         cloned._query.after = response._query.after;
       }
-      if (this._is_comment_list && response.length > options.amount) {
-        cloned._cached_lookahead = cloned.splice(options.amount);
+      if (this._is_comment_list) {
+        cloned._more = cloned._more || response._more;
+        if (response.length > options.amount) {
+          cloned._cached_lookahead = cloned.splice(options.amount);
+        }
       }
       return cloned.fetch_more({...options, amount: options.amount - response.length});
     });

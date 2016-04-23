@@ -200,6 +200,10 @@ describe('snoowrap', function () {
     it('should be able to fetch replies to comments', async () => {
       expect(await comment.replies.fetch_until({length: 1})[0].body).to.equal("Let's knock the humor down to 65%.");
     });
+    it('should stop searching for replies to a comment if none are initially found', async () => {
+      const comment_with_no_replies = r.get_comment('c0bggv9');
+      expect(await comment_with_no_replies.replies.fetch_all()).to.be.empty();
+    });
     it('should correctly identify when a comment has no more replies to fetch', async () => {
       if (!r.ratelimit_remaining) {
         await r.get_me();
