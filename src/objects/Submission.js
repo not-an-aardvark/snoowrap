@@ -14,9 +14,8 @@ const api_type = 'json';
 const Submission = class extends require('./VoteableContent') {
   constructor (data, _r, _has_fetched) {
     super(data, _r, _has_fetched);
-    this.comments = this.comments || helpers._get_empty_replies_listing(this);
-    if (!this.comments) {
-      this.comments = helpers._get_empty_replies_listing(this);
+    if (_has_fetched) {
+      this.comments = this.comments || helpers._get_empty_replies_listing(this);
     }
   }
   get _uri () {
