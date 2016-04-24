@@ -1,5 +1,5 @@
 'use strict';
-if (typeof Proxy !== 'undefined' && typeof Reflect === 'undefined') {
+if (typeof Proxy === 'object') {
   require('harmony-reflect'); // temp dependency until node implements Proxies correctly
 }
 const Promise = require('bluebird');
