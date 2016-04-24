@@ -996,7 +996,7 @@ const snoowrap = class {
   */
   check_username_availability (name) {
     // The oauth endpoint listed in reddit's documentation doesn't actually work, so just send an unauthenticated request.
-    return request_handler.unauthenticated_request(this, {uri: 'api/username_available.json', qs: {user: name}});
+    return this.unauthenticated_request({uri: 'api/username_available.json', qs: {user: name}});
   }
   /**
   * @summary Creates a new LiveThread.
@@ -1064,7 +1064,7 @@ const snoowrap = class {
     })}});
   }
   _revoke_token (token) {
-    return request_handler.base_client_request(this, {uri: 'api/v1/revoke_token', form: {token}, method: 'post'});
+    return this.credentialed_client_request({uri: 'api/v1/revoke_token', form: {token}, method: 'post'});
   }
   /**
   * @summary Invalidates the current access token.
@@ -1123,9 +1123,11 @@ const snoowrap = class {
   }
 };
 
+_.assign(snoowrap.prototype, request_handler);
+
 _.forEach(constants.HTTP_VERBS, method => {
   snoowrap.prototype[`_${method}`] = function (options) {
-    return promise_wrap(request_handler.oauth_request(this, {...options, method}));
+    return promise_wrap(this.oauth_request({...options, method}));
   };
 });
 
@@ -1145,7 +1147,6 @@ _.forOwn(snoowrap.objects, (value, key) => {
 snoowrap.helpers = helpers;
 snoowrap.constants = constants;
 snoowrap.errors = errors;
-snoowrap.request_handler = request_handler;
 
 if (!module.parent && typeof window !== 'undefined') { // check if the code is being run in a browser through browserify
   /* global window */
