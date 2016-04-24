@@ -3,4 +3,5 @@ node_modules/
 npm-debug.log
 lib/
 doc/
+coverage/
 oauth_info.json
