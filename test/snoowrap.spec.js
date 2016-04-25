@@ -263,6 +263,9 @@ describe('snoowrap', function () {
       expect(rules_obj.rules[0].short_name).to.equal('Rule 1: No breaking the rules');
     });
     it('can get a stickied post on a subreddit', async () => {
+      const submission = await r.get_submission('474t3u');
+      await submission.unsticky();
+      await submission.sticky({num: 1});
       const stickied_post = await subreddit.get_sticky();
       expect(stickied_post).to.be.an.instanceof(snoowrap.objects.Submission);
       expect(stickied_post.title).to.equal('This post is stickied');
