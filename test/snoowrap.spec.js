@@ -697,7 +697,7 @@ describe('snoowrap', function () {
         sub.create_link_flair_template({text: 'some other link flair text'})
       ]);
       await sub.delete_all_link_flair_templates();
-      expect(await await sub._get_flair_options({link: 't3_43qlu8'}).choices).to.eql([]);
+      expect(await sub._get_flair_options({link: 't3_43qlu8'}).choices).to.eql([]);
     });
     it('can change multiple user flairs at once', async () => {
       const naa_flair = "not_an_aardvark's flair";
