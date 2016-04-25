@@ -20,6 +20,7 @@ describe('snoowrap', function () {
       // oauth_info.json has the properties `user_agent`, `client_id`, `client_secret`, and `refresh_token`.
       r = new snoowrap(require('../oauth_info.json'));
     }
+    r.config({request_delay: 1000});
   });
 
   describe('.constructor', () => {
