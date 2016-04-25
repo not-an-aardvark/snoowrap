@@ -160,7 +160,7 @@ const Submission = class extends require('./VoteableContent') {
   * @example r.get_submission('2np694').get_related()
   */
   get_related (options = {}) {
-    return this._get_listing({uri: `related/${this.name}`, qs: options}).tap(result => {
+    return this._get_listing({uri: `related/${this.name.slice(3)}`, qs: options}).tap(result => {
       if (result.constructor.name === 'Submission') {
         this._r.log.warn('Submission.prototype.get_related has been deprecated upstream, and will not work as expected.');
       }

@@ -306,6 +306,60 @@ describe('snoowrap', function () {
     });
   });
 
+  describe('acting on a submission', () => {
+    let submission;
+    beforeEach(() => {
+      submission = r.get_submission('4gf7ix');
+    });
+    it('can hide/unhide a submission', async () => {
+      await submission.hide();
+      expect(await submission.refresh().hidden).to.be.true();
+      await submission.unhide();
+      expect(await submission.refresh().hidden).to.be.false();
+    });
+    it('can lock/unlock a submission', async () => {
+      await submission.lock();
+      expect(await submission.refresh().locked).to.be.true();
+      await submission.unlock();
+      expect(await submission.refresh().locked).to.be.false();
+    });
+    it('can mark/unmark a submission as NSFW', async () => {
+      await submission.mark_nsfw();
+      expect(await submission.refresh().over_18).to.be.true();
+      await submission.unmark_nsfw();
+      expect(await submission.refresh().over_18).to.be.false();
+    });
+    it('can enable/disable contest mode on a submission', async () => {
+      /* There's no way to check whether a submission is in contest mode using the OAuth API, so just make sure the functions
+      don't throw errors. */
+      await submission.enable_contest_mode();
+      await submission.disable_contest_mode();
+    });
+    // skipped for the time being: see https://redd.it/4gfitf
+    it.skip('can sticky/unsticky a submission', async () => {
+      // Make sure the submission starts out unstickied for this test.
+      r.config({debug: true, request_delay: 1000});
+      await submission.unsticky();
+      await submission.sticky();
+      expect(await submission.refresh().stickied).to.be.true();
+      await submission.unsticky();
+      expect(await submission.refresh().stickied).to.be.false();
+      await submission.sticky({num: 2});
+      expect(await submission.subreddit.get_hot({limit: 2})[1].name).to.equal(submission.name);
+      await submission.unsticky();
+      expect(await submission.subreddit.get_hot({limit: 2})[1].name).to.not.equal(submission.name);
+    });
+    it('can set suggested sort on a submission', async () => {
+      await submission.set_suggested_sort('new');
+      expect(await submission.refresh().suggested_sort).to.equal('new');
+      await submission.set_suggested_sort('top');
+      expect(await submission.refresh().suggested_sort).to.equal('top');
+    });
+    it('can get the "related submissions" endpoint (deprecated on reddit.com)', async () => {
+      expect(await submission.get_related()).to.be.an.instanceof(snoowrap.objects.Submission);
+    });
+  });
+
   describe('general Listing behavior', () => {
     let comments;
     beforeEach(async () => {
