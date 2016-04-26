@@ -122,17 +122,25 @@ For more information, see the [LiveThread documentation page](https://not-an-aar
 
 ---
 
-### Important note regarding ES6
+### Important note on ES6
 
-snoowrap uses the `Proxy` object introduced in ES6. Since this is not yet included in Node by default, you will need to run your project with the `--harmony-proxies` runtime flag, e.g. `node --harmony-proxies yourProject.js`. With regard to running code in browsers, as of April 2016 the only browsers that support Proxies are Chrome 49+, Microsoft Edge, Firefox, and Opera.
+snoowrap uses the `Proxy` object introduced in ES6.
 
-If you *can't* use that node flag for some reason, or your code is running in a non-supporting browser, snoowrap will still function. However, method chaining as described above won't work, so your syntax will need to be a bit heavier.
+If your target environment does not support Proxies, snoowrap will still function. However, method chaining as described above won't work, so your syntax will need to be a bit heavier.
 
-For example:
+#### Environments that support the ES6 Proxy object
+
+* Node 6+
+* Chrome 49+
+* Firefox 4+
+* Edge
+* Node 4 and 5 (requires the `--harmony_proxies` runtime flag to be enabled. e.g. `node --harmony_proxies yourFile.js`)
+
+Example of how Proxy support affects behavior:
 
 ```javascript
-// This works when run with node's --harmony-proxies flag, or with a browser that supports Proxies.
-// However, it fails if Proxies are not available.
+// This works in environments that support Proxies.
+// However, it throws a TypeError if Proxies are not available.
 r.get_submission('47v7tm').comments[0].upvote();
 
 // ----------
