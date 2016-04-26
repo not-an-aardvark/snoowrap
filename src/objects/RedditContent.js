@@ -1,7 +1,4 @@
 'use strict';
-if (typeof Proxy === 'object') {
-  require('harmony-reflect'); // temp dependency until node implements Proxies correctly
-}
 const Promise = require('bluebird');
 const _ = require('lodash');
 const promise_wrap = require('promise-chains');
