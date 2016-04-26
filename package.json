@@ -6,12 +6,12 @@
   "main": "lib/snoowrap.js",
   "scripts": {
     "compile": "babel -d lib/ src/",
-    "bundle": "browserify --im lib/snoowrap.js -o doc/snoowrap.js",
+    "bundle": "npm run compile && browserify --im lib/snoowrap.js -o doc/snoowrap.js && uglifyjs doc/snoowrap.js -o doc/snoowrap.min.js",
     "lint": "eslint .",
     "pretest": "npm run lint && npm run compile",
     "test": "mocha --harmony-proxies --compilers js:babel-core/register",
     "smoketest": "npm run test -- -g 'smoketest'",
-    "docs": "npm run compile && npm run bundle && jsdoc -c jsdoc.conf.json lib/snoowrap.js lib/request_handler.js lib/objects/RedditContent.js lib/objects/ReplyableContent.js lib/objects/VoteableContent.js lib/objects/Comment.js lib/objects/RedditUser.js lib/objects/Submission.js lib/objects/LiveThread.js lib/objects/PrivateMessage.js lib/objects/Subreddit.js lib/objects/MultiReddit.js lib/objects/WikiPage.js lib/objects/Listing.js",
+    "docs": "npm run bundle && jsdoc -c jsdoc.conf.json lib/snoowrap.js lib/request_handler.js lib/objects/RedditContent.js lib/objects/ReplyableContent.js lib/objects/VoteableContent.js lib/objects/Comment.js lib/objects/RedditUser.js lib/objects/Submission.js lib/objects/LiveThread.js lib/objects/PrivateMessage.js lib/objects/Subreddit.js lib/objects/MultiReddit.js lib/objects/WikiPage.js lib/objects/Listing.js",
     "coverage": "node --harmony-proxies node_modules/.bin/istanbul cover _mocha -- --compilers js:babel-core/register"
   },
   "repository": {
@@ -56,6 +56,7 @@
     "istanbul": "^1.0.0-alpha.2",
     "jsdoc": "^3.4.0",
     "mocha": "^2.4.5",
-    "moment": "^2.12.0"
+    "moment": "^2.12.0",
+    "uglify-js": "git://github.com/mishoo/UglifyJS2/#d1b4f61f93b03bde93509206656bcd95f31e9220"
   }
 }
