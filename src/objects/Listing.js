@@ -22,8 +22,18 @@ an Array (length, forEach, etc.) in addition to some added methods. The Listing 
 [#fetch_more()]{@link Listing#fetch_more}, [#fetch_until]{@link Listing#fetch_until}, and
 [#fetch_all()]{@link Listing#fetch_all} functions. Note that these methods return new Listings, rather than mutating the
 original Listing.
-
+*
 * Most methods that return Listings will also accept `limit`, `after`, `before`, `show`, and `count` properties.
+*
+* If you've used the reddit API before (or used other API wrappers like [PRAW](https://praw.readthedocs.org/en/stable/)), you
+might know that reddit uses a `MoreComments` object in its raw JSON responses, representing comments that have been stubbed
+out of Listings. In snoowrap, there are no exposed `MoreComments` objects; the objects returned by the reddit API are
+stripped from Listings and are used internally as sources for the `fetch_more` functions. This means that in snoowrap, Listings
+that contain Comments can be used/expanded in the same manner as Listings that don't contain Comments, and for the most part
+you don't have to worry about the distinction.
+
+(Incidentally, if you encounter a Listing that *does* contain a `MoreComments` object, then it's a bug so please report it.)
+
 * <style> #Listing {display: none} </style>
 * @extends Array
 */
