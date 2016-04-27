@@ -5,8 +5,8 @@ const _ = require('lodash');
 const moment = require('moment');
 const snoowrap = require('../src/snoowrap');
 describe('snoowrap', function () {
-  this.timeout(30000);
-  this.slow(20000);
+  this.timeout(300000);
+  this.slow(Infinity);
   let r;
   before(() => {
     if (process.env.CI) {
@@ -46,6 +46,10 @@ describe('snoowrap', function () {
   });
 
   describe('general snoowrap behavior', () => {
+    let previous_request_delay;
+    before(() => {
+      previous_request_delay = r.config().request_delay;
+    });
     it('can chain properties together before they get resolved', async () => {
       const comment = r.get_comment('coip909');
       const first_mod_of_that_subreddit = await comment.subreddit.get_moderators()[0];
@@ -69,8 +73,8 @@ describe('snoowrap', function () {
     it('throws a TypeError if an invalid config option is set', () => {
       expect(() => r.config({invalid_config_option: true})).to.throw(TypeError);
     });
-    after(() => {
-      r.config({request_delay: 0});
+    afterEach(() => {
+      r.config({request_delay: previous_request_delay});
     });
   });
 
