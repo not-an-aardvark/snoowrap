@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.11.6 (2016-04-27)
+
+* Exposed `oauth_request`, `credentialed_client_request`, `unauthenticated_request`, and `update_access_token` functions for sending raw requests to servers
+* Fixed an issue where a TypeError would be thrown if the ratelimit was exceeded and `r.config().continue_after_ratelimit_error` was set to `true` (#19)
+* Fixed an issue where Submissions fetched from the front page were missing a `.comments` property
+
 ## v0.11.5 (2016-04-23)
 
 * Fixed an issue where `Listing#fetch_all()` would sometimes return an incomplete Listing when fetching Comment replies
