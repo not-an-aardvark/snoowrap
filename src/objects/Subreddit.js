@@ -266,6 +266,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {string} [options.text] The flair text to use. (This is only necessary/useful if the given flair
   template has the `text_editable` property set to `true`.)
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').select_my_flair({flair_template_id: 'fdfd8532-c91e-11e5-b4d4-0e082084d721'})
   */
   select_my_flair (options) {
     /* NOTE: This requires `identity` scope in addition to `flair` scope, since the reddit api needs to be passed a username.
@@ -280,6 +281,7 @@ const Subreddit = class extends require('./RedditContent') {
   /**
   * @summary Makes the requester's flair visible on this subreddit.
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').show_my_flair()
   */
   show_my_flair () {
     return this._set_my_flair_visibility(true);
@@ -287,6 +289,7 @@ const Subreddit = class extends require('./RedditContent') {
   /**
   * @summary Makes the requester's flair invisible on this subreddit.
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').hide_my_flair()
   */
   hide_my_flair () {
     return this._set_my_flair_visibility(false);
@@ -301,6 +304,10 @@ const Subreddit = class extends require('./RedditContent') {
   requires a captcha to submit posts and comments.
   * @param {string} [options.captcha_response] The response to the captcha with the given identifier
   * @returns {Promise} The newly-created Submission object
+  * @example
+  *
+  * r.get_subreddit('snoowrap').submit_selfpost({title: 'this is a selfpost', text: "hi, how's it going?"}).then(console.log)
+  * // => Submission { title: 'this is a selfpost', ... }
   */
   submit_selfpost (options) {
     return this._r.submit_selfpost({...options, subreddit_name: this.display_name});
@@ -317,6 +324,10 @@ const Subreddit = class extends require('./RedditContent') {
   requires a captcha to submit posts and comments.
   * @param {string} [options.captcha_response] The response to the captcha with the given identifier
   * @returns {Promise} The newly-created Submission object
+  * @example
+  *
+  * r.get_subreddit('snoowrap').submit_link({title: 'I found a cool website', url: 'https://google.com'}).then(console.log)
+  * // => Submission { title: 'I found a cool website', ... }
   */
   submit_link (options) {
     return this._r.submit_link({...options, subreddit_name: this.display_name});
@@ -325,6 +336,14 @@ const Subreddit = class extends require('./RedditContent') {
   * @summary Gets a Listing of hot posts on this subreddit.
   * @param {object} [options={}] Options for the resulting Listing
   * @returns {Promise} A Listing containing the retrieved submissions
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_hot().then(console.log)
+  * // => Listing [
+  * //  Submission { ... },
+  * //  Submission { ... },
+  * //  ...
+  * // ]
   */
   get_hot (options) {
     return this._r.get_hot(this.display_name, options);
@@ -333,6 +352,15 @@ const Subreddit = class extends require('./RedditContent') {
   * @summary Gets a Listing of new posts on this subreddit.
   * @param {object} [options={}] Options for the resulting Listing
   * @returns {Promise} A Listing containing the retrieved submissions
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_new().then(console.log)
+  * // => Listing [
+  * //  Submission { ... },
+  * //  Submission { ... },
+  * //  ...
+  * // ]
+  *
   */
   get_new (options) {
     return this._r.get_new(this.display_name, options);
@@ -341,6 +369,14 @@ const Subreddit = class extends require('./RedditContent') {
   * @summary Gets a Listing of new comments on this subreddit.
   * @param {object} [options={}] Options for the resulting Listing
   * @returns {Promise} A Listing containing the retrieved comments
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_hot().then(console.log)
+  * // => Listing [
+  * //  Comment { ... },
+  * //  Comment { ... },
+  * //  ...
+  * // ]
   */
   get_new_comments (options) {
     return this._r.get_new_comments(this.display_name, options);
@@ -349,6 +385,10 @@ const Subreddit = class extends require('./RedditContent') {
   * @summary Gets a single random Submission from this subreddit.
   * @param {object} [options={}] Options for the resulting Listing
   * @returns {Promise} The retrieved Submission object
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_random_submission.then(console.log)
+  * // => Submission { ... }
   */
   get_random_submission () {
     return this._r.get_random_submission(this.display_name);
@@ -359,6 +399,14 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {string} [options.time] Describes the timespan that posts should be retrieved from. Should be one of
   `hour, day, week, month, year, all`
   * @returns {Promise} A Listing containing the retrieved submissions
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_top({time: 'all'}).then(console.log)
+  * // => Listing [
+  * //  Comment { ... },
+  * //  Comment { ... },
+  * //  ...
+  * // ]
   */
   get_top (options) {
     return this._r.get_top(this.display_name, options);
@@ -369,6 +417,14 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {string} [options.time] Describes the timespan that posts should be retrieved from. Should be one of
   `hour, day, week, month, year, all`
   * @returns {Promise} A Listing containing the retrieved submissions
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_controversial({time: 'week'}).then(console.log)
+  * // => Listing [
+  * //  Comment { ... },
+  * //  Comment { ... },
+  * //  ...
+  * // ]
   */
   get_controversial (options) {
     return this._r.get_controversial(this.display_name, options);
@@ -384,6 +440,15 @@ const Subreddit = class extends require('./RedditContent') {
   ignorereports, unignorereports, setpermissions, setsuggestedsort, sticky, unsticky, setcontestmode, unsetcontestmode,
   lock, unlock, muteuser, unmuteuser, createrule, editrule, deleterule`
   * @returns {Promise} A Listing containing moderation actions
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_moderation_log().then(console.log)
+  *
+  * // => Listing [
+  * //  ModAction { description: null, mod: 'snoowrap_testing', action: 'editflair', ... }
+  * //  ModAction { description: null, mod: 'snoowrap_testing', action: 'approvecomment', ... }
+  * //  ModAction { description: null, mod: 'snoowrap_testing', action: 'createrule', ... }
+  * // ]
   */
   get_moderation_log (options = {}) {
     const parsed_options = _(options).assign({mod: options.mods && options.mods.join(',')}).omit('mods').value();
@@ -394,6 +459,15 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} [options={}] Options for the resulting Listing
   * @param {string} [options.only] Restricts the Listing to the specified type of item. One of `links, comments`
   * @returns {Promise} A Listing containing reported items
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_reports().then(console.log)
+  * // => Listing [
+  * //  Comment { ... },
+  * //  Comment { ... },
+  * //  Submission { ... },
+  * //  ...
+  * // ]
   */
   get_reports (options = {}) {
     return this._get_listing({uri: `r/${this.display_name}/about/reports`, qs: options});
@@ -403,6 +477,15 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} [options={}] Options for the resulting Listing
   * @param {string} [options.only] Restricts the Listing to the specified type of item. One of `links, comments`
   * @returns {Promise} A Listing containing removed items
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_spam().then(console.log)
+  * // => Listing [
+  * //  Comment { ... },
+  * //  Comment { ... },
+  * //  Submission { ... },
+  * //  ...
+  * // ]
   */
   get_spam (options = {}) {
     return this._get_listing({uri: `r/${this.display_name}/about/spam`, qs: options});
@@ -412,6 +495,15 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} [options={}] Options for the resulting Listing
   * @param {string} [options.only] Restricts the Listing to the specified type of item. One of `links, comments`
   * @returns {Promise} A Listing containing items on the modqueue
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_modqueue().then(console.log)
+  * // => Listing [
+  * //  Comment { ... },
+  * //  Comment { ... },
+  * //  Submission { ... },
+  * //  ...
+  * // ]
   */
   get_modqueue (options = {}) {
     return this._get_listing({uri: `r/${this.display_name}/about/modqueue`, qs: options});
@@ -421,6 +513,15 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} [options={}] Options for the resulting Listing
   * @param {string} [options.only] Restricts the Listing to the specified type of item. One of `links, comments`
   * @returns {Promise} A Listing containing unmoderated items
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_unmoderated().then(console.log)
+  * // => Listing [
+  * //  Comment { ... },
+  * //  Comment { ... },
+  * //  Submission { ... },
+  * //  ...
+  * // ]
   */
   get_unmoderated (options = {}) {
     return this._get_listing({uri: `r/${this.display_name}/about/unmoderated`, qs: options});
@@ -430,6 +531,15 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} [options={}] Options for the resulting Listing
   * @param {string} [options.only] Restricts the Listing to the specified type of item. One of `links, comments`
   * @returns {Promise} A Listing containing edited items
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_edited().then(console.log)
+  * // => Listing [
+  * //  Comment { ... },
+  * //  Comment { ... },
+  * //  Submission { ... },
+  * //  ...
+  * // ]
   */
   get_edited (options = {}) {
     return this._get_listing({uri: `r/${this.display_name}/about/edited`, qs: options});
@@ -437,6 +547,7 @@ const Subreddit = class extends require('./RedditContent') {
   /**
   * @summary Accepts an invite to become a moderator of this subreddit.
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').accept_moderator_invite()
   */
   accept_moderator_invite () {
     return this._post({
@@ -447,6 +558,7 @@ const Subreddit = class extends require('./RedditContent') {
   /**
   * @summary Abdicates moderator status on this subreddit.
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
+  * @example r.get_subreddit('snoowrap').leave_moderator()
   */
   leave_moderator () {
     return this.fetch().get('name').then(name =>
@@ -456,6 +568,7 @@ const Subreddit = class extends require('./RedditContent') {
   /**
   * @summary Abdicates approved submitter status on this subreddit.
   * @returns {Promise} A Promise that resolves with this Subreddit when the request is complete.
+  * @example r.get_subreddit('snoowrap').leave_contributor()
   */
   leave_contributor () {
     return this.fetch().get('name').then(name =>
@@ -466,6 +579,10 @@ const Subreddit = class extends require('./RedditContent') {
   * @summary Gets a subreddit's CSS stylesheet.
   * @desc **Note**: This method will return a 404 error if the subreddit in question does not have a custom stylesheet.
   * @returns {Promise} A Promise for a string containing the subreddit's CSS.
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_stylesheet().then(console.log)
+  * // => '.md blockquote,.md del,body{color:#121212}.usertext-body ... '
   */
   get_stylesheet () {
     return this._get({uri: `r/${this.display_name}/stylesheet`, json: false, transform: _.identity});
@@ -479,6 +596,14 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {string} [options.sort] Determines how the results should be sorted. One of `relevance, hot, top, new, comments`
   * @param {string} [options.syntax='plain'] Specifies a syntax for the search. One of `cloudsearch, lucene, plain`
   * @returns {Promise} A Listing containing the search results.
+  * @example
+  *
+  * r.get_subreddit('snoowrap').search({query: 'blah', sort: 'year'}).then(console.log)
+  * // => Listing [
+  * //  Submission { ... },
+  * //  Submission { ... },
+  * //  ...
+  * // ]
   */
   search (options) {
     return this._r.search({...options, subreddit: this, restrict_sr: true});
@@ -488,6 +613,14 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} options Filtering options. Can also contain options for the resulting Listing.
   * @param {string} options.name A username on the list to jump to.
   * @returns {Promise} A Listing of users
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_banned_users().then(console.log)
+  * // => Listing [
+  * //  { date: 1461720936, note: '', name: 'actually_an_aardvark', id: 't2_q3519' }
+  * //  ...
+  * // ]
+  *
   */
   get_banned_users (options) { // TODO: Return Listings containing RedditUser objects rather than normal objects with data
     const opts = typeof options === 'string' ? options : options && {name: options.name};
@@ -498,6 +631,13 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} options Filtering options. Can also contain options for the resulting Listing.
   * @param {string} options.name A username on the list to jump to.
   * @returns {Promise} A Listing of users
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_banned_users().then(console.log)
+  * // => Listing [
+  * //  { date: 1461720936, name: 'actually_an_aardvark', id: 't2_q3519' }
+  * //  ...
+  * // ]
   */
   get_muted_users (options) {
     const opts = typeof options === 'string' ? options : options && {name: options.name};
@@ -508,6 +648,13 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} options Filtering options. Can also contain options for the resulting Listing.
   * @param {string} options.name A username on the list to jump to.
   * @returns {Promise} A Listing of users
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_wikibanned_users().then(console.log)
+  * // => Listing [
+  * //  { date: 1461720936, note: '', name: 'actually_an_aardvark', id: 't2_q3519' }
+  * //  ...
+  * // ]
   */
   get_wikibanned_users (options) {
     const opts = typeof options === 'string' ? options : options && {name: options.name};
@@ -518,6 +665,13 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} options Filtering options. Can also contain options for the resulting Listing.
   * @param {string} options.name A username on the list to jump to.
   * @returns {Promise} A Listing of users
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_contributors().then(console.log)
+  * // => Listing [
+  * //  { date: 1461720936, name: 'actually_an_aardvark', id: 't2_q3519' }
+  * //  ...
+  * // ]
   */
   get_contributors (options) {
     const opts = typeof options === 'string' ? options : options && {name: options.name};
@@ -528,6 +682,13 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} options Filtering options. Can also contain options for the resulting Listing.
   * @param {string} options.name A username on the list to jump to.
   * @returns {Promise} A Listing of users
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_wiki_contributors().then(console.log)
+  * // => Listing [
+  * //  { date: 1461720936, name: 'actually_an_aardvark', id: 't2_q3519' }
+  * //  ...
+  * // ]
   */
   get_wiki_contributors (options) {
     const opts = typeof options === 'string' ? options : options && {name: options.name};
@@ -539,6 +700,14 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} $0
   * @param {string} [$0.name] The name of a user to find in the list
   * @returns {Promise} An Array of RedditUsers representing the moderators of this subreddit
+  * @example
+  *
+  * r.get_subreddit('AskReddit').get_moderators().then(console.log)
+  * // => [
+  * //  RedditUser { date: 1453862639, mod_permissions: [ 'all' ], name: 'not_an_aardvark', id: 't2_k83md' },
+  * //  ...
+  * // ]
+  *
   */
   get_moderators (options) {
     const opts = typeof options === 'string' ? options : options && {name: options.name};
@@ -547,6 +716,7 @@ const Subreddit = class extends require('./RedditContent') {
   /**
   * @summary Deletes the banner for this Subreddit.
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').delete_banner()
   */
   delete_banner () {
     return this._post({
@@ -557,6 +727,7 @@ const Subreddit = class extends require('./RedditContent') {
   /**
   * @summary Deletes the header image for this Subreddit.
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').delete_header()
   */
   delete_header () {
     return this._post({
@@ -567,6 +738,7 @@ const Subreddit = class extends require('./RedditContent') {
   /**
   * @summary Deletes this subreddit's icon.
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').delete_icon()
   */
   delete_icon () {
     return this._post({
@@ -579,6 +751,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} $0
   * @param {string} $0.image_name The name of the image.
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').delete_image()
   */
   delete_image ({image_name}) {
     return this._post({
@@ -589,6 +762,10 @@ const Subreddit = class extends require('./RedditContent') {
   /**
   * @summary Gets this subreddit's current settings.
   * @returns {Promise} An Object containing this subreddit's current settings.
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_settings().then(console.log)
+  * // => SubredditSettings { default_set: true, submit_text: '', subreddit_type: 'private', ... }
   */
   get_settings () {
     return this._get({uri: `r/${this.display_name}/about/edit`});
@@ -639,6 +816,7 @@ const Subreddit = class extends require('./RedditContent') {
   one of `confidence, top, new, controversial, old, random, qa`.If left blank, there will be no suggested sort,
   which means that users will see the sort method that is set in their own preferences (usually `confidence`.)
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
+  * @example r.get_subreddit('snoowrap').edit_settings({submit_text: 'Welcome! Please be sure to read the rules.'})
   */
   edit_settings (options) {
     return Promise.join(this.get_settings(), this.name, (current_values, name) => {
@@ -650,6 +828,10 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} [$0]
   * @param {Array} [$0.omit=[]] An Array of subreddit names that should be excluded from the listing.
   * @returns {Promise} An Array of subreddit names
+  * @example
+  *
+  * r.get_subreddit('AskReddit').get_recommended_subreddits().then(console.log);
+  * // [ 'TheChurchOfRogers', 'Sleepycabin', ... ]
   */
   get_recommended_subreddits ({omit} = {}) {
     return this._get({uri: `api/recommend/sr/${this.display_name}`, qs: {omit: omit && omit.join(',')}}).then(names =>
@@ -659,6 +841,10 @@ const Subreddit = class extends require('./RedditContent') {
   /**
   * @summary Gets the submit text (which displays on the submission form) for this subreddit.
   * @returns {Promise} The submit text, represented as a string.
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_submit_text().then(console.log)
+  * // => 'Welcome! Please be sure to read the rules.'
   */
   get_submit_text () {
     return this._get({uri: `r/${this.display_name}/api/submit_text`}).submit_text;
@@ -669,6 +855,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {string} $0.css The new contents of the stylesheet
   * @param {string} [$0.reason] The reason for the change (256 characters max)
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').update_stylesheet({css: 'body {color:#00ff00;}', reason: 'yay green'})
   */
   update_stylesheet ({css, reason}) {
     return this._post({
@@ -686,6 +873,7 @@ const Subreddit = class extends require('./RedditContent') {
   /**
   * @summary Subscribes to this subreddit.
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').subscribe()
   */
   subscribe () {
     return this._set_subscribed(true);
@@ -693,6 +881,7 @@ const Subreddit = class extends require('./RedditContent') {
   /**
   * @summary Unsubscribes from this subreddit.
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').unsubscribe()
   */
   unsubscribe () {
     /* Reddit returns a 404 error if the user attempts to unsubscribe to a subreddit that they weren't subscribed to in the
@@ -727,6 +916,7 @@ const Subreddit = class extends require('./RedditContent') {
   browsers) where the filesystem is unavailable.
   * @param {string} [$0.image_type='png'] Determines how the uploaded image should be stored. One of `png, jpg`
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
+  * @example r.get_subreddit('snoowrap').upload_subreddit_image({name: 'the cookie monster', file: './cookie_monster.png'})
   */
   upload_stylesheet_image ({name, file, image_type = 'png'}) {
     return this._upload_sr_img({name, file, image_type, upload_type: 'img'});
@@ -739,6 +929,7 @@ const Subreddit = class extends require('./RedditContent') {
   browsers) where the filesystem is unavailable.
   * @param {string} [$0.image_type='png'] Determines how the uploaded image should be stored. One of `png, jpg`
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
+  * @example r.get_subreddit('snoowrap').upload_header_image({name: 'the cookie monster', file: './cookie_monster.png'})
   */
   upload_header_image ({file, image_type = 'png'}) {
     return this._upload_sr_img({file, image_type, upload_type: 'header'});
@@ -751,6 +942,7 @@ const Subreddit = class extends require('./RedditContent') {
   browsers) where the filesystem is unavailable.
   * @param {string} [$0.image_type='png'] Determines how the uploaded image should be stored. One of `png, jpg`
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
+  * @example r.get_subreddit('snoowrap').upload_icon({name: 'the cookie monster', file: './cookie_monster.png'})
   */
   upload_icon ({file, image_type = 'png'}) {
     return this._upload_sr_img({file, image_type, upload_type: 'icon'});
@@ -763,6 +955,7 @@ const Subreddit = class extends require('./RedditContent') {
   browsers) where the filesystem is unavailable.
   * @param {string} [$0.image_type='png'] Determines how the uploaded image should be stored. One of `png, jpg`
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
+  * @example r.get_subreddit('snoowrap').upload_banner_image({name: 'the cookie monster', file: './cookie_monster.png'})
   */
   upload_banner_image ({file, image_type = 'png'}) {
     return this._upload_sr_img({file, image_type, upload_type: 'banner'});
@@ -770,6 +963,26 @@ const Subreddit = class extends require('./RedditContent') {
   /**
   * @summary Gets information on this subreddit's rules.
   * @returns {Promise} A Promise that fulfills with information on this subreddit's rules.
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_rules().then(console.log)
+  *
+  * // => {
+  *   rules: [
+  *     {
+  *       kind: 'all',
+  *       short_name: 'Rule 1: No violating rule 1',
+  *       description: 'Breaking this rule is not allowed.',
+  *       ...
+  *     },
+  *     ...
+  *   ],
+  *   site_rules: [
+  *     'Spam',
+  *     'Personal and confidential information'',
+  *     'Threatening, harassing, or inciting violence'
+  *   ]
+  * }
   */
   get_rules () {
     return this._get({uri: `r/${this.display_name}/about/rules`});
@@ -779,6 +992,9 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} [$0]
   * @param {number} [$0.num=1] The number of the sticky to get. Should be either `1` (first sticky) or `2` (second sticky).
   * @returns {Promise} A Submission object representing this subreddit's stickied submission
+  * @example
+  * r.get_subreddit('snoowrap').get_sticky({num: 2})
+  * // => Submission { ... }
   */
   get_sticky ({num = 1} = {}) {
     return this._get({uri: `r/${this.display_name}/about/sticky`, qs: {num}});
@@ -803,6 +1019,7 @@ const Subreddit = class extends require('./RedditContent') {
   some combination of `"wiki", "posts", "access", "mail", "config", "flair"`. To add a moderator with full permissions, omit
   this property entirely.
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').invite_moderator({name: 'actually_an_aardvark', permissions: ['posts', 'wiki']})
   */
   invite_moderator ({name, permissions}) {
     return this._friend({name, permissions: helpers._format_mod_permissions(permissions), type: 'moderator_invite'});
@@ -812,6 +1029,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} $0
   * @param {string} $0.name The username of the account whose invitation should be revoked
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').revoke_moderator_invite({name: 'actually_an_aardvark'})
   */
   revoke_moderator_invite ({name}) {
     return this._unfriend({name, type: 'moderator_invite'});
@@ -821,6 +1039,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} $0
   * @param {string} $0.name The username of the account whose moderator status should be removed
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').remove_moderator({name: 'actually_an_aardvark'})
   */
   remove_moderator ({name}) {
     return this._unfriend({name, type: 'moderator'});
@@ -830,6 +1049,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} $0
   * @param {string} $0.name The username of the account that should be given this status
   * returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').add_contributor({name: 'actually_an_aardvark'})
   */
   add_contributor ({name}) {
     return this._friend({name, type: 'contributor'});
@@ -839,6 +1059,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} $0
   * @param {string} $0.name The username of the account whose status should be revoked
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').remove_contributor({name: 'actually_an_aardvark'})
   */
   remove_contributor ({name}) {
     return this._unfriend({name, type: 'contributor'});
@@ -854,6 +1075,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {string} [$0.ban_note] A note that appears on the moderation log, usually used to indicate the reason for the
   ban. This is not visible to the banned user. (300 characters max)
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').ban_user({name: 'actually_an_aardvark', ban_message: 'You are now banned LOL'})
   */
   ban_user ({name, ban_message, ban_reason, duration, ban_note}) {
     return this._friend({name, ban_message, ban_reason, duration, note: ban_note, type: 'banned'});
@@ -863,6 +1085,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} $0
   * @param {string} $0.name The username of the account that should be unbanned
   * @returns {Promise} A Promise that fulfills when the request is complete
+  * @example r.get_subreddit('snoowrap').unban_user({name: 'actually_an_aardvark'})
   */
   unban_user ({name}) {
     return this._unfriend({name, type: 'banned'});
@@ -872,6 +1095,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} $0
   * @param {string} $0.name The username of the account that should be muted
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').mute_user({name: 'actually_an_aardvark'})
   */
   mute_user ({name}) {
     return this._friend({name, type: 'muted'});
@@ -881,6 +1105,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} $0
   * @param {string} $0.name The username of the account that should be muted
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').unmute_user({name: 'actually_an_aardvark'})
   */
   unmute_user ({name}) {
     return this._unfriend({name, type: 'muted'});
@@ -890,6 +1115,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} $0
   * @param {string} $0.name The username of the account that should be wikibanned
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').wikiban_user({name: 'actually_an_aardvark'})
   */
   wikiban_user ({name}) {
     return this._friend({name, type: 'wikibanned'});
@@ -899,6 +1125,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} $0
   * @param {string} $0.name The username of the account that should be unwikibanned
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').unwikiban_user({name: 'actually_an_aardvark'})
   */
   unwikiban_user ({name}) {
     return this._unfriend({name, type: 'wikibanned'});
@@ -908,6 +1135,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} $0
   * @param {string} $0.name The username of the account that should be given approved editor status
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').add_wiki_contributor({name: 'actually_an_aardvark'})
   */
   add_wiki_contributor ({name}) {
     return this._friend({name, type: 'wikicontributor'});
@@ -917,6 +1145,7 @@ const Subreddit = class extends require('./RedditContent') {
   * @param {object} $0
   * @param {string} $0.name The username of the account whose approved editor status should be revoked
   * returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @example r.get_subreddit('snoowrap').remove_wiki_contributor({name: 'actually_an_aardvark'})
   */
   remove_wiki_contributor ({name}) {
     return this._unfriend({name, type: 'wikicontributor'});
@@ -929,6 +1158,7 @@ const Subreddit = class extends require('./RedditContent') {
   containing some combination of `"wiki", "posts", "access", "mail", "config", "flair"`. To add a moderator with full
   permissions, omit this property entirely.
   * @returns {Promise} A Promise that fulfills with this Subreddit when this request is complete
+  * @example r.get_subreddit('snoowrap').set_moderator_permissions({name: 'actually_an_aardvark', permissions: ['mail']})
   */
   set_moderator_permissions ({name, permissions}) {
     return this._post({
@@ -940,6 +1170,10 @@ const Subreddit = class extends require('./RedditContent') {
   * @summary Gets a given wiki page on this subreddit.
   * @param {string} title The title of the desired wiki page.
   * @returns {WikiPage} An unfetched WikiPage object corresponding to the desired wiki page
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_wiki_page('index')
+  * // => WikiPage { title: 'index', subreddit: Subreddit { display_name: 'snoowrap' } }
   */
   get_wiki_page (title) {
     return this._r._new_object('WikiPage', {subreddit: this, title});
@@ -947,6 +1181,15 @@ const Subreddit = class extends require('./RedditContent') {
   /**
   * @summary Gets the list of wiki pages on this subreddit.
   * @returns {Promise} An Array containing WikiPage objects
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_wiki_pages().then(console.log)
+  * // => [
+  * //   WikiPage { title: 'index', subreddit: Subreddit { display_name: 'snoowrap'} }
+  * //   WikiPage { title: 'config/sidebar', subreddit: Subreddit { display_name: 'snoowrap'} }
+  * //   WikiPage { title: 'secret_things', subreddit: Subreddit { display_name: 'snoowrap'} }
+  * //   WikiPage { title: 'config/submit_text', subreddit: Subreddit { display_name: 'snoowrap'} }
+  * // ]
   */
   get_wiki_pages () {
     return this._get({uri: `r/${this.display_name}/wiki/pages`}).then(result =>
@@ -957,6 +1200,13 @@ const Subreddit = class extends require('./RedditContent') {
   * @summary Gets a list of revisions on this subreddit's wiki.
   * @param {object} [options] Options for the resulting Listing
   * @returns {Promise} A Listing containing wiki revisions
+  * @example
+  *
+  * r.get_subreddit('snoowrap').get_wiki_revisions().then(console.log)
+  * // => Listing [
+  * //  { page: 'index', reason: 'added cookies', ... },
+  * //  ...
+  * // ]
   */
   get_wiki_revisions (options) {
     return this._get_listing({uri: `r/${this.display_name}/wiki/revisions`, qs: options});
