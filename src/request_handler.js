@@ -55,7 +55,7 @@ module.exports = {
       if (this._config.continue_after_ratelimit_error) {
         /* If the `continue_after_ratelimit_error` setting is enabled, queue the request, wait until the next ratelimit
         period, and then send it. */
-        this.warn(errors.RateLimitWarning(time_until_expiry));
+        this.log.warn(errors.RateLimitWarning(time_until_expiry));
         await Promise.delay(time_until_expiry);
       } else {
         // Otherwise, throw an error.
