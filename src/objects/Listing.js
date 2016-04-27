@@ -141,14 +141,11 @@ const Listing = class extends Array {
   within a Listing, reddit sends the last comment in the list as as a `more` object, with links to all the remaining comments
   in the thread. */
   async _fetch_more_comments (options) {
-    if (this._more) {
-      const more_comments = await this._more.fetch_more(options);
-      const cloned = this._clone();
-      cloned.push(..._.toArray(more_comments));
-      cloned._more._remove_leading_children(options.amount);
-      return cloned;
-    }
-    return this._clone();
+    const cloned = this._clone();
+    const more_comments = await this._more.fetch_more(options);
+    cloned.push(..._.toArray(more_comments));
+    cloned._more._remove_leading_children(options.amount);
+    return cloned;
   }
   /**
   * @summary Fetches all of the items in this Listing, only stopping when there are none left.
@@ -166,9 +163,6 @@ const Listing = class extends Array {
   }
   fetch_until (options) {
     this._r.log.warn('Listing.prototype.fetch_until is deprecated -- use Listing.prototype.fetch_more instead.');
-    if (!_.isNumber(options.length)) {
-      throw new errors.InvalidMethodCallError('Failed to fetch Listing. (No amount specified.)');
-    }
     return this.fetch_more({...options, amount: options.length - this.length});
   }
   inspect () {
