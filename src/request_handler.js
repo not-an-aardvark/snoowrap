@@ -112,9 +112,26 @@ module.exports = {
   * @summary Sends a request to the reddit server, authenticated with the user's client ID and client secret.
   * @desc **Note**: This is used internally as part of the authentication process, but it cannot be used to actually fetch
   content from reddit. To do that, use {@link snoowrap#oauth_request} or another of snoowrap's helper functions.
+  *
+  * This function can work with alternate `this`-bindings, provided that the binding has the `client_id`, `client_secret`, and
+  `user_agent` properties. This allows it be used if no snoowrap requester has been created yet.
   * @param {object|string} options Options for the request; these are passed directly to the
   [Request API](https://www.npmjs.com/package/request).
   * @returns {Promise} The response from the reddit server
+  * @example
+  *
+  * // example: this function could be used to exchange a one-time authentication code for a refresh token.
+  snoowrap.prototype.credentialed_client_request.call({
+    client_id: 'client id goes here',
+    client_secret: 'client secret goes here',
+    user_agent: 'user agent goes here'
+  }, {
+    method: 'post',
+    uri: 'api/v1/access_token',
+    form: {grant_type: 'authorization_code', code: 'code goes here', redirect_uri: 'redirect uri goes here'}
+  }).then(response => {
+    //handle response here
+  })
   * @memberof snoowrap
   * @instance
   */
