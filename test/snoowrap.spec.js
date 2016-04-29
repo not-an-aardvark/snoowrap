@@ -66,10 +66,6 @@ describe('snoowrap', function () {
     it('stores the version number as a constant', () => {
       expect(snoowrap.constants.VERSION).to.equal(require('../package.json').version);
     });
-    it('stores the ratelimit remaining as a number', async () => {
-      await r.get_me();
-      expect(r.ratelimit_remaining).to.be.a('number');
-    });
     it('throws a TypeError if an invalid config option is set', () => {
       expect(() => r.config({invalid_config_option: true})).to.throw(TypeError);
     });
@@ -210,12 +206,7 @@ describe('snoowrap', function () {
       expect(await comment_with_no_replies.replies.fetch_all()).to.be.empty();
     });
     it('should correctly identify when a comment has no more replies to fetch', async () => {
-      if (!r.ratelimit_remaining) {
-        await r.get_me();
-      }
-      const initial_remaining = r.ratelimit_remaining;
       expect(await r.get_comment('d2dof1c').expand_replies().replies.is_finished).to.be.true();
-      expect(r.ratelimit_remaining).to.equal(initial_remaining - 2);
     });
   });
 
@@ -448,10 +439,8 @@ describe('snoowrap', function () {
     it('can sequentially fetch more than 20 comment trees at a time', async () => {
       const comments = await submission.comments;
       const initial_length = comments.length;
-      const initial_ratelimit_remaining = r.ratelimit_remaining;
       const expanded_comments = await comments.fetch_more(25);
       expect(expanded_comments.length).to.be.above(initial_length + 20);
-      expect(r.ratelimit_remaining).to.be.below(initial_ratelimit_remaining - 1);
     });
     it('correctly handles `more` objects in non-top-level comments', async () => {
       const initial_comment = await r._get({uri: 'comments/4fp36y/-/d2c5bbk', qs: {limit: 2}}).comments[0];
