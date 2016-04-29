@@ -343,19 +343,13 @@ describe('snoowrap', function () {
       await submission.enable_contest_mode();
       await submission.disable_contest_mode();
     });
-    // skipped for the time being: see https://redd.it/4gfitf
-    it.skip('can sticky/unsticky a submission', async () => {
+    it('can sticky/unsticky a submission', async () => {
       // Make sure the submission starts out unstickied for this test.
-      r.config({debug: true, request_delay: 1000});
       await submission.unsticky();
       await submission.sticky();
       expect(await submission.refresh().stickied).to.be.true();
       await submission.unsticky();
       expect(await submission.refresh().stickied).to.be.false();
-      await submission.sticky({num: 2});
-      expect(await submission.subreddit.get_hot({limit: 2})[1].name).to.equal(submission.name);
-      await submission.unsticky();
-      expect(await submission.subreddit.get_hot({limit: 2})[1].name).to.not.equal(submission.name);
     });
     it('can set suggested sort on a submission', async () => {
       await submission.set_suggested_sort('new');
