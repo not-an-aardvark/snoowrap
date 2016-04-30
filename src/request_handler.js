@@ -1,6 +1,6 @@
 import Promise from 'bluebird';
 import request_promise from 'request-promise';
-import {_populate} from './helpers';
+import {populate} from './helpers';
 import {MAX_TOKEN_LATENCY} from './constants';
 import {RateLimitWarning, RateLimitError} from './errors';
 const request = request_promise.defaults({json: true});
@@ -82,7 +82,7 @@ export async function oauth_request (options, attempts = 0) {
         if (!response.statusCode.toString().startsWith(2)) {
           return response;
         }
-        const populated = _populate(body, this);
+        const populated = populate(body, this);
         if (populated && populated.constructor && populated.constructor.name === 'Listing') {
           populated._set_uri(response.request.uri.path);
         }

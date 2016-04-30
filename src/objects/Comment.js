@@ -1,4 +1,4 @@
-import {_get_empty_replies_listing, _add_empty_replies_listing} from '../helpers';
+import {get_empty_replies_listing, add_empty_replies_listing} from '../helpers';
 import Listing from './Listing';
 import {empty_children as empty_more_object} from './More';
 import VoteableContent from './VoteableContent';
@@ -20,7 +20,7 @@ const Comment = class extends VoteableContent {
       comment's replies. This is the equivalent of seeing a 'Continue this thread' link on the HTML site, and it indicates that
       replies should be fetched by sending another request to view the deep comment alone, and parsing the replies from that. */
       if (this.replies instanceof Listing && !this.replies.length && this.replies._more && this.replies._more.name === 't1__') {
-        this.replies = _get_empty_replies_listing(this);
+        this.replies = get_empty_replies_listing(this);
       } else if (this.replies === '') {
         /* If a comment has no replies, reddit returns an empty string as its `replies` property rather than an empty Listing.
         This behavior is unexpected, so replace the empty string with an empty Listing. */
@@ -31,7 +31,7 @@ const Comment = class extends VoteableContent {
     }
   }
   _transform_api_response (response_obj) {
-    return _add_empty_replies_listing(response_obj[0]);
+    return add_empty_replies_listing(response_obj[0]);
   }
   get _uri () {
     return `api/info?id=${this.name}`;

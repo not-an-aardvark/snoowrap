@@ -5,7 +5,7 @@ import util from 'util';
 import * as request_handler from './request_handler';
 import {MODULE_NAME, VERSION, HTTP_VERBS, KINDS} from './constants';
 import * as errors from './errors';
-import {_handle_json_errors} from './helpers';
+import {handle_json_errors} from './helpers';
 import default_config from './default_config';
 import * as objects from './objects';
 const api_type = 'json';
@@ -365,7 +365,7 @@ const snoowrap = class {
     return this._post({uri: 'api/submit', form: {
       api_type, captcha: captcha_response, iden: captcha_iden, sendreplies: send_replies, sr: subreddit_name, kind, resubmit,
       text, title, url
-    }}).tap(_handle_json_errors(this)).then(result => this.get_submission(result.json.data.id));
+    }}).tap(handle_json_errors(this)).then(result => this.get_submission(result.json.data.id));
   }
   /**
   * @summary Creates a new selfpost on the given subreddit.
@@ -664,7 +664,7 @@ const snoowrap = class {
     }
     return this._post({uri: 'api/compose', form: {
       api_type, captcha, iden: captcha_iden, from_sr: parsed_from_sr, subject, text, to: parsed_to
-    }}).tap(_handle_json_errors(this)).return({});
+    }}).tap(handle_json_errors(this)).return({});
   }
   /**
   * @summary Gets a list of all oauth scopes supported by the reddit API.
@@ -780,7 +780,7 @@ const snoowrap = class {
       'header-title': header_title, hide_ads, iden: captcha_iden, lang, link_type, name, over_18, public_description,
       public_traffic, show_media, spam_comments, spam_links, spam_selfposts, sr, submit_link_label, submit_text,
       submit_text_label, suggested_comment_sort, title, type: subreddit_type || type, wiki_edit_age, wiki_edit_karma, wikimode
-    }}).then(_handle_json_errors(this.get_subreddit(name)));
+    }}).then(handle_json_errors(this.get_subreddit(name)));
   }
   /**
   * @summary Creates a new subreddit.
@@ -1017,7 +1017,7 @@ const snoowrap = class {
     return this._post({
       uri: 'api/live/create',
       form: {api_type, description, nsfw, resources, title}
-    }).tap(_handle_json_errors(this)).then(result => this.get_livethread(result.json.data.id));
+    }).tap(handle_json_errors(this)).then(result => this.get_livethread(result.json.data.id));
   }
   /**
   * @summary Gets the user's own multireddits.

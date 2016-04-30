@@ -1,4 +1,4 @@
-import {_handle_json_errors} from '../helpers';
+import {handle_json_errors} from '../helpers';
 import RedditContent from './RedditContent';
 const api_type = 'json';
 
@@ -67,7 +67,7 @@ const ReplyableContent = class extends RedditContent {
     return this._post({
       uri: 'api/comment',
       form: {api_type, text, thing_id: this.name}
-    }).tap(_handle_json_errors(this)).then(res => res.json.data.things[0]);
+    }).tap(handle_json_errors(this)).then(res => res.json.data.things[0]);
   }
   /**
   * @summary Blocks the author of this content.

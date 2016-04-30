@@ -2,11 +2,11 @@ import {keys, map, mapValues, includes, property, isEmpty, find, partial, omit, 
 import {KINDS, USER_KEYS, SUBREDDIT_KEYS, MODERATOR_PERMISSIONS, LIVETHREAD_PERMISSIONS} from './constants';
 import {empty_children as empty_more_object} from './objects/More';
 
-export function _populate (response_tree, _r) {
+export function populate (response_tree, _r) {
   if (typeof response_tree === 'object' && response_tree !== null) {
     // Map {kind: 't2', data: {name: 'some_username', ... }} to a RedditUser (e.g.) with the same properties
     if (keys(response_tree).length === 2 && response_tree.kind) {
-      const remainder_of_tree = _populate(response_tree.data, _r);
+      const remainder_of_tree = populate(response_tree.data, _r);
       return _r._new_object(KINDS[response_tree.kind] || 'RedditContent', remainder_of_tree, true);
     }
     const result = (Array.isArray(response_tree) ? map : mapValues)(response_tree, (value, key) => {
@@ -17,7 +17,7 @@ export function _populate (response_tree, _r) {
       if (includes(SUBREDDIT_KEYS, key) && value !== null) {
         return _r._new_object('Subreddit', {display_name: value}, false);
       }
-      return _populate(value, _r);
+      return populate(value, _r);
     });
     if (result.length === 2 && result[0] && result[0].constructor.name === 'Listing' && result[0][0] &&
         result[0][0].constructor.name === 'Submission' && result[1] && result[1].constructor.name === 'Listing') {
@@ -32,7 +32,7 @@ export function _populate (response_tree, _r) {
   return response_tree;
 }
 
-export function _get_empty_replies_listing (item) {
+export function get_empty_replies_listing (item) {
   if (item.constructor.name === 'Comment') {
     return item._r._new_object('Listing', {
       _uri: `comments/${item.link_id.slice(3)}`,
@@ -52,12 +52,12 @@ export function _get_empty_replies_listing (item) {
   return item._r._new_object('Listing');
 }
 
-export function _add_empty_replies_listing (item) {
-  item.replies = _get_empty_replies_listing(item);
+export function add_empty_replies_listing (item) {
+  item.replies = get_empty_replies_listing(item);
   return item;
 }
 
-export function _handle_json_errors (returnValue) {
+export function handle_json_errors (returnValue) {
   return response => {
     if (isEmpty(response) || !response.json.errors.length) {
       return returnValue;
@@ -67,30 +67,30 @@ export function _handle_json_errors (returnValue) {
 }
 
 // Performs a depth-first search of a tree of private messages, in order to find a message with a given name.
-export function _find_message_in_tree (desired_message_name, current_message) {
+export function find_message_in_tree (desired_message_name, current_message) {
   if (current_message.name === desired_message_name) {
     return current_message;
   }
-  return find(current_message.replies.map(partial(_find_message_in_tree, desired_message_name)));
+  return find(current_message.replies.map(partial(find_message_in_tree, desired_message_name)));
 }
 
-export function _format_permissions (all_permission_names, permissions_array) {
+export function format_permissions (all_permission_names, permissions_array) {
   if (!permissions_array) {
     return '+all';
   }
   return all_permission_names.map(type => (includes(permissions_array, type) ? '+' : '-') + type).join(',');
 }
 
-export function _rename_key (obj, old_key, new_key) {
+export function rename_key (obj, old_key, new_key) {
   return obj && omit({...obj, [new_key]: obj[old_key]}, old_key);
 }
 
 /* When reddit returns private messages (or comments from the /api/morechildren endpoint), it arranges their in a very
 nonintuitive way (see https://github.com/not-an-aardvark/snoowrap/issues/15 for details). This function rearranges the message
 tree so that replies are threaded properly. */
-export function _build_replies_tree (child_list) {
+export function build_replies_tree (child_list) {
   const child_map = keyBy(child_list, 'name');
-  child_list.forEach(_add_empty_replies_listing);
+  child_list.forEach(add_empty_replies_listing);
   child_list.forEach(child => {
     if (child.constructor.name === 'Comment') {
       child.replies._more = empty_more_object;
@@ -107,5 +107,5 @@ export function _build_replies_tree (child_list) {
   return child_list;
 }
 
-export const _format_mod_permissions = partial(_format_permissions, MODERATOR_PERMISSIONS);
-export const _format_livethread_permissions = partial(_format_permissions, LIVETHREAD_PERMISSIONS);
+export const format_mod_permissions = partial(format_permissions, MODERATOR_PERMISSIONS);
+export const format_livethread_permissions = partial(format_permissions, LIVETHREAD_PERMISSIONS);

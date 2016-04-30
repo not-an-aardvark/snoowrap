@@ -1,4 +1,4 @@
-import {_get_empty_replies_listing} from '../helpers';
+import {get_empty_replies_listing} from '../helpers';
 import VoteableContent from './VoteableContent';
 const api_type = 'json';
 
@@ -15,7 +15,7 @@ const Submission = class extends VoteableContent {
   constructor (data, _r, _has_fetched) {
     super(data, _r, _has_fetched);
     if (_has_fetched) {
-      this.comments = this.comments || _get_empty_replies_listing(this);
+      this.comments = this.comments || get_empty_replies_listing(this);
     }
   }
   get _uri () {

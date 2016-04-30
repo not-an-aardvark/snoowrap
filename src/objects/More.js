@@ -1,6 +1,6 @@
 import {assign, remove, forEach, flatten, clone, pick} from 'lodash';
 import Promise from 'bluebird';
-import {_handle_json_errors, _add_empty_replies_listing, _build_replies_tree} from '../helpers';
+import {handle_json_errors, add_empty_replies_listing, build_replies_tree} from '../helpers';
 import {MAX_API_INFO_AMOUNT, MAX_API_MORECHILDREN_AMOUNT} from '../constants';
 const api_type = 'json';
 
@@ -51,9 +51,9 @@ const More = class {
     const result_trees = await this._r._get({
       uri: 'api/morechildren',
       qs: {api_type, children: ids.join(','), link_id: this.link_id || this.parent_id}
-    }).tap(_handle_json_errors).then(res => {
+    }).tap(handle_json_errors).then(res => {
       return res.json.data.things;
-    }).mapSeries(_add_empty_replies_listing).then(_build_replies_tree);
+    }).mapSeries(add_empty_replies_listing).then(build_replies_tree);
     /* Sometimes, when sending a request to reddit to get multiple comments from a `more` object, reddit decides to only send
     some of the requested comments, and then stub out the remaining ones in a smaller `more` object. ( ¯\_(ツ)_/¯ )
     In these cases, recursively fetch the smaller `more` objects as well. */

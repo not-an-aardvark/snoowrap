@@ -53,9 +53,9 @@ Whenever the version number is bumped and a tag is pushed to github, a new versi
 
 All OAuth credentials and HTTP requests are handled by the [request_handler.js](./request_handler.js) file.
 
-For almost all endpoints, reddit's response takes the form of some JSON data. Before being returned, this data is passed into `helpers._populate`, which is found in [helpers.js](./helpers.js). `helpers._populate` replaces reddit's representation of data with snoowrap objects.
+For almost all endpoints, reddit's response takes the form of some JSON data. Before being returned, this data is passed into `helpers.populate`, which is found in [helpers.js](./helpers.js). `helpers.populate` replaces reddit's representation of data with snoowrap objects.
 
-For example, `helpers._populate` transforms this JSON response:
+For example, `helpers.populate` transforms this JSON response:
 
 ```json
 {
