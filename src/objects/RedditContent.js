@@ -20,9 +20,6 @@ const RedditContent = class {
     assign(this, options);
     if (typeof Proxy !== 'undefined' && !this._has_fetched) {
       return new Proxy(this, {get (target, key) {
-        if (key === '_raw') {
-          return target;
-        }
         if (key in target || key === 'length' || key in Promise.prototype) {
           return target[key];
         }
