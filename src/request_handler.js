@@ -40,15 +40,6 @@ module.exports = {
   * r.get_top({time: 'all'})
   */
   async oauth_request (options, attempts = 0) {
-    /* r._throttle is a timer that gets reset to r._config.request_delay whenever a request is sent. This ensures that
-    requests are throttled correctly according to the user's config settings, and that no requests are lost. The await
-    statement is wrapped in a loop to make sure that if the throttle promise resolves while multiple requests are pending,
-    only one of the requests is sent, and the others await the throttle again. (The loop is non-blocking due to its await
-    statement.) */
-    while (!this._throttle.isFulfilled()) {
-      await this._throttle;
-    }
-    this._throttle = Promise.delay(this._config.request_delay);
     if (this.ratelimit_remaining < 1 && Date.now() < this.ratelimit_expiration) {
       // If the ratelimit has been exceeded, delay or abort the request depending on the user's config.
       const time_until_expiry = this.ratelimit_expiration - Date.now();
@@ -62,6 +53,15 @@ module.exports = {
         throw new errors.RateLimitError(time_until_expiry);
       }
     }
+    /* this._throttle is a timer that gets reset to r._config.request_delay whenever a request is sent. This ensures that
+    requests are throttled correctly according to the user's config settings, and that no requests are lost. The await
+    statement is wrapped in a loop to make sure that if the throttle promise resolves while multiple requests are pending,
+    only one of the requests is sent, and the others await the throttle again. (The loop is non-blocking due to its await
+    statement.) */
+    while (!this._throttle.isFulfilled()) {
+      await this._throttle;
+    }
+    this._throttle = Promise.delay(this._config.request_delay);
     try {
       // If the access token has expired, refresh it.
       if (this.refresh_token && (!this.access_token || Date.now() > this.token_expiration)) {
