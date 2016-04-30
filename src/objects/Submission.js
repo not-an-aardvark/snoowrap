@@ -1,5 +1,5 @@
-'use strict';
-const helpers = require('../helpers');
+import helpers from '../helpers';
+import VoteableContent from './VoteableContent';
 const api_type = 'json';
 
 /**
@@ -11,7 +11,7 @@ const api_type = 'json';
 * // Get a submission by ID
 * r.get_submission('2np694')
 */
-const Submission = class extends require('./VoteableContent') {
+const Submission = class extends VoteableContent {
   constructor (data, _r, _has_fetched) {
     super(data, _r, _has_fetched);
     if (_has_fetched) {

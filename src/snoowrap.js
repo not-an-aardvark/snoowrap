@@ -1,11 +1,13 @@
-'use strict';
-const Promise = require('bluebird');
-const _ = require('lodash');
-const promise_wrap = require('promise-chains');
-const request_handler = require('./request_handler');
-const constants = require('./constants');
-const errors = require('./errors');
-const helpers = require('./helpers');
+import Promise from 'bluebird';
+import _ from 'lodash';
+import promise_wrap from 'promise-chains';
+import util from 'util';
+import request_handler from './request_handler';
+import constants from './constants';
+import errors from './errors';
+import helpers from './helpers';
+import default_config from './default_config';
+import * as objects from './objects';
 const api_type = 'json';
 
 /** The class for a snoowrap requester.
@@ -42,7 +44,7 @@ const snoowrap = class {
       throw new errors.NoCredentialsError();
     }
     _.assign(this, {user_agent, client_id, client_secret, refresh_token, access_token});
-    this._config = require('./default_config');
+    this._config = default_config;
     this._throttle = Promise.resolve();
   }
   static get name () {
@@ -98,7 +100,7 @@ const snoowrap = class {
     const formatted = _.mapValues(_.omitBy(this, (value, key) => key.startsWith('_')), (value, key) => {
       return _.includes(keys_for_hidden_values, key) ? value && '(redacted)' : value;
     });
-    return `${constants.MODULE_NAME} ${require('util').inspect(formatted)}`;
+    return `${constants.MODULE_NAME} ${util.inspect(formatted)}`;
   }
   get log () {
     /* eslint-disable no-console */
@@ -1130,10 +1132,10 @@ _.forEach(constants.HTTP_VERBS, method => {
   };
 });
 
-snoowrap.objects = require('./objects');
+snoowrap.objects = {};
 
 _.forOwn(constants.KINDS, value => {
-  snoowrap.objects[value] = snoowrap.objects[value] || class extends snoowrap.objects.RedditContent {};
+  snoowrap.objects[value] = objects[value] || class extends objects.RedditContent {};
 });
 
 /* Ensure that for any instance `x` of a snoowrap object, `x.constructor.name` will return the expected name (e.g. 'Comment').

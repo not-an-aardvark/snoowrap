@@ -1,5 +1,5 @@
-'use strict';
-const _ = require('lodash');
+import _ from 'lodash';
+import RedditContent from './RedditContent';
 
 /**
 * @summary A class representing a multireddit.
@@ -8,7 +8,7 @@ const _ = require('lodash');
 * // Get a multireddit belonging to a specific user
 * r.get_user('multi-mod').get_multireddit('coding_languages')
 */
-const MultiReddit = class extends require('./RedditContent') {
+const MultiReddit = class extends RedditContent {
   constructor (options, _r, _has_fetched) {
     super(options, _r, _has_fetched);
     if (_has_fetched) {

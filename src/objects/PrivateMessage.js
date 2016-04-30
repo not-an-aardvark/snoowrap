@@ -1,5 +1,5 @@
-'use strict';
-const helpers = require('../helpers');
+import helpers from '../helpers';
+import ReplyableContent from './ReplyableContent';
 
 /**
 * A class representing a private message or a modmail.
@@ -10,7 +10,7 @@ const helpers = require('../helpers');
 * r.get_message('51shnw')
 * @extends ReplyableContent
 */
-const PrivateMessage = class extends require('./ReplyableContent') {
+const PrivateMessage = class extends ReplyableContent {
   get _uri () {
     return `message/messages/${this.name.slice(3)}`;
   }

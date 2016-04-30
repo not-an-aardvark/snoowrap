@@ -1,9 +1,9 @@
-'use strict';
-const Promise = require('bluebird');
-const request = require('request-promise').defaults({json: true});
-const helpers = require('./helpers');
-const constants = require('./constants');
-const errors = require('./errors');
+import Promise from 'bluebird';
+import request_promise from 'request-promise';
+import helpers from './helpers';
+import constants from './constants';
+import errors from './errors';
+const request = request_promise.defaults({json: true});
 
 module.exports = {
   /**

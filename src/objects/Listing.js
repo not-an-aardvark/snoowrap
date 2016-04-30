@@ -1,9 +1,10 @@
-'use strict';
-const _ = require('lodash');
-const Promise = require('bluebird');
-const promise_wrap = require('promise-chains');
-const errors = require('../errors');
-const More = require('./More');
+import _ from 'lodash';
+import Promise from 'bluebird';
+import promise_wrap from 'promise-chains';
+import {inspect} from 'util';
+import {parse as url_parse} from 'url';
+import errors from '../errors';
+import More from './More';
 
 const INTERNAL_DEFAULTS = {
   _query: {},
@@ -50,7 +51,7 @@ const Listing = class extends Array {
     }
   }
   _set_uri (value) {
-    const parsed_uri = require('url').parse(value, true);
+    const parsed_uri = url_parse(value, true);
     this._uri = parsed_uri.pathname;
     _.defaultsDeep(this._query, parsed_uri.query);
     if (parsed_uri.query.before) {
@@ -166,7 +167,7 @@ const Listing = class extends Array {
     return this.fetch_more({...options, amount: options.length - this.length});
   }
   inspect () {
-    return `Listing ${require('util').inspect(_.toArray(this))}`;
+    return `Listing ${inspect(_.toArray(this))}`;
   }
   _clone ({deep = false} = {}) {
     const properties = _.pick(this, _.keys(INTERNAL_DEFAULTS));

@@ -1,9 +1,9 @@
-'use strict';
-const Promise = require('bluebird');
-const _ = require('lodash');
-const promise_wrap = require('promise-chains');
-const constants = require('../constants');
-const Listing = require('./Listing');
+import _ from 'lodash';
+import Promise from 'bluebird';
+import promise_wrap from 'promise-chains';
+import {inspect} from 'util';
+import constants from '../constants';
+import Listing from './Listing';
 
 /**
 * A base class for content from reddit. With the expection of Listings, all content types extend this class.
@@ -105,7 +105,7 @@ const RedditContent = class {
     });
   }
   inspect () {
-    return `${this.constructor.name} ${require('util').inspect(this._strip_private_props())}`;
+    return `${this.constructor.name} ${inspect(this._strip_private_props())}`;
   }
   _strip_private_props () {
     return _.pick(this, _.keys(this).filter(key => !key.startsWith('_')));
@@ -127,7 +127,7 @@ const RedditContent = class {
   }
 };
 
-_.forEach(require('../constants').HTTP_VERBS, type => {
+_.forEach(constants.HTTP_VERBS, type => {
   RedditContent.prototype[`_${type}`] = function (...args) {
     return this._r[`_${type}`](...args);
   };

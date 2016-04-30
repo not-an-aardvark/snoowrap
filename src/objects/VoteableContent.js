@@ -1,6 +1,6 @@
-'use strict';
-const promise_wrap = require('promise-chains');
-const helpers = require('../helpers.js');
+import promise_wrap from 'promise-chains';
+import helpers from '../helpers';
+import ReplyableContent from './ReplyableContent';
 const api_type = 'json';
 
 /**
@@ -8,7 +8,7 @@ const api_type = 'json';
 * <style> #VoteableContent {display: none} </style>
 * @extends ReplyableContent
 */
-const VoteableContent = class extends require('./ReplyableContent') {
+const VoteableContent = class extends ReplyableContent {
   /**
   * @summary Casts a vote on this Comment or Submission.
   * @private

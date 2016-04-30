@@ -1,7 +1,7 @@
-'use strict';
-const EventEmitter = require('events').EventEmitter;
-const WebSocket = require('ws');
-const helpers = require('../helpers');
+import {EventEmitter} from 'events';
+import WebSocket from 'ws';
+import helpers from '../helpers';
+import RedditContent from './RedditContent';
 const api_type = 'json';
 
 /**
@@ -39,7 +39,7 @@ some_livethread.stream.on('update', data => {
 
 * @extends RedditContent
 */
-const LiveThread = class extends require('./RedditContent') {
+const LiveThread = class extends RedditContent {
   get _uri () {
     return `live/${this.id}/about`;
   }

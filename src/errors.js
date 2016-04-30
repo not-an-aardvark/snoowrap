@@ -1,7 +1,6 @@
 /* eslint-disable max-len */
-'use strict';
-const _ = require('lodash');
-const constants = require('./constants');
+import _ from 'lodash';
+import constants from './constants';
 
 function sub_error (name, default_message) {
   function SubclassedError (message) {

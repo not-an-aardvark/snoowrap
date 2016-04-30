@@ -1,6 +1,7 @@
 'use strict';
-const _ = require('lodash');
-const constants = require('./constants');
+import _ from 'lodash';
+import constants from './constants';
+import {empty_children} from './objects/More';
 
 module.exports = {
   _populate (response_tree, _r) {
@@ -91,16 +92,15 @@ module.exports = {
   nonintuitive way (see https://github.com/not-an-aardvark/snoowrap/issues/15 for details). This function rearranges the message
   tree so that replies are threaded properly. */
   _build_replies_tree (child_list) {
-    const More = require('./objects/More');
     const child_map = _.keyBy(child_list, 'name');
     child_list.forEach(module.exports._add_empty_replies_listing);
     child_list.forEach(child => {
       if (child.constructor.name === 'Comment') {
-        child.replies._more = More.empty_children();
+        child.replies._more = empty_children();
       }
     });
     _.remove(child_list, child => child_map[child.parent_id]).forEach(child => {
-      if (child instanceof More) {
+      if (child.constructor.name === 'More') {
         child_map[child.parent_id].replies._set_more(child);
         child.link_id = child_map[child.parent_id].link_id;
       } else {

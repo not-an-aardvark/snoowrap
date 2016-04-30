@@ -1,7 +1,7 @@
-'use strict';
-const helpers = require('../helpers');
-const Listing = require('./Listing');
-const More = require('./More');
+import helpers from '../helpers';
+import Listing from './Listing';
+import {empty_children} from './More';
+import VoteableContent from './VoteableContent';
 /**
 * A class representing a reddit comment
 * <style> #Comment {display: none} </style>
@@ -12,7 +12,7 @@ const More = require('./More');
 *
 * @extends VoteableContent
 */
-const Comment = class extends require('./VoteableContent') {
+const Comment = class extends VoteableContent {
   constructor (options, _r, _has_fetched) {
     super(options, _r, _has_fetched);
     if (_has_fetched) {
@@ -24,7 +24,7 @@ const Comment = class extends require('./VoteableContent') {
       } else if (this.replies === '') {
         /* If a comment has no replies, reddit returns an empty string as its `replies` property rather than an empty Listing.
         This behavior is unexpected, so replace the empty string with an empty Listing. */
-        this.replies = this._r._new_object('Listing', {children: [], _more: More.empty_children(), _is_comment_list: true});
+        this.replies = this._r._new_object('Listing', {children: [], _more: empty_children(), _is_comment_list: true});
       } else if (this.replies._more && !this.replies._more.link_id) {
         this.replies._more.link_id = this.link_id;
       }

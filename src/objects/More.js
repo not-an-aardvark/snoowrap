@@ -1,8 +1,7 @@
-'use strict';
-const _ = require('lodash');
-const Promise = require('bluebird');
-const helpers = require('../helpers');
-const constants = require('../constants');
+import _ from 'lodash';
+import Promise from 'bluebird';
+import helpers from '../helpers';
+import constants from '../constants';
 const api_type = 'json';
 
 /**
@@ -76,11 +75,8 @@ const More = class {
   _get_id_slice (amount, start_index) {
     return this.children.slice(start_index, start_index + amount);
   }
-  static empty_children () {
-    return empty_children;
-  }
 };
 
-const empty_children = new More({children: []});
+export const empty_children = new More({children: []});
 
 module.exports = More;

@@ -1,6 +1,6 @@
-'use strict';
-const constants = require('../constants');
-const errors = require('../errors');
+import constants from '../constants';
+import errors from '../errors';
+import RedditContent from './RedditContent';
 
 /**
 * A class representing a reddit user
@@ -11,7 +11,7 @@ const errors = require('../errors');
 * // Get a user with the given username
 * r.get_user('spez')
 */
-const RedditUser = class extends require('./RedditContent') {
+const RedditUser = class extends RedditContent {
   get _uri () {
     if (typeof this.name !== 'string' || !constants.USERNAME_REGEX.test(this.name)) {
       throw new errors.InvalidUserError(this.name);

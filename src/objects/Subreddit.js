@@ -1,8 +1,10 @@
-'use strict';
-const _ = require('lodash');
-const Promise = require('bluebird');
-const helpers = require('../helpers');
-const errors = require('../errors');
+import _ from 'lodash';
+import Promise from 'bluebird';
+import helpers from '../helpers';
+import errors from '../errors';
+import RedditContent from './RedditContent';
+import {Readable} from 'stream';
+import {createReadStream} from 'fs';
 const api_type = 'json';
 
 /**
@@ -14,7 +16,7 @@ const api_type = 'json';
 * // Get a subreddit by name
 * r.get_subreddit('AskReddit')
 */
-const Subreddit = class extends require('./RedditContent') {
+const Subreddit = class extends RedditContent {
   get _uri () {
     return `r/${this.display_name}/about`;
   }
@@ -893,10 +895,10 @@ const Subreddit = class extends require('./RedditContent') {
     return this._set_subscribed(false).catch({statusCode: 404}, err => this.fetch().return(this).catchThrow(err));
   }
   _upload_sr_img ({name, file, upload_type, image_type}) {
-    if (typeof file !== 'string' && !(file instanceof require('stream').Readable)) {
+    if (typeof file !== 'string' && !(file instanceof Readable)) {
       throw new errors.InvalidMethodCallError('Uploaded image filepath must be a string or a ReadableStream.');
     }
-    const parsed_file = typeof file === 'string' ? require('fs').createReadStream(file) : file;
+    const parsed_file = typeof file === 'string' ? createReadStream(file) : file;
     return this._post({
       uri: `r/${this.display_name}/api/upload_sr_img`,
       formData: {name, upload_type, img_type: image_type, file: parsed_file}

@@ -1,17 +1,14 @@
-'use strict';
-module.exports = {
-  RedditContent: require('./RedditContent'),
-  ReplyableContent: require('./ReplyableContent'),
-  VoteableContent: require('./VoteableContent'),
-  Comment: require('./Comment'),
-  RedditUser: require('./RedditUser'),
-  Submission: require('./Submission'),
-  LiveThread: require('./LiveThread'),
-  PrivateMessage: require('./PrivateMessage'),
-  Subreddit: require('./Subreddit'),
-  MultiReddit: require('./MultiReddit'),
-  WikiPage: require('./WikiPage'),
-  Listing: require('./Listing'),
-  More: require('./More'),
-  UserList: require('./UserList')
-};
+export {default as RedditContent} from './RedditContent';
+export {default as ReplyableContent} from './ReplyableContent';
+export {default as VoteableContent} from './VoteableContent';
+export {default as Comment} from './Comment';
+export {default as RedditUser} from './RedditUser';
+export {default as Submission} from './Submission';
+export {default as LiveThread} from './LiveThread';
+export {default as PrivateMessage} from './PrivateMessage';
+export {default as Subreddit} from './Subreddit';
+export {default as MultiReddit} from './MultiReddit';
+export {default as WikiPage} from './WikiPage';
+export {default as Listing} from './Listing';
+export {default as More} from './More';
+export {default as UserList} from './UserList';

@@ -1,5 +1,5 @@
-'use strict';
-const helpers = require('../helpers');
+import helpers from '../helpers';
+import RedditContent from './RedditContent';
 const api_type = 'json';
 
 /**
@@ -7,7 +7,7 @@ const api_type = 'json';
 * <style> #ReplyableContent {display: none} </style>
 * @extends RedditContent
 */
-const ReplyableContent = class extends require('./RedditContent') {
+const ReplyableContent = class extends RedditContent {
   /**
   * @summary Removes this Comment, Submission or PrivateMessage from public listings.
   * @desc This requires the authenticated user to be a moderator of the subreddit with the `posts` permission.
