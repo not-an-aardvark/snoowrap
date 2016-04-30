@@ -1,5 +1,5 @@
 import promise_wrap from 'promise-chains';
-import helpers from '../helpers';
+import {_handle_json_errors} from '../helpers';
 import ReplyableContent from './ReplyableContent';
 const api_type = 'json';
 
@@ -108,7 +108,7 @@ const VoteableContent = class extends ReplyableContent {
     return this._post({
       uri: 'api/editusertext',
       form: {api_type, text: updated_text, thing_id: this.name}
-    }).tap(helpers._handle_json_errors(this));
+    }).tap(_handle_json_errors(this));
   }
   /**
   * @summary Gives reddit gold to the author of this Comment or Submission.
@@ -192,4 +192,4 @@ const VoteableContent = class extends ReplyableContent {
   }
 };
 
-module.exports = VoteableContent;
+export default VoteableContent;

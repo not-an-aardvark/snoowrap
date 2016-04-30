@@ -1,5 +1,5 @@
-import constants from '../constants';
-import errors from '../errors';
+import {USERNAME_REGEX} from '../constants';
+import {InvalidUserError, InvalidMethodCallError} from '../errors';
 import RedditContent from './RedditContent';
 
 /**
@@ -13,8 +13,8 @@ import RedditContent from './RedditContent';
 */
 const RedditUser = class extends RedditContent {
   get _uri () {
-    if (typeof this.name !== 'string' || !constants.USERNAME_REGEX.test(this.name)) {
-      throw new errors.InvalidUserError(this.name);
+    if (typeof this.name !== 'string' || !USERNAME_REGEX.test(this.name)) {
+      throw new InvalidUserError(this.name);
     }
     return `user/${this.name}/about`;
   }
@@ -28,7 +28,7 @@ const RedditUser = class extends RedditContent {
     /* Ideally this would allow for more than 36 months by sending multiple requests, but I don't have the resources to test
     that code, and it's probably better that such a big investment be deliberate anyway. */
     if (typeof months !== 'number' || months < 1 || months > 36) {
-      throw new errors.InvalidMethodCallError('Invalid argument to RedditUser.give_gold; `months` must be between 1 and 36.');
+      throw new InvalidMethodCallError('Invalid argument to RedditUser.give_gold; `months` must be between 1 and 36.');
     }
     return this._post({uri: `api/v1/gold/give/${this.name}`, form: {months}});
   }
@@ -267,4 +267,4 @@ const RedditUser = class extends RedditContent {
   }
 };
 
-module.exports = RedditUser;
+export default RedditUser;

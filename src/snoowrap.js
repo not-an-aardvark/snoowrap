@@ -1,11 +1,11 @@
+import {isUndefined, assign, findKey, mapValues, omitBy, includes, map, isEmpty, omit, isString, forEach, forOwn} from 'lodash';
 import Promise from 'bluebird';
-import _ from 'lodash';
 import promise_wrap from 'promise-chains';
 import util from 'util';
-import request_handler from './request_handler';
-import constants from './constants';
-import errors from './errors';
-import helpers from './helpers';
+import * as request_handler from './request_handler';
+import {MODULE_NAME, VERSION, HTTP_VERBS, KINDS} from './constants';
+import * as errors from './errors';
+import {_handle_json_errors} from './helpers';
 import default_config from './default_config';
 import * as objects from './objects';
 const api_type = 'json';
@@ -40,15 +40,15 @@ const snoowrap = class {
     if (!user_agent) {
       throw new errors.MissingUserAgentError();
     }
-    if (!access_token && (_.isUndefined(client_id) || _.isUndefined(client_secret) || _.isUndefined(refresh_token))) {
+    if (!access_token && (isUndefined(client_id) || isUndefined(client_secret) || isUndefined(refresh_token))) {
       throw new errors.NoCredentialsError();
     }
-    _.assign(this, {user_agent, client_id, client_secret, refresh_token, access_token});
+    assign(this, {user_agent, client_id, client_secret, refresh_token, access_token});
     this._config = default_config;
     this._throttle = Promise.resolve();
   }
   static get name () {
-    return constants.MODULE_NAME;
+    return MODULE_NAME;
   }
   _new_object (object_type, content, _has_fetched) {
     if (Array.isArray(content)) {
@@ -88,19 +88,19 @@ const snoowrap = class {
   * // sets the request delay to 1000 milliseconds, and suppresses warnings.
   */
   config (options) {
-    const invalid_key = _.findKey(options, (value, key) => !this._config.hasOwnProperty(key));
+    const invalid_key = findKey(options, (value, key) => !this._config.hasOwnProperty(key));
     if (invalid_key) {
       throw new TypeError(`Invalid config option '${invalid_key}'`);
     }
-    return _.assign(this._config, options);
+    return assign(this._config, options);
   }
   inspect () {
     // Hide confidential information (tokens, client IDs, etc.), as well as private properties, from the console.log output.
     const keys_for_hidden_values = ['client_secret', 'refresh_token', 'access_token'];
-    const formatted = _.mapValues(_.omitBy(this, (value, key) => key.startsWith('_')), (value, key) => {
-      return _.includes(keys_for_hidden_values, key) ? value && '(redacted)' : value;
+    const formatted = mapValues(omitBy(this, (value, key) => key.startsWith('_')), (value, key) => {
+      return includes(keys_for_hidden_values, key) ? value && '(redacted)' : value;
     });
-    return `${constants.MODULE_NAME} ${util.inspect(formatted)}`;
+    return `${MODULE_NAME} ${util.inspect(formatted)}`;
   }
   get log () {
     /* eslint-disable no-console */
@@ -359,13 +359,13 @@ const snoowrap = class {
   * // (the links will now appear purple on reddit)
   */
   mark_as_visited (links) {
-    return this._post({uri: 'api/store_visits', links: _.map(links, 'name').join(',')});
+    return this._post({uri: 'api/store_visits', links: map(links, 'name').join(',')});
   }
   _submit ({captcha_response, captcha_iden, kind, resubmit = true, send_replies = true, text, title, url, subreddit_name}) {
     return this._post({uri: 'api/submit', form: {
       api_type, captcha: captcha_response, iden: captcha_iden, sendreplies: send_replies, sr: subreddit_name, kind, resubmit,
       text, title, url
-    }}).tap(helpers._handle_json_errors(this)).then(result => this.get_submission(result.json.data.id));
+    }}).tap(_handle_json_errors(this)).then(result => this.get_submission(result.json.data.id));
   }
   /**
   * @summary Creates a new selfpost on the given subreddit.
@@ -421,13 +421,13 @@ const snoowrap = class {
     // Handle things properly if only a time parameter is provided but not the subreddit name
     let opts = options;
     let sub_name = subreddit_name;
-    if (typeof subreddit_name === 'object' && _(opts).omitBy(_.isUndefined).isEmpty()) {
+    if (typeof subreddit_name === 'object' && isEmpty(omitBy(opts, isUndefined))) {
       /* In this case, "subreddit_name" ends up referring to the second argument, which is not actually a name since the user
       decided to omit that parameter. */
       opts = subreddit_name;
       sub_name = undefined;
     }
-    const parsed_options = _.omit({...opts, t: opts.time || opts.t}, 'time');
+    const parsed_options = omit({...opts, t: opts.time || opts.t}, 'time');
     return this._get_listing({uri: (sub_name ? `r/${sub_name}/` : '') + sort_type, qs: parsed_options});
   }
   /**
@@ -664,7 +664,7 @@ const snoowrap = class {
     }
     return this._post({uri: 'api/compose', form: {
       api_type, captcha, iden: captcha_iden, from_sr: parsed_from_sr, subject, text, to: parsed_to
-    }}).tap(helpers._handle_json_errors(this)).return({});
+    }}).tap(_handle_json_errors(this)).return({});
   }
   /**
   * @summary Gets a list of all oauth scopes supported by the reddit API.
@@ -720,7 +720,7 @@ const snoowrap = class {
     }
     options.restrict_sr = options.restrict_sr || true;
     options.syntax = options.syntax || 'plain';
-    const parsed_query = _.omit({...options, t: options.time, q: options.query}, ['time', 'query']);
+    const parsed_query = omit({...options, t: options.time, q: options.query}, ['time', 'query']);
     return this._get_listing({uri: `${options.subreddit ? `r/${options.subreddit}/` : ''}search`, qs: parsed_query});
   }
   /**
@@ -780,7 +780,7 @@ const snoowrap = class {
       'header-title': header_title, hide_ads, iden: captcha_iden, lang, link_type, name, over_18, public_description,
       public_traffic, show_media, spam_comments, spam_links, spam_selfposts, sr, submit_link_label, submit_text,
       submit_text_label, suggested_comment_sort, title, type: subreddit_type || type, wiki_edit_age, wiki_edit_karma, wikimode
-    }}).then(helpers._handle_json_errors(this.get_subreddit(name)));
+    }}).then(_handle_json_errors(this.get_subreddit(name)));
   }
   /**
   * @summary Creates a new subreddit.
@@ -860,7 +860,7 @@ const snoowrap = class {
   */
   search_subreddit_topics ({query}) {
     return this._get({uri: 'api/subreddits_by_topic', qs: {query}}).then(results =>
-      _.map(results, 'name').map(this.get_subreddit.bind(this))
+      map(results, 'name').map(this.get_subreddit.bind(this))
     );
   }
   /**
@@ -935,7 +935,7 @@ const snoowrap = class {
   */
   search_subreddits (options) {
     options.q = options.query;
-    return this._get_listing({uri: 'subreddits/search', qs: _.omit(options, 'query')});
+    return this._get_listing({uri: 'subreddits/search', qs: omit(options, 'query')});
   }
   /**
   * @summary Gets a list of subreddits, arranged by popularity.
@@ -1017,7 +1017,7 @@ const snoowrap = class {
     return this._post({
       uri: 'api/live/create',
       form: {api_type, description, nsfw, resources, title}
-    }).tap(helpers._handle_json_errors(this)).then(result => this.get_livethread(result.json.data.id));
+    }).tap(_handle_json_errors(this)).then(result => this.get_livethread(result.json.data.id));
   }
   /**
   * @summary Gets the user's own multireddits.
@@ -1060,7 +1060,7 @@ const snoowrap = class {
       description_md: description,
       icon_name,
       key_color,
-      subreddits: subreddits.map(sub => ({name: _.isString(sub) ? sub : sub.display_name})),
+      subreddits: subreddits.map(sub => ({name: isString(sub) ? sub : sub.display_name})),
       visibility,
       weighting_scheme
     })}});
@@ -1122,9 +1122,9 @@ const snoowrap = class {
 };
 
 // Add the request_handler functions (oauth_request, credentialed_client_request, etc.) to the snoowrap prototype.
-_.assign(snoowrap.prototype, request_handler);
+assign(snoowrap.prototype, request_handler);
 
-_.forEach(constants.HTTP_VERBS, method => {
+forEach(HTTP_VERBS, method => {
   /* Define method shortcuts for each of the HTTP verbs. i.e. `snoowrap.prototype._post` is the same as `oauth_request` except
   that the HTTP method defaults to `post`, and the result is promise-wrapped. */
   snoowrap.prototype[`_${method}`] = function (options) {
@@ -1134,24 +1134,22 @@ _.forEach(constants.HTTP_VERBS, method => {
 
 snoowrap.objects = {};
 
-_.forOwn(constants.KINDS, value => {
+forOwn(KINDS, value => {
   snoowrap.objects[value] = objects[value] || class extends objects.RedditContent {};
+  /* Ensure that for any instance `x` of a snoowrap object, `x.constructor.name` will return the expected name (e.g. 'Comment').
+  This is done by defining a static `name` getter on each constructor. The alternative to this would be to define the
+  constructor name as part of the class syntax (e.g. `class Comment {}` rather than just `class {}`), but that causes issues
+  when snoowrap is minified, because the class names change (e.g. `class Comment {}` might be minified into `class n{}` which
+  would change the `name` property). Explicitly defining a static getter on the constructor avoids this issue. */
+  Object.defineProperty(snoowrap.objects[value], 'name', {get: () => value});
 });
 
-/* Ensure that for any instance `x` of a snoowrap object, `x.constructor.name` will return the expected name (e.g. 'Comment').
-This is done by defining a static `name` getter on each constructor. The alternative to this would be to define the constructor
-name as part of the class syntax (e.g. `class Comment {}` rather than just `class {}`), but that causes issues when snoowrap is
-minified, because the class names change (e.g. `class Comment {}` might be minified into `class n{}` which would change the
-`name` property). Explicitly defining a static getter on the constructor avoids this issue. */
-_.forOwn(snoowrap.objects, (value, key) => Object.defineProperty(value, 'name', {get: () => key}));
-
-snoowrap.helpers = helpers;
-snoowrap.constants = constants;
 snoowrap.errors = errors;
+snoowrap.version = VERSION;
 
 if (!module.parent && typeof window !== 'undefined') { // check if the code is being run in a browser through browserify
   /* global window */
-  window[constants.MODULE_NAME] = snoowrap;
+  window[MODULE_NAME] = snoowrap;
 }
 
 module.exports = snoowrap;

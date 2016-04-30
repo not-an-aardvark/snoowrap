@@ -1,4 +1,4 @@
-import helpers from '../helpers';
+import {_build_replies_tree, _find_message_in_tree} from '../helpers';
 import ReplyableContent from './ReplyableContent';
 
 /**
@@ -15,8 +15,8 @@ const PrivateMessage = class extends ReplyableContent {
     return `message/messages/${this.name.slice(3)}`;
   }
   _transform_api_response (response_obj) {
-    response_obj[0].replies = helpers._build_replies_tree(response_obj[0].replies);
-    return helpers._find_message_in_tree(this.name, response_obj[0]);
+    response_obj[0].replies = _build_replies_tree(response_obj[0].replies);
+    return _find_message_in_tree(this.name, response_obj[0]);
   }
   // TODO: Get rid of the repeated code here, most of these methods are exactly the same with the exception of the URIs
   /**
@@ -53,4 +53,4 @@ const PrivateMessage = class extends ReplyableContent {
   }
 };
 
-module.exports = PrivateMessage;
+export default PrivateMessage;

@@ -1,7 +1,7 @@
-import _ from 'lodash';
+import {clone, omit, assign, identity, map} from 'lodash';
 import Promise from 'bluebird';
-import helpers from '../helpers';
-import errors from '../errors';
+import {_handle_json_errors, _rename_key, _format_mod_permissions} from '../helpers';
+import {InvalidMethodCallError} from '../errors';
 import RedditContent from './RedditContent';
 import {Readable} from 'stream';
 import {createReadStream} from 'fs';
@@ -180,7 +180,7 @@ const Subreddit = class extends RedditContent {
   * ])
   */
   set_multiple_user_flairs (flair_array_orig) {
-    const flair_array = _.clone(flair_array_orig);
+    const flair_array = clone(flair_array_orig);
     const requests = [];
     while (flair_array.length > 0) {
       // The endpoint only accepts at most 100 lines of csv at a time, so split the array into chunks of 100.
@@ -453,7 +453,7 @@ const Subreddit = class extends RedditContent {
   * // ]
   */
   get_moderation_log (options = {}) {
-    const parsed_options = _(options).assign({mod: options.mods && options.mods.join(',')}).omit('mods').value();
+    const parsed_options = omit(assign(options, {mod: options.mods && options.mods.join(',')}), 'mods');
     return this._get_listing({uri: `r/${this.display_name}/about/log`, qs: parsed_options});
   }
   /**
@@ -555,7 +555,7 @@ const Subreddit = class extends RedditContent {
     return this._post({
       uri: `r/${this.display_name}/api/accept_moderator_invite`,
       form: {api_type}
-    }).then(helpers._handle_json_errors(this));
+    }).then(_handle_json_errors(this));
   }
   /**
   * @summary Abdicates moderator status on this subreddit.
@@ -564,7 +564,7 @@ const Subreddit = class extends RedditContent {
   */
   leave_moderator () {
     return this.fetch().get('name').then(name =>
-      this._post({uri: 'api/leavemoderator', form: {id: name}}).then(helpers._handle_json_errors(this))
+      this._post({uri: 'api/leavemoderator', form: {id: name}}).then(_handle_json_errors(this))
     );
   }
   /**
@@ -587,7 +587,7 @@ const Subreddit = class extends RedditContent {
   * // => '.md blockquote,.md del,body{color:#121212}.usertext-body ... '
   */
   get_stylesheet () {
-    return this._get({uri: `r/${this.display_name}/stylesheet`, json: false, transform: _.identity});
+    return this._get({uri: `r/${this.display_name}/stylesheet`, json: false, transform: identity});
   }
   /**
   * @summary Conducts a search of reddit submissions, restricted to this subreddit.
@@ -626,7 +626,7 @@ const Subreddit = class extends RedditContent {
   */
   get_banned_users (options) { // TODO: Return Listings containing RedditUser objects rather than normal objects with data
     const opts = typeof options === 'string' ? options : options && {name: options.name};
-    return this._get_listing({uri: `r/${this.display_name}/about/banned`, qs: helpers._rename_key(opts, 'name', 'user')});
+    return this._get_listing({uri: `r/${this.display_name}/about/banned`, qs: _rename_key(opts, 'name', 'user')});
   }
   /**
   * @summary Gets the list of muted users on this subreddit.
@@ -643,7 +643,7 @@ const Subreddit = class extends RedditContent {
   */
   get_muted_users (options) {
     const opts = typeof options === 'string' ? options : options && {name: options.name};
-    return this._get_listing({uri: `r/${this.display_name}/about/muted`, qs: helpers._rename_key(opts, 'name', 'user')});
+    return this._get_listing({uri: `r/${this.display_name}/about/muted`, qs: _rename_key(opts, 'name', 'user')});
   }
   /**
   * @summary Gets the list of users banned from this subreddit's wiki.
@@ -660,7 +660,7 @@ const Subreddit = class extends RedditContent {
   */
   get_wikibanned_users (options) {
     const opts = typeof options === 'string' ? options : options && {name: options.name};
-    return this._get_listing({uri: `r/${this.display_name}/about/wikibanned`, qs: helpers._rename_key(opts, 'name', 'user')});
+    return this._get_listing({uri: `r/${this.display_name}/about/wikibanned`, qs: _rename_key(opts, 'name', 'user')});
   }
   /**
   * @summary Gets the list of approved submitters on this subreddit.
@@ -677,7 +677,7 @@ const Subreddit = class extends RedditContent {
   */
   get_contributors (options) {
     const opts = typeof options === 'string' ? options : options && {name: options.name};
-    return this._get_listing({uri: `r/${this.display_name}/about/contributors`, qs: helpers._rename_key(opts, 'name', 'user')});
+    return this._get_listing({uri: `r/${this.display_name}/about/contributors`, qs: _rename_key(opts, 'name', 'user')});
   }
   /**
   * @summary Gets the list of approved wiki submitters on this subreddit .
@@ -694,7 +694,7 @@ const Subreddit = class extends RedditContent {
   */
   get_wiki_contributors (options) {
     const opts = typeof options === 'string' ? options : options && {name: options.name};
-    const query = helpers._rename_key(opts, 'name', 'user');
+    const query = _rename_key(opts, 'name', 'user');
     return this._get_listing({uri: `r/${this.display_name}/about/wikicontributors`, qs: query});
   }
   /**
@@ -713,7 +713,7 @@ const Subreddit = class extends RedditContent {
   */
   get_moderators (options) {
     const opts = typeof options === 'string' ? options : options && {name: options.name};
-    return this._get({uri: `r/${this.display_name}/about/moderators`, qs: helpers._rename_key(opts, 'name', 'user')});
+    return this._get({uri: `r/${this.display_name}/about/moderators`, qs: _rename_key(opts, 'name', 'user')});
   }
   /**
   * @summary Deletes the banner for this Subreddit.
@@ -724,7 +724,7 @@ const Subreddit = class extends RedditContent {
     return this._post({
       uri: `r/${this.display_name}/api/delete_sr_banner`,
       form: {api_type}
-    }).then(helpers._handle_json_errors(this));
+    }).then(_handle_json_errors(this));
   }
   /**
   * @summary Deletes the header image for this Subreddit.
@@ -735,7 +735,7 @@ const Subreddit = class extends RedditContent {
     return this._post({
       uri: `r/${this.display_name}/api/delete_sr_header`,
       form: {api_type}
-    }).then(helpers._handle_json_errors(this));
+    }).then(_handle_json_errors(this));
   }
   /**
   * @summary Deletes this subreddit's icon.
@@ -746,7 +746,7 @@ const Subreddit = class extends RedditContent {
     return this._post({
       uri: `r/${this.display_name}/api/delete_sr_icon`,
       form: {api_type}
-    }).then(helpers._handle_json_errors(this));
+    }).then(_handle_json_errors(this));
   }
   /**
   * @summary Deletes an image from this subreddit.
@@ -759,7 +759,7 @@ const Subreddit = class extends RedditContent {
     return this._post({
       uri: `r/${this.display_name}/api/delete_sr_image`,
       form: {api_type, img_name: image_name}
-    }).then(helpers._handle_json_errors(this));
+    }).then(_handle_json_errors(this));
   }
   /**
   * @summary Gets this subreddit's current settings.
@@ -827,18 +827,17 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Gets a list of recommended other subreddits given this one.
-  * @param {object} [$0]
-  * @param {Array} [$0.omit=[]] An Array of subreddit names that should be excluded from the listing.
+  * @param {object} [options]
+  * @param {Array} [options.omit=[]] An Array of subreddit names that should be excluded from the listing.
   * @returns {Promise} An Array of subreddit names
   * @example
   *
   * r.get_subreddit('AskReddit').get_recommended_subreddits().then(console.log);
   * // [ 'TheChurchOfRogers', 'Sleepycabin', ... ]
   */
-  get_recommended_subreddits ({omit} = {}) {
-    return this._get({uri: `api/recommend/sr/${this.display_name}`, qs: {omit: omit && omit.join(',')}}).then(names =>
-      _.map(names, 'sr_name')
-    );
+  get_recommended_subreddits (options) {
+    const to_omit = options.omit && options.omit.join(',');
+    return this._get({uri: `api/recommend/sr/${this.display_name}`, qs: {omit: to_omit}}).then(names => map(names, 'sr_name'));
   }
   /**
   * @summary Gets the submit text (which displays on the submission form) for this subreddit.
@@ -863,7 +862,7 @@ const Subreddit = class extends RedditContent {
     return this._post({
       uri: `r/${this.display_name}/api/subreddit_stylesheet`,
       form: {api_type, op: 'save', reason, stylesheet_contents: css}
-    }).then(helpers._handle_json_errors(this));
+    }).then(_handle_json_errors(this));
   }
 
   _set_subscribed (status) {
@@ -896,14 +895,14 @@ const Subreddit = class extends RedditContent {
   }
   _upload_sr_img ({name, file, upload_type, image_type}) {
     if (typeof file !== 'string' && !(file instanceof Readable)) {
-      throw new errors.InvalidMethodCallError('Uploaded image filepath must be a string or a ReadableStream.');
+      throw new InvalidMethodCallError('Uploaded image filepath must be a string or a ReadableStream.');
     }
     const parsed_file = typeof file === 'string' ? createReadStream(file) : file;
     return this._post({
       uri: `r/${this.display_name}/api/upload_sr_img`,
       formData: {name, upload_type, img_type: image_type, file: parsed_file}
     }).then(result => {
-      if (result.errors.length) {
+      if (result.length) {
         throw result.errors[0];
       }
       return this;
@@ -1005,13 +1004,13 @@ const Subreddit = class extends RedditContent {
     return this._post({
       uri: `r/${this.display_name}/api/friend`,
       form: {...options, api_type}
-    }).then(helpers._handle_json_errors(this));
+    }).then(_handle_json_errors(this));
   }
   _unfriend (options) {
     return this._post({
       uri: `r/${this.display_name}/api/unfriend`,
       form: {...options, api_type}
-    }).then(helpers._handle_json_errors(this));
+    }).then(_handle_json_errors(this));
   }
   /**
   * @summary Invites the given user to be a moderator of this subreddit.
@@ -1024,7 +1023,7 @@ const Subreddit = class extends RedditContent {
   * @example r.get_subreddit('snoowrap').invite_moderator({name: 'actually_an_aardvark', permissions: ['posts', 'wiki']})
   */
   invite_moderator ({name, permissions}) {
-    return this._friend({name, permissions: helpers._format_mod_permissions(permissions), type: 'moderator_invite'});
+    return this._friend({name, permissions: _format_mod_permissions(permissions), type: 'moderator_invite'});
   }
   /**
   * @summary Revokes an invitation for the given user to be a moderator.
@@ -1165,8 +1164,8 @@ const Subreddit = class extends RedditContent {
   set_moderator_permissions ({name, permissions}) {
     return this._post({
       uri: `r/${this.display_name}/api/setpermissions`,
-      form: {api_type, name, permissions: helpers._format_mod_permissions(permissions), type: 'moderator'}
-    }).then(helpers._handle_json_errors(this));
+      form: {api_type, name, permissions: _format_mod_permissions(permissions), type: 'moderator'}
+    }).then(_handle_json_errors(this));
   }
   /**
   * @summary Gets a given wiki page on this subreddit.
@@ -1213,4 +1212,4 @@ const Subreddit = class extends RedditContent {
   }
 };
 
-module.exports = Subreddit;
+export default Subreddit;

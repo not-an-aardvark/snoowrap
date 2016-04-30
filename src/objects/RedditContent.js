@@ -1,8 +1,8 @@
-import _ from 'lodash';
+import {assign, mapValues, includes, pick, keys, cloneDeep, forEach} from 'lodash';
 import Promise from 'bluebird';
 import promise_wrap from 'promise-chains';
 import {inspect} from 'util';
-import constants from '../constants';
+import {USER_KEYS, SUBREDDIT_KEYS, HTTP_VERBS} from '../constants';
 import Listing from './Listing';
 
 /**
@@ -17,7 +17,7 @@ const RedditContent = class {
     this._r = _r;
     this._fetch = undefined;
     this._has_fetched = !!_has_fetched;
-    _.assign(this, options);
+    assign(this, options);
     if (typeof Proxy !== 'undefined' && !this._has_fetched) {
       return new Proxy(this, {get (target, key) {
         if (key === '_raw') {
@@ -92,12 +92,12 @@ const RedditContent = class {
   * JSON.stringify(user) // => '{"name":"not_an_aardvark"}'
   */
   toJSON () {
-    return _.mapValues(this._strip_private_props(), (value, key) => {
+    return mapValues(this._strip_private_props(), (value, key) => {
       if (value instanceof RedditContent && !value._has_fetched) {
-        if (value.constructor.name === 'RedditUser' && _.includes(constants.USER_KEYS, key)) {
+        if (value.constructor.name === 'RedditUser' && includes(USER_KEYS, key)) {
           return value.name;
         }
-        if (value.constructor.name === 'Subreddit' && _.includes(constants.SUBREDDIT_KEYS, key)) {
+        if (value.constructor.name === 'Subreddit' && includes(SUBREDDIT_KEYS, key)) {
           return value.display_name;
         }
       }
@@ -108,15 +108,15 @@ const RedditContent = class {
     return `${this.constructor.name} ${inspect(this._strip_private_props())}`;
   }
   _strip_private_props () {
-    return _.pick(this, _.keys(this).filter(key => !key.startsWith('_')));
+    return pick(this, keys(this).filter(key => !key.startsWith('_')));
   }
   _transform_api_response (response_object) {
     return response_object;
   }
   _clone ({deep = false} = {}) {
-    const cloned_props = _.mapValues(this, value => {
+    const cloned_props = mapValues(this, value => {
       if (deep) {
-        return value instanceof RedditContent || value instanceof Listing ? value._clone({deep}) : _.cloneDeep(value);
+        return value instanceof RedditContent || value instanceof Listing ? value._clone({deep}) : cloneDeep(value);
       }
       return value;
     });
@@ -127,10 +127,10 @@ const RedditContent = class {
   }
 };
 
-_.forEach(constants.HTTP_VERBS, type => {
+forEach(HTTP_VERBS, type => {
   RedditContent.prototype[`_${type}`] = function (...args) {
     return this._r[`_${type}`](...args);
   };
 });
 
-module.exports = RedditContent;
+export default RedditContent;

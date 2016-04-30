@@ -1,6 +1,6 @@
 import {EventEmitter} from 'events';
 import WebSocket from 'ws';
-import helpers from '../helpers';
+import {_populate, _handle_json_errors, _format_livethread_permissions} from '../helpers';
 import RedditContent from './RedditContent';
 const api_type = 'json';
 
@@ -47,7 +47,7 @@ const LiveThread = class extends RedditContent {
     const populated_stream = new EventEmitter();
     const raw_stream = new WebSocket(response_object.websocket_url);
     raw_stream.on('message', data => {
-      const parsed = helpers._populate(JSON.parse(data), this._r);
+      const parsed = _populate(JSON.parse(data), this._r);
       populated_stream.emit(parsed.type, parsed.payload);
     });
     return {...response_object, _websocket: raw_stream, stream: populated_stream};
@@ -62,7 +62,7 @@ const LiveThread = class extends RedditContent {
     return this._post({
       uri: `api/live/${this.id}/update`,
       form: {api_type, body}
-    }).then(helpers._handle_json_errors(this));
+    }).then(_handle_json_errors(this));
   }
   /**
   * @summary Strikes (marks incorrect and crosses out) the given update.
@@ -74,7 +74,7 @@ const LiveThread = class extends RedditContent {
     return this._post({
       uri: `api/live/${this.id}/strike_update`,
       form: {api_type, id: `${id.startsWith('LiveUpdate_') ? '' : 'LiveUpdate_'}${id}`}
-    }).then(helpers._handle_json_errors(this));
+    }).then(_handle_json_errors(this));
   }
   /**
   * @summary Deletes an update from this LiveThread.
@@ -87,7 +87,7 @@ const LiveThread = class extends RedditContent {
     return this._post({
       uri: `api/live/${this.id}/delete_update`,
       form: {api_type, id: `${id.startsWith('LiveUpdate_') ? '' : 'LiveUpdate_'}${id}`}
-    }).then(helpers._handle_json_errors(this));
+    }).then(_handle_json_errors(this));
   }
   /**
   * @summary Gets a list of this LiveThread's contributors
@@ -120,10 +120,10 @@ const LiveThread = class extends RedditContent {
       form: {
         api_type,
         name,
-        permissions: helpers._format_livethread_permissions(permissions),
+        permissions: _format_livethread_permissions(permissions),
         type: 'liveupdate_contributor_invite'
       }
-    }).then(helpers._handle_json_errors(this));
+    }).then(_handle_json_errors(this));
   }
   /**
   * @summary Revokes an invitation for the given user to become a contributor on this LiveThread.
@@ -136,7 +136,7 @@ const LiveThread = class extends RedditContent {
     return this._r.get_user(name).id.then(user_id => this._post({
       uri: `api/live/${this.id}/rm_contributor_invite`,
       form: {api_type, id: `t2_${user_id}`}
-    })).then(helpers._handle_json_errors(this));
+    })).then(_handle_json_errors(this));
   }
   /**
   * @summary Accepts a pending contributor invitation on this LiveThread.
@@ -165,7 +165,7 @@ const LiveThread = class extends RedditContent {
     return this._r.get_user(name).fetch().get('id').then(user_id => this._post({
       uri: `api/live/${this.id}/rm_contributor`,
       form: {api_type, id: `t2_${user_id}`}
-    })).then(helpers._handle_json_errors(this));
+    })).then(_handle_json_errors(this));
   }
   /**
   * @summary Sets the permissions of the given contributor.
@@ -179,8 +179,8 @@ const LiveThread = class extends RedditContent {
   set_contributor_permissions ({name, permissions}) {
     return this._post({
       uri: `api/live/${this.id}/set_contributor_permissions`,
-      form: {api_type, name, permissions: helpers._format_livethread_permissions(permissions), type: 'liveupdate_contributor'}
-    }).then(helpers._handle_json_errors(this));
+      form: {api_type, name, permissions: _format_livethread_permissions(permissions), type: 'liveupdate_contributor'}
+    }).then(_handle_json_errors(this));
   }
   /**
   * @summary Edits the settings on this LiveThread.
@@ -196,7 +196,7 @@ const LiveThread = class extends RedditContent {
     return this._post({
       uri: `api/live/${this.id}/edit`,
       form: {api_type, description, nsfw, resources, title}
-    }).then(helpers._handle_json_errors(this));
+    }).then(_handle_json_errors(this));
   }
   /**
   * @summary Permanently closes this thread, preventing any more updates from being added.
@@ -218,7 +218,7 @@ const LiveThread = class extends RedditContent {
     return this._post({
       uri: `api/live/${this.id}/report`,
       form: {api_type, type: reason}
-    }).then(helpers._handle_json_errors(this));
+    }).then(_handle_json_errors(this));
   }
   /**
   * @summary Gets a Listing containing past updates to this LiveThread.
@@ -272,4 +272,4 @@ const LiveThread = class extends RedditContent {
   }
 };
 
-module.exports = LiveThread;
+export default LiveThread;

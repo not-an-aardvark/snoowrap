@@ -145,4 +145,4 @@ const WikiPage = class extends RedditContent {
   }
 };
 
-module.exports = WikiPage;
+export default WikiPage;

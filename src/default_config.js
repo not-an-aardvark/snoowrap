@@ -1,5 +1,5 @@
 // Defines the default config values. For more information on these, see the documentation for snoowrap#config()
-module.exports = {
+export default {
   endpoint_domain: 'reddit.com',
   request_delay: 0,
   continue_after_ratelimit_error: false,

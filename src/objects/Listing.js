@@ -1,14 +1,14 @@
-import _ from 'lodash';
+import {identity, assign, defaults, defaultsDeep, pick, keys, last, isObject, clone, isNumber, isFunction} from 'lodash';
 import Promise from 'bluebird';
 import promise_wrap from 'promise-chains';
 import {inspect} from 'util';
 import {parse as url_parse} from 'url';
-import errors from '../errors';
+import {InvalidMethodCallError} from '../errors';
 import More from './More';
 
 const INTERNAL_DEFAULTS = {
   _query: {},
-  _transform: _.identity,
+  _transform: identity,
   _method: 'get',
   _is_comment_list: false,
   _link_id: null,
@@ -42,18 +42,18 @@ const Listing = class extends Array {
   constructor (options = {}, _r) {
     super();
     this._r = _r;
-    _.assign(this, options.children || []);
-    _.defaults(this, {_cached_lookahead: options._cached_lookahead});
-    _.defaultsDeep(this, _.pick(options, _.keys(INTERNAL_DEFAULTS)), INTERNAL_DEFAULTS);
-    _.assign(this._query, _.pick(options, ['before', 'after']));
-    if (_.last(options.children) instanceof More) {
+    assign(this, options.children || []);
+    defaults(this, {_cached_lookahead: options._cached_lookahead});
+    defaultsDeep(this, pick(options, keys(INTERNAL_DEFAULTS)), INTERNAL_DEFAULTS);
+    assign(this._query, pick(options, ['before', 'after']));
+    if (last(options.children) instanceof More) {
       this._set_more(this.pop());
     }
   }
   _set_uri (value) {
     const parsed_uri = url_parse(value, true);
     this._uri = parsed_uri.pathname;
-    _.defaultsDeep(this._query, parsed_uri.query);
+    defaultsDeep(this._query, parsed_uri.query);
     if (parsed_uri.query.before) {
       this._query.after = null;
     } else {
@@ -100,9 +100,9 @@ const Listing = class extends Array {
   * });
   */
   fetch_more (options) {
-    const parsed_options = _.defaults(_.isObject(options) ? _.clone(options) : {amount: options}, {skip_replies: false});
-    if (!_.isNumber(parsed_options.amount) || Number.isNaN(parsed_options.amount)) {
-      throw new errors.InvalidMethodCallError('Failed to fetch Listing. (`amount` parameter was missing or invalid)');
+    const parsed_options = defaults(isObject(options) ? clone(options) : {amount: options}, {skip_replies: false});
+    if (!isNumber(parsed_options.amount) || Number.isNaN(parsed_options.amount)) {
+      throw new InvalidMethodCallError('Failed to fetch Listing. (`amount` parameter was missing or invalid)');
     }
     if (parsed_options.amount <= 0 || this.is_finished) {
       return promise_wrap(Promise.resolve(this._clone()));
@@ -121,11 +121,11 @@ const Listing = class extends Array {
     }).then(this._transform).then(response => {
       const cloned = this._clone();
       if (cloned._query.before) {
-        cloned.unshift(..._.toArray(response));
+        cloned.unshift(...Array.from(response));
         cloned._query.before = response._query.before;
         cloned._query.after = null;
       } else {
-        cloned.push(..._.toArray(response));
+        cloned.push(...Array.from(response));
         cloned._query.before = null;
         cloned._query.after = response._query.after;
       }
@@ -144,7 +144,7 @@ const Listing = class extends Array {
   async _fetch_more_comments (options) {
     const cloned = this._clone();
     const more_comments = await this._more.fetch_more(options);
-    cloned.push(..._.toArray(more_comments));
+    cloned.push(...Array.from(more_comments));
     cloned._more._remove_leading_children(options.amount);
     return cloned;
   }
@@ -167,16 +167,16 @@ const Listing = class extends Array {
     return this.fetch_more({...options, amount: options.length - this.length});
   }
   inspect () {
-    return `Listing ${inspect(_.toArray(this))}`;
+    return `Listing ${inspect(Array.from(this))}`;
   }
   _clone ({deep = false} = {}) {
-    const properties = _.pick(this, _.keys(INTERNAL_DEFAULTS));
-    properties._query = _.clone(properties._query);
-    properties._cached_lookahead = _.clone(properties._cached_lookahead);
+    const properties = pick(this, keys(INTERNAL_DEFAULTS));
+    properties._query = clone(properties._query);
+    properties._cached_lookahead = clone(properties._cached_lookahead);
     properties._more = this._more && this._more._clone();
-    const shallow_children = _.toArray(this);
+    const shallow_children = Array.from(this);
     properties.children = deep ? shallow_children.map(item => {
-      return '_clone' in item && _.isFunction(item._clone) ? item._clone({deep}) : item;
+      return '_clone' in item && isFunction(item._clone) ? item._clone({deep}) : item;
     }) : shallow_children;
     return new Listing(properties, this._r);
   }
@@ -185,8 +185,8 @@ const Listing = class extends Array {
     this._is_comment_list = true;
   }
   toJSON () {
-    return _.toArray(this).map(item => item && item.toJSON ? item.toJSON() : item);
+    return Array.from(this).map(item => item && item.toJSON ? item.toJSON() : item);
   }
 };
 
-module.exports = Listing;
+export default Listing;

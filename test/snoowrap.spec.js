@@ -64,7 +64,7 @@ describe('snoowrap', function () {
       expect(timer.isFulfilled()).to.be.true();
     });
     it('stores the version number as a constant', () => {
-      expect(snoowrap.constants.VERSION).to.equal(require('../package.json').version);
+      expect(snoowrap.version).to.equal(require('../package.json').version);
     });
     it('throws a TypeError if an invalid config option is set', () => {
       expect(() => r.config({invalid_config_option: true})).to.throw(TypeError);
