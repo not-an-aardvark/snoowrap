@@ -42,7 +42,7 @@ const Listing = class extends Array {
   constructor (options = {}, _r) {
     super();
     this._r = _r;
-    assign(this, options.children || []);
+    this.push(...options.children || []);
     defaults(this, {_cached_lookahead: options._cached_lookahead});
     defaultsDeep(this, pick(options, keys(INTERNAL_DEFAULTS)), INTERNAL_DEFAULTS);
     assign(this._query, pick(options, ['before', 'after']));
