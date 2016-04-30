@@ -1192,9 +1192,7 @@ const Subreddit = class extends require('./RedditContent') {
   * // ]
   */
   get_wiki_pages () {
-    return this._get({uri: `r/${this.display_name}/wiki/pages`}).then(result =>
-      _.map(result, title => this.get_wiki_page(title))
-    );
+    return this._get({uri: `r/${this.display_name}/wiki/pages`}).map(title => this.get_wiki_page(title));
   }
   /**
   * @summary Gets a list of revisions on this subreddit's wiki.
