@@ -1,7 +1,7 @@
-import {get_empty_replies_listing, add_empty_replies_listing} from '../helpers';
-import Listing from './Listing';
-import {empty_children as empty_more_object} from './More';
-import VoteableContent from './VoteableContent';
+import {get_empty_replies_listing, add_empty_replies_listing} from '../helpers.js';
+import Listing from './Listing.js';
+import {empty_children as empty_more_object} from './More.js';
+import VoteableContent from './VoteableContent.js';
 /**
 * A class representing a reddit comment
 * <style> #Comment {display: none} </style>

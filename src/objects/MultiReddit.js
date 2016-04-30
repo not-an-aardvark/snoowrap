@@ -1,5 +1,5 @@
 import {isString} from 'lodash';
-import RedditContent from './RedditContent';
+import RedditContent from './RedditContent.js';
 
 /**
 * @summary A class representing a multireddit.

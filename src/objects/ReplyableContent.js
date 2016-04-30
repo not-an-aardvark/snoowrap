@@ -1,5 +1,5 @@
-import {handle_json_errors} from '../helpers';
-import RedditContent from './RedditContent';
+import {handle_json_errors} from '../helpers.js';
+import RedditContent from './RedditContent.js';
 const api_type = 'json';
 
 /**

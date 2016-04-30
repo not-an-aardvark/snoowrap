@@ -1,7 +1,7 @@
 import {EventEmitter} from 'events';
 import WebSocket from 'ws';
-import {populate, handle_json_errors, format_livethread_permissions} from '../helpers';
-import RedditContent from './RedditContent';
+import {populate, handle_json_errors, format_livethread_permissions} from '../helpers.js';
+import RedditContent from './RedditContent.js';
 const api_type = 'json';
 
 /**

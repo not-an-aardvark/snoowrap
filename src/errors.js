@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import {isString} from 'lodash';
-import {MODULE_NAME, API_RULES_LINK, DOCS_LINK} from './constants';
+import {MODULE_NAME, API_RULES_LINK, DOCS_LINK} from './constants.js';
 
 function sub_error (name, default_message) {
   function SubclassedError (message) {

@@ -1,4 +1,4 @@
-import package_info from '../package';
+import package_info from '../package.json';
 // SCREAMING_SNAKE_CASE MAKES EVERYTHING SEEM LIKE I'M SHOUTING AAAAAAAA
 export const MODULE_NAME = package_info.name;
 export const VERSION = package_info.version;

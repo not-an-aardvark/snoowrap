@@ -1,6 +1,6 @@
 import promise_wrap from 'promise-chains';
-import {handle_json_errors} from '../helpers';
-import ReplyableContent from './ReplyableContent';
+import {handle_json_errors} from '../helpers.js';
+import ReplyableContent from './ReplyableContent.js';
 const api_type = 'json';
 
 /**

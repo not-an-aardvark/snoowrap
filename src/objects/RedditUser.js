@@ -1,6 +1,6 @@
-import {USERNAME_REGEX} from '../constants';
-import {InvalidUserError, InvalidMethodCallError} from '../errors';
-import RedditContent from './RedditContent';
+import {USERNAME_REGEX} from '../constants.js';
+import {InvalidUserError, InvalidMethodCallError} from '../errors.js';
+import RedditContent from './RedditContent.js';
 
 /**
 * A class representing a reddit user

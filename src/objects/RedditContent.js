@@ -2,8 +2,8 @@ import {assign, mapValues, includes, pick, keys, cloneDeep, forEach} from 'lodas
 import Promise from 'bluebird';
 import promise_wrap from 'promise-chains';
 import {inspect} from 'util';
-import {USER_KEYS, SUBREDDIT_KEYS, HTTP_VERBS} from '../constants';
-import Listing from './Listing';
+import {USER_KEYS, SUBREDDIT_KEYS, HTTP_VERBS} from '../constants.js';
+import Listing from './Listing.js';
 
 /**
 * A base class for content from reddit. With the expection of Listings, all content types extend this class.

@@ -3,8 +3,8 @@ import Promise from 'bluebird';
 import promise_wrap from 'promise-chains';
 import {inspect} from 'util';
 import {parse as url_parse} from 'url';
-import {InvalidMethodCallError} from '../errors';
-import More from './More';
+import {InvalidMethodCallError} from '../errors.js';
+import More from './More.js';
 
 const INTERNAL_DEFAULTS = {
   _query: {},

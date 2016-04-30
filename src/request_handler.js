@@ -1,8 +1,8 @@
 import Promise from 'bluebird';
 import request_promise from 'request-promise';
-import {populate} from './helpers';
-import {MAX_TOKEN_LATENCY} from './constants';
-import {RateLimitWarning, RateLimitError} from './errors';
+import {populate} from './helpers.js';
+import {MAX_TOKEN_LATENCY} from './constants.js';
+import {RateLimitWarning, RateLimitError} from './errors.js';
 const request = request_promise.defaults({json: true});
 
 /**

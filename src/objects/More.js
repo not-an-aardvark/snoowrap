@@ -1,7 +1,7 @@
 import {assign, remove, forEach, flatten, clone, pick} from 'lodash';
 import Promise from 'bluebird';
-import {handle_json_errors, add_empty_replies_listing, build_replies_tree} from '../helpers';
-import {MAX_API_INFO_AMOUNT, MAX_API_MORECHILDREN_AMOUNT} from '../constants';
+import {handle_json_errors, add_empty_replies_listing, build_replies_tree} from '../helpers.js';
+import {MAX_API_INFO_AMOUNT, MAX_API_MORECHILDREN_AMOUNT} from '../constants.js';
 const api_type = 'json';
 
 /**

@@ -2,12 +2,12 @@ import {isUndefined, assign, findKey, mapValues, omitBy, includes, map, isEmpty,
 import Promise from 'bluebird';
 import promise_wrap from 'promise-chains';
 import util from 'util';
-import * as request_handler from './request_handler';
-import {MODULE_NAME, VERSION, HTTP_VERBS, KINDS} from './constants';
-import * as errors from './errors';
-import {handle_json_errors} from './helpers';
-import default_config from './default_config';
-import * as objects from './objects';
+import * as request_handler from './request_handler.js';
+import {MODULE_NAME, VERSION, HTTP_VERBS, KINDS} from './constants.js';
+import * as errors from './errors.js';
+import {handle_json_errors} from './helpers.js';
+import default_config from './default_config.js';
+import * as objects from './objects/index.js';
 const api_type = 'json';
 
 /** The class for a snoowrap requester.

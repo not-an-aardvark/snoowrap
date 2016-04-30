@@ -1,6 +1,6 @@
 import {keys, map, mapValues, includes, property, isEmpty, find, partial, omit, keyBy, remove} from 'lodash';
-import {KINDS, USER_KEYS, SUBREDDIT_KEYS, MODERATOR_PERMISSIONS, LIVETHREAD_PERMISSIONS} from './constants';
-import {empty_children as empty_more_object} from './objects/More';
+import {KINDS, USER_KEYS, SUBREDDIT_KEYS, MODERATOR_PERMISSIONS, LIVETHREAD_PERMISSIONS} from './constants.js';
+import {empty_children as empty_more_object} from './objects/More.js';
 
 export function populate (response_tree, _r) {
   if (typeof response_tree === 'object' && response_tree !== null) {

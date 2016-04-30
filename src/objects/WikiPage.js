@@ -1,4 +1,4 @@
-import RedditContent from './RedditContent';
+import RedditContent from './RedditContent.js';
 
 /**
 * A class representing a wiki page on a subreddit.

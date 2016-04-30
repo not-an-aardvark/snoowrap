@@ -1,5 +1,5 @@
-import {get_empty_replies_listing} from '../helpers';
-import VoteableContent from './VoteableContent';
+import {get_empty_replies_listing} from '../helpers.js';
+import VoteableContent from './VoteableContent.js';
 const api_type = 'json';
 
 /**
