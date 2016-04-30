@@ -103,7 +103,8 @@ module.exports = {
       if (attempts + 1 >= this._config.max_retry_attempts || this._config.retry_error_codes.indexOf(err.statusCode) === -1) {
         throw err;
       }
-      this.log.warn(`Received status code ${err.statusCode} from reddit. Retrying request...`);
+      this.log.warn(`Received status code ${err.statusCode} from reddit. Retrying request (attempt ${attempts + 2}/${
+        this._config.max_retry_attempts})...`);
       return await this.oauth_request(options, attempts + 1);
     }
   },
