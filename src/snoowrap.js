@@ -1,4 +1,5 @@
-import {assign, forEach, forOwn, findKey, includes, isEmpty, isString, isUndefined, map, mapValues, omit, omitBy} from 'lodash';
+import {assign, defaults, forEach, forOwn, findKey, includes, isEmpty, isString, isUndefined, map, mapValues, omit,
+  omitBy} from 'lodash';
 import Promise from 'bluebird';
 import promise_wrap from 'promise-chains';
 import util from 'util';
@@ -715,8 +716,7 @@ const snoowrap = class {
     if (options.subreddit instanceof snoowrap.objects.Subreddit) {
       options.subreddit = options.subreddit.display_name;
     }
-    options.restrict_sr = options.restrict_sr || true;
-    options.syntax = options.syntax || 'plain';
+    defaults(options, {restrict_sr: true, syntax: 'plain'});
     const parsed_query = omit({...options, t: options.time, q: options.query}, ['time', 'query']);
     return this._get_listing({uri: `${options.subreddit ? `r/${options.subreddit}/` : ''}search`, qs: parsed_query});
   }
