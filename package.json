@@ -41,6 +41,7 @@
     "babel-cli": "^6.7.5",
     "babel-core": "^6.7.6",
     "babel-eslint": "^6.0.2",
+    "babel-plugin-lodash": "^2.3.0",
     "babel-plugin-transform-async-to-generator": "^6.5.0",
     "babel-plugin-transform-es2015-destructuring": "^6.5.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.7.7",
