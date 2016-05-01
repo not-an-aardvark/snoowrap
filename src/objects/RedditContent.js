@@ -1,4 +1,4 @@
-import {assign, cloneDeep, forEach, includes, keys, mapValues, pick} from 'lodash';
+import {assign, cloneDeep, forEach, keys, mapValues, pick} from 'lodash';
 import Promise from 'bluebird';
 import promise_wrap from 'promise-chains';
 import {inspect} from 'util';
@@ -88,10 +88,10 @@ const RedditContent = class {
   toJSON () {
     return mapValues(this._strip_private_props(), (value, key) => {
       if (value instanceof RedditContent && !value._has_fetched) {
-        if (value.constructor.name === 'RedditUser' && includes(USER_KEYS, key)) {
+        if (value.constructor.name === 'RedditUser' && USER_KEYS.has(key)) {
           return value.name;
         }
-        if (value.constructor.name === 'Subreddit' && includes(SUBREDDIT_KEYS, key)) {
+        if (value.constructor.name === 'Subreddit' && SUBREDDIT_KEYS.has(key)) {
           return value.display_name;
         }
       }

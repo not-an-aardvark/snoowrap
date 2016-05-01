@@ -9,8 +9,8 @@ export const API_RULES_LINK = 'https://github.com/reddit/reddit/wiki/API';
 `helpers.populate`. `author`, `approved_by`, `banned_by`, and `subreddit` all appear in fetched Submissions, among other places.
 `user` appears in responses from the api/flairlist endpoint, and `sr` appears in responses from the `api/v1/me/karma`
 endpoint. */
-export const USER_KEYS = ['author', 'approved_by', 'banned_by', 'user'];
-export const SUBREDDIT_KEYS = ['subreddit', 'sr'];
+export const USER_KEYS = new Set(['author', 'approved_by', 'banned_by', 'user']);
+export const SUBREDDIT_KEYS = new Set(['subreddit', 'sr']);
 export const KINDS = {
   t1: 'Comment',
   t2: 'RedditUser',

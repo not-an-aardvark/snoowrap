@@ -11,10 +11,10 @@ export function populate (response_tree, _r) {
     }
     const result = (Array.isArray(response_tree) ? map : mapValues)(response_tree, (value, key) => {
       // Maps {..., author: 'some_username', ...} to {..., author: RedditUser {}, ... } (e.g.)
-      if (includes(USER_KEYS, key) && value !== null) {
+      if (value !== null && USER_KEYS.has(key)) {
         return _r._new_object('RedditUser', {name: value}, false);
       }
-      if (includes(SUBREDDIT_KEYS, key) && value !== null) {
+      if (value !== null && SUBREDDIT_KEYS.has(key)) {
         return _r._new_object('Subreddit', {display_name: value}, false);
       }
       return populate(value, _r);
