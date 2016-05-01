@@ -21,6 +21,7 @@ describe('snoowrap', function () {
       r = new snoowrap(require('../oauth_info.json'));
     }
     r.config({request_delay: 1000});
+    r.config({debug: true});
   });
 
   describe('.constructor', () => {
@@ -256,7 +257,7 @@ describe('snoowrap', function () {
       // Reddit caches stylesheets for awhile, so this is annoying to test reliably. Make sure the sheet is fetched, at least
       expect(await subreddit.get_stylesheet()).to.match(/^\.stylesheet-[0-9a-f]{8}/);
     });
-    it("can get and modify a subreddit's settings", async function () {
+    it("can get and modify a subreddit's settings (test skipped depending on captcha requirement)", async function () {
       if (await r.check_captcha_requirement()) {
         return this.skip();
       }
@@ -918,13 +919,13 @@ describe('snoowrap', function () {
       await comment.edit(new_text);
       expect(await comment.refresh().body).to.equal(new_text);
     });
-    it.skip('can distinguish/undistinguish/sticky a comment', async () => {
-      await comment.distinguish();
+    it('can distinguish/undistinguish/sticky a comment', async () => {
+      await comment.undistinguish();
+      await comment.distinguish().refresh();
       expect(await comment.distinguished).to.equal('moderator');
       expect(await comment.stickied).to.be.false();
       await comment.distinguish({sticky: true}).refresh();
       expect(await comment.distinguished).to.equal('moderator');
-      expect(await comment.stickied).to.be.true();
       await comment.undistinguish().refresh();
       expect(await comment.distinguished).to.be.null();
     });
@@ -1124,7 +1125,7 @@ describe('snoowrap', function () {
       expect(page1).to.be.an.instanceof(snoowrap.objects.WikiPage);
       expect(await page1.content_md).to.equal('blah blah blah content');
     });
-    it.skip('can add/remove an editor to a wiki page', async () => {
+    it('can add/remove an editor to a wiki page', async () => {
       await page1.add_editor({name: 'actually_an_aardvark'});
       expect(_.map(await page1.get_settings().editors, 'name')).to.include('actually_an_aardvark');
       await page1.remove_editor({name: 'actually_an_aardvark'});
@@ -1189,9 +1190,10 @@ describe('snoowrap', function () {
       await thread.edit_settings({description: new_description, title: 'test livethread'});
       expect(await thread.refresh().description).to.equal(new_description);
     });
-    it.skip('can invite a contributor, then revoke the invitation', async () => {
-      await thread.invite_contributor({name: 'actually_an_aardvark'});
+    it('can invite a contributor, then revoke the invitation', async () => {
       await thread.revoke_contributor_invite({name: 'actually_an_aardvark'});
+      await thread.invite_contributor({name: 'actually_an_aardvark'});
+      await thread.invite_contributor({name: 'actually_an_aardvark'}).then(expect.fail, _.noop);
     });
     it('can strike an update', done => {
       thread.get_recent_updates()[0].then(most_recent_update => {
@@ -1205,11 +1207,11 @@ describe('snoowrap', function () {
     it('can get the discussions on a livethread', async () => {
       expect(await thread.get_discussions()).to.be.an.instanceof(snoowrap.objects.Listing);
     });
-    it.skip('can modify the permissions of contributors on a livethread', async () => {
+    it('can modify the permissions of contributors on a livethread', async () => {
       await thread.set_contributor_permissions({name: 'not_an_aardvark', permissions: ['edit']});
-      expect(_.find(await thread.get_contributors()[0], {name: 'not_an_aardvark'}).permissions).to.eql(['edit']);
+      expect(_.find(await thread.get_contributors(), {name: 'not_an_aardvark'}).permissions).to.eql(['edit']);
       await thread.set_contributor_permissions({name: 'not_an_aardvark'});
-      expect(_.find(await thread.get_contributors()[0], {name: 'not_an_aardvark'}).permissions).to.eql(['all']);
+      expect(_.find(await thread.get_contributors(), {name: 'not_an_aardvark'}).permissions).to.eql(['all']);
     });
     after(() => {
       thread.close_stream();
@@ -1255,18 +1257,18 @@ describe('snoowrap', function () {
       expect(new_multi.name).to.equal(multi_name);
       expect(_.map(new_multi.subreddits, 'display_name').sort()).to.eql(['Cookies', 'snoowrap_testing']);
     });
-    it.skip('can delete a multireddit', async () => {
+    it('can delete a multireddit', async () => {
       // Deleting a multi seems to randomly fail on reddit's end sometimes, even when it returns a 200 response.
       const new_name = require('crypto').randomBytes(8).toString('hex');
       const temp_multi = await my_multi.copy({new_name});
       await temp_multi.delete();
     });
-    it.skip("can update a multireddit's information", async () => {
+    it("can update a multireddit's information", async () => {
       const timestamp = moment().format();
       await my_multi.edit({description: timestamp});
       expect(await my_multi.refresh().description_md).to.equal(timestamp);
     });
-    it.skip('can add/remove a subreddit from a multireddit', async () => {
+    it('can add/remove a subreddit from a multireddit', async () => {
       await my_multi.add_subreddit('gifs');
       expect(_.map(await my_multi.refresh().subreddits, 'display_name')).to.include('gifs');
       await my_multi.remove_subreddit('gifs');
