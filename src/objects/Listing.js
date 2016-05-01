@@ -1,4 +1,5 @@
-import {assign, clone, defaults, defaultsDeep, identity, isFunction, isNumber, isObject, keys, last, pick} from 'lodash';
+import {assign, clone, defaults, defaultsDeep, identity, isFunction, isNil, isNumber, isObject, keys, last, omitBy,
+  pick} from 'lodash';
 import Promise from 'bluebird';
 import promise_wrap from 'promise-chains';
 import {inspect} from 'util';
@@ -115,9 +116,28 @@ const Listing = class extends Array {
     return promise_wrap(this._more ? this._fetch_more_comments(parsed_options) : this._fetch_more_regular(parsed_options));
   }
   _fetch_more_regular (options) {
+    const query = omitBy(clone(this._query), isNil);
+    if (!this._is_comment_list) {
+      /* Reddit returns a different number of items per request depending on the `limit` querystring property specified in the
+      request. If no `limit` property is specified, reddit returns some number of items depending on the user's preferences
+      (currently 25 items with default preferences). If a `limit` property is specified, then reddit returns `limit` items per
+      batch. However, this is capped at 100, so if a `limit` larger than 100 items is specified, reddit will only return 100
+      items in the batch. (The cap of 100 could plausibly change to a different amount in the future.)
+
+      However, one caveat is that reddit's parser doesn't understand the javascript `Infinity` global. If `limit=Infinity` is
+      provided in the querystring, reddit won't understand the parameter so it'll just act as if no parameter was provided, and
+      will return 25 items in the batch. This is suboptimal behavior as far as snoowrap is concerned, because it means that 4
+      times as many requests are needed to fetch the entire listing.
+
+      To get around the issue, snoowrap caps the `limit` property at Number.MAX_SAFE_INTEGER when sending requests. This ensures
+      that `Infinity` will never be sent as part of the querystring, so reddit will always return the maximal 100 items per
+      request if the desired amount of items is large.
+      */
+      query.limit = Math.min(options.amount, Number.MAX_SAFE_INTEGER);
+    }
     return this._r[`_${this._method}`]({
       uri: this._uri,
-      qs: {...this._query, limit: this._is_comment_list ? undefined : options.amount}
+      qs: query
     }).then(this._transform).then(response => {
       const cloned = this._clone();
       if (cloned._query.before) {

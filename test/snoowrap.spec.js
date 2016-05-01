@@ -385,9 +385,10 @@ describe('snoowrap', function () {
   });
 
   describe('general Listing behavior', () => {
-    let comments;
+    let comments, initial_request_delay;
     beforeEach(async () => {
       comments = await r.get_submission('2np694').comments;
+      initial_request_delay = r.config().request_delay;
     });
     it('can store elements and inherit Array functions', async () => {
       expect(comments).to.be.an.instanceof(snoowrap.objects.Listing);
@@ -441,6 +442,18 @@ describe('snoowrap', function () {
     it('allows more than 100 items to be fetched initially by repeatedly making requests', async () => {
       const lots_of_top_posts = await r.get_top({time: 'all', limit: 120});
       expect(lots_of_top_posts).to.have.lengthOf(120);
+    });
+    it('retrieves 100 items at a time when fetching a large listing', async () => {
+      const l = await r.get_top({time: 'all', limit: 1});
+      expect(l).to.have.lengthOf(1);
+      r.config({request_delay: 5000});
+      const timer_promise = Promise.delay(9999);
+      const expanded_l = await l.fetch_more({amount: 200});
+      expect(expanded_l).to.have.lengthOf(201);
+      expect(timer_promise.isFulfilled()).to.be.false();
+    });
+    afterEach(() => {
+      r.config({request_delay: initial_request_delay});
     });
   });
 
