@@ -5,7 +5,11 @@ export const VERSION = package_info.version;
 export const ISSUE_REPORT_LINK = package_info.bugs.url;
 export const DOCS_LINK = 'https://not-an-aardvark.github.io/snoowrap/';
 export const API_RULES_LINK = 'https://github.com/reddit/reddit/wiki/API';
-export const USER_KEYS = ['author', 'approved_by', 'banned_by'];
+/* USER_KEYS and SUBREDDIT_KEYS are keys that are replaced by RedditUser and Subreddit objects when encountered in
+`helpers.populate`. `author`, `approved_by`, `banned_by`, and `subreddit` all appear in fetched Submissions, among other places.
+`user` appears in responses from the api/flairlist endpoint, and `sr` appears in responses from the `api/v1/me/karma`
+endpoint. */
+export const USER_KEYS = ['author', 'approved_by', 'banned_by', 'user'];
 export const SUBREDDIT_KEYS = ['subreddit', 'sr'];
 export const KINDS = {
   t1: 'Comment',

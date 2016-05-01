@@ -193,11 +193,11 @@ const Subreddit = class extends RedditContent {
   /**
   * @summary Gets a list of all user flairs on this subreddit.
   * @param {string} [options.name] A specific username to jump to
-  * @returns {Promise} A Array containing user flairs
+  * @returns {Promise} A Listing containing user flairs
   * @example
   *
   * r.get_subreddit('snoowrap').get_user_flair_list().then(console.log)
-  // => [
+  // => Listing [
   //  { flair_css_class: null,
   //  user: 'not_an_aardvark',
   //  flair_text: 'Isn\'t an aardvark' },
@@ -209,8 +209,19 @@ const Subreddit = class extends RedditContent {
   //    flair_text: 'this is /u/snoowrap_testing\'s flair text' }
   // ]
   */
-  get_user_flair_list (options) {
-    return this._get({uri: `r/${this.display_name}/api/flairlist`, qs: options}).get('users');
+  get_user_flair_list (options = {}) {
+    return this._get_listing({uri: `r/${this.display_name}/api/flairlist`, qs: options, _transform: response => {
+      /* For unknown reasons, responses from the api/flairlist endpoint are formatted differently than responses from all other
+      Listing endpoints. Most Listing endpoints return an object with a `children` property containing the Listing's children,
+      and `after` and `before` properties corresponding to the `after` and `before` querystring parameters that a client should
+      use in the next request. However, the api/flairlist endpoint returns an objecti with a `users` property containing the
+      Listing's children, and `next` and `prev` properties corresponding to the `after` and `before` querystring parameters. As
+      far as I can tell, there's no actual reason for this difference. >_> */
+      response.after = response.next || null;
+      response.before = response.prev || null;
+      response.children = response.users;
+      return this._r._new_object('Listing', response);
+    }});
   }
   /**
   * @summary Configures the flair settings for this subreddit.

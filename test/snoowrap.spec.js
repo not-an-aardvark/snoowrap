@@ -775,6 +775,56 @@ describe('snoowrap', function () {
     });
   });
 
+  describe('api/flairlist Listings', () => {
+    let sub;
+    beforeEach(() => {
+      sub = r.get_subreddit('snoowrap_testing');
+    });
+    it('treats responses from the api/flairlist endpoint as Listings', async () => {
+      expect(await sub.get_user_flair_list()).to.be.an.instanceof(snoowrap.objects.Listing);
+    });
+    it('passes query parameters from get_user_flair_list() to the resulting Listing', async () => {
+      expect(await sub.get_user_flair_list({limit: 10})).to.have.lengthOf(10);
+      expect(await sub.get_user_flair_list({limit: 20})).to.have.lengthOf(20);
+    });
+    it('parses the `next` and `prev` properties from the JSON response correctly', async () => {
+      expect(await sub.get_user_flair_list().is_finished).to.be.false();
+    });
+    it('casts the users in the list to RedditUser objects', async () => {
+      expect(await sub.get_user_flair_list({limit: 1})[0].user).to.be.an.instanceof(snoowrap.objects.RedditUser);
+    });
+    it('can fetch more items in a flair list', async () => {
+      const initial = await sub.get_user_flair_list({limit: 1});
+      expect(initial).to.have.lengthOf(1);
+      expect(await initial.fetch_more({amount: 201})).to.have.lengthOf(202);
+    });
+    it('can start from a specific point in the flair list', async () => {
+      const initial = await sub.get_user_flair_list({limit: 1});
+      const after_id = initial._query.after;
+      const next_username = await initial.fetch_more({amount: 1})[1].user.name;
+      expect(await sub.get_user_flair_list({limit: 1, after: after_id})[0].user.name).to.equal(next_username);
+    });
+    it('can paginate in reverse through the flair list', async () => {
+      const initial = await sub.get_user_flair_list({limit: 10});
+      const before_id = initial._query.after;
+      const reversed = await sub.get_user_flair_list({limit: 5, before: before_id});
+      expect(reversed).to.have.lengthOf(5);
+      expect(reversed.is_finished).to.be.false();
+      expect(_.map(reversed, 'user.name')).to.eql(_.map(initial, 'user.name').slice(4, -1));
+      const reversed_expanded = await reversed.fetch_more({amount: 2});
+      expect(reversed_expanded).to.have.lengthOf(7);
+      expect(reversed_expanded.is_finished).to.be.false();
+      expect(_.map(reversed_expanded, 'user.name')).to.eql(_.map(initial, 'user.name').slice(2, -1));
+      const reversed_fully_expanded = await reversed_expanded.fetch_more({amount: 10});
+      expect(reversed_fully_expanded).to.have.lengthOf(9);
+      expect(reversed_fully_expanded.is_finished).to.be.true();
+      expect(_.map(reversed_fully_expanded, 'user.name')).to.eql(_.map(initial, 'user.name').slice(0, -1));
+      const reversed_fully_expanded_v2 = await sub.get_user_flair_list({limit: 20, before: before_id});
+      expect(reversed_fully_expanded_v2.is_finished).to.be.true();
+      expect(_.map(reversed_fully_expanded_v2, 'user.name')).to.eql(_.map(reversed_fully_expanded, 'user.name'));
+    });
+  });
+
   describe('lists of subreddits', () => {
     it('can get my subscriptions', async () => {
       const subs = await r.get_subscriptions({limit: 3});
