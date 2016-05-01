@@ -1,4 +1,4 @@
-import {get_empty_replies_listing, add_empty_replies_listing} from '../helpers.js';
+import {add_empty_replies_listing, get_empty_replies_listing} from '../helpers.js';
 import Listing from './Listing.js';
 import {empty_children as empty_more_object} from './More.js';
 import VoteableContent from './VoteableContent.js';

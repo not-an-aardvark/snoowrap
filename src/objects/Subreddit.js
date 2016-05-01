@@ -1,8 +1,8 @@
-import {clone, omit, assign, identity, map} from 'lodash';
+import {assign, clone, identity, map, omit} from 'lodash';
 import Promise from 'bluebird';
 import {Readable} from 'stream';
 import {createReadStream} from 'fs';
-import {handle_json_errors, rename_key, format_mod_permissions} from '../helpers.js';
+import {format_mod_permissions, handle_json_errors, rename_key} from '../helpers.js';
 import {InvalidMethodCallError} from '../errors.js';
 import RedditContent from './RedditContent.js';
 const api_type = 'json';

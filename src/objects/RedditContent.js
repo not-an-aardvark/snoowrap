@@ -1,8 +1,8 @@
-import {assign, mapValues, includes, pick, keys, cloneDeep, forEach} from 'lodash';
+import {assign, cloneDeep, forEach, includes, keys, mapValues, pick} from 'lodash';
 import Promise from 'bluebird';
 import promise_wrap from 'promise-chains';
 import {inspect} from 'util';
-import {USER_KEYS, SUBREDDIT_KEYS, HTTP_VERBS} from '../constants.js';
+import {HTTP_VERBS, USER_KEYS, SUBREDDIT_KEYS} from '../constants.js';
 import Listing from './Listing.js';
 
 /**
@@ -20,10 +20,7 @@ const RedditContent = class {
     assign(this, options);
     if (typeof Proxy !== 'undefined' && !this._has_fetched) {
       return new Proxy(this, {get (target, key) {
-        if (key in target || key === 'length' || key in Promise.prototype) {
-          return target[key];
-        }
-        return target.fetch()[key];
+        return key in target || key === 'length' || key in Promise.prototype ? target[key] : target.fetch()[key];
       }});
     }
   }

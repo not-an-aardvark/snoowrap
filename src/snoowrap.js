@@ -1,9 +1,9 @@
-import {isUndefined, assign, findKey, mapValues, omitBy, includes, map, isEmpty, omit, isString, forEach, forOwn} from 'lodash';
+import {assign, forEach, forOwn, findKey, includes, isEmpty, isString, isUndefined, map, mapValues, omit, omitBy} from 'lodash';
 import Promise from 'bluebird';
 import promise_wrap from 'promise-chains';
 import util from 'util';
 import * as request_handler from './request_handler.js';
-import {MODULE_NAME, VERSION, HTTP_VERBS, KINDS} from './constants.js';
+import {HTTP_VERBS, KINDS, MODULE_NAME, VERSION} from './constants.js';
 import * as errors from './errors.js';
 import {handle_json_errors} from './helpers.js';
 import default_config from './default_config.js';
@@ -51,10 +51,7 @@ const snoowrap = class {
     return MODULE_NAME;
   }
   _new_object (object_type, content, _has_fetched) {
-    if (Array.isArray(content)) {
-      return content;
-    }
-    return new snoowrap.objects[object_type](content, this, _has_fetched);
+    return Array.isArray(content) ? content : new snoowrap.objects[object_type](content, this, _has_fetched);
   }
   /**
   * @summary Retrieves or modifies the configuration options for this requester.

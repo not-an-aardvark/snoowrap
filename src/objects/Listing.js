@@ -1,4 +1,4 @@
-import {identity, assign, defaults, defaultsDeep, pick, keys, last, isObject, clone, isNumber, isFunction} from 'lodash';
+import {assign, clone, defaults, defaultsDeep, identity, isFunction, isNumber, isObject, keys, last, pick} from 'lodash';
 import Promise from 'bluebird';
 import promise_wrap from 'promise-chains';
 import {inspect} from 'util';
@@ -145,7 +145,7 @@ const Listing = class extends Array {
     const cloned = this._clone();
     const more_comments = await this._more.fetch_more(options);
     cloned.push(...Array.from(more_comments));
-    cloned._more._remove_leading_children(options.amount);
+    cloned._more.children = cloned._more.children.slice(options.amount);
     return cloned;
   }
   /**

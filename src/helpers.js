@@ -1,4 +1,4 @@
-import {keys, map, mapValues, includes, property, isEmpty, find, partial, omit, keyBy, remove} from 'lodash';
+import {filter, find, forEach, includes, isEmpty, keyBy, keys, map, mapValues, omit, partial, property, remove} from 'lodash';
 import {KINDS, USER_KEYS, SUBREDDIT_KEYS, MODERATOR_PERMISSIONS, LIVETHREAD_PERMISSIONS} from './constants.js';
 import {empty_children as empty_more_object} from './objects/More.js';
 
@@ -59,7 +59,7 @@ export function add_empty_replies_listing (item) {
 
 export function handle_json_errors (returnValue) {
   return response => {
-    if (isEmpty(response) || !response.json.errors.length) {
+    if (isEmpty(response) || isEmpty(response.json.errors)) {
       return returnValue;
     }
     throw new Error(response.json.errors[0]);
@@ -67,19 +67,16 @@ export function handle_json_errors (returnValue) {
 }
 
 // Performs a depth-first search of a tree of private messages, in order to find a message with a given name.
-export function find_message_in_tree (desired_message_name, current_message) {
-  if (current_message.name === desired_message_name) {
-    return current_message;
-  }
-  return find(current_message.replies.map(partial(find_message_in_tree, desired_message_name)));
+export function find_message_in_tree (desired_name, root_node) {
+  return root_node.name === desired_name ? root_node : find(root_node.replies.map(partial(find_message_in_tree, desired_name)));
 }
 
-export function format_permissions (all_permission_names, permissions_array) {
-  if (!permissions_array) {
-    return '+all';
-  }
-  return all_permission_names.map(type => (includes(permissions_array, type) ? '+' : '-') + type).join(',');
+export function format_permissions (all_permission_names, perms_array) {
+  return perms_array ? all_permission_names.map(type => (includes(perms_array, type) ? '+' : '-') + type).join(',') : '+all';
 }
+
+export const format_mod_permissions = partial(format_permissions, MODERATOR_PERMISSIONS);
+export const format_livethread_permissions = partial(format_permissions, LIVETHREAD_PERMISSIONS);
 
 export function rename_key (obj, old_key, new_key) {
   return obj && omit({...obj, [new_key]: obj[old_key]}, old_key);
@@ -90,11 +87,9 @@ nonintuitive way (see https://github.com/not-an-aardvark/snoowrap/issues/15 for 
 tree so that replies are threaded properly. */
 export function build_replies_tree (child_list) {
   const child_map = keyBy(child_list, 'name');
-  child_list.forEach(add_empty_replies_listing);
-  child_list.forEach(child => {
-    if (child.constructor.name === 'Comment') {
-      child.replies._more = empty_more_object;
-    }
+  forEach(child_list, add_empty_replies_listing);
+  forEach(filter(child_list, child => child.constructor.name === 'Comment'), child => {
+    child.replies._more = empty_more_object;
   });
   remove(child_list, child => child_map[child.parent_id]).forEach(child => {
     if (child.constructor.name === 'More') {
@@ -106,6 +101,3 @@ export function build_replies_tree (child_list) {
   });
   return child_list;
 }
-
-export const format_mod_permissions = partial(format_permissions, MODERATOR_PERMISSIONS);
-export const format_livethread_permissions = partial(format_permissions, LIVETHREAD_PERMISSIONS);
