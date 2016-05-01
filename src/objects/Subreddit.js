@@ -185,7 +185,7 @@ const Subreddit = class extends RedditContent {
     while (flair_array.length > 0) {
       // The endpoint only accepts at most 100 lines of csv at a time, so split the array into chunks of 100.
       requests.push(this._set_flair_from_csv(flair_array.splice(0, 100).map(item =>
-        `${item.name},${item.text || ''},${item.css_class || ''}`).join('\n')
+        `${item.name},${item.text || item.flair_text || ''},${item.css_class || item.flair_css_class || ''}`).join('\n')
       ));
     }
     return Promise.all(requests).return(this);
