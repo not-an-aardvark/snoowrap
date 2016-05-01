@@ -127,7 +127,7 @@ const snoowrap = class {
   * // => 6
   */
   get_user (name) {
-    return this._new_object('RedditUser', {name});
+    return this._new_object('RedditUser', {name: (name + '').replace(/^\/?u\//, '')});
   }
   /**
   * @summary Gets information on a comment with a given id.
@@ -141,7 +141,7 @@ const snoowrap = class {
   * // => 'Kharos'
   */
   get_comment (comment_id) {
-    return this._new_object('Comment', {name: `t1_${comment_id}`});
+    return this._new_object('Comment', {name: comment_id.startsWith('t1_') ? comment_id : `t1_${comment_id}`});
   }
   /**
   * @summary Gets information on a given subreddit.
@@ -155,7 +155,7 @@ const snoowrap = class {
   * // => 1201233135
   */
   get_subreddit (display_name) {
-    return this._new_object('Subreddit', {display_name});
+    return this._new_object('Subreddit', {display_name: display_name.replace(/^\/?r\//, '')});
   }
   /**
   * @summary Gets information on a given submission.
@@ -169,7 +169,7 @@ const snoowrap = class {
   * // => 'What tasty food would be distusting if eaten over rice?'
   */
   get_submission (submission_id) {
-    return this._new_object('Submission', {name: `t3_${submission_id}`});
+    return this._new_object('Submission', {name: submission_id.startsWith('t3_') ? submission_id : `t3_${submission_id}`});
   }
   /**
   * @summary Gets a private message by ID.
@@ -184,7 +184,7 @@ const snoowrap = class {
   * // See here for a screenshot of the PM in question https://i.gyazo.com/24f3b97e55b6ff8e3a74cb026a58b167.png
   */
   get_message (message_id) {
-    return this._new_object('PrivateMessage', {name: `t4_${message_id}`});
+    return this._new_object('PrivateMessage', {name: message_id.startsWith('t4_') ? message_id : `t4_${message_id}`});
   }
   /**
   * Gets a livethread by ID.
@@ -198,7 +198,7 @@ const snoowrap = class {
   * // => false
   */
   get_livethread (thread_id) {
-    return this._new_object('LiveThread', {id: thread_id});
+    return this._new_object('LiveThread', {id: thread_id.startsWith('LiveUpdateEvent_') ? thread_id.slice(16) : thread_id});
   }
   /**
   * @summary Gets information on the requester's own user profile.

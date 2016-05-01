@@ -74,6 +74,35 @@ describe('snoowrap', function () {
     });
   });
 
+  describe('lenient parsing on object creation', () => {
+    it('allows an optional t1_ comment prefix', () => {
+      expect(r.get_comment('coip909').name).to.equal('t1_coip909');
+      expect(r.get_comment('t1_coip909').name).to.equal('t1_coip909');
+    });
+    it('allows an optional /u/ user prefix', () => {
+      expect(r.get_user('snoowrap_testing').name).to.equal('snoowrap_testing');
+      expect(r.get_user('u/snoowrap_testing').name).to.equal('snoowrap_testing');
+      expect(r.get_user('/u/snoowrap_testing').name).to.equal('snoowrap_testing');
+    });
+    it('allows an optional t3_ submission prefix', () => {
+      expect(r.get_submission('2np694').name).to.equal('t3_2np694');
+      expect(r.get_submission('t3_2np694').name).to.equal('t3_2np694');
+    });
+    it('allows an optional t4_ privatemessage prefix', () => {
+      expect(r.get_message('51shnw').name).to.equal('t4_51shnw');
+      expect(r.get_message('t4_51shnw').name).to.equal('t4_51shnw');
+    });
+    it('allows an optional /r/ subreddit prefix', () => {
+      expect(r.get_subreddit('snoowrap_testing').display_name).to.equal('snoowrap_testing');
+      expect(r.get_subreddit('r/snoowrap_testing').display_name).to.equal('snoowrap_testing');
+      expect(r.get_subreddit('/r/snoowrap_testing').display_name).to.equal('snoowrap_testing');
+    });
+    it('allows an optional LiveUpdateEvent_ livethread prefix', () => {
+      expect(r.get_livethread('whrdxo8dg9n0').id).to.equal('whrdxo8dg9n0');
+      expect(r.get_livethread('LiveUpdateEvent_whrdxo8dg9n0').id).to.equal('whrdxo8dg9n0');
+    });
+  });
+
   describe('requester metadata', () => {
     /* When running tests on private info such as access tokens, always use an expression that evaluates to true or false
     instead of using chai's shortcuts.
@@ -150,9 +179,11 @@ describe('snoowrap', function () {
     it('returns a promise that resolves as undefined when fetching a nonexistent property', async () => {
       expect(await user.nonexistent_property).to.be.undefined();
     });
+    it('casts non-string names to strings', () => {
+      expect(r.get_user(null).name).to.equal('null');
+    });
     it('throws an error if it tries to fetch the profile of a deleted/invalid account', () => {
       expect(() => r.get_user('[deleted]').fetch()).to.throw(snoowrap.errors.InvalidUserError);
-      expect(() => r.get_user(null).fetch()).to.throw(snoowrap.errors.InvalidUserError);
     });
     it("can get a user's trophies", async () => {
       expect(await user.get_trophies()).to.be.an.instanceof(snoowrap.objects.TrophyList);
