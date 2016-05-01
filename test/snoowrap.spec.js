@@ -21,7 +21,6 @@ describe('snoowrap', function () {
       r = new snoowrap(require('../oauth_info.json'));
     }
     r.config({request_delay: 1000});
-    r.config({debug: true});
   });
 
   describe('.constructor', () => {
