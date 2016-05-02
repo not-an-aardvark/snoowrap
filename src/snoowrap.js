@@ -62,7 +62,7 @@ const snoowrap = class {
   parameter.)
   * @param {string} [options.endpoint_domain='reddit.com'] The endpoint where requests should be sent
   * @param {string} [options.request_delay=0] A minimum delay, in milliseconds, to enforce between API calls. If multiple
-  api calls are requested during this timespan, they will be queued and sent one at a time. Setting this to more than 1 will
+  api calls are requested during this timespan, they will be queued and sent one at a time. Setting this to more than 1000 will
   ensure that reddit's ratelimit is never reached, but it will make things run slower than necessary if only a few requests
   are being sent. If this is set to zero, snoowrap will not enforce any delay between individual requests. However, it will
   still refuse to continue if reddit's enforced ratelimit (600 requests per 10 minutes) is exceeded.
