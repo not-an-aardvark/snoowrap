@@ -913,7 +913,7 @@ const Subreddit = class extends RedditContent {
       uri: `r/${this.display_name}/api/upload_sr_img`,
       formData: {name, upload_type, img_type: image_type, file: parsed_file}
     }).then(result => {
-      if (result.length) {
+      if (result.errors.length) {
         throw result.errors[0];
       }
       return this;
