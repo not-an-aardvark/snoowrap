@@ -284,8 +284,8 @@ const Subreddit = class extends RedditContent {
   select_my_flair (options) {
     /* NOTE: This requires `identity` scope in addition to `flair` scope, since the reddit api needs to be passed a username.
     I'm not sure if there's a way to do this without requiring additional scope. */
-    return (this._r.own_user_info ? Promise.resolve() : this._r.get_me()).then(() => {
-      return this._r._select_flair({...options, subreddit_name: this.display_name, name: this._r.own_user_info.name});
+    return this._r._get_my_name().then(name => {
+      return this._r._select_flair({...options, subreddit_name: this.display_name, name});
     }).return(this);
   }
   _set_my_flair_visibility (flair_enabled) {
@@ -584,9 +584,7 @@ const Subreddit = class extends RedditContent {
   * @example r.get_subreddit('snoowrap').leave_contributor()
   */
   leave_contributor () {
-    return this.fetch().get('name').then(name =>
-      this._post({uri: 'api/leavecontributor', form: {id: name}}).return(this)
-    );
+    return this.fetch().get('name').then(name => this._post({uri: 'api/leavecontributor', form: {id: name}}).return(this));
   }
   /**
   * @summary Gets a subreddit's CSS stylesheet.
