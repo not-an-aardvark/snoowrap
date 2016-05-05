@@ -738,7 +738,7 @@ const snoowrap = class {
   * // ]
   */
   search_subreddit_names ({exact = false, include_nsfw = true, query}) {
-    return this._post({uri: 'api/search_reddit_names', qs: {exact, include_over_18: include_nsfw, query}}).names;
+    return this._post({uri: 'api/search_reddit_names', qs: {exact, include_over_18: include_nsfw, query}}).get('names');
   }
   _create_or_edit_subreddit ({
     allow_top = true,
