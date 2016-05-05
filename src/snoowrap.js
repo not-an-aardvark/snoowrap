@@ -211,12 +211,12 @@ const snoowrap = class {
   */
   get_me () {
     return this._get({uri: 'api/v1/me'}).then(result => {
-      this.own_user_info = this._new_object('RedditUser', result, true);
-      return this.own_user_info;
+      this._own_user_info = this._new_object('RedditUser', result, true);
+      return this._own_user_info;
     });
   }
   _get_my_name () {
-    return Promise.resolve(this.own_user_info ? this.own_user_info.name : this.get_me().get('name'));
+    return Promise.resolve(this._own_user_info ? this._own_user_info.name : this.get_me().get('name'));
   }
   /**
   * @summary Gets a distribution of the requester's own karma distribution by subreddit.

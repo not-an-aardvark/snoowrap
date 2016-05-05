@@ -145,8 +145,9 @@ describe('snoowrap', function () {
       expect(r.ratelimit_remaining).to.be.a('number');
       expect(r.ratelimit_remaining).to.be.at.least(0).and.at.most(600);
     });
-    it("stores a user's own info on the requester after calling get_me()", () => {
-      expect(r.own_user_info).to.be.an.instanceof(snoowrap.objects.RedditUser);
+    it("stores a user's own info on the requester after calling get_me()", async () => {
+      await r.get_me();
+      expect(r._own_user_info).to.be.an.instanceof(snoowrap.objects.RedditUser);
     });
     it('stores the access token and the access token expiration properly', () => {
       expect(typeof r.access_token === 'string').to.be.true();
@@ -649,7 +650,8 @@ describe('snoowrap', function () {
   describe('self-property fetching', () => {
     it("gets information from the requester's own profile", async () => {
       const me = await r.get_me();
-      expect(me.name).to.equal(r.own_user_info.name); // (this doesn't necessarily mean that the name is correct)
+      expect(me).to.be.an.instanceof(snoowrap.objects.RedditUser);
+      expect(me.name).to.equal(r._own_user_info.name); // (this doesn't necessarily mean that the name is correct)
       expect(me.name).to.be.a('string');
     });
     it("gets the requester's karma", async () => {
