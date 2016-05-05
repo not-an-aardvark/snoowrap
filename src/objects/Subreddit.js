@@ -703,8 +703,7 @@ const Subreddit = class extends RedditContent {
   */
   get_wiki_contributors (options) {
     const opts = typeof options === 'string' ? options : options && {name: options.name};
-    const query = rename_key(opts, 'name', 'user');
-    return this._get_listing({uri: `r/${this.display_name}/about/wikicontributors`, qs: query});
+    return this._get_listing({uri: `r/${this.display_name}/about/wikicontributors`, qs: rename_key(opts, 'name', 'user')});
   }
   /**
   * @summary Gets the list of moderators on this subreddit.
