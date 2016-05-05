@@ -859,7 +859,7 @@ const Subreddit = class extends RedditContent {
   * // => 'Welcome! Please be sure to read the rules.'
   */
   get_submit_text () {
-    return this._get({uri: `r/${this.display_name}/api/submit_text`}).submit_text;
+    return this._get({uri: `r/${this.display_name}/api/submit_text`}).get('submit_text');
   }
   /**
   * @summary Updates this subreddit's stylesheet.
