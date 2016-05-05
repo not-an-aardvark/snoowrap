@@ -830,7 +830,7 @@ const Subreddit = class extends RedditContent {
   * @example r.get_subreddit('snoowrap').edit_settings({submit_text: 'Welcome! Please be sure to read the rules.'})
   */
   edit_settings (options) {
-    return Promise.join(this.get_settings(), this.name, (current_values, name) => {
+    return Promise.join(this.get_settings(), this.fetch().get('name'), (current_values, name) => {
       return this._r._create_or_edit_subreddit({...current_values, ...options, sr: name});
     }).return(this);
   }
