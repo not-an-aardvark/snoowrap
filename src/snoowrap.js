@@ -1106,27 +1106,22 @@ const snoowrap = class {
       return this._post({uri: `r/${display_name}/api/flair`, form: {api_type, name, text, link, css_class}});
     }));
   }
-  _get_listing ({uri, qs = {}, ...other_options}) {
+  _get_listing ({uri, qs = {}, ...options}) {
     /* When the response type is expected to be a Listing, add a `count` parameter with a very high number.
     This ensures that reddit returns a `before` property in the resulting Listing to enable pagination.
     (Aside from the additional parameter, this function is equivalent to snoowrap.prototype._get) */
     const merged_query = {count: 9999, ...qs};
-    if (qs.limit || !isEmpty(other_options)) {
-      return this._new_object('Listing', {
-        _query: merged_query,
-        _uri: uri,
-        ...other_options
-      }).fetch_more(qs.limit || MAX_LISTING_ITEMS);
-    }
-    /* This is used as a fallback in case the endpoint unexpectedly ends up returning something other than a Listing
-    (e.g. Submission#get_related, which used to return a Listing but no longer does due to upstream reddit API changes), in
-    which case using fetch_more() as above will throw an error.
+    return qs.limit || !isEmpty(options)
+      ? this._new_object('Listing', {_query: merged_query, _uri: uri, ...options}).fetch_more(qs.limit || MAX_LISTING_ITEMS)
+      /* This second case is used as a fallback in case the endpoint unexpectedly ends up returning something other than a
+      Listing (e.g. Submission#get_related, which used to return a Listing but no longer does due to upstream reddit API
+      changes), in which case using fetch_more() as above will throw an error.
 
-    This fallback only works if there are no other meta-properties provided for the Listing, such as _transform. If there are
-    other meta-properties,  the function will still end up throwing an error, but there's not really any good way to handle it
-    (predicting upstream changes can only go so far). More importantly, in the limited cases where it's used, the fallback
-    should have no effect on the returned results */
-    return this._get({uri, qs: merged_query});
+      This fallback only works if there are no other meta-properties provided for the Listing, such as _transform. If there are
+      other meta-properties,  the function will still end up throwing an error, but there's not really any good way to handle it
+      (predicting upstream changes can only go so far). More importantly, in the limited cases where it's used, the fallback
+      should have no effect on the returned results */
+      : this._get({uri, qs: merged_query});
   }
 };
 
