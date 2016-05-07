@@ -41,7 +41,8 @@ you don't have to worry about the distinction.
 */
 const Listing = class extends Array {
   constructor (options = {}, _r) {
-    super(...options.children || []);
+    super();
+    this.push(...options.children || []);
     this._r = _r;
     defaults(this, {_cached_lookahead: options._cached_lookahead});
     defaultsDeep(this, pick(options, keys(INTERNAL_DEFAULTS)), INTERNAL_DEFAULTS);
