@@ -1,11 +1,11 @@
-import {assign, clone, defaults, defaultsDeep, identity, isFunction, isNil, isNumber, isObject, keys, last, omitBy,
-  pick} from 'lodash';
+import {assign, clone, defaults, defaultsDeep, identity, isEmpty, isFunction, isNil, isNull, isNumber, isObject, keys, last,
+  omitBy, pick} from 'lodash';
 import Promise from 'bluebird';
 import promise_wrap from 'promise-chains';
 import {inspect} from 'util';
 import {parse as url_parse} from 'url';
 import {InvalidMethodCallError} from '../errors.js';
-import More from './More.js';
+import {default as More, empty_children} from './More.js';
 
 const INTERNAL_DEFAULTS = {
   _query: {},
@@ -41,9 +41,8 @@ you don't have to worry about the distinction.
 */
 const Listing = class extends Array {
   constructor (options = {}, _r) {
-    super();
+    super(...options.children || []);
     this._r = _r;
-    this.push(...options.children || []);
     defaults(this, {_cached_lookahead: options._cached_lookahead});
     defaultsDeep(this, pick(options, keys(INTERNAL_DEFAULTS)), INTERNAL_DEFAULTS);
     assign(this._query, pick(options, ['before', 'after']));
@@ -62,19 +61,23 @@ const Listing = class extends Array {
     }
   }
   /**
-  * @summary This is a getter that is true if there are no more items left to fetch, and false otherwise.
+  * @summary A getter that indicates whether this Listing has any more items to fetch.
+  * @type boolean
   */
   get is_finished () {
-    if (this._more) {
-      return !this._more.children.length;
-    }
-    if (this._cached_lookahead && this._cached_lookahead.length) {
-      return false;
-    }
-    if (this._is_comment_list && this.length) {
-      return true;
-    }
-    return !this._uri || this._query.after === null && this._query.before === null;
+    // The process of checking whether a Listing is 'finished' varies depending on what kind of Listing it is.
+    return this._is_comment_list
+      /* For comment Listings (i.e. Listings containing comments and comment replies, sourced by `more` objects): A Listing is
+      *never* finished if it has a cached lookahead (i.e. extra items that were fetched from a previous request). If there is
+      no cached lookahead, a Listing is finished iff it has an empty `more` object. */
+      ? isEmpty(this._cached_lookahead) && !!this._more && isEmpty(this._more.children)
+      /* For non-comment Listings: A Listing is always finished if it has no URI (since there would be nowhere to fetch items
+      from). If it has a URI, a Listing is finished iff its `before` and `after` query are both `null`. This is because reddit
+      returns a value of `null` as the `after` and `before` parameters to signify that a Listing is complete.
+
+      It is important to check for `null` here rather than any falsey value, because when an empty Listing is initialized, its
+      `after` and `before` properties are both `undefined`, but calling these empty Listings `finished` would be incorrect. */
+      : !this._uri || isNull(this._query.after) && isNull(this._query.before);
   }
   /**
   * @summary Fetches some more items
@@ -131,8 +134,7 @@ const Listing = class extends Array {
 
       To get around the issue, snoowrap caps the `limit` property at Number.MAX_SAFE_INTEGER when sending requests. This ensures
       that `Infinity` will never be sent as part of the querystring, so reddit will always return the maximal 100 items per
-      request if the desired amount of items is large.
-      */
+      request if the desired amount of items is large. */
       query.limit = Math.min(options.amount, Number.MAX_SAFE_INTEGER);
     }
     return this._r[`_${this._method}`]({
@@ -150,7 +152,7 @@ const Listing = class extends Array {
         cloned._query.after = response._query.after;
       }
       if (this._is_comment_list) {
-        cloned._more = cloned._more || response._more;
+        cloned._more = cloned._more || response._more || empty_children;
         if (response.length > options.amount) {
           cloned._cached_lookahead = cloned.splice(options.amount);
         }
