@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.0.0-rc.1 (2016-05-07)
+
+* **[breaking]**: Removed the `suppress_warnings` config option in favor of a new `warnings` option.
+* **[breaking]**: `Subreddit#get_user_flair_list` now returns a Promise for a Listing instead of a plain Array, which can be extended as usual. The `user` property of each item in this Listing is now a RedditUser object rather than a string.
+* Added more lenient input parsing for `snoowrap#get_user`, `snoowrap#get_subreddit`, etc.
+* Fixed issues where `snoowrap#search_subreddit_names`, `Subreddit#get_settings`, and `Subreddit#get_submit_text` would fail if Proxies were disabled
+* Fixed an issue where requests immediately following a ratelimit warning at the end of a ratelimit period would not be throttled correctly
+* Fixed an issue where `Listing#fetch_all()` would consume more requests than necessary
+* Fixed an issue where an unsuccessful image upload could incorrectly report success
+* Fixed an issue where the `restrict_sr` option on `snoowrap#search` was always set to `true`
+
 ## v0.11.6 (2016-04-27)
 
 * Exposed `oauth_request`, `credentialed_client_request`, `unauthenticated_request`, and `update_access_token` functions for sending raw requests to servers
