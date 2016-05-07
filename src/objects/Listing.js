@@ -198,9 +198,9 @@ const Listing = class extends Array {
     properties._cached_lookahead = clone(properties._cached_lookahead);
     properties._more = this._more && this._more._clone();
     const shallow_children = Array.from(this);
-    properties.children = deep ? shallow_children.map(item => {
-      return '_clone' in item && isFunction(item._clone) ? item._clone({deep}) : item;
-    }) : shallow_children;
+    properties.children = deep
+      ? shallow_children.map(item => '_clone' in item && isFunction(item._clone) ? item._clone({deep}) : item)
+      : shallow_children;
     return new Listing(properties, this._r);
   }
   _set_more (more_obj) {
