@@ -39,7 +39,7 @@ domain name.
 * // equivalent to:
 * r.get_top({time: 'all'})
 */
-export async function oauth_request (options, attempt_num = 1) {
+export const oauth_request = Promise.coroutine(function *(options, attempt_num = 1) {
   if (this.ratelimit_remaining < 1 && Date.now() < this.ratelimit_expiration) {
     // If the ratelimit has been exceeded, delay or abort the request depending on the user's config.
     const time_until_expiry = this.ratelimit_expiration - Date.now();
@@ -47,7 +47,7 @@ export async function oauth_request (options, attempt_num = 1) {
       /* If the `continue_after_ratelimit_error` setting is enabled, queue the request, wait until the next ratelimit
       period, and then send it. */
       this.log.warn(RateLimitWarning(time_until_expiry));
-      await Promise.delay(time_until_expiry);
+      yield Promise.delay(time_until_expiry);
     } else {
       // Otherwise, throw an error.
       throw new RateLimitError(time_until_expiry);
@@ -59,11 +59,11 @@ export async function oauth_request (options, attempt_num = 1) {
   only one of the requests is sent, and the others await the throttle again. (The loop is non-blocking due to its await
   statement.) */
   while (!this._throttle.isFulfilled()) {
-    await this._throttle;
+    yield this._throttle;
   }
   this._throttle = Promise.delay(this._config.request_delay);
   // If the access token has expired, refresh it.
-  return await this.update_access_token({force_update: false}).then(() => {
+  return this.update_access_token({force_update: false}).then(() => {
     // Send the request and return the response.
     return request.defaults({
       headers: {'user-agent': this.user_agent},
@@ -105,7 +105,7 @@ export async function oauth_request (options, attempt_num = 1) {
     }
     return populated || response;
   });
-}
+});
 
 /**
 * @summary Sends a request to the reddit server, authenticated with the user's client ID and client secret.

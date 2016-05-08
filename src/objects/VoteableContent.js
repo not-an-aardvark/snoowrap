@@ -1,3 +1,4 @@
+import Promise from 'bluebird';
 import promise_wrap from 'promise-chains';
 import {handle_json_errors} from '../helpers.js';
 import ReplyableContent from './ReplyableContent.js';
@@ -145,16 +146,18 @@ const VoteableContent = class extends ReplyableContent {
   disable_inbox_replies () {
     return this._set_inbox_replies_enabled(false).return(this);
   }
-  async _mutate_and_expand_replies ({limit, depth}) {
+  _mutate_and_expand_replies ({limit, depth}) {
     if (depth <= 0) {
-      return this;
+      return Promise.resolve(this);
     }
     const replies_key = this.constructor.name === 'Submission' ? 'comments' : 'replies';
-    this[replies_key] = await this[replies_key].fetch_more({amount: limit - this[replies_key].length});
-    for (let i = 0; i < this[replies_key].length && i < limit; i++) {
-      await this[replies_key][i]._mutate_and_expand_replies({limit, depth: depth - 1});
-    }
-    return this;
+    return this[replies_key].fetch_more({amount: limit - this[replies_key].length})
+      .tap(replies => {
+        this[replies_key] = replies;
+      })
+      .then(replies => replies.slice(0, limit))
+      .map(reply => reply._mutate_and_expand_replies({limit, depth: depth - 1}))
+      .return(this);
   }
   /**
   * @summary Expands the reply Listings on this Comment/Submission.

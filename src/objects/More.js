@@ -1,5 +1,5 @@
 import {assign, clone, concat, flatten, forEach, pick, remove} from 'lodash';
-import {mapSeries} from 'bluebird';
+import {default as Promise, mapSeries} from 'bluebird';
 import {add_empty_replies_listing, build_replies_tree, handle_json_errors} from '../helpers.js';
 import {MAX_API_INFO_AMOUNT, MAX_API_MORECHILDREN_AMOUNT} from '../constants.js';
 const api_type = 'json';
@@ -28,9 +28,9 @@ const More = class {
   /* Requests to /api/morechildren are capped at 20 comments at a time, but requests to /api/info are capped at 100, so
   it's easier to send to the latter. The disadvantage is that comment replies are not automatically sent from requests
   to /api/info. */
-  async fetch_more (options, start_index = 0) {
+  fetch_more (options, start_index = 0) {
     if (options.amount <= 0 || start_index >= this.children.length) {
-      return [];
+      return Promise.resolve([]);
     }
     if (!options.skip_replies) {
       return this.fetch_tree(options, start_index);
@@ -41,27 +41,34 @@ const More = class {
     const promise_for_this_batch = this._r._get_listing({uri: 'api/info', qs: {id: ids.join(',')}});
     const next_request_options = {...options, amount: options.amount - ids.length};
     const promise_for_remaining_items = this.fetch_more(next_request_options, start_index + ids.length);
-    return Array.from(await promise_for_this_batch).concat(await promise_for_remaining_items);
+    return Promise.all([promise_for_this_batch, promise_for_remaining_items]).then(flatten);
   }
-  async fetch_tree (options, start_index) {
+  fetch_tree (options, start_index) {
     if (options.amount <= 0 || start_index >= this.children.length) {
-      return [];
+      return Promise.resolve([]);
     }
     const ids = get_next_id_slice(this.children, start_index, options.amount, MAX_API_MORECHILDREN_AMOUNT);
-    const result_trees = await this._r._get({
+    return this._r._get({
       uri: 'api/morechildren',
       qs: {api_type, children: ids.join(','), link_id: this.link_id || this.parent_id}
-    }).tap(handle_json_errors).then(res => res.json.data.things).mapSeries(add_empty_replies_listing).then(build_replies_tree);
-    /* Sometimes, when sending a request to reddit to get multiple comments from a `more` object, reddit decides to only send
-    some of the requested comments, and then stub out the remaining ones in a smaller `more` object. ( ¯\_(ツ)_/¯ )
-    In these cases, recursively fetch the smaller `more` objects as well. */
-    const child_mores = remove(result_trees, c => c instanceof More);
-    forEach(child_mores, c => {
-      c.link_id = this.link_id || this.parent_id;
-    });
-    const expanded_child_mores = flatten(await mapSeries(child_mores, c => c.fetch_tree({...options, amount: Infinity}, 0)));
-    const next_request_options = {...options, amount: options.amount - ids.length};
-    return concat(result_trees, expanded_child_mores, await this.fetch_more(next_request_options, start_index + ids.length));
+    }).tap(handle_json_errors)
+      .then(res => res.json.data.things)
+      .mapSeries(add_empty_replies_listing)
+      .then(build_replies_tree)
+      .then(result_trees => {
+        /* Sometimes, when sending a request to reddit to get multiple comments from a `more` object, reddit decides to only
+        send some of the requested comments, and then stub out the remaining ones in a smaller `more` object. ( ¯\_(ツ)_/¯ )
+        In these cases, recursively fetch the smaller `more` objects as well. */
+        const child_mores = remove(result_trees, c => c instanceof More);
+        forEach(child_mores, c => {
+          c.link_id = this.link_id || this.parent_id;
+        });
+        return mapSeries(child_mores, c => c.fetch_tree({...options, amount: Infinity}, 0)).then(flatten).then(expanded => {
+          return this.fetch_more({...options, amount: options.amount - ids.length}, start_index + ids.length).then(nexts => {
+            return concat(result_trees, expanded, nexts);
+          });
+        });
+      });
   }
   _clone () {
     return new More(clone(pick(this, Object.getOwnPropertyNames(this))), this._r);

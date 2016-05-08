@@ -1102,12 +1102,12 @@ const snoowrap = class {
       this.access_token = null; // Revoking a refresh token also revokes any associated access tokens.
     });
   }
-  async _select_flair ({flair_template_id, link, name, text, subreddit_name}) {
+  _select_flair ({flair_template_id, link, name, text, subreddit_name}) {
     if (!flair_template_id) {
       throw new errors.InvalidMethodCallError('No flair template ID provided');
     }
-    return await this._post({uri: `r/${await subreddit_name}/api/selectflair`, form: {
-      api_type, flair_template_id, link, name, text}
+    return Promise.resolve(subreddit_name).then(sub_name => {
+      return this._post({uri: `r/${sub_name}/api/selectflair`, form: {api_type, flair_template_id, link, name, text}});
     });
   }
   _assign_flair ({css_class, link, name, text, subreddit_name}) {
