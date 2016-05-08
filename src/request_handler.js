@@ -51,7 +51,7 @@ export function oauth_request (options, attempts = 1) {
         auth: {bearer: token},
         resolveWithFullResponse: true,
         transform: (body, response) => {
-          if (response.headers.hasOwnProperty('x-ratelimit-remaining')) {
+          if (Object.prototype.hasOwnProperty.call(response.headers, 'x-ratelimit-remaining')) {
             this.ratelimit_remaining = +response.headers['x-ratelimit-remaining'];
             this.ratelimit_expiration = Date.now() + response.headers['x-ratelimit-reset'] * 1000;
           }
@@ -62,13 +62,12 @@ export function oauth_request (options, attempts = 1) {
           return response;
         }
       })(options);
-    }).catch(e => e.statusCode === 401 && this.token_expiration - Date.now() < MAX_TOKEN_LATENCY && this.refresh_token, () => {
-      /* If the server returns a 401 error, it's possible that the access token expired during the latency period as this
-      request was being sent. In this scenario, snoowrap thought that the access token was valid for a few more seconds, so it
-      didn't refresh the token, but the token had expired by the time the request reached the server. To handle this issue,
-      invalidate the access token and call oauth_request again, automatically causing the token to be refreshed. */
-      this.access_token = null;
-      return this.oauth_request(options, attempts);
+    }).then(response => {
+      const populated = this._populate(response.body);
+      if (populated && populated.constructor.name === 'Listing') {
+        populated._set_uri(response.request.uri.path);
+      }
+      return populated || response;
     }).catch(e => includes(this._config.retry_error_codes, e.statusCode) && attempts < this._config.max_retry_attempts, e => {
       /* If the error's status code is in the user's configured `retry_status_codes` and this request still has attempts
       remaining, retry this request and increment the `attempts` counter. */
@@ -77,12 +76,13 @@ export function oauth_request (options, attempts = 1) {
         `Retrying request (attempt ${attempts + 1}/${this._config.max_retry_attempts})...`
       );
       return this.oauth_request(options, attempts + 1);
-    }).then(response => {
-      const populated = this._populate(response.body);
-      if (populated && populated.constructor.name === 'Listing') {
-        populated._set_uri(response.request.uri.path);
-      }
-      return populated || response;
+    }).catch(e => e.statusCode === 401 && this.access_token && this.token_expiration - Date.now() < MAX_TOKEN_LATENCY, () => {
+      /* If the server returns a 401 error, it's possible that the access token expired during the latency period as this
+      request was being sent. In this scenario, snoowrap thought that the access token was valid for a few more seconds, so it
+      didn't refresh the token, but the token had expired by the time the request reached the server. To handle this issue,
+      invalidate the access token and call oauth_request again, automatically causing the token to be refreshed. */
+      this.access_token = null;
+      return this.oauth_request(options, attempts);
     });
 }
 
