@@ -39,7 +39,55 @@ domain name.
 * // equivalent to:
 * r.get_top({time: 'all'})
 */
-export const oauth_request = Promise.coroutine(function *(options, attempt_num = 1) {
+export function oauth_request (options, attempts = 1) {
+  return Promise.resolve()
+    .then(() => this._await_ratelimit())
+    .then(() => this._await_request_delay())
+    .then(() => this.update_access_token())
+    .then(token => {
+      return request.defaults({
+        headers: {'user-agent': this.user_agent},
+        baseUrl: `https://oauth.${this._config.endpoint_domain}`,
+        qs: {raw_json: 1},
+        auth: {bearer: token},
+        resolveWithFullResponse: true,
+        transform: (body, response) => {
+          if (response.headers.hasOwnProperty('x-ratelimit-remaining')) {
+            this.ratelimit_remaining = +response.headers['x-ratelimit-remaining'];
+            this.ratelimit_expiration = Date.now() + response.headers['x-ratelimit-reset'] * 1000;
+          }
+          this.log.debug(
+            `Received a ${response.statusCode} status code from a \`${response.request.method}\` request`,
+            `sent to ${response.request.uri.href}. ratelimit_remaining: ${this.ratelimit_remaining}`
+          );
+          return response;
+        }
+      })(options);
+    }).catch(e => e.statusCode === 401 && this.token_expiration - Date.now() < MAX_TOKEN_LATENCY && this.refresh_token, () => {
+      /* If the server returns a 401 error, it's possible that the access token expired during the latency period as this
+      request was being sent. In this scenario, snoowrap thought that the access token was valid for a few more seconds, so it
+      didn't refresh the token, but the token had expired by the time the request reached the server. To handle this issue,
+      invalidate the access token and call oauth_request again, automatically causing the token to be refreshed. */
+      this.access_token = null;
+      return this.oauth_request(this, options, attempts);
+    }).catch(e => includes(this._config.retry_error_codes, e.statusCode) && attempts < this._config.max_retry_attempts, e => {
+      /* If the error's status code is in the user's configured `retry_status_codes` and this request still has attempts
+      remaining, retry this request and increment the `attempts` counter. */
+      this.log.warn(
+        `Received status code ${e.statusCode} from reddit.`,
+        `Retrying request (attempt ${attempts + 1}/${this._config.max_retry_attempts})...`
+      );
+      return this.oauth_request(options, attempts + 1);
+    }).then(response => {
+      const populated = populate(response.body, this);
+      if (populated && populated.constructor.name === 'Listing') {
+        populated._set_uri(response.request.uri.path);
+      }
+      return populated || response;
+    });
+}
+
+export function _await_ratelimit () {
   if (this.ratelimit_remaining < 1 && Date.now() < this.ratelimit_expiration) {
     // If the ratelimit has been exceeded, delay or abort the request depending on the user's config.
     const time_until_expiry = this.ratelimit_expiration - Date.now();
@@ -47,65 +95,26 @@ export const oauth_request = Promise.coroutine(function *(options, attempt_num =
       /* If the `continue_after_ratelimit_error` setting is enabled, queue the request, wait until the next ratelimit
       period, and then send it. */
       this.log.warn(RateLimitWarning(time_until_expiry));
-      yield Promise.delay(time_until_expiry);
-    } else {
-      // Otherwise, throw an error.
-      throw new RateLimitError(time_until_expiry);
+      return Promise.delay(time_until_expiry);
     }
+    // Otherwise, throw an error.
+    throw new RateLimitError(time_until_expiry);
   }
+  // If the ratelimit hasn't been exceeded, no delay is necessary.
+  return Promise.resolve();
+}
+
+export function _await_request_delay () {
   /* this._throttle is a timer that gets reset to r._config.request_delay whenever a request is sent. This ensures that
-  requests are throttled correctly according to the user's config settings, and that no requests are lost. The await
-  statement is wrapped in a loop to make sure that if the throttle promise resolves while multiple requests are pending,
-  only one of the requests is sent, and the others await the throttle again. (The loop is non-blocking due to its await
-  statement.) */
-  while (!this._throttle.isFulfilled()) {
-    yield this._throttle;
+  requests are throttled correctly according to the user's config settings, and that no requests are lost. _await_request_delay
+  is called recursively to ensure that if multiple requests are queued waiting for the throttle, only one request request gets
+  sent when the throttle resolves, and the other requests await the throttle again. */
+  if (this._throttle.isFulfilled()) {
+    this._throttle = Promise.delay(this._config.request_delay);
+    return Promise.resolve();
   }
-  this._throttle = Promise.delay(this._config.request_delay);
-  // If the access token has expired, refresh it.
-  return this.update_access_token({force_update: false}).then(() => {
-    // Send the request and return the response.
-    return request.defaults({
-      headers: {'user-agent': this.user_agent},
-      baseUrl: `https://oauth.${this._config.endpoint_domain}`,
-      qs: {raw_json: 1},
-      auth: {bearer: this.access_token},
-      resolveWithFullResponse: true,
-      transform: (body, response) => {
-        if (response.headers.hasOwnProperty('x-ratelimit-remaining')) {
-          this.ratelimit_remaining = +response.headers['x-ratelimit-remaining'];
-          this.ratelimit_expiration = Date.now() + response.headers['x-ratelimit-reset'] * 1000;
-        }
-        this.log.debug(
-          `Received a ${response.statusCode} status code from a \`${response.request.method}\` request`,
-          `sent to ${response.request.uri.href}. ratelimit_remaining: ${this.ratelimit_remaining}`
-        );
-        return response;
-      }
-    })(options);
-  }).catch(e => e.statusCode === 401 && this.token_expiration - Date.now() < MAX_TOKEN_LATENCY && this.refresh_token, () => {
-    /* If the server returns a 401 error, it's possible that the access token expired during the latency period as this request
-    was being sent. In this scenario, snoowrap thought that the access token was valid for a few more seconds, so it didn't
-    refresh the token, but the token had expired by the time the request reached the server. To handle this issue, invalidate
-    the access token and call oauth_request again, automatically causing the token to be refreshed. */
-    this.access_token = null;
-    return this.oauth_request(this, options, attempt_num);
-  }).catch(e => includes(this._config.retry_error_codes, e.statusCode) && attempt_num < this._config.max_retry_attempts, e => {
-    /* If the error's status code is in the user's configured `retry_status_codes` and this request still has attempts
-    remaining, retry this request and increment the `attempts` counter. */
-    this.log.warn(
-      `Received status code ${e.statusCode} from reddit.`,
-      `Retrying request (attempt ${attempt_num + 1}/${this._config.max_retry_attempts})...`
-    );
-    return this.oauth_request(options, attempt_num + 1);
-  }).then(response => {
-    const populated = populate(response.body, this);
-    if (populated && populated.constructor.name === 'Listing') {
-      populated._set_uri(response.request.uri.path);
-    }
-    return populated || response;
-  });
-});
+  return this._throttle.then(() => this._await_request_delay());
+}
 
 /**
 * @summary Sends a request to the reddit server, authenticated with the user's client ID and client secret.
@@ -158,17 +167,21 @@ export function unauthenticated_request (options) {
 }
 
 /**
-* @summary Updates this requester's access token.
+* @summary Updates this requester's access token if the current one is absent or expired.
 * @desc **Note**: This function is automatically called internally when making a request. While the function is exposed as
 a stable feature, using it is rarely necessary unless an access token is needed for some external purpose.
-* @returns {Promise} A Promise fulfills when this request is complete
+* @param
+* @returns {Promise} A Promise fulfills with the access token when this request is complete
 * @memberof snoowrap
 * @instance
 * @example r.update_access_token()
 */
-export function update_access_token ({force_update = true} = {}) {
-  if (force_update || this.refresh_token && (!this.access_token || Date.now() > this.token_expiration)) {
-    return this.credentialed_client_request({
+export function update_access_token () {
+  return this.access_token && Date.now() < this.token_expiration || !this.refresh_token
+    // If the access token already exists and has not expired, just return a Promise for it.
+    ? Promise.resolve(this.access_token)
+    // Otherwise, get a new one from reddit.
+    : this.credentialed_client_request({
       method: 'post',
       uri: 'api/v1/access_token',
       form: {grant_type: 'refresh_token', refresh_token: this.refresh_token}
@@ -178,6 +191,4 @@ export function update_access_token ({force_update = true} = {}) {
       this.scope = token_info.scope.split(' ');
       return this.access_token;
     });
-  }
-  return Promise.resolve(this.access_token);
 }
