@@ -1,10 +1,10 @@
-import {assign, defaults, forEach, forOwn, findKey, includes, isEmpty, isString, isUndefined, map, mapValues, omit,
-  omitBy} from 'lodash';
+import {assign, defaults, forEach, forOwn, findKey, includes, isEmpty, isObject, isString, isUndefined, map, mapValues,
+  omit, omitBy} from 'lodash';
 import Promise from 'bluebird';
 import promise_wrap from 'promise-chains';
 import util from 'util';
 import * as request_handler from './request_handler.js';
-import {HTTP_VERBS, KINDS, MAX_LISTING_ITEMS, MODULE_NAME, VERSION} from './constants.js';
+import {HTTP_VERBS, KINDS, MAX_LISTING_ITEMS, MODULE_NAME, USER_KEYS, SUBREDDIT_KEYS, VERSION} from './constants.js';
 import * as errors from './errors.js';
 import {handle_json_errors} from './helpers.js';
 import default_config from './default_config.js';
@@ -1114,6 +1114,34 @@ const snoowrap = class {
     return promise_wrap(Promise.resolve(subreddit_name).then(display_name => {
       return this._post({uri: `r/${display_name}/api/flair`, form: {api_type, name, text, link, css_class}});
     }));
+  }
+  _populate (response_tree) {
+    if (isObject(response_tree)) {
+      // Map {kind: 't2', data: {name: 'some_username', ... }} to a RedditUser (e.g.) with the same properties
+      if (Object.keys(response_tree).length === 2 && response_tree.kind && response_tree.data) {
+        return this._new_object(KINDS[response_tree.kind] || 'RedditContent', this._populate(response_tree.data), true);
+      }
+      const result = (Array.isArray(response_tree) ? map : mapValues)(response_tree, (value, key) => {
+        // Maps {author: 'some_username'} to {author: RedditUser { name: 'some_username' } }
+        if (value !== null && USER_KEYS.has(key)) {
+          return this._new_object('RedditUser', {name: value}, false);
+        }
+        if (value !== null && SUBREDDIT_KEYS.has(key)) {
+          return this._new_object('Subreddit', {display_name: value}, false);
+        }
+        return this._populate(value);
+      });
+      if (result.length === 2 && result[0] instanceof snoowrap.objects.Listing
+          && result[0][0] instanceof snoowrap.objects.Submission && result[1] instanceof snoowrap.objects.Listing) {
+        if (result[1]._more && !result[1]._more.link_id) {
+          result[1]._more.link_id = result[0][0].name;
+        }
+        result[0][0].comments = result[1];
+        return result[0][0];
+      }
+      return result;
+    }
+    return response_tree;
   }
   _get_listing ({uri, qs = {}, ...options}) {
     /* When the response type is expected to be a Listing, add a `count` parameter with a very high number.

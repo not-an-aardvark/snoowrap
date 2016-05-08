@@ -1,7 +1,6 @@
 import {includes} from 'lodash';
 import Promise from 'bluebird';
 import request_promise from 'request-promise';
-import {populate} from './helpers.js';
 import {MAX_TOKEN_LATENCY} from './constants.js';
 import {RateLimitWarning, RateLimitError} from './errors.js';
 const request = request_promise.defaults({json: true});
@@ -79,7 +78,7 @@ export function oauth_request (options, attempts = 1) {
       );
       return this.oauth_request(options, attempts + 1);
     }).then(response => {
-      const populated = populate(response.body, this);
+      const populated = this._populate(response.body);
       if (populated && populated.constructor.name === 'Listing') {
         populated._set_uri(response.request.uri.path);
       }

@@ -1,36 +1,6 @@
-import {filter, find, forEach, includes, isEmpty, keyBy, keys, map, mapValues, omit, partial, property, remove} from 'lodash';
-import {KINDS, USER_KEYS, SUBREDDIT_KEYS, MODERATOR_PERMISSIONS, LIVETHREAD_PERMISSIONS} from './constants.js';
+import {filter, find, forEach, includes, isEmpty, keyBy, omit, partial, property, remove} from 'lodash';
+import {MODERATOR_PERMISSIONS, LIVETHREAD_PERMISSIONS} from './constants.js';
 import {empty_children as empty_more_object} from './objects/More.js';
-
-export function populate (response_tree, _r) {
-  if (typeof response_tree === 'object' && response_tree !== null) {
-    // Map {kind: 't2', data: {name: 'some_username', ... }} to a RedditUser (e.g.) with the same properties
-    if (keys(response_tree).length === 2 && response_tree.kind) {
-      const remainder_of_tree = populate(response_tree.data, _r);
-      return _r._new_object(KINDS[response_tree.kind] || 'RedditContent', remainder_of_tree, true);
-    }
-    const result = (Array.isArray(response_tree) ? map : mapValues)(response_tree, (value, key) => {
-      // Maps {..., author: 'some_username', ...} to {..., author: RedditUser {}, ... } (e.g.)
-      if (value !== null && USER_KEYS.has(key)) {
-        return _r._new_object('RedditUser', {name: value}, false);
-      }
-      if (value !== null && SUBREDDIT_KEYS.has(key)) {
-        return _r._new_object('Subreddit', {display_name: value}, false);
-      }
-      return populate(value, _r);
-    });
-    if (result.length === 2 && result[0] && result[0].constructor.name === 'Listing' && result[0][0] &&
-        result[0][0].constructor.name === 'Submission' && result[1] && result[1].constructor.name === 'Listing') {
-      if (result[1]._more && !result[1]._more.link_id) {
-        result[1]._more.link_id = result[0][0].name;
-      }
-      result[0][0].comments = result[1];
-      return result[0][0];
-    }
-    return result;
-  }
-  return response_tree;
-}
 
 export function get_empty_replies_listing (item) {
   if (item.constructor.name === 'Comment') {

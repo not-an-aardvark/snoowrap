@@ -1,6 +1,6 @@
 import {EventEmitter} from 'events';
 import WebSocket from 'ws';
-import {format_livethread_permissions, handle_json_errors, populate} from '../helpers.js';
+import {format_livethread_permissions, handle_json_errors} from '../helpers.js';
 import RedditContent from './RedditContent.js';
 const api_type = 'json';
 
@@ -47,7 +47,7 @@ const LiveThread = class extends RedditContent {
     const populated_stream = new EventEmitter();
     const raw_stream = new WebSocket(response_object.websocket_url);
     raw_stream.on('message', data => {
-      const parsed = populate(JSON.parse(data), this._r);
+      const parsed = this._r._populate(JSON.parse(data));
       populated_stream.emit(parsed.type, parsed.payload);
     });
     return {...response_object, _websocket: raw_stream, stream: populated_stream};
