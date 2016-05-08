@@ -1134,15 +1134,19 @@ const snoowrap = class {
   }
 };
 
-// Add the request_handler functions (oauth_request, credentialed_client_request, etc.) to the snoowrap prototype.
-assign(snoowrap.prototype, request_handler);
+/* Add the request_handler functions (oauth_request, credentialed_client_request, etc.) to the snoowrap prototype. Use
+Object.defineProperty to ensure that the properties are non-enumerable. */
+forOwn(request_handler, (value, key) => {
+  Object.defineProperty(snoowrap.prototype, key, {value});
+});
 
 forEach(HTTP_VERBS, method => {
   /* Define method shortcuts for each of the HTTP verbs. i.e. `snoowrap.prototype._post` is the same as `oauth_request` except
-  that the HTTP method defaults to `post`, and the result is promise-wrapped. */
-  snoowrap.prototype[`_${method}`] = function (options) {
+  that the HTTP method defaults to `post`, and the result is promise-wrapped. Use Object.defineProperty to ensure that the
+  properties are non-enumerable. */
+  Object.defineProperty(snoowrap.prototype, `_${method}`, {value (options) {
     return promise_wrap(this.oauth_request({...options, method}));
-  };
+  }});
 });
 
 snoowrap.objects = {};

@@ -69,6 +69,15 @@ describe('snoowrap', function () {
     it('throws a TypeError if an invalid config option is set', () => {
       expect(() => r.config({invalid_config_option: true})).to.throw(TypeError);
     });
+    it('sets all prototype functions as non-enumerable', () => {
+      const ensure_prototype_funcs_arent_enumerable = obj => {
+        Object.getOwnPropertyNames(obj.prototype).forEach(funcName => {
+          expect(obj.prototype.propertyIsEnumerable(funcName)).to.be.false();
+        });
+      };
+      ensure_prototype_funcs_arent_enumerable(snoowrap);
+      _.forOwn(snoowrap.objects, ensure_prototype_funcs_arent_enumerable);
+    });
     afterEach(() => {
       r.config({request_delay: previous_request_delay});
     });

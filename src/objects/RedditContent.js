@@ -121,10 +121,10 @@ const RedditContent = class {
   }
 };
 
-forEach(HTTP_VERBS, type => {
-  RedditContent.prototype[`_${type}`] = function (...args) {
-    return this._r[`_${type}`](...args);
-  };
+forEach(HTTP_VERBS, method => {
+  Object.defineProperty(RedditContent.prototype, `_${method}`, {value (...args) {
+    return this._r[`_${method}`](...args);
+  }});
 });
 
 export default RedditContent;
