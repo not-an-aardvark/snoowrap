@@ -44,9 +44,18 @@ const snoowrap = class {
     if (!access_token && (isUndefined(client_id) || isUndefined(client_secret) || isUndefined(refresh_token))) {
       throw new errors.NoCredentialsError();
     }
-    assign(this, {user_agent, client_id, client_secret, refresh_token, access_token});
-    this._config = default_config;
-    this._throttle = Promise.resolve();
+    defaults(this, {user_agent, client_id, client_secret, refresh_token, access_token}, {
+      client_id: null,
+      client_secret: null,
+      refresh_token: null,
+      access_token: null,
+      ratelimit_remaining: null,
+      ratelimit_expiration: null,
+      token_expiration: null,
+      scope: null,
+      _config: default_config,
+      _throttle: Promise.resolve()
+    });
   }
   static get name () {
     return MODULE_NAME;
