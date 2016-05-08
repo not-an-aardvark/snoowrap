@@ -1,3 +1,4 @@
+import {includes} from 'lodash';
 import Promise from 'bluebird';
 import request_promise from 'request-promise';
 import {populate} from './helpers.js';
@@ -38,7 +39,7 @@ domain name.
 * // equivalent to:
 * r.get_top({time: 'all'})
 */
-export async function oauth_request (options, attempts = 0) {
+export async function oauth_request (options, attempt_num = 1) {
   if (this.ratelimit_remaining < 1 && Date.now() < this.ratelimit_expiration) {
     // If the ratelimit has been exceeded, delay or abort the request depending on the user's config.
     const time_until_expiry = this.ratelimit_expiration - Date.now();
@@ -61,51 +62,49 @@ export async function oauth_request (options, attempts = 0) {
     await this._throttle;
   }
   this._throttle = Promise.delay(this._config.request_delay);
-  try {
-    // If the access token has expired, refresh it.
-    if (this.refresh_token && (!this.access_token || Date.now() > this.token_expiration)) {
-      await this.update_access_token();
-    }
+  // If the access token has expired, refresh it.
+  return await this.update_access_token({force_update: false}).then(() => {
     // Send the request and return the response.
-    return await request.defaults({
+    return request.defaults({
       headers: {'user-agent': this.user_agent},
       baseUrl: `https://oauth.${this._config.endpoint_domain}`,
       qs: {raw_json: 1},
       auth: {bearer: this.access_token},
+      resolveWithFullResponse: true,
       transform: (body, response) => {
-        if (response.headers['x-ratelimit-remaining']) {
+        if (response.headers.hasOwnProperty('x-ratelimit-remaining')) {
           this.ratelimit_remaining = +response.headers['x-ratelimit-remaining'];
           this.ratelimit_expiration = Date.now() + response.headers['x-ratelimit-reset'] * 1000;
         }
-        this.log.debug(`Received a ${response.statusCode} status code from a \`${response.request.method}\` request sent to ${
-          response.request.uri.href}. ratelimit_remaining: ${this.ratelimit_remaining}`);
-        if (!response.statusCode.toString().startsWith(2)) {
-          return response;
-        }
-        const populated = populate(body, this);
-        if (populated && populated.constructor && populated.constructor.name === 'Listing') {
-          populated._set_uri(response.request.uri.path);
-        }
-        return populated;
+        this.log.debug(
+          `Received a ${response.statusCode} status code from a \`${response.request.method}\` request`,
+          `sent to ${response.request.uri.href}. ratelimit_remaining: ${this.ratelimit_remaining}`
+        );
+        return response;
       }
     })(options);
-  } catch (err) {
-    if (err.statusCode === 401 && this.token_expiration - Date.now() < MAX_TOKEN_LATENCY && this.refresh_token) {
-      /* If the server returns a 401 error, it's possible that the access token expired during the latency period
-      as this request was being sent. In this scenario, snoowrap thought that the access token was valid
-      for a few more seconds, so it didn't refresh the token, but the token had expired by the time the request
-      reached the server. To handle this issue, invalidate the access token and call oauth_request again,
-      automatically causing the token to be refreshed. */
-      this.access_token = undefined;
-      return await this.oauth_request(this, options, attempts);
+  }).catch(e => e.statusCode === 401 && this.token_expiration - Date.now() < MAX_TOKEN_LATENCY && this.refresh_token, () => {
+    /* If the server returns a 401 error, it's possible that the access token expired during the latency period as this request
+    was being sent. In this scenario, snoowrap thought that the access token was valid for a few more seconds, so it didn't
+    refresh the token, but the token had expired by the time the request reached the server. To handle this issue, invalidate
+    the access token and call oauth_request again, automatically causing the token to be refreshed. */
+    this.access_token = null;
+    return this.oauth_request(this, options, attempt_num);
+  }).catch(e => includes(this._config.retry_error_codes, e.statusCode) && attempt_num < this._config.max_retry_attempts, e => {
+    /* If the error's status code is in the user's configured `retry_status_codes` and this request still has attempts
+    remaining, retry this request and increment the `attempts` counter. */
+    this.log.warn(
+      `Received status code ${e.statusCode} from reddit.`,
+      `Retrying request (attempt ${attempt_num + 1}/${this._config.max_retry_attempts})...`
+    );
+    return this.oauth_request(options, attempt_num + 1);
+  }).then(response => {
+    const populated = populate(response.body, this);
+    if (populated && populated.constructor.name === 'Listing') {
+      populated._set_uri(response.request.uri.path);
     }
-    if (attempts + 1 >= this._config.max_retry_attempts || this._config.retry_error_codes.indexOf(err.statusCode) === -1) {
-      throw err;
-    }
-    this.log.warn(`Received status code ${err.statusCode} from reddit. Retrying request (attempt ${attempts + 2}/${
-      this._config.max_retry_attempts})...`);
-    return await this.oauth_request(options, attempts + 1);
-  }
+    return populated || response;
+  });
 }
 
 /**
@@ -167,14 +166,18 @@ a stable feature, using it is rarely necessary unless an access token is needed 
 * @instance
 * @example r.update_access_token()
 */
-export function update_access_token () {
-  return this.credentialed_client_request({
-    method: 'post',
-    uri: 'api/v1/access_token',
-    form: {grant_type: 'refresh_token', refresh_token: this.refresh_token}
-  }).then(token_info => {
-    this.access_token = token_info.access_token;
-    this.token_expiration = Date.now() + token_info.expires_in * 1000;
-    this.scope = token_info.scope.split(' ');
-  });
+export function update_access_token ({force_update = true} = {}) {
+  if (force_update || this.refresh_token && (!this.access_token || Date.now() > this.token_expiration)) {
+    return this.credentialed_client_request({
+      method: 'post',
+      uri: 'api/v1/access_token',
+      form: {grant_type: 'refresh_token', refresh_token: this.refresh_token}
+    }).then(token_info => {
+      this.access_token = token_info.access_token;
+      this.token_expiration = Date.now() + token_info.expires_in * 1000;
+      this.scope = token_info.scope.split(' ');
+      return this.access_token;
+    });
+  }
+  return Promise.resolve(this.access_token);
 }
