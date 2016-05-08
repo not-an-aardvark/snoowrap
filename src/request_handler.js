@@ -68,7 +68,7 @@ export function oauth_request (options, attempts = 1) {
       didn't refresh the token, but the token had expired by the time the request reached the server. To handle this issue,
       invalidate the access token and call oauth_request again, automatically causing the token to be refreshed. */
       this.access_token = null;
-      return this.oauth_request(this, options, attempts);
+      return this.oauth_request(options, attempts);
     }).catch(e => includes(this._config.retry_error_codes, e.statusCode) && attempts < this._config.max_retry_attempts, e => {
       /* If the error's status code is in the user's configured `retry_status_codes` and this request still has attempts
       remaining, retry this request and increment the `attempts` counter. */
