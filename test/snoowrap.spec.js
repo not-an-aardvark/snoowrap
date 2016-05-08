@@ -46,6 +46,52 @@ describe('snoowrap', function () {
     });
   });
 
+  describe('internal helpers', () => {
+    it('can deeply clone a RedditContent instance', async () => {
+      const some_user = r.get_user('someone');
+      const cloned_user = some_user._clone({deep: true});
+      expect(some_user.name).to.equal(cloned_user.name);
+      expect(cloned_user).to.be.an.instanceof(snoowrap.objects.RedditUser);
+      expect(cloned_user._has_fetched).to.be.false();
+
+      const sub = await r.get_submission('4fp36y').fetch();
+      const cloned = sub._clone({deep: true});
+      expect(sub).to.not.equal(cloned);
+      expect(sub.comments).to.not.equal(cloned.comments);
+      expect(sub.comments[0]).to.not.equal(cloned.comments[0]);
+      expect(sub.comments[0].replies).to.not.equal(cloned.comments[0].replies);
+      expect(sub.comments[0].replies[0]).to.not.equal(cloned.comments[0].replies[0]);
+    });
+    it('can convert a RedditContent instance to JSON', async () => {
+      const some_user = r.get_user('someone');
+      expect(JSON.stringify(some_user)).to.equal('{"name":"someone"}');
+      const fetched_user = await r.get_user('snoowrap_testing').fetch();
+      const reparsed = JSON.parse(JSON.stringify(fetched_user));
+      expect(fetched_user).to.have.property('_r');
+      expect(reparsed).to.not.have.property('_r');
+      expect(reparsed.name).to.equal(fetched_user.name);
+      expect(reparsed.created_utc).to.equal(fetched_user.created_utc);
+    });
+    it('de-populates a RedditContent object when converting it to JSON', async () => {
+      const some_submission = await r.get_submission('4abn1k').fetch();
+      expect(some_submission.author).to.be.an('object');
+      expect(some_submission.subreddit).to.be.an('object');
+      const jsonified = some_submission.toJSON();
+      expect(jsonified.author).to.be.a('string');
+      expect(jsonified.author).to.equal(some_submission.author.name);
+      expect(jsonified.subreddit).to.be.a('string');
+      expect(jsonified.subreddit).to.equal(some_submission.subreddit.display_name);
+    });
+    it('does not de-populate a RedditContent object when inspecting it', async () => {
+      const some_submission = await r.get_submission('4abn1k').fetch();
+      expect(some_submission.author).to.be.an('object');
+      expect(some_submission.subreddit).to.be.an('object');
+      const inspected = some_submission.inspect();
+      expect(inspected).to.be.a('string');
+      expect(_.includes(inspected, "author: RedditUser { name: 'not_an_aardvark' }")).to.be.true();
+    });
+  });
+
   describe('general snoowrap behavior', () => {
     let previous_request_delay;
     before(() => {
@@ -178,6 +224,9 @@ describe('snoowrap', function () {
   describe('smoketest', () => {
     it("can get the requester's profile", async () => {
       expect(await r.get_me()).to.be.an.instanceof(snoowrap.objects.RedditUser);
+    });
+    it("can get a user's overview", async () => {
+      expect(await r.get_me().get_overview()).to.be.an.instanceof(snoowrap.objects.Listing);
     });
   });
 
@@ -1367,51 +1416,6 @@ describe('snoowrap', function () {
       const initial_gilding_amount = await submission.gilded;
       await submission.gild();
       expect(await submission.refresh().gilded).to.be.above(initial_gilding_amount);
-    });
-  });
-  describe('internal helpers', () => {
-    it('can deeply clone a RedditContent instance', async () => {
-      const some_user = r.get_user('someone');
-      const cloned_user = some_user._clone({deep: true});
-      expect(some_user.name).to.equal(cloned_user.name);
-      expect(cloned_user).to.be.an.instanceof(snoowrap.objects.RedditUser);
-      expect(cloned_user._has_fetched).to.be.false();
-
-      const sub = await r.get_submission('4fp36y').fetch();
-      const cloned = sub._clone({deep: true});
-      expect(sub).to.not.equal(cloned);
-      expect(sub.comments).to.not.equal(cloned.comments);
-      expect(sub.comments[0]).to.not.equal(cloned.comments[0]);
-      expect(sub.comments[0].replies).to.not.equal(cloned.comments[0].replies);
-      expect(sub.comments[0].replies[0]).to.not.equal(cloned.comments[0].replies[0]);
-    });
-    it('can convert a RedditContent instance to JSON', async () => {
-      const some_user = r.get_user('someone');
-      expect(JSON.stringify(some_user)).to.equal('{"name":"someone"}');
-      const fetched_user = await r.get_user('snoowrap_testing').fetch();
-      const reparsed = JSON.parse(JSON.stringify(fetched_user));
-      expect(fetched_user).to.have.property('_r');
-      expect(reparsed).to.not.have.property('_r');
-      expect(reparsed.name).to.equal(fetched_user.name);
-      expect(reparsed.created_utc).to.equal(fetched_user.created_utc);
-    });
-    it('de-populates a RedditContent object when converting it to JSON', async () => {
-      const some_submission = await r.get_submission('4abn1k').fetch();
-      expect(some_submission.author).to.be.an('object');
-      expect(some_submission.subreddit).to.be.an('object');
-      const jsonified = some_submission.toJSON();
-      expect(jsonified.author).to.be.a('string');
-      expect(jsonified.author).to.equal(some_submission.author.name);
-      expect(jsonified.subreddit).to.be.a('string');
-      expect(jsonified.subreddit).to.equal(some_submission.subreddit.display_name);
-    });
-    it('does not de-populate a RedditContent object when inspecting it', async () => {
-      const some_submission = await r.get_submission('4abn1k').fetch();
-      expect(some_submission.author).to.be.an('object');
-      expect(some_submission.subreddit).to.be.an('object');
-      const inspected = some_submission.inspect();
-      expect(inspected).to.be.a('string');
-      expect(_.includes(inspected, "author: RedditUser { name: 'not_an_aardvark' }")).to.be.true();
     });
   });
 });
