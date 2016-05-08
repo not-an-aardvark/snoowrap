@@ -1149,10 +1149,12 @@ forEach(HTTP_VERBS, method => {
   }});
 });
 
-snoowrap.objects = {};
+/* `objects` will be an object containing getters for each content type, due to the way objects are exported from
+objects/index.js. To unwrap these getters into direct properties, use lodash.mapValues with an identity function. */
+snoowrap.objects = mapValues(objects, value => value);
 
 forOwn(KINDS, value => {
-  snoowrap.objects[value] = objects[value] || class extends objects.RedditContent {};
+  snoowrap.objects[value] = snoowrap.objects[value] || class extends objects.RedditContent {};
   /* Ensure that for any instance `x` of a snoowrap object, `x.constructor.name` will return the expected name (e.g. 'Comment').
   This is done by defining a static `name` getter on each constructor. The alternative to this would be to define the
   constructor name as part of the class syntax (e.g. `class Comment {}` rather than just `class {}`), but that causes issues

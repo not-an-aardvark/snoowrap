@@ -78,6 +78,14 @@ describe('snoowrap', function () {
       ensure_prototype_funcs_arent_enumerable(snoowrap);
       _.forOwn(snoowrap.objects, ensure_prototype_funcs_arent_enumerable);
     });
+    it('adds all object types to snoowrap.objects', () => {
+      Object.keys(snoowrap.objects).forEach(key => {
+        // Ensure that each object is a direct property of snoowrap (as opposed to a getter)
+        expect(Object.getOwnPropertyDescriptor(snoowrap.objects, key).value).to.equal(snoowrap.objects[key]);
+      });
+      expect(snoowrap.objects.RedditContent).to.exist();
+      expect(snoowrap.objects.Comment).to.exist();
+    });
     afterEach(() => {
       r.config({request_delay: previous_request_delay});
     });
