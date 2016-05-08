@@ -1084,7 +1084,7 @@ const snoowrap = class {
   */
   revoke_access_token () {
     return this._revoke_token(this.access_token).then(() => {
-      this.access_token = undefined;
+      this.access_token = null;
     });
   }
   /**
@@ -1098,8 +1098,8 @@ const snoowrap = class {
   */
   revoke_refresh_token () {
     return this._revoke_token(this.refresh_token).then(() => {
-      this.refresh_token = undefined;
-      this.access_token = undefined; // Revoking a refresh token also revokes any associated access tokens.
+      this.refresh_token = null;
+      this.access_token = null; // Revoking a refresh token also revokes any associated access tokens.
     });
   }
   async _select_flair ({flair_template_id, link, name, text, subreddit_name}) {
