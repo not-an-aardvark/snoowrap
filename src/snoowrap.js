@@ -70,11 +70,13 @@ const snoowrap = class {
   that one property in this parameter. To get the current configuration without modifying anything, simply omit this
   parameter.)
   * @param {string} [options.endpoint_domain='reddit.com'] The endpoint where requests should be sent
-  * @param {string} [options.request_delay=0] A minimum delay, in milliseconds, to enforce between API calls. If multiple
+  * @param {Number} [options.request_delay=0] A minimum delay, in milliseconds, to enforce between API calls. If multiple
   api calls are requested during this timespan, they will be queued and sent one at a time. Setting this to more than 1000 will
   ensure that reddit's ratelimit is never reached, but it will make things run slower than necessary if only a few requests
   are being sent. If this is set to zero, snoowrap will not enforce any delay between individual requests. However, it will
   still refuse to continue if reddit's enforced ratelimit (600 requests per 10 minutes) is exceeded.
+  * @param {Number} [options.request_timeout=30000] A timeout for all OAuth requests, in milliseconds. If the reddit server
+  fails to return a response within this amount of time, the Promise will be rejected with a timeout error.
   * @param {string} [options.continue_after_ratelimit_error=false] Determines whether snoowrap should queue API calls if
   reddit's ratelimit is exceeded. If set to `true` when the ratelimit is exceeded, snoowrap will queue all further requests,
   and will attempt to send them again after the current ratelimit period expires (which happens every 10 minutes). If set
@@ -83,7 +85,7 @@ const snoowrap = class {
   codes, snoowrap will retry the request, up to a maximum of `options.max_retry_attempts` requests in total. (These errors
   usually indicate that there was an temporary issue on reddit's end, and retrying the request has a decent chance of
   success.) This behavior can be disabled by simply setting this property to an empty array.
-  * @param {number} [options.max_retry_attempts=3] See `retry_error_codes`.
+  * @param {Number} [options.max_retry_attempts=3] See `retry_error_codes`.
   * @param {boolean} [options.warnings=true] snoowrap may occasionally log warnings, such as deprecation notices, to the
   console. These can be disabled by setting this to `false`.
   * @param {boolean} [options.debug=false] If set to true, snoowrap will print out potentially-useful information for debugging

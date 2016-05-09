@@ -92,9 +92,10 @@ describe('snoowrap', function () {
   });
 
   describe('general snoowrap behavior', () => {
-    let previous_request_delay;
+    let previous_request_delay, previous_request_timeout;
     before(() => {
       previous_request_delay = r.config().request_delay;
+      previous_request_timeout = r.config().request_timeout;
     });
     it('can chain properties together before they get resolved', async () => {
       const comment = r.get_comment('coip909');
@@ -108,6 +109,14 @@ describe('snoowrap', function () {
       await r.get_user('not_an_aardvark').fetch();
       await r.get_user('actually_an_aardvark').fetch();
       expect(timer.isFulfilled()).to.be.true();
+    });
+    it('throws a timeout error if a request takes too long', async () => {
+      r.config({request_timeout: 1});
+      await r.get_me().then(expect.fail).catch({message: 'Error: ETIMEDOUT'}, _.noop);
+    });
+    it('does not throw a timeout error if time accumulates while waiting to send a request', async () => {
+      r.config({request_timeout: 2000, request_delay: 2500});
+      await Promise.all([r.get_me(), r.get_me()]);
     });
     it('stores the version number as a constant', () => {
       expect(snoowrap.version).to.equal(require('../package.json').version);
@@ -133,7 +142,7 @@ describe('snoowrap', function () {
       expect(snoowrap.objects.Comment).to.exist();
     });
     afterEach(() => {
-      r.config({request_delay: previous_request_delay});
+      r.config({request_delay: previous_request_delay, request_timeout: previous_request_timeout});
     });
   });
 
@@ -454,7 +463,7 @@ describe('snoowrap', function () {
 
   describe('general Listing behavior', () => {
     let comments, initial_request_delay;
-    beforeEach(async () => {
+    before(async () => {
       comments = await r.get_submission('2np694').comments;
       initial_request_delay = r.config().request_delay;
     });

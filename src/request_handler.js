@@ -50,6 +50,7 @@ export function oauth_request (options, attempts = 1) {
         qs: {raw_json: 1},
         auth: {bearer: token},
         resolveWithFullResponse: true,
+        timeout: this._config.request_timeout,
         transform: (body, response) => {
           if (Object.prototype.hasOwnProperty.call(response.headers, 'x-ratelimit-remaining')) {
             this.ratelimit_remaining = +response.headers['x-ratelimit-remaining'];
