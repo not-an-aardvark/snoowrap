@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.0.0-rc.2 (2016-05-08)
+
+* Fixed an issue where snoowrap would crash if it received a 401 error from the reddit API
+* Fixed an issue where 5xx errors from the reddit API were parsed incorrectly
+* Fixed an issue where some methods on `snoowrap.prototype` were enumerable
+
 ## v1.0.0-rc.1 (2016-05-07)
 
 * **[breaking]**: Removed the `suppress_warnings` config option in favor of a new `warnings` option.
