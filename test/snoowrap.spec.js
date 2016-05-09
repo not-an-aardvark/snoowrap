@@ -365,7 +365,7 @@ describe('snoowrap', function () {
       const rules_obj = await subreddit.get_rules();
       expect(rules_obj.rules[0].short_name).to.equal('Rule 1: No breaking the rules');
     });
-    it('can get a stickied post on a subreddit', async () => {
+    it.skip("can get a stickied post on a subreddit (skipped due to issues with reddit's cache)", async () => {
       const submission = r.get_submission('474t3u');
       await submission.sticky({num: 1}).catch({statusCode: 409}, _.noop);
       const stickied_post = await subreddit.get_sticky({num: 1});
