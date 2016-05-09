@@ -82,6 +82,7 @@ export function oauth_request (options, attempts = 1) {
       didn't refresh the token, but the token had expired by the time the request reached the server. To handle this issue,
       invalidate the access token and call oauth_request again, automatically causing the token to be refreshed. */
       this.access_token = null;
+      this.token_expiration = null;
       return this.oauth_request(options, attempts);
     });
 }

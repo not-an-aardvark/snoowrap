@@ -1085,6 +1085,7 @@ const snoowrap = class {
   revoke_access_token () {
     return this._revoke_token(this.access_token).then(() => {
       this.access_token = null;
+      this.token_expiration = null;
     });
   }
   /**
@@ -1100,6 +1101,7 @@ const snoowrap = class {
     return this._revoke_token(this.refresh_token).then(() => {
       this.refresh_token = null;
       this.access_token = null; // Revoking a refresh token also revokes any associated access tokens.
+      this.token_expiration = null;
     });
   }
   _select_flair ({flair_template_id, link, name, text, subreddit_name}) {
