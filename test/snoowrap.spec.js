@@ -115,7 +115,7 @@ describe('snoowrap', function () {
       await r.get_me().then(expect.fail).catch({message: 'Error: ETIMEDOUT'}, _.noop);
     });
     it('does not throw a timeout error if time accumulates while waiting to send a request', async () => {
-      r.config({request_timeout: 2000, request_delay: 2500});
+      r.config({request_timeout: 5000, request_delay: 5500});
       await Promise.all([r.get_me(), r.get_me()]);
     });
     it('stores the version number as a constant', () => {
