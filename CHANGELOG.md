@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.0.0 (2016-05-10)
+
+* Added a `request_timeout` config option
+
+If you're upgrading from v0.11.x, note the two small breaking changes introduced in `v1.0.0-rc.1`.
+
 ## v1.0.0-rc.2 (2016-05-08)
 
 * Fixed an issue where snoowrap would crash if it received a 401 error from the reddit API
