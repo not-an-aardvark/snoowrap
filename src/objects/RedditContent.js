@@ -15,7 +15,7 @@ const RedditContent = class {
   constructor (options, _r, _has_fetched) {
     // _r refers to the snoowrap requester that is used to fetch this content.
     this._r = _r;
-    this._fetch = undefined;
+    this._fetch = null;
     this._has_fetched = !!_has_fetched;
     assign(this, options);
     if (typeof Proxy !== 'undefined' && !this._has_fetched) {
@@ -72,7 +72,7 @@ const RedditContent = class {
   * }, 10000);
   */
   refresh () {
-    this._fetch = undefined;
+    this._fetch = null;
     return this.fetch();
   }
   /**

@@ -102,7 +102,8 @@ The helper functions are `_get`, `_post`, `_put`, `_delete`, etc., corresponding
   auth: {bearer: "(the user's access token)"},
   headers: {'user-agent': "(the user's user-agent string)"},
   baseUrl: "the user's specified endpoint domain, usually https://oauth.reddit.com",
-  qs: {raw_json: 1} // (prevents reddit from escaping HTML characters)
+  qs: {raw_json: 1} // (prevents reddit from escaping HTML characters),
+  timeout: "(the user's timeout)"
 }
 ```
 
@@ -110,4 +111,8 @@ The process of getting an access token from a refresh token is handled internall
 
 ### Content objects
 
-TODO
+Most content constructors (`Comment`, `Submission`, etc.) are subclasses of the [RedditContent](./objects/RedditContent.js) class. (Note: The `Listing` and `More` constructors are exceptions to this rule.) Every `RedditContent` instance carries a reference to the snoowrap instance that initially created it. This allows further requests to be made directly from the content objects. (For example, `Comment#upvote` works by sending an OAuth request from the snoowrap instance that initially created the given comment.) This snoowrap can be accessed through the `_r` property, i.e. `r.get_comment('abcdef')._r === r`.
+
+`RedditContent` instances carry shortcut functions such as `_get`, `_post`, etc. These do the same thing as the corresponding functions on the snoowrap prototype.
+
+`RedditContent` objects also have a `_fetch` property. This starts out as `null` when the object is created, and gets set to a Promise and returned when `fetch()` is called for the first time. All subsequent calls to `fetch()` return the same Promise. This ensures that no objects get fetched more than once (unless it is explicitly re-fetched using `refresh()`).
