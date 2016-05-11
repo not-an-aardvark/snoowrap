@@ -3,7 +3,7 @@ const expect = require('chai').use(require('dirty-chai')).expect;
 const Promise = require('bluebird');
 const _ = require('lodash');
 const moment = require('moment');
-const snoowrap = require('../src/snoowrap');
+const snoowrap = require('..');
 describe('snoowrap', function () {
   this.timeout(300000);
   this.slow(Infinity);
