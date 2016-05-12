@@ -626,6 +626,8 @@ const snoowrap = class {
   }
   /**
   * @summary Marks all of the user's messages as read.
+  * @desc **Note:** The reddit.com site imposes a ratelimit of approximately 1 request every 10 minutes on this endpoint.
+  Further requests will cause the API to return a 429 error
   * @returns {Promise} A Promise that resolves when the request is complete
   * @example
   *
