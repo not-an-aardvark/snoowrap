@@ -124,6 +124,9 @@ describe('snoowrap', function () {
     it('throws a TypeError if an invalid config option is set', () => {
       expect(() => r.config({invalid_config_option: true})).to.throw(TypeError);
     });
+    it('does not use Object.prototype for the config object', () => {
+      expect(Object.getPrototypeOf(r.config())).to.be.null();
+    });
     it('sets all prototype functions as non-enumerable', () => {
       const ensure_prototype_funcs_arent_enumerable = obj => {
         Object.getOwnPropertyNames(obj.prototype).forEach(funcName => {
