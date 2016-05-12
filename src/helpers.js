@@ -71,3 +71,10 @@ export function build_replies_tree (child_list) {
   });
   return child_list;
 }
+
+export function add_fullname_prefix (item, prefix) {
+  if (typeof item === 'string') {
+    return item.startsWith(prefix) ? item : prefix + item;
+  }
+  return item.name;
+}

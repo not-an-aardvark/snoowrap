@@ -1,12 +1,12 @@
-import {assign, defaults, forEach, forOwn, findKey, includes, isEmpty, isObject, isString, isUndefined, map, mapValues,
-  omit, omitBy} from 'lodash';
+import {assign, defaults, forEach, forOwn, findKey, includes, isEmpty, isObject, isString, isUndefined, map, mapValues, omit,
+  omitBy} from 'lodash';
 import Promise from 'bluebird';
 import promise_wrap from 'promise-chains';
 import util from 'util';
 import * as request_handler from './request_handler.js';
 import {HTTP_VERBS, KINDS, MAX_LISTING_ITEMS, MODULE_NAME, USER_KEYS, SUBREDDIT_KEYS, VERSION} from './constants.js';
 import * as errors from './errors.js';
-import {handle_json_errors} from './helpers.js';
+import {add_fullname_prefix, handle_json_errors} from './helpers.js';
 import default_config from './default_config.js';
 import * as objects from './objects/index.js';
 const api_type = 'json';
@@ -153,7 +153,7 @@ const snoowrap = class {
   * // => 'Kharos'
   */
   get_comment (comment_id) {
-    return this._new_object('Comment', {name: comment_id.startsWith('t1_') ? comment_id : `t1_${comment_id}`});
+    return this._new_object('Comment', {name: add_fullname_prefix(comment_id, 't1_')});
   }
   /**
   * @summary Gets information on a given subreddit.
@@ -181,7 +181,7 @@ const snoowrap = class {
   * // => 'What tasty food would be distusting if eaten over rice?'
   */
   get_submission (submission_id) {
-    return this._new_object('Submission', {name: submission_id.startsWith('t3_') ? submission_id : `t3_${submission_id}`});
+    return this._new_object('Submission', {name: add_fullname_prefix(submission_id, 't3_')});
   }
   /**
   * @summary Gets a private message by ID.
@@ -196,7 +196,7 @@ const snoowrap = class {
   * // See here for a screenshot of the PM in question https://i.gyazo.com/24f3b97e55b6ff8e3a74cb026a58b167.png
   */
   get_message (message_id) {
-    return this._new_object('PrivateMessage', {name: message_id.startsWith('t4_') ? message_id : `t4_${message_id}`});
+    return this._new_object('PrivateMessage', {name: add_fullname_prefix(message_id, 't4_')});
   }
   /**
   * Gets a livethread by ID.
@@ -210,7 +210,7 @@ const snoowrap = class {
   * // => false
   */
   get_livethread (thread_id) {
-    return this._new_object('LiveThread', {id: thread_id.startsWith('LiveUpdateEvent_') ? thread_id.slice(16) : thread_id});
+    return this._new_object('LiveThread', {id: add_fullname_prefix(thread_id, 'LiveUpdateEvent_').slice(16)});
   }
   /**
   * @summary Gets information on the requester's own user profile.
@@ -623,6 +623,26 @@ const snoowrap = class {
   */
   get_sent_messages (options = {}) {
     return this._get_listing({uri: 'message/sent', qs: options});
+  }
+  /**
+  * @summary Marks all of the given messages as read.
+  * @param {PrivateMessage[]|String[]} messages An Array of PrivateMessage objects. Can also contain strings representing
+  message IDs.
+  * @returns {Promise} A Promise that fulfills when the request is complete
+  */
+  mark_messages_as_read (messages) {
+    const message_ids = messages.map(message => add_fullname_prefix(message, 't4_'));
+    return this._post({uri: 'api/read_message', form: {id: message_ids.join(',')}});
+  }
+  /**
+  * @summary Marks all of the given messages as unread.
+  * @param {PrivateMessage[]|String[]} messages An Array of PrivateMessage objects. Can also contain strings representing
+  message IDs.
+  * @returns {Promise} A Promise that fulfills when the request is complete
+  */
+  mark_messages_as_unread (messages) {
+    const message_ids = messages.map(message => add_fullname_prefix(message, 't4_'));
+    return this._post({uri: 'api/unread_message', form: {id: message_ids.join(',')}});
   }
   /**
   * @summary Marks all of the user's messages as read.

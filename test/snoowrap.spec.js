@@ -1069,6 +1069,14 @@ describe('snoowrap', function () {
       expect(await message3.mark_as_unread().refresh().new).to.be.true();
       expect(await message3.mark_as_read().refresh().new).to.be.false();
     });
+    it('can read/unread multiple messages simultaneously', async () => {
+      await r.mark_messages_as_unread([message2, message3]);
+      expect(await message2.new).to.be.true();
+      expect(await message3.new).to.be.true();
+      await r.mark_messages_as_read([message2.name, message3.name.slice(3)]);
+      expect(await message2.refresh().new).to.be.false();
+      expect(await message3.refresh().new).to.be.false();
+    });
   });
 
   describe('inbox operations', () => {

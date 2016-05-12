@@ -25,7 +25,7 @@ const PrivateMessage = class extends ReplyableContent {
   * @example r.get_message('51shxv').mark_as_read()
   */
   mark_as_read () {
-    return this._post({uri: 'api/read_message', form: {id: this.name}}).return(this);
+    return this._r.mark_messages_as_read([this]).return(this);
   }
   /**
   * @summary Marks this message as unread.
@@ -33,7 +33,7 @@ const PrivateMessage = class extends ReplyableContent {
   * @example r.get_message('51shxv').mark_as_unread()
   */
   mark_as_unread () {
-    return this._post({uri: 'api/unread_message', form: {id: this.name}}).return(this);
+    return this._r.mark_messages_as_unread([this]).return(this);
   }
   /**
   * @summary Mutes the author of this message for 72 hours. This can only be used on moderator mail.
