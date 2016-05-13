@@ -1189,10 +1189,8 @@ const snoowrap = class {
 };
 
 /* Add the request_handler functions (oauth_request, credentialed_client_request, etc.) to the snoowrap prototype. Use
-Object.defineProperty to ensure that the properties are non-enumerable. */
-forOwn(request_handler, (value, key) => {
-  Object.defineProperty(snoowrap.prototype, key, {value});
-});
+Object.defineProperties to ensure that the properties are non-enumerable. */
+Object.defineProperties(snoowrap.prototype, mapValues(request_handler, func => ({value: func})));
 
 forEach(HTTP_VERBS, method => {
   /* Define method shortcuts for each of the HTTP verbs. i.e. `snoowrap.prototype._post` is the same as `oauth_request` except
