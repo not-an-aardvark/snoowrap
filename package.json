@@ -61,6 +61,6 @@
     "jsdoc": "^3.4.0",
     "mocha": "^2.4.5",
     "moment": "^2.13.0",
-    "uglify-js": "git://github.com/mishoo/UglifyJS2/#e36e07fa77859bcd461234856c06c95cee0cfffe"
+    "uglify-js-harmony": "^2.6.2"
   }
 }
