@@ -26,10 +26,11 @@ const WikiPage = class extends RedditContent {
   }
   /**
   * @summary Edits the settings for this wiki page.
-  * @param {object} $0
-  * @param {boolean} $0.listed Determines whether this wiki page should appear on the public list of pages for this subreddit.
-  * @param {number} $0.permission_level Determines who should be allowed to access and edit this page `0` indicates that this
-  subreddit's default wiki settings should get used, `1` indicates that only approved wiki contributors on this subreddit
+  * @param {object} options
+  * @param {boolean} options.listed Determines whether this wiki page should appear on the public list of pages for this
+  subreddit.
+  * @param {number} options.permission_level Determines who should be allowed to access and edit this page `0` indicates that
+  this subreddit's default wiki settings should get used, `1` indicates that only approved wiki contributors on this subreddit
   should be able to edit this page, and `2` indicates that only mods should be able to view and edit this page.
   * @returns {Promise} A Promise that fulfills with this WikiPage when the request is complete
   * @example r.get_subreddit('snoowrap').get_wiki_page('index').edit_settings({listed: false, permission_level: 1})
@@ -48,8 +49,8 @@ const WikiPage = class extends RedditContent {
   }
   /**
   * @summary Makes the given user an approved editor of this wiki page.
-  * @param {object} $0
-  * @param {string} $0.name The name of the user to be added
+  * @param {object} options
+  * @param {string} options.name The name of the user to be added
   * @returns {Promise} A Promise that fulfills with this WikiPage when the request is complete
   * @example r.get_subreddit('snoowrap').get_wiki_page('index').add_editor({name: 'actually_an_aardvark'})
   */
@@ -58,8 +59,8 @@ const WikiPage = class extends RedditContent {
   }
   /**
   * @summary Revokes this user's approved editor status for this wiki page
-  * @param {object} $0
-  * @param {string} $0.name The name of the user to be removed
+  * @param {object} options
+  * @param {string} options.name The name of the user to be removed
   * @returns {Promise} A Promise that fulfills with this WikiPage when the request is complete
   * @example r.get_subreddit('snoowrap').get_wiki_page('index').remove_editor({name: 'actually_an_aardvark'})
   */
@@ -68,10 +69,10 @@ const WikiPage = class extends RedditContent {
   }
   /**
   * @summary Edits this wiki page, or creates it if it does not exist yet.
-  * @param {object} $0
-  * @param {string} $0.text The new content of the page, in markdown.
-  * @param {string} [$0.reason] The edit reason that will appear in this page's revision history. 256 characters max
-  * @param {string} [$0.previous_revision] Determines which revision this edit should be added to. If this parameter is
+  * @param {object} options
+  * @param {string} options.text The new content of the page, in markdown.
+  * @param {string} [options.reason] The edit reason that will appear in this page's revision history. 256 characters max
+  * @param {string} [options.previous_revision] Determines which revision this edit should be added to. If this parameter is
   omitted, this edit is simply added to the most recent revision.
   * @returns {Promise} A Promise that fulfills with this WikiPage when the request is complete
   * @example r.get_subreddit('snoowrap').get_wiki_page('index').edit({text: 'Welcome', reason: 'Added a welcome message'})
@@ -104,8 +105,8 @@ const WikiPage = class extends RedditContent {
   }
   /**
   * @summary Hides the given revision from this page's public revision history.
-  * @param {object} $0
-  * @param {string} $0.id The revision's id
+  * @param {object} options
+  * @param {string} options.id The revision's id
   * @returns {Promise} A Promise that fulfills with this WikiPage when the request is complete
   * @example r.get_subreddit('snoowrap').get_wiki_page('index').hide_revision({id: '506370b4-0508-11e6-b550-0e69f29e0c4d'})
   */
@@ -117,8 +118,8 @@ const WikiPage = class extends RedditContent {
   }
   /**
   * @summary Reverts this wiki page to the given point.
-  * @param {object} $0
-  * @param {string} $0.id The id of the revision that this page should be reverted to
+  * @param {object} options
+  * @param {string} options.id The id of the revision that this page should be reverted to
   * @returns {Promise} A Promise that fulfills with this WikiPage when the request is complete
   * @example r.get_subreddit('snoowrap').get_wiki_page('index').revert({id: '506370b4-0508-11e6-b550-0e69f29e0c4d'})
   */

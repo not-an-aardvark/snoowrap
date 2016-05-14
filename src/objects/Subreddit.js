@@ -709,7 +709,7 @@ const Subreddit = class extends RedditContent {
   /**
   * @summary Gets the list of moderators on this subreddit.
   * @param {object} options
-  * @param {string} [$0.name] The name of a user to find in the list
+  * @param {string} [options.name] The name of a user to find in the list
   * @returns {Promise} An Array of RedditUsers representing the moderators of this subreddit
   * @example
   *
@@ -759,8 +759,8 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Deletes an image from this subreddit.
-  * @param {object} $0
-  * @param {string} $0.image_name The name of the image.
+  * @param {object} options
+  * @param {string} options.image_name The name of the image.
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   * @example r.get_subreddit('snoowrap').delete_image()
   */
@@ -861,9 +861,9 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Updates this subreddit's stylesheet.
-  * @param {object} $0
-  * @param {string} $0.css The new contents of the stylesheet
-  * @param {string} [$0.reason] The reason for the change (256 characters max)
+  * @param {object} options
+  * @param {string} options.css The new contents of the stylesheet
+  * @param {string} [options.reason] The reason for the change (256 characters max)
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   * @example r.get_subreddit('snoowrap').update_stylesheet({css: 'body {color:#00ff00;}', reason: 'yay green'})
   */
@@ -919,12 +919,12 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Uploads an image for use in this subreddit's stylesheet.
-  * @param {object} $0
-  * @param {string} $0.name The name that the new image should have in the stylesheet
-  * @param {string|stream.Readable} $0.file The image file that should get uploaded. This should either be the path to an
+  * @param {object} options
+  * @param {string} options.name The name that the new image should have in the stylesheet
+  * @param {string|stream.Readable} options.file The image file that should get uploaded. This should either be the path to an
   image file, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) in environments (e.g.
   browsers) where the filesystem is unavailable.
-  * @param {string} [$0.image_type='png'] Determines how the uploaded image should be stored. One of `png, jpg`
+  * @param {string} [options.image_type='png'] Determines how the uploaded image should be stored. One of `png, jpg`
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
   * @example r.get_subreddit('snoowrap').upload_subreddit_image({name: 'the cookie monster', file: './cookie_monster.png'})
   */
@@ -933,11 +933,11 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Uploads an image to use as this subreddit's header.
-  * @param {object} $0
-  * @param {string|stream.Readable} $0.file The image file that should get uploaded. This should either be the path to an
+  * @param {object} options
+  * @param {string|stream.Readable} options.file The image file that should get uploaded. This should either be the path to an
   image file, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) for environments (e.g.
   browsers) where the filesystem is unavailable.
-  * @param {string} [$0.image_type='png'] Determines how the uploaded image should be stored. One of `png, jpg`
+  * @param {string} [options.image_type='png'] Determines how the uploaded image should be stored. One of `png, jpg`
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
   * @example r.get_subreddit('snoowrap').upload_header_image({name: 'the cookie monster', file: './cookie_monster.png'})
   */
@@ -946,11 +946,11 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Uploads an image to use as this subreddit's mobile icon.
-  * @param {object} $0
-  * @param {string|stream.Readable} $0.file The image file that should get uploaded. This should either be the path to an
+  * @param {object} options
+  * @param {string|stream.Readable} options.file The image file that should get uploaded. This should either be the path to an
   image file, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) for environments (e.g.
   browsers) where the filesystem is unavailable.
-  * @param {string} [$0.image_type='png'] Determines how the uploaded image should be stored. One of `png, jpg`
+  * @param {string} [options.image_type='png'] Determines how the uploaded image should be stored. One of `png, jpg`
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
   * @example r.get_subreddit('snoowrap').upload_icon({name: 'the cookie monster', file: './cookie_monster.png'})
   */
@@ -959,11 +959,11 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Uploads an image to use as this subreddit's mobile banner.
-  * @param {object} $0
-  * @param {string|stream.Readable} $0.file The image file that should get uploaded. This should either be the path to an
+  * @param {object} options
+  * @param {string|stream.Readable} options.file The image file that should get uploaded. This should either be the path to an
   image file, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) for environments (e.g.
   browsers) where the filesystem is unavailable.
-  * @param {string} [$0.image_type='png'] Determines how the uploaded image should be stored. One of `png, jpg`
+  * @param {string} [options.image_type='png'] Determines how the uploaded image should be stored. One of `png, jpg`
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
   * @example r.get_subreddit('snoowrap').upload_banner_image({name: 'the cookie monster', file: './cookie_monster.png'})
   */
@@ -999,8 +999,8 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Gets the stickied post on this subreddit, or throws a 404 error if none exists.
-  * @param {object} [$0]
-  * @param {number} [$0.num=1] The number of the sticky to get. Should be either `1` (first sticky) or `2` (second sticky).
+  * @param {object} [options]
+  * @param {number} [options.num=1] The number of the sticky to get. Should be either `1` (first sticky) or `2` (second sticky).
   * @returns {Promise} A Submission object representing this subreddit's stickied submission
   * @example
   * r.get_subreddit('snoowrap').get_sticky({num: 2})
@@ -1023,11 +1023,11 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Invites the given user to be a moderator of this subreddit.
-  * @param {object} $0
-  * @param {string} $0.name The username of the account that should be invited
-  * @param {Array} [$0.permissions] The moderator permissions that this user should have. This should be an array containing
-  some combination of `"wiki", "posts", "access", "mail", "config", "flair"`. To add a moderator with full permissions, omit
-  this property entirely.
+  * @param {object} options
+  * @param {string} options.name The username of the account that should be invited
+  * @param {Array} [options.permissions] The moderator permissions that this user should have. This should be an array
+  containing some combination of `"wiki", "posts", "access", "mail", "config", "flair"`. To add a moderator with full
+  permissions, omit this property entirely.
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   * @example r.get_subreddit('snoowrap').invite_moderator({name: 'actually_an_aardvark', permissions: ['posts', 'wiki']})
   */
@@ -1036,8 +1036,8 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Revokes an invitation for the given user to be a moderator.
-  * @param {object} $0
-  * @param {string} $0.name The username of the account whose invitation should be revoked
+  * @param {object} options
+  * @param {string} options.name The username of the account whose invitation should be revoked
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   * @example r.get_subreddit('snoowrap').revoke_moderator_invite({name: 'actually_an_aardvark'})
   */
@@ -1046,8 +1046,8 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Removes the given user's moderator status on this subreddit.
-  * @param {object} $0
-  * @param {string} $0.name The username of the account whose moderator status should be removed
+  * @param {object} options
+  * @param {string} options.name The username of the account whose moderator status should be removed
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   * @example r.get_subreddit('snoowrap').remove_moderator({name: 'actually_an_aardvark'})
   */
@@ -1056,8 +1056,8 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Makes the given user an approved submitter of this subreddit.
-  * @param {object} $0
-  * @param {string} $0.name The username of the account that should be given this status
+  * @param {object} options
+  * @param {string} options.name The username of the account that should be given this status
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   * @example r.get_subreddit('snoowrap').add_contributor({name: 'actually_an_aardvark'})
   */
@@ -1066,8 +1066,8 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Revokes this user's approved submitter status on this subreddit.
-  * @param {object} $0
-  * @param {string} $0.name The username of the account whose status should be revoked
+  * @param {object} options
+  * @param {string} options.name The username of the account whose status should be revoked
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   * @example r.get_subreddit('snoowrap').remove_contributor({name: 'actually_an_aardvark'})
   */
@@ -1076,13 +1076,13 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Bans the given user from this subreddit.
-  * @param {object} $0
-  * @param {string} $0.name The username of the account that should be banned
-  * @param {string} [$0.ban_message] The ban message. This will get sent to the user in a private message, alerting them
+  * @param {object} options
+  * @param {string} options.name The username of the account that should be banned
+  * @param {string} [options.ban_message] The ban message. This will get sent to the user in a private message, alerting them
   that they have been banned.
-  * @param {string} [$0.ban_reason] A string indicating which rule the banned user broke (100 characters max)
-  * @param {number} [$0.duration] The duration of the ban, in days. For a permanent ban, omit this parameter.
-  * @param {string} [$0.ban_note] A note that appears on the moderation log, usually used to indicate the reason for the
+  * @param {string} [options.ban_reason] A string indicating which rule the banned user broke (100 characters max)
+  * @param {number} [options.duration] The duration of the ban, in days. For a permanent ban, omit this parameter.
+  * @param {string} [options.ban_note] A note that appears on the moderation log, usually used to indicate the reason for the
   ban. This is not visible to the banned user. (300 characters max)
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   * @example r.get_subreddit('snoowrap').ban_user({name: 'actually_an_aardvark', ban_message: 'You are now banned LOL'})
@@ -1092,8 +1092,8 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Unbans the given user from this subreddit.
-  * @param {object} $0
-  * @param {string} $0.name The username of the account that should be unbanned
+  * @param {object} options
+  * @param {string} options.name The username of the account that should be unbanned
   * @returns {Promise} A Promise that fulfills when the request is complete
   * @example r.get_subreddit('snoowrap').unban_user({name: 'actually_an_aardvark'})
   */
@@ -1102,8 +1102,8 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Mutes the given user from messaging this subreddit for 72 hours.
-  * @param {object} $0
-  * @param {string} $0.name The username of the account that should be muted
+  * @param {object} options
+  * @param {string} options.name The username of the account that should be muted
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   * @example r.get_subreddit('snoowrap').mute_user({name: 'actually_an_aardvark'})
   */
@@ -1112,8 +1112,8 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Unmutes the given user from messaging this subreddit.
-  * @param {object} $0
-  * @param {string} $0.name The username of the account that should be muted
+  * @param {object} options
+  * @param {string} options.name The username of the account that should be muted
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   * @example r.get_subreddit('snoowrap').unmute_user({name: 'actually_an_aardvark'})
   */
@@ -1122,8 +1122,8 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Bans the given user from editing this subreddit's wiki.
-  * @param {object} $0
-  * @param {string} $0.name The username of the account that should be wikibanned
+  * @param {object} options
+  * @param {string} options.name The username of the account that should be wikibanned
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   * @example r.get_subreddit('snoowrap').wikiban_user({name: 'actually_an_aardvark'})
   */
@@ -1132,8 +1132,8 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Unbans the given user from editing this subreddit's wiki.
-  * @param {object} $0
-  * @param {string} $0.name The username of the account that should be unwikibanned
+  * @param {object} options
+  * @param {string} options.name The username of the account that should be unwikibanned
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   * @example r.get_subreddit('snoowrap').unwikiban_user({name: 'actually_an_aardvark'})
   */
@@ -1142,8 +1142,8 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Adds the given user to this subreddit's list of approved wiki editors.
-  * @param {object} $0
-  * @param {string} $0.name The username of the account that should be given approved editor status
+  * @param {object} options
+  * @param {string} options.name The username of the account that should be given approved editor status
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   * @example r.get_subreddit('snoowrap').add_wiki_contributor({name: 'actually_an_aardvark'})
   */
@@ -1152,8 +1152,8 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Removes the given user from this subreddit's list of approved wiki editors.
-  * @param {object} $0
-  * @param {string} $0.name The username of the account whose approved editor status should be revoked
+  * @param {object} options
+  * @param {string} options.name The username of the account whose approved editor status should be revoked
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   * @example r.get_subreddit('snoowrap').remove_wiki_contributor({name: 'actually_an_aardvark'})
   */
@@ -1162,9 +1162,9 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Sets the permissions for a given moderator on this subreddit.
-  * @param {object} $0
-  * @param {string} $0.name The username of the moderator whose permissions are being changed
-  * @param {Array} [$0.permissions] The new moderator permissions that this user should have. This should be an array
+  * @param {object} options
+  * @param {string} options.name The username of the moderator whose permissions are being changed
+  * @param {Array} [options.permissions] The new moderator permissions that this user should have. This should be an array
   containing some combination of `"wiki", "posts", "access", "mail", "config", "flair"`. To add a moderator with full
   permissions, omit this property entirely.
   * @returns {Promise} A Promise that fulfills with this Subreddit when this request is complete

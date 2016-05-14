@@ -74,11 +74,11 @@ const VoteableContent = class extends ReplyableContent {
   /**
   * @summary Distinguishes this Comment or Submission with a sigil.
   * @desc **Note:** This function will only work if the requester is the author of this Comment/Submission.
-  * @param {boolean|string} [$0.status=true] Determines how the item should be distinguished.
+  * @param {boolean|string} [options.status=true] Determines how the item should be distinguished.
   `true` (default) signifies that the item should be moderator-distinguished, and
   `false` signifies that the item should not be distinguished. Passing a string (e.g.
   `admin`) will cause the item to get distinguished with that string, if possible.
-  * @param {boolean} [$0.sticky=false] Determines whether this item should be stickied in addition to being
+  * @param {boolean} [options.sticky=false] Determines whether this item should be stickied in addition to being
   distinguished. (This only applies to comments; to sticky a submission, use {@link Submission#sticky} instead.)
   * @returns {Promise} A Promise that fulfills when the request is complete.
   * @example r.get_comment('d1xclfo').distinguish({status: true, sticky: true})

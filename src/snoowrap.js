@@ -25,15 +25,15 @@ exposed since they are useful externally as well.
 const snoowrap = class {
   /**
   * @summary Constructs a new requester. This will be necessary if you want to do anything.
-  * @param {object} $0 An Object containing credentials.  This should have the properties (a) `user_agent`,
+  * @param {object} options An Object containing credentials.  This should have the properties (a) `user_agent`,
   `client_id`, `client_secret`, and `refresh_token`, **or** (b) `user_agent` and `access_token`.
-  * @param {string} $0.user_agent A unique description of what your app does
-  * @param {string} [$0.client_id] The client ID of your app (assigned by reddit)
-  * @param {string} [$0.client_secret] The client secret of your app (assigned by reddit)
-  * @param {string} [$0.refresh_token] A refresh token for your app. You will need to get this from reddit beforehand. A
+  * @param {string} options.user_agent A unique description of what your app does
+  * @param {string} [options.client_id] The client ID of your app (assigned by reddit)
+  * @param {string} [options.client_secret] The client secret of your app (assigned by reddit)
+  * @param {string} [options.refresh_token] A refresh token for your app. You will need to get this from reddit beforehand. A
   script to automatically generate refresh tokens for you can be found
   [here](https://github.com/not-an-aardvark/reddit-oauth-helper).
-  * @param {string} [$0.access_token] An access token for your app. If this is provided, then the
+  * @param {string} [options.access_token] An access token for your app. If this is provided, then the
   client ID/client secret/refresh token are not required. Note that all access tokens expire one hour after being
   generated; if you want to retain access for longer than that, provide the other credentials instead.
   */
@@ -664,14 +664,15 @@ const snoowrap = class {
   }
   /**
   * @summary Composes a new private message.
-  * @param {object} $0
-  * @param {RedditUser|Subreddit|string} $0.to The recipient of the message.
-  * @param {string} $0.subject The message subject (100 characters max)
-  * @param {string} $0.text The body of the message, in raw markdown text_edit
-  * @param {Subreddit|string} [$0.from_subreddit] If provided, the message is sent as a modmail from the specified subreddit.
-  * @param {string} [$0.captcha_iden] A captcha identifier. This is only necessary if the authenticated account
+  * @param {object} options
+  * @param {RedditUser|Subreddit|string} options.to The recipient of the message.
+  * @param {string} options.subject The message subject (100 characters max)
+  * @param {string} options.text The body of the message, in raw markdown text_edit
+  * @param {Subreddit|string} [options.from_subreddit] If provided, the message is sent as a modmail from the specified
+  subreddit.
+  * @param {string} [options.captcha_iden] A captcha identifier. This is only necessary if the authenticated account
   requires a captcha to submit posts and comments.
-  * @param {string} [$0.captcha_response] The response to the captcha with the given identifier
+  * @param {string} [options.captcha_response] The response to the captcha with the given identifier
   * @returns {Promise} A Promise that fulfills when the request is complete
   * @example
   *
@@ -757,10 +758,10 @@ const snoowrap = class {
   }
   /**
   * @summary Searches for subreddits given a query.
-  * @param {object} $0
-  * @param {string} $0.query A search query (50 characters max)
-  * @param {boolean} [$0.exact=false] Determines whether the results shouldbe limited to exact matches.
-  * @param {boolean} [$0.include_nsfw=true] Determines whether the results should include NSFW subreddits.
+  * @param {object} options
+  * @param {string} options.query A search query (50 characters max)
+  * @param {boolean} [options.exact=false] Determines whether the results shouldbe limited to exact matches.
+  * @param {boolean} [options.include_nsfw=true] Determines whether the results should include NSFW subreddits.
   * @returns {Promise} An Array containing subreddit names
   * @example
   *
@@ -877,8 +878,8 @@ const snoowrap = class {
   }
   /**
   * @summary Searches subreddits by topic.
-  * @param {object} $0
-  * @param {string} $0.query The search query. (50 characters max)
+  * @param {object} options
+  * @param {string} options.query The search query. (50 characters max)
   * @returns {Promise} An Array of subreddit objects corresponding to the search results
   * @example
   *
@@ -1034,11 +1035,11 @@ const snoowrap = class {
   }
   /**
   * @summary Creates a new LiveThread.
-  * @param {object} $0
-  * @param {string} $0.title The title of the livethread (100 characters max)
-  * @param {string} [$0.description] A descriptions of the thread. 120 characters max
-  * @param {string} [$0.resources] Information and useful links related to the thread. 120 characters max
-  * @param {boolean} [$0.nsfw=false] Determines whether the thread is Not Safe For Work
+  * @param {object} options
+  * @param {string} options.title The title of the livethread (100 characters max)
+  * @param {string} [options.description] A descriptions of the thread. 120 characters max
+  * @param {string} [options.resources] Information and useful links related to the thread. 120 characters max
+  * @param {boolean} [options.nsfw=false] Determines whether the thread is Not Safe For Work
   * @returns {Promise} A Promise that fulfills with the new LiveThread when the request is complete
   * @example
   *
@@ -1064,17 +1065,17 @@ const snoowrap = class {
   }
   /**
   * @summary Creates a new multireddit.
-  * @param {object} $0
-  * @param {string} $0.name The name of the new multireddit. 50 characters max
-  * @param {string} $0.description A description for the new multireddit, in markdown.
-  * @param {Array} $0.subreddits An Array of Subreddit objects (or subreddit names) that this multireddit should compose of.
-  * @param {string} [$0.visibility='private'] The multireddit's visibility setting. One of `private`, `public`, `hidden`.
-  * @param {string} [$0.icon_name=''] One of `art and design`, `ask`, `books`, `business`, `cars`, `comics`, `cute animals`,
-  `diy`, `entertainment`, `food and drink`, `funny`, `games`, `grooming`, `health`, `life advice`, `military`, `models pinup`,
-  `music`, `news`, `philosophy`, `pictures and gifs`, `science`, `shopping`, `sports`, `style`, `tech`, `travel`,
-  `unusual stories`, `video`, `None`
-  * @param {string} [$0.key_color='#000000'] A six-digit RGB hex color, preceded by '#'
-  * @param {string} [$0.weighting_scheme='classic'] One of `classic`, `fresh`
+  * @param {object} options
+  * @param {string} options.name The name of the new multireddit. 50 characters max
+  * @param {string} options.description A description for the new multireddit, in markdown.
+  * @param {Array} options.subreddits An Array of Subreddit objects (or subreddit names) that this multireddit should compose of
+  * @param {string} [options.visibility='private'] The multireddit's visibility setting. One of `private`, `public`, `hidden`.
+  * @param {string} [options.icon_name=''] One of `art and design`, `ask`, `books`, `business`, `cars`, `comics`,
+  `cute animals`, `diy`, `entertainment`, `food and drink`, `funny`, `games`, `grooming`, `health`, `life advice`, `military`,
+  `models pinup`, `music`, `news`, `philosophy`, `pictures and gifs`, `science`, `shopping`, `sports`, `style`, `tech`,
+  `travel`, `unusual stories`, `video`, `None`
+  * @param {string} [options.key_color='#000000'] A six-digit RGB hex color, preceded by '#'
+  * @param {string} [options.weighting_scheme='classic'] One of `classic`, `fresh`
   * @returns {Promise} A Promise for the newly-created MultiReddit object
   * @example
   *

@@ -48,8 +48,8 @@ const RedditUser = class extends RedditContent {
   * @summary Adds this user as a friend, or modifies their friend note.
   * @desc **Note:** reddit.com only permits "notes" to be added on friends if the authenticated account has a subscription to
   reddit gold.
-  * @param {object} $0
-  * @param {string} [$0.note] An optional note to add on the user (300 characters max)
+  * @param {object} options
+  * @param {string} [options.note] An optional note to add on the user (300 characters max)
   * @returns {Promise} A Promise that fulfills when this request is complete
   * @example r.get_user('actually_an_aardvark').friend({note: 'Is an aardvark'})
   */

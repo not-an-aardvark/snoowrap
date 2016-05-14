@@ -66,8 +66,8 @@ const LiveThread = class extends RedditContent {
   }
   /**
   * @summary Strikes (marks incorrect and crosses out) the given update.
-  * @param {object} $0
-  * @param {string} $0.id The ID of the update that should be striked.
+  * @param {object} options
+  * @param {string} options.id The ID of the update that should be striked.
   * @returns {Promise} A Promise that fulfills with this LiveThread when the request is complete
   * @example r.get_livethread('whrdxo8dg9n0').strike_update({id: 'LiveUpdate_edc34446-faf0-11e5-a1b4-0e858bca33cd'})
   */
@@ -79,8 +79,8 @@ const LiveThread = class extends RedditContent {
   }
   /**
   * @summary Deletes an update from this LiveThread.
-  * @param {object} $0
-  * @param {string} $0.id The ID of the LiveUpdate that should be deleted
+  * @param {object} options
+  * @param {string} options.id The ID of the LiveUpdate that should be deleted
   * @returns {Promise} A Promise that fulfills with this LiveThread when the request is complete
   * @example r.get_livethread('whrdxo8dg9n0').delete_update({id: 'LiveUpdate_edc34446-faf0-11e5-a1b4-0e858bca33cd'})
   */
@@ -108,9 +108,9 @@ const LiveThread = class extends RedditContent {
   }
   /**
   * @summary Invites a contributor to this LiveThread.
-  * @param {object} $0
-  * @param {string} $0.name The name of the user who should be invited
-  * @param {Array} $0.permissions The permissions that the invited user should receive. This should be an Array containing
+  * @param {object} options
+  * @param {string} options.name The name of the user who should be invited
+  * @param {Array} options.permissions The permissions that the invited user should receive. This should be an Array containing
   some combination of `'update', 'edit', 'manage'`. To invite a contributor with full permissions, omit this property.
   * @returns {Promise} A Promise that fulfills with this LiveThread when the request is complete
   * @example r.get_livethread('whrdxo8dg9n0').invite_contributor({name: 'actually_an_aardvark', permissions: ['update']})
@@ -128,8 +128,8 @@ const LiveThread = class extends RedditContent {
   }
   /**
   * @summary Revokes an invitation for the given user to become a contributor on this LiveThread.
-  * @param {object} $0
-  * @param {string} $0.name The username of the account whose invitation should be revoked
+  * @param {object} options
+  * @param {string} options.name The username of the account whose invitation should be revoked
   * @returns {Promise} A Promise that fulfills with this LiveThread when the request is complete
   * @example r.get_livethread('whrdxo8dg9n0').revoke_contributor_invite({name: 'actually_an_aardvark'});
   */
@@ -157,8 +157,8 @@ const LiveThread = class extends RedditContent {
   }
   /**
   * @summary Removes the given user from contributor status on this LiveThread.
-  * @param {object} $0
-  * @param {string} $0.name The username of the account who should be removed
+  * @param {object} options
+  * @param {string} options.name The username of the account who should be removed
   * @returns {Promise} A Promise that fulfills with this LiveThread when the request is complete
   * @example r.get_livethread('whrdxo8dg9n0').remove_contributor({name: 'actually_an_aardvark'})
   */
@@ -170,9 +170,9 @@ const LiveThread = class extends RedditContent {
   }
   /**
   * @summary Sets the permissions of the given contributor.
-  * @param {object} $0
-  * @param {string} $0.name The name of the user whose permissions should be changed
-  * @param {Array} $0.permissions The updated permissions that the user should have. This should be an Array containing
+  * @param {object} options
+  * @param {string} options.name The name of the user whose permissions should be changed
+  * @param {Array} options.permissions The updated permissions that the user should have. This should be an Array containing
   some combination of `'update', 'edit', 'manage'`. To give the contributor with full permissions, omit this property.
   * @returns {Promise} A Promise that fulfills with this LiveThread when the request is complete
   * @example r.get_livethread('whrdxo8dg9n0').set_contributor_permissions({name: 'actually_an_aardvark', permissions: ['edit']})
@@ -185,11 +185,11 @@ const LiveThread = class extends RedditContent {
   }
   /**
   * @summary Edits the settings on this LiveThread.
-  * @param {object} $0
-  * @param {string} $0.title The title of the thread
-  * @param {string} [$0.description] A descriptions of the thread. 120 characters max
-  * @param {string} [$0.resources] Information and useful links related to the thread. 120 characters max
-  * @param {boolean} $0.nsfw Determines whether the thread is Not Safe For Work
+  * @param {object} options
+  * @param {string} options.title The title of the thread
+  * @param {string} [options.description] A descriptions of the thread. 120 characters max
+  * @param {string} [options.resources] Information and useful links related to the thread. 120 characters max
+  * @param {boolean} options.nsfw Determines whether the thread is Not Safe For Work
   * @returns {Promise} A Promise that fulfills with this LiveThread when the request is complete
   * @example r.get_livethread('whrdxo8dg9n0').edit_settings({title: 'My livethread', description: 'an updated description'})
   */
@@ -209,8 +209,8 @@ const LiveThread = class extends RedditContent {
   }
   /**
   * @summary Reports this LiveThread for breaking reddit's rules.
-  * @param {object} $0
-  * @param {string} $0.reason The reason for the report. One of `spam`, `vote-manipulation`, `personal-information`,
+  * @param {object} options
+  * @param {string} options.reason The reason for the report. One of `spam`, `vote-manipulation`, `personal-information`,
   `sexualizing-minors`, `site-breaking`
   * @returns {Promise} A Promise that fulfills with this LiveThread when the request is complete
   * @example r.get_livethread('whrdxo8dg9n0').report({reason: 'Breaking a rule blah blah blah'})

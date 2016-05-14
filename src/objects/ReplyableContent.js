@@ -11,8 +11,8 @@ const ReplyableContent = class extends RedditContent {
   /**
   * @summary Removes this Comment, Submission or PrivateMessage from public listings.
   * @desc This requires the authenticated user to be a moderator of the subreddit with the `posts` permission.
-  * @param {object} $0
-  * @param {boolean} [$0.spam=false] Determines whether this should be marked as spam
+  * @param {object} options
+  * @param {boolean} [options.spam=false] Determines whether this should be marked as spam
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
   * @example r.get_comment('c08pp5z').remove({spam: true})
   */
@@ -30,8 +30,8 @@ const ReplyableContent = class extends RedditContent {
   /**
   * @summary Reports this content anonymously to subreddit moderators (for Comments and Submissions)
   or to the reddit admins (for PrivateMessages)
-  * @param {object} [$0]
-  * @param {string} [$0.reason] The reason for the report
+  * @param {object} [options]
+  * @param {string} [options.reason] The reason for the report
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
   * @example r.get_comment('c08pp5z').report({reason: 'Breaking the subreddit rules'})
   */

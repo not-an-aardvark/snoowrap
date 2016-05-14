@@ -25,8 +25,8 @@ const MultiReddit = class extends RedditContent {
   }
   /**
   * @summary Copies this multireddit to the requester's own account.
-  * @param {object} $0
-  * @param {string} $0.new_name The new name for the copied multireddit
+  * @param {object} options
+  * @param {string} options.new_name The new name for the copied multireddit
   * @returns {Promise} A Promise for the newly-copied multireddit
   * @example r.get_user('multi-mod').get_multireddit('coding_languages').copy({new_name: 'my_coding_languages_copy'})
   */
@@ -41,8 +41,8 @@ const MultiReddit = class extends RedditContent {
   /**
   * @summary Renames this multireddit.
   * @desc **Note**: This method mutates this MultiReddit.
-  * @param {object} $0
-  * @param {string} $0.new_name The new name for this multireddit.
+  * @param {object} options
+  * @param {string} options.new_name The new name for this multireddit.
   * @returns {Promise} A Promise that fulfills with this multireddit
   * @example r.get_user('multi-mod').get_multireddit('coding_languages').copy({new_name: 'cookie_languages '})
   */
@@ -68,16 +68,16 @@ const MultiReddit = class extends RedditContent {
   /**
   * @summary Edits the properties of this multireddit.
   * @desc **Note**: Any omitted properties here will simply retain their previous values.
-  * @param {object} $0
-  * @param {string} [$0.name] The name of the new multireddit. 50 characters max
-  * @param {string} [$0.description] A description for the new multireddit, in markdown.
-  * @param {string} [$0.visibility] The multireddit's visibility setting. One of `private`, `public`, `hidden`.
-  * @param {string} [$0.icon_name] One of `art and design`, `ask`, `books`, `business`, `cars`, `comics`, `cute animals`,
+  * @param {object} options
+  * @param {string} [options.name] The name of the new multireddit. 50 characters max
+  * @param {string} [options.description] A description for the new multireddit, in markdown.
+  * @param {string} [options.visibility] The multireddit's visibility setting. One of `private`, `public`, `hidden`.
+  * @param {string} [options.icon_name] One of `art and design`, `ask`, `books`, `business`, `cars`, `comics`, `cute animals`,
   `diy`, `entertainment`, `food and drink`, `funny`, `games`, `grooming`, `health`, `life advice`, `military`, `models pinup`,
   `music`, `news`, `philosophy`, `pictures and gifs`, `science`, `shopping`, `sports`, `style`, `tech`, `travel`,
   `unusual stories`, `video`, `None`
-  * @param {string} [$0.key_color] A six-digit RGB hex color, preceded by '#'
-  * @param {string} [$0.weighting_scheme] One of 'classic', 'fresh'
+  * @param {string} [options.key_color] A six-digit RGB hex color, preceded by '#'
+  * @param {string} [options.weighting_scheme] One of 'classic', 'fresh'
   * @returns {Promise} The updated version of this multireddit
   * @example r.get_user('not_an_aardvark').get_multireddit('cookie_languages').edit({visibility: 'hidden'})
   */
