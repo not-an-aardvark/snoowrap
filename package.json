@@ -7,7 +7,7 @@
   "scripts": {
     "compile": "babel -d lib/ src/",
     "bundle": "npm run compile && browserify --im lib/snoowrap.js -o doc/snoowrap.js && uglifyjs doc/snoowrap.js -o doc/snoowrap.min.js -m --screw-ie8",
-    "lint": "eslint .",
+    "lint": "eslint src/ test/",
     "pretest": "npm run lint && npm run compile",
     "test": "mocha --compilers js:babel-core/register",
     "smoketest": "npm run test -- -g 'smoketest'",
