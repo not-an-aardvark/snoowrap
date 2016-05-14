@@ -31,6 +31,7 @@ const WikiPage = class extends RedditContent {
   * @param {number} $0.permission_level Determines who should be allowed to access and edit this page `0` indicates that this
   subreddit's default wiki settings should get used, `1` indicates that only approved wiki contributors on this subreddit
   should be able to edit this page, and `2` indicates that only mods should be able to view and edit this page.
+  * @returns {Promise} A Promise that fulfills with this WikiPage when the request is complete
   * @example r.get_subreddit('snoowrap').get_wiki_page('index').edit_settings({listed: false, permission_level: 1})
   */
   edit_settings ({listed, permission_level}) {

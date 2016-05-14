@@ -68,6 +68,7 @@ const LiveThread = class extends RedditContent {
   * @summary Strikes (marks incorrect and crosses out) the given update.
   * @param {object} $0
   * @param {string} $0.id The ID of the update that should be striked.
+  * @returns {Promise} A Promise that fulfills with this LiveThread when the request is complete
   * @example r.get_livethread('whrdxo8dg9n0').strike_update({id: 'LiveUpdate_edc34446-faf0-11e5-a1b4-0e858bca33cd'})
   */
   strike_update ({id}) {
@@ -258,6 +259,7 @@ const LiveThread = class extends RedditContent {
   finished listening for updates on this LiveThread.
   *
   * This should not be confused with {@link LiveThread#close_thread}, which marks the thread as "closed" on reddit.
+  * @returns undefined
   * @example
   *
   * var my_thread = r.get_livethread('whrdxo8dg9n0');

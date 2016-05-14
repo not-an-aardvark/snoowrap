@@ -179,12 +179,12 @@ const Subreddit = class extends RedditContent {
     {name: 'snoowrap_testing', 'text': "this is /u/snoowrap_testing's flair text", css_class: 'some-css-class'}
   * ])
   */
-  set_multiple_user_flairs (flair_array_orig) {
-    const flair_array = clone(flair_array_orig);
+  set_multiple_user_flairs (flair_array) {
+    const flair_arr = clone(flair_array);
     const requests = [];
-    while (flair_array.length > 0) {
+    while (flair_arr.length > 0) {
       // The endpoint only accepts at most 100 lines of csv at a time, so split the array into chunks of 100.
-      requests.push(this._set_flair_from_csv(flair_array.splice(0, 100).map(item =>
+      requests.push(this._set_flair_from_csv(flair_arr.splice(0, 100).map(item =>
         `${item.name},${item.text || item.flair_text || ''},${item.css_class || item.flair_css_class || ''}`).join('\n')
       ));
     }
@@ -192,6 +192,7 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Gets a list of all user flairs on this subreddit.
+  * @param {object} options
   * @param {string} [options.name] A specific username to jump to
   * @returns {Promise} A Listing containing user flairs
   * @example
@@ -707,7 +708,7 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Gets the list of moderators on this subreddit.
-  * @param {object} $0
+  * @param {object} options
   * @param {string} [$0.name] The name of a user to find in the list
   * @returns {Promise} An Array of RedditUsers representing the moderators of this subreddit
   * @example
@@ -1057,7 +1058,7 @@ const Subreddit = class extends RedditContent {
   * @summary Makes the given user an approved submitter of this subreddit.
   * @param {object} $0
   * @param {string} $0.name The username of the account that should be given this status
-  * returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   * @example r.get_subreddit('snoowrap').add_contributor({name: 'actually_an_aardvark'})
   */
   add_contributor ({name}) {
@@ -1153,7 +1154,7 @@ const Subreddit = class extends RedditContent {
   * @summary Removes the given user from this subreddit's list of approved wiki editors.
   * @param {object} $0
   * @param {string} $0.name The username of the account whose approved editor status should be revoked
-  * returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+  * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   * @example r.get_subreddit('snoowrap').remove_wiki_contributor({name: 'actually_an_aardvark'})
   */
   remove_wiki_contributor ({name}) {

@@ -172,7 +172,6 @@ export function unauthenticated_request (options) {
 * @summary Updates this requester's access token if the current one is absent or expired.
 * @desc **Note**: This function is automatically called internally when making a request. While the function is exposed as
 a stable feature, using it is rarely necessary unless an access token is needed for some external purpose.
-* @param
 * @returns {Promise} A Promise fulfills with the access token when this request is complete
 * @memberof snoowrap
 * @instance

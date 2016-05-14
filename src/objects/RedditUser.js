@@ -32,7 +32,8 @@ const RedditUser = class extends RedditContent {
     }
     return this._post({uri: `api/v1/gold/give/${this.name}`, form: {months}});
   }
-  /** Assigns flair to this user on a given subreddit (as a moderator).
+  /**
+  * Assigns flair to this user on a given subreddit (as a moderator).
   * @param {object} options
   * @param {string} options.subreddit_name The subreddit that flair should be assigned on
   * @param {string} [options.text=''] The text that the user's flair should have
@@ -49,10 +50,11 @@ const RedditUser = class extends RedditContent {
   reddit gold.
   * @param {object} $0
   * @param {string} [$0.note] An optional note to add on the user (300 characters max)
+  * @returns {Promise} A Promise that fulfills when this request is complete
   * @example r.get_user('actually_an_aardvark').friend({note: 'Is an aardvark'})
   */
   friend ({note} = {}) {
-    return this._put({uri: `api/v1/me/friends/${this.name}`, json: {user: this.name, note}});
+    return this._put({uri: `api/v1/me/friends/${this.name}`, json: {user: this.name, note}}).return(this);
   }
   /**
   * @summary Removes this user from the requester's friend list.

@@ -63,7 +63,7 @@ const Listing = class extends Array {
   }
   /**
   * @summary A getter that indicates whether this Listing has any more items to fetch.
-  * @type boolean
+  * @type {boolean}
   */
   get is_finished () {
     // The process of checking whether a Listing is 'finished' varies depending on what kind of Listing it is.
