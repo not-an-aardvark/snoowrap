@@ -1,38 +1,42 @@
 # snoowrap [![Build Status](https://travis-ci.org/not-an-aardvark/snoowrap.svg?branch=v1.1.0)](https://travis-ci.org/not-an-aardvark/snoowrap)
 
-A simple Node.js wrapper for the reddit API. ([Documentation](https://not-an-aardvark.github.io/snoowrap))
+A fully-featured Node.js wrapper for the reddit API. ([Documentation](https://not-an-aardvark.github.io/snoowrap))
 
 ### Features
 
-snoowrap provides a simple interface to access every reddit API endpoint. The method to get a user profile is just `get_user()`, and the method to upvote something is just `upvote()`. There's no need to look up REST endpoints or deal directly with HTTP requests.
+* snoowrap provides a simple interface to access every reddit API endpoint. For example, the method to get a user profile is just `get_user()`, and the method to upvote something is just `upvote()`.
+* snoowrap is non-blocking; all of its API calls are asynchronous and return bluebird Promises. This means that you can handle concurrent requests however you want to, and you can use snoowrap as part of a larger process without it holding everything back.
+* Each snoowrap object is completely independent. This means that you can have scripts from separate accounts making requests at the same time.
+* After you provide a token once, snoowrap will refresh it on its own from then on -- you won't have to worry about authentication again.
+* snoowrap uses lazy objects, so it never fetches more than it needs to.
+* snoowrap has built-in ratelimit protection. If you hit reddit's ratelimit, you can choose to queue the request, and then run it after the current ratelimit period runs out. That way you won't lose a request if you go a bit too fast.
+* snoowrap will retry its request a few times if reddit returns an error due to its servers being overloaded.
 
-If you've used [PRAW](https://praw.readthedocs.org/en/stable/), you'll probably find a lot of snoowrap's syntax to be somewhat familiar.
-
-snoowrap is non-blocking; all API calls are async and return bluebird Promises. This means that you can handle asynchronous events however you want to, and you can use snoowrap as part of a larger process without it holding everything back.
+These features ensure that you can write less boilerplate code and focus more on actually doing what you want to do.
 
 ---
 
-snoowrap's objects are structured to keep the syntax as simple as possible. So the following expression:
+snoowrap's methods are designed to be as simple and consistent as possible. So the following expression:
 
-```javascript
+```js
 r.get_submission('2np694').body
 ```
 ...will return a Promise. So will this one:
-```javascript
+```js
  r.get_submission('2np694').author.name
  // --> returns a Promise for the string 'DO_U_EVN_SPAGHETTI'
  // (this submission's author's name)
  ```
 The above will return a Promise for the author's name, without having to deal with callback hell or `.then` statements. You can chain multiple API calls together:
 
-```javascript
+```js
 r.get_submission('2np694').subreddit.get_moderators()[0].name
 // --> returns a Promise for the string 'krispykrackers'
 // (this submission's subreddit's first mod's name)
 ```
 ...or chain actions together with fluent syntax:
 
-```javascript
+```js
 r.get_subreddit('snoowrap')
   .submit_selfpost({title: 'Discussion Thread', text: 'Hello! This is a thread'})
   .sticky()
@@ -41,20 +45,13 @@ r.get_subreddit('snoowrap')
   .assign_flair({text: 'Exciting Flair Text', css_class: 'modpost'})
 ```
 
-snoowrap handles all API interactions such as authentication, ratelimiting, error recovery, and HTTP requests under the hood. That way, you can write less boilerplate code and focus more on doing what you actually want to do.
- * Each snoowrap object is completely independent. If you want, you can have scripts from separate accounts make requests at the same time.
- * After you provide a token once, snoowrap will refresh it on its own from then on -- you won't have to worry about authentication again.
- * snoowrap uses lazy objects, so it never fetches more than it needs to.
- * snoowrap has built-in ratelimit protection. If you hit reddit's ratelimit, you can choose to queue the request, and then run it after the current ratelimit period runs out. That way you won't lose a request if you go a bit too fast.
- * snoowrap will retry its request a few times if reddit returns an error due to its servers being overloaded.
-
-For more examples of what can be done with snoowrap, take a look at the [documentation](https://not-an-aardvark.github.io/snoowrap) or the [test file](https://github.com/not-an-aardvark/snoowrap/blob/master/test/snoowrap.spec.js).
+snoowrap works on Node.js 4+, as well as most common browsers.
 
 ---
 
-### Example file
+### Examples
 
-```javascript
+```js
 'use strict';
 const snoowrap = require('snoowrap');
 
@@ -79,18 +76,13 @@ r.get_subreddit('gifs').submit_link({
 // Printing a list of the titles on the front page
 r.get_hot().map(post => post.title).then(console.log);
 
-// Replying to comments that match certain criteria
-r.get_new_comments().fetch_until(500).forEach(comment => {
-  if (comment.body === 'ayy') {
-    comment.reply('lmao'); // (look at me I'm so original)
-  }
-});
+// Extracting every comment on a thread
+r.get_submission('4j8p6d').expand_replies({limit: Infinity, depth: Infinity}).then(console.log)
 
 // Automating moderation tasks
 r.get_subreddit('some_subreddit_name').get_modqueue({limit: 100}).filter(/some-removal-condition/.test).forEach(flaggedItem => {
   flaggedItem.remove();
   flaggedItem.subreddit.ban_user(flaggedItem.author);
-  // (Probably overkill here, but that's none of my business and pretty much any functionality is there if you want it)
 });
 
 // Automatically creating a stickied thread for a moderated subreddit
@@ -108,13 +100,15 @@ r.get_subreddit('AskReddit').get_wiki_page('bestof').content_md.then(console.log
 
 ```
 
+For more examples of what can be done with snoowrap, take a look at the [documentation](https://not-an-aardvark.github.io/snoowrap).
+
 ---
 
 ### Live threads
 
 Reddit's [live threads](https://www.reddit.com/r/live/wiki/index) are different from most other content, in that messages are distributed through websockets instead of a RESTful API. snoowrap supports this protocol under the hood by representing the content stream as an [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter). For example, the following script will stream all livethread updates to the console as they appear:
 
-```javascript
+```js
 r.get_livethread('whrdxo8dg9n0').stream.on('update', console.log);
 ```
 
@@ -138,7 +132,7 @@ If your target environment does not support Proxies, snoowrap will still functio
 
 Example of how Proxy support affects behavior:
 
-```javascript
+```js
 // This works in environments that support Proxies.
 // However, it throws a TypeError if Proxies are not available.
 r.get_submission('47v7tm').comments[0].upvote();
