@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.1.0 (2016-05-13)
+
+* Added `snoowrap#mark_messages_as_read` and `snoowrap#mark_messages_as_unread` functions for dealing with multiple private messages simultaneously
+* Fixed an issue where `snoowrap#credentialed_client_request` would incorrectly fail when given certain `this`-bindings
+
 ## v1.0.0 (2016-05-10)
 
 * Added a `request_timeout` config option
