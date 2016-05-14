@@ -136,6 +136,7 @@ snoowrap.prototype.credentialed_client_request.call({
   user_agent: 'user agent goes here'
 }, {
   method: 'post',
+  baseUrl: 'https://www.reddit.com',
   uri: 'api/v1/access_token',
   form: {grant_type: 'authorization_code', code: 'code goes here', redirect_uri: 'redirect uri goes here'}
 }).then(response => {
@@ -148,7 +149,7 @@ export function credentialed_client_request (options) {
   return request.defaults({
     auth: {user: this.client_id, pass: this.client_secret},
     headers: {'user-agent': this.user_agent},
-    baseUrl: `https://www.${this._config.endpoint_domain}`
+    baseUrl: this._config ? `https://www.${this._config.endpoint_domain}` : undefined
   })(options);
 }
 
