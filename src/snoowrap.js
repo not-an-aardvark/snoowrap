@@ -629,6 +629,7 @@ const snoowrap = class {
   * @param {PrivateMessage[]|String[]} messages An Array of PrivateMessage objects. Can also contain strings representing
   message IDs.
   * @returns {Promise} A Promise that fulfills when the request is complete
+  * @example r.mark_messages_as_read(['51shsd', '51shxv'])
   */
   mark_messages_as_read (messages) {
     const message_ids = messages.map(message => add_fullname_prefix(message, 't4_'));
@@ -639,6 +640,7 @@ const snoowrap = class {
   * @param {PrivateMessage[]|String[]} messages An Array of PrivateMessage objects. Can also contain strings representing
   message IDs.
   * @returns {Promise} A Promise that fulfills when the request is complete
+  * @example r.mark_messages_as_unread(['51shsd', '51shxv'])
   */
   mark_messages_as_unread (messages) {
     const message_ids = messages.map(message => add_fullname_prefix(message, 't4_'));
