@@ -14,6 +14,9 @@
     "docs": "npm run bundle && jsdoc -c jsdoc.conf.json lib/snoowrap.js lib/request_handler.js lib/objects/RedditContent.js lib/objects/ReplyableContent.js lib/objects/VoteableContent.js lib/objects/Comment.js lib/objects/RedditUser.js lib/objects/Submission.js lib/objects/LiveThread.js lib/objects/PrivateMessage.js lib/objects/Subreddit.js lib/objects/MultiReddit.js lib/objects/WikiPage.js lib/objects/Listing.js",
     "coverage": "istanbul cover _mocha -- --compilers js:babel-core/register"
   },
+  "files": [
+    "lib/"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/not-an-aardvark/snoowrap.git"
