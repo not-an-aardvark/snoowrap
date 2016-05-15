@@ -76,10 +76,7 @@ const Submission = class extends VoteableContent {
   * @returns {Promise} The updated version of this Submission
   */
   _set_contest_mode_enabled (state) {
-    return this._post({
-      uri: 'api/set_contest_mode',
-      form: {api_type, state, id: this.name}
-    }).return(this);
+    return this._post({uri: 'api/set_contest_mode', form: {api_type, state, id: this.name}}).return(this);
   }
   /**
   * @summary Enables contest mode for this Submission.
@@ -98,10 +95,7 @@ const Submission = class extends VoteableContent {
     return this._set_contest_mode_enabled(false);
   }
   _set_stickied ({state, num}) {
-    return this._post({
-      uri: 'api/set_subreddit_sticky',
-      form: {api_type, state, num, id: this.name}
-    }).return(this);
+    return this._post({uri: 'api/set_subreddit_sticky', form: {api_type, state, num, id: this.name}}).return(this);
   }
   /**
   * @summary Stickies this Submission.

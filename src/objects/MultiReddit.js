@@ -13,9 +13,7 @@ const MultiReddit = class extends RedditContent {
     super(options, _r, _has_fetched);
     if (_has_fetched) {
       this.curator = _r.get_user(this.path.split('/')[2]);
-      this.subreddits = this.subreddits.map(item =>
-        this._r._new_object('Subreddit', item.data || {display_name: item.name}, false)
-      );
+      this.subreddits = this.subreddits.map(item => this._r._new_object('Subreddit', item.data || {display_name: item.name}));
     } else {
       this.path = `/user/${this.curator.name}/m/${this.name}`;
     }
@@ -31,12 +29,13 @@ const MultiReddit = class extends RedditContent {
   * @example r.get_user('multi-mod').get_multireddit('coding_languages').copy({new_name: 'my_coding_languages_copy'})
   */
   copy ({new_name}) {
-    return this._r._get_my_name().then(name =>
-      this._post({
-        uri: 'api/multi/copy',
-        form: {from: this.path, to: `/user/${name}/m/${new_name}`, display_name: new_name}
-      })
-    );
+    return this._r._get_my_name().then(name => {
+      return this._post({uri: 'api/multi/copy', form: {
+        from: this.path,
+        to: `/user/${name}/m/${new_name}`,
+        display_name: new_name
+      }});
+    });
   }
   /**
   * @summary Renames this multireddit.
@@ -50,12 +49,7 @@ const MultiReddit = class extends RedditContent {
     return this._r._get_my_name().then(my_name => this._post({
       uri: 'api/multi/rename',
       form: {from: this.path, to: `/user/${my_name}/m/${new_name}`, display_name: new_name}
-    })).then(res => {
-      Object.keys(res).forEach(key => {
-        this[key] = res[key];
-      });
-      return this;
-    });
+    })).return(this);
   }
   /**
   * @summary Deletes this multireddit.
@@ -98,11 +92,8 @@ const MultiReddit = class extends RedditContent {
   * @example r.get_user('not_an_aardvark').get_multireddit('cookie_languages').add_subreddit('cookies')
   */
   add_subreddit (sub) {
-    const sub_name = isString(sub) ? sub : sub.display_name;
-    return this._put({
-      uri: `api/multi${this.path}/r/${sub_name}`,
-      form: {model: JSON.stringify({name: sub_name})}
-    }).return(this);
+    sub = isString(sub) ? sub : sub.display_name;
+    return this._put({uri: `api/multi${this.path}/r/${sub}`, form: {model: JSON.stringify({name: sub})}}).return(this);
   }
   /**
   * @summary Removes a subreddit from this multireddit.

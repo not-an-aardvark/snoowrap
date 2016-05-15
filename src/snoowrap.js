@@ -60,7 +60,7 @@ const snoowrap = class {
   static get name () {
     return MODULE_NAME;
   }
-  _new_object (object_type, content, _has_fetched) {
+  _new_object (object_type, content, _has_fetched = false) {
     return Array.isArray(content) ? content : new snoowrap.objects[object_type](content, this, _has_fetched);
   }
   /**

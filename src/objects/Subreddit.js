@@ -245,17 +245,14 @@ const Subreddit = class extends RedditContent {
   * })
   */
   configure_flair (options) {
-    return this._post({
-      uri: `r/${this.display_name}/api/flairconfig`,
-      form: {
-        api_type,
-        flair_enabled: options.user_flair_enabled,
-        flair_position: options.user_flair_position,
-        flair_self_assign_enabled: options.user_flair_self_assign_enabled,
-        link_flair_position: options.link_flair_position,
-        link_flair_self_assign_enabled: options.link_flair_self_assign_enabled
-      }
-    }).return(this);
+    return this._post({uri: `r/${this.display_name}/api/flairconfig`, form: {
+      api_type,
+      flair_enabled: options.user_flair_enabled,
+      flair_position: options.user_flair_position,
+      flair_self_assign_enabled: options.user_flair_self_assign_enabled,
+      link_flair_position: options.link_flair_position,
+      link_flair_self_assign_enabled: options.link_flair_self_assign_enabled
+    }}).return(this);
   }
   /**
   * @summary Gets the requester's flair on this subreddit.
@@ -575,9 +572,9 @@ const Subreddit = class extends RedditContent {
   * @example r.get_subreddit('snoowrap').leave_moderator()
   */
   leave_moderator () {
-    return this.fetch().get('name').then(name =>
-      this._post({uri: 'api/leavemoderator', form: {id: name}}).then(handle_json_errors(this))
-    );
+    return this.fetch().get('name').then(name => {
+      return this._post({uri: 'api/leavemoderator', form: {id: name}}).then(handle_json_errors(this));
+    });
   }
   /**
   * @summary Abdicates approved submitter status on this subreddit.
@@ -634,9 +631,8 @@ const Subreddit = class extends RedditContent {
   * // ]
   *
   */
-  get_banned_users (options) { // TODO: Return Listings containing RedditUser objects rather than normal objects with data
-    const opts = typeof options === 'string' ? options : options && {name: options.name};
-    return this._get_listing({uri: `r/${this.display_name}/about/banned`, qs: rename_key(opts, 'name', 'user')});
+  get_banned_users (options) {
+    return this._get_listing({uri: `r/${this.display_name}/about/banned`, qs: rename_key(options, 'name', 'user')});
   }
   /**
   * @summary Gets the list of muted users on this subreddit.
@@ -652,8 +648,7 @@ const Subreddit = class extends RedditContent {
   * // ]
   */
   get_muted_users (options) {
-    const opts = typeof options === 'string' ? options : options && {name: options.name};
-    return this._get_listing({uri: `r/${this.display_name}/about/muted`, qs: rename_key(opts, 'name', 'user')});
+    return this._get_listing({uri: `r/${this.display_name}/about/muted`, qs: rename_key(options, 'name', 'user')});
   }
   /**
   * @summary Gets the list of users banned from this subreddit's wiki.
@@ -669,8 +664,7 @@ const Subreddit = class extends RedditContent {
   * // ]
   */
   get_wikibanned_users (options) {
-    const opts = typeof options === 'string' ? options : options && {name: options.name};
-    return this._get_listing({uri: `r/${this.display_name}/about/wikibanned`, qs: rename_key(opts, 'name', 'user')});
+    return this._get_listing({uri: `r/${this.display_name}/about/wikibanned`, qs: rename_key(options, 'name', 'user')});
   }
   /**
   * @summary Gets the list of approved submitters on this subreddit.
@@ -686,8 +680,7 @@ const Subreddit = class extends RedditContent {
   * // ]
   */
   get_contributors (options) {
-    const opts = typeof options === 'string' ? options : options && {name: options.name};
-    return this._get_listing({uri: `r/${this.display_name}/about/contributors`, qs: rename_key(opts, 'name', 'user')});
+    return this._get_listing({uri: `r/${this.display_name}/about/contributors`, qs: rename_key(options, 'name', 'user')});
   }
   /**
   * @summary Gets the list of approved wiki submitters on this subreddit .
@@ -703,8 +696,7 @@ const Subreddit = class extends RedditContent {
   * // ]
   */
   get_wiki_contributors (options) {
-    const opts = typeof options === 'string' ? options : options && {name: options.name};
-    return this._get_listing({uri: `r/${this.display_name}/about/wikicontributors`, qs: rename_key(opts, 'name', 'user')});
+    return this._get_listing({uri: `r/${this.display_name}/about/wikicontributors`, qs: rename_key(options, 'name', 'user')});
   }
   /**
   * @summary Gets the list of moderators on this subreddit.
@@ -720,9 +712,8 @@ const Subreddit = class extends RedditContent {
   * // ]
   *
   */
-  get_moderators (options) {
-    const opts = typeof options === 'string' ? options : options && {name: options.name};
-    return this._get({uri: `r/${this.display_name}/about/moderators`, qs: rename_key(opts, 'name', 'user')});
+  get_moderators ({name} = {}) {
+    return this._get({uri: `r/${this.display_name}/about/moderators`, qs: {user: name}});
   }
   /**
   * @summary Deletes the banner for this Subreddit.
@@ -741,10 +732,7 @@ const Subreddit = class extends RedditContent {
   * @example r.get_subreddit('snoowrap').delete_header()
   */
   delete_header () {
-    return this._post({
-      uri: `r/${this.display_name}/api/delete_sr_header`,
-      form: {api_type}
-    }).then(handle_json_errors(this));
+    return this._post({uri: `r/${this.display_name}/api/delete_sr_header`, form: {api_type}}).then(handle_json_errors(this));
   }
   /**
   * @summary Deletes this subreddit's icon.
@@ -752,10 +740,7 @@ const Subreddit = class extends RedditContent {
   * @example r.get_subreddit('snoowrap').delete_icon()
   */
   delete_icon () {
-    return this._post({
-      uri: `r/${this.display_name}/api/delete_sr_icon`,
-      form: {api_type}
-    }).then(handle_json_errors(this));
+    return this._post({uri: `r/${this.display_name}/api/delete_sr_icon`, form: {api_type}}).then(handle_json_errors(this));
   }
   /**
   * @summary Deletes an image from this subreddit.

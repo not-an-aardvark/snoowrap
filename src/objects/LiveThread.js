@@ -59,10 +59,7 @@ const LiveThread = class extends RedditContent {
   * @example r.get_livethread('whrdxo8dg9n0').add_update('Breaking: Someone is reading the snoowrap documentation \\o/')
   */
   add_update (body) {
-    return this._post({
-      uri: `api/live/${this.id}/update`,
-      form: {api_type, body}
-    }).then(handle_json_errors(this));
+    return this._post({uri: `api/live/${this.id}/update`, form: {api_type, body}}).then(handle_json_errors(this));
   }
   /**
   * @summary Strikes (marks incorrect and crosses out) the given update.
@@ -116,15 +113,12 @@ const LiveThread = class extends RedditContent {
   * @example r.get_livethread('whrdxo8dg9n0').invite_contributor({name: 'actually_an_aardvark', permissions: ['update']})
   */
   invite_contributor ({name, permissions}) {
-    return this._post({
-      uri: `api/live/${this.id}/invite_contributor`,
-      form: {
-        api_type,
-        name,
-        permissions: format_livethread_permissions(permissions),
-        type: 'liveupdate_contributor_invite'
-      }
-    }).then(handle_json_errors(this));
+    return this._post({uri: `api/live/${this.id}/invite_contributor`, form: {
+      api_type,
+      name,
+      permissions: format_livethread_permissions(permissions),
+      type: 'liveupdate_contributor_invite'
+    }}).then(handle_json_errors(this));
   }
   /**
   * @summary Revokes an invitation for the given user to become a contributor on this LiveThread.
@@ -134,10 +128,9 @@ const LiveThread = class extends RedditContent {
   * @example r.get_livethread('whrdxo8dg9n0').revoke_contributor_invite({name: 'actually_an_aardvark'});
   */
   revoke_contributor_invite ({name}) {
-    return this._r.get_user(name).fetch().get('id').then(user_id => this._post({
-      uri: `api/live/${this.id}/rm_contributor_invite`,
-      form: {api_type, id: `t2_${user_id}`}
-    })).then(handle_json_errors(this));
+    return this._r.get_user(name).fetch().get('id').then(user_id => {
+      return this._post({uri: `api/live/${this.id}/rm_contributor_invite`, form: {api_type, id: `t2_${user_id}`}});
+    }).then(handle_json_errors(this));
   }
   /**
   * @summary Accepts a pending contributor invitation on this LiveThread.
@@ -163,10 +156,9 @@ const LiveThread = class extends RedditContent {
   * @example r.get_livethread('whrdxo8dg9n0').remove_contributor({name: 'actually_an_aardvark'})
   */
   remove_contributor ({name}) {
-    return this._r.get_user(name).fetch().get('id').then(user_id => this._post({
-      uri: `api/live/${this.id}/rm_contributor`,
-      form: {api_type, id: `t2_${user_id}`}
-    })).then(handle_json_errors(this));
+    return this._r.get_user(name).fetch().get('id').then(user_id => {
+      return this._post({uri: `api/live/${this.id}/rm_contributor`, form: {api_type, id: `t2_${user_id}`}});
+    }).then(handle_json_errors(this));
   }
   /**
   * @summary Sets the permissions of the given contributor.
@@ -216,10 +208,7 @@ const LiveThread = class extends RedditContent {
   * @example r.get_livethread('whrdxo8dg9n0').report({reason: 'Breaking a rule blah blah blah'})
   */
   report ({reason}) {
-    return this._post({
-      uri: `api/live/${this.id}/report`,
-      form: {api_type, type: reason}
-    }).then(handle_json_errors(this));
+    return this._post({uri: `api/live/${this.id}/report`, form: {api_type, type: reason}}).then(handle_json_errors(this));
   }
   /**
   * @summary Gets a Listing containing past updates to this LiveThread.
