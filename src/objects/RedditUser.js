@@ -248,7 +248,7 @@ const RedditUser = class extends RedditContent {
   * // }
   */
   get_multireddit (name) {
-    return this._r._new_object('MultiReddit', {name, curator: this}, false);
+    return this._r._new_object('MultiReddit', {name, curator: this});
   }
   /**
   * @summary Gets an Array of all of this user's MultiReddits.

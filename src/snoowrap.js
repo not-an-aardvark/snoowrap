@@ -1153,10 +1153,10 @@ const snoowrap = class {
       const result = (Array.isArray(response_tree) ? map : mapValues)(response_tree, (value, key) => {
         // Maps {author: 'some_username'} to {author: RedditUser { name: 'some_username' } }
         if (value !== null && USER_KEYS.has(key)) {
-          return this._new_object('RedditUser', {name: value}, false);
+          return this._new_object('RedditUser', {name: value});
         }
         if (value !== null && SUBREDDIT_KEYS.has(key)) {
-          return this._new_object('Subreddit', {display_name: value}, false);
+          return this._new_object('Subreddit', {display_name: value});
         }
         return this._populate(value);
       });
