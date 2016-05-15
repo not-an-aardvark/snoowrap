@@ -1,4 +1,4 @@
-import {assign, clone, identity, map, omit} from 'lodash';
+import {clone, identity, map, omit} from 'lodash';
 import Promise from 'bluebird';
 import {Readable} from 'stream';
 import {createReadStream} from 'fs';
@@ -462,7 +462,7 @@ const Subreddit = class extends RedditContent {
   * // ]
   */
   get_moderation_log (options = {}) {
-    const parsed_options = omit(assign(options, {mod: options.mods && options.mods.join(',')}), 'mods');
+    const parsed_options = omit({...options, mod: options.mods && options.mods.join(',')}, 'mods');
     return this._get_listing({uri: `r/${this.display_name}/about/log`, qs: parsed_options});
   }
   /**
