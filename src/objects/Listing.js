@@ -138,9 +138,10 @@ const Listing = class extends Array {
       request if the desired amount of items is large. */
       query.limit = Math.min(options.amount, Number.MAX_SAFE_INTEGER);
     }
-    return this._r[`_${this._method}`]({
+    return this._r.oauth_request({
       uri: this._uri,
-      qs: query
+      qs: query,
+      method: this._method
     }).then(this._transform).then(response => {
       const cloned = this._clone();
       if (cloned._query.before) {
