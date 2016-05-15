@@ -134,7 +134,7 @@ const LiveThread = class extends RedditContent {
   * @example r.get_livethread('whrdxo8dg9n0').revoke_contributor_invite({name: 'actually_an_aardvark'});
   */
   revoke_contributor_invite ({name}) {
-    return this._r.get_user(name).id.then(user_id => this._post({
+    return this._r.get_user(name).fetch().get('id').then(user_id => this._post({
       uri: `api/live/${this.id}/rm_contributor_invite`,
       form: {api_type, id: `t2_${user_id}`}
     })).then(handle_json_errors(this));
