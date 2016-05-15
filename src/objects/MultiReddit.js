@@ -14,12 +14,13 @@ const MultiReddit = class extends RedditContent {
     if (_has_fetched) {
       this.curator = _r.get_user(this.path.split('/')[2]);
       this.subreddits = this.subreddits.map(item => this._r._new_object('Subreddit', item.data || {display_name: item.name}));
-    } else {
-      this.path = `/user/${this.curator.name}/m/${this.name}`;
     }
   }
   get _uri () {
-    return `api/multi${this.path}?expand_srs=true`;
+    return `api/multi${this._path}?expand_srs=true`;
+  }
+  get _path () {
+    return `/user/${this.curator.name}/m/${this.name}`;
   }
   /**
   * @summary Copies this multireddit to the requester's own account.
@@ -31,7 +32,7 @@ const MultiReddit = class extends RedditContent {
   copy ({new_name}) {
     return this._r._get_my_name().then(name => {
       return this._post({uri: 'api/multi/copy', form: {
-        from: this.path,
+        from: this._path,
         to: `/user/${name}/m/${new_name}`,
         display_name: new_name
       }});
@@ -48,8 +49,10 @@ const MultiReddit = class extends RedditContent {
   rename ({new_name}) {
     return this._r._get_my_name().then(my_name => this._post({
       uri: 'api/multi/rename',
-      form: {from: this.path, to: `/user/${my_name}/m/${new_name}`, display_name: new_name}
-    })).return(this);
+      form: {from: this._path, to: `/user/${my_name}/m/${new_name}`, display_name: new_name}
+    })).then(res => {
+      this.name = res.name;
+    }).return(this);
   }
   /**
   * @summary Deletes this multireddit.
@@ -57,7 +60,7 @@ const MultiReddit = class extends RedditContent {
   * @example r.get_user('not_an_aardvark').get_multireddit('cookie_languages').delete()
   */
   delete () {
-    return this._delete({uri: `api/multi${this.path}`});
+    return this._delete({uri: `api/multi${this._path}`});
   }
   /**
   * @summary Edits the properties of this multireddit.
@@ -76,7 +79,7 @@ const MultiReddit = class extends RedditContent {
   * @example r.get_user('not_an_aardvark').get_multireddit('cookie_languages').edit({visibility: 'hidden'})
   */
   edit ({description, icon_name, key_color, visibility, weighting_scheme}) {
-    return this._put({uri: `api/multi${this.path}`, form: {model: JSON.stringify({
+    return this._put({uri: `api/multi${this._path}`, form: {model: JSON.stringify({
       description_md: description,
       display_name: this.name,
       icon_name,
@@ -93,7 +96,7 @@ const MultiReddit = class extends RedditContent {
   */
   add_subreddit (sub) {
     sub = isString(sub) ? sub : sub.display_name;
-    return this._put({uri: `api/multi${this.path}/r/${sub}`, form: {model: JSON.stringify({name: sub})}}).return(this);
+    return this._put({uri: `api/multi${this._path}/r/${sub}`, form: {model: JSON.stringify({name: sub})}}).return(this);
   }
   /**
   * @summary Removes a subreddit from this multireddit.
@@ -102,7 +105,7 @@ const MultiReddit = class extends RedditContent {
   * @example r.get_user('not_an_aardvark').get_multireddit('cookie_languages').remove_subreddit('cookies')
   */
   remove_subreddit (sub) {
-    return this._delete({uri: `api/multi${this.path}/r/${isString(sub) ? sub : sub.display_name}`}).return(this);
+    return this._delete({uri: `api/multi${this._path}/r/${isString(sub) ? sub : sub.display_name}`}).return(this);
   }
   /* Note: The endpoints GET/PUT /api/multi/multipath/description and GET /api/multi/multipath/r/srname are intentionally not
   included, because they're redundant and the same thing can be achieved by simply using fetch() and edit(). */
