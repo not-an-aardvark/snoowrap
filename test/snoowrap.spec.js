@@ -1206,27 +1206,27 @@ describe('snoowrap', function () {
     });
     it('can ban/unban a user from a subreddit', async () => {
       await sub.ban_user({name: victim.name, ban_message: 'banned for stuff', ban_note: 'test note'});
-      expect(await sub.get_banned_users(victim)).to.have.lengthOf(1);
+      expect(await sub.get_banned_users({name: victim.name})).to.have.lengthOf(1);
       await sub.unban_user(victim);
-      expect(await sub.get_banned_users(victim)).to.have.lengthOf(0);
+      expect(await sub.get_banned_users({name: victim.name})).to.have.lengthOf(0);
     });
     it('can add/remove an approved submitter from a subreddit', async () => {
       await sub.add_contributor(victim);
-      expect(await sub.get_contributors(victim)).to.have.lengthOf(1);
+      expect(await sub.get_contributors({name: victim.name})).to.have.lengthOf(1);
       await sub.remove_contributor(victim);
-      expect(await sub.get_contributors(victim)).to.have.lengthOf(0);
+      expect(await sub.get_contributors({name: victim.name})).to.have.lengthOf(0);
     });
     it('can wikiban/unwikiban a user from a subreddit', async () => {
       await sub.wikiban_user(victim);
-      expect(await sub.get_wikibanned_users(victim)).to.have.lengthOf(1);
+      expect(await sub.get_wikibanned_users({name: victim.name})).to.have.lengthOf(1);
       await sub.unwikiban_user(victim);
-      expect(await sub.get_wikibanned_users(victim)).to.have.lengthOf(0);
+      expect(await sub.get_wikibanned_users({name: victim.name})).to.have.lengthOf(0);
     });
     it('can add/remove a user from approved wiki editor status on a subreddit', async () => {
       await sub.add_wiki_contributor(victim);
-      expect(await sub.get_wiki_contributors(victim)).to.have.lengthOf(1);
+      expect(await sub.get_wiki_contributors({name: victim.name})).to.have.lengthOf(1);
       await sub.remove_wiki_contributor(victim);
-      expect(await sub.get_wiki_contributors(victim)).to.have.lengthOf(0);
+      expect(await sub.get_wiki_contributors({name: victim.name})).to.have.lengthOf(0);
     });
     it("can change a moderator's permissions on a subreddit", async () => {
       await sub.set_moderator_permissions({name: 'not_an_aardvark', permissions: ['flair', 'wiki']});
