@@ -812,16 +812,6 @@ describe('snoowrap', function () {
       await sub.delete_all_link_flair_templates();
       expect(await sub._get_flair_options({link: 't3_43qlu8'}).choices).to.eql([]);
     });
-    it('can change multiple user flairs at once', async () => {
-      const naa_flair = "not_an_aardvark's flair";
-      const aaa_flair = "actually_an_aardvark's flair";
-      await sub.set_multiple_user_flairs([
-        {name: 'not_an_aardvark', text: naa_flair},
-        {name: 'actually_an_aardvark', text: aaa_flair}
-      ]);
-      expect(await sub.get_user_flair('not_an_aardvark').flair_text).to.equal(naa_flair);
-      expect(await sub.get_user_flair('actually_an_aardvark').flair_text).to.equal(aaa_flair);
-    });
     it('can assign flair to a user', async () => {
       const user1 = r.get_user('not_an_aardvark');
       const user2 = r.get_user('actually_an_aardvark');
@@ -853,6 +843,65 @@ describe('snoowrap', function () {
       await submission.select_flair({flair_template_id});
       expect(await submission.refresh().link_flair_text).to.equal(text);
       await sub.delete_all_link_flair_templates();
+    });
+  });
+
+  describe('Subreddit#set_multiple_user_flairs', () => {
+    let sub;
+    beforeEach(async () => {
+      sub = r.get_subreddit('snoowrap_testing');
+      await r.get_user('not_an_aardvark').assign_flair({subreddit_name: sub.display_name, text: 'foo', css_class: 'bar'});
+      await r.get_user('actually_an_aardvark').assign_flair({subreddit_name: sub.display_name, text: 'baz', css_class: 'quux'});
+      const naa_previous_flair = await sub.get_user_flair('not_an_aardvark');
+      const aaa_previous_flair = await sub.get_user_flair('actually_an_aardvark');
+      expect(naa_previous_flair.flair_text).to.equal('foo');
+      expect(naa_previous_flair.flair_css_class).to.equal('bar');
+      expect(aaa_previous_flair.flair_text).to.equal('baz');
+      expect(aaa_previous_flair.flair_css_class).to.equal('quux');
+    });
+    it('can change multiple user flairs at once', async () => {
+      await sub.set_multiple_user_flairs([
+        {name: 'not_an_aardvark', text: "not_an_aardvark's flair", css_class: 'naa-css-class'},
+        {name: 'actually_an_aardvark', text: "actually_an_aardvark's flair", css_class: 'aaa-css-class'}
+      ]);
+      const naa_afterwards_flair = await sub.get_user_flair('not_an_aardvark');
+      const aaa_afterwards_flair = await sub.get_user_flair('actually_an_aardvark');
+      expect(naa_afterwards_flair.flair_text).to.equal("not_an_aardvark's flair");
+      expect(naa_afterwards_flair.flair_css_class).to.equal('naa-css-class');
+      expect(aaa_afterwards_flair.flair_text).to.equal("actually_an_aardvark's flair");
+      expect(aaa_afterwards_flair.flair_css_class).to.equal('aaa-css-class');
+    });
+    it('rejects with an array if a flair is invalid', async () => {
+      await sub.set_multiple_user_flairs([
+        {name: 'not_an_aardvark', text: "not_an_aardvark's flair", css_class: 'naa-css-class'},
+        {name: 'actually_an_aardvark', text: "actually_an_aardvark's flair", css_class: "this isn't a valid css class"}
+      ]).then(expect.fail, err => {
+        expect(err).to.eql([{
+          status: 'skipped',
+          errors: {css: "invalid css class `this isn't a valid css class', ignoring"},
+          ok: false,
+          warnings: {}
+        }]);
+      });
+      const naa_afterwards_flair = await sub.get_user_flair('not_an_aardvark');
+      const aaa_afterwards_flair = await sub.get_user_flair('actually_an_aardvark');
+      expect(naa_afterwards_flair.flair_text).to.equal("not_an_aardvark's flair");
+      expect(naa_afterwards_flair.flair_css_class).to.equal('naa-css-class');
+      expect(aaa_afterwards_flair.flair_text).to.equal('baz');
+      expect(aaa_afterwards_flair.flair_css_class).to.equal('quux');
+    });
+    it('can set multiple user flairs even if the flair text contains special characters', async () => {
+      const special_chars_string = '!@#$%^&*();\'\\"""∑œ´®œçœ∑|\\"""",<.>>.<,"\\\';)(*%$#@!';
+      await sub.set_multiple_user_flairs([
+        {name: 'not_an_aardvark', text: special_chars_string, css_class: 'naa-css-class'},
+        {name: 'actually_an_aardvark', text: "actually_an_aardvark's flair", css_class: 'aaa-css-class'}
+      ]);
+      const naa_afterwards_flair = await sub.get_user_flair('not_an_aardvark');
+      const aaa_afterwards_flair = await sub.get_user_flair('actually_an_aardvark');
+      expect(naa_afterwards_flair.flair_text).to.equal(special_chars_string);
+      expect(naa_afterwards_flair.flair_css_class).to.equal('naa-css-class');
+      expect(aaa_afterwards_flair.flair_text).to.equal("actually_an_aardvark's flair");
+      expect(aaa_afterwards_flair.flair_css_class).to.equal('aaa-css-class');
     });
   });
 

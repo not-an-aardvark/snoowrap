@@ -1,4 +1,4 @@
-import {clone, identity, map, omit} from 'lodash';
+import {chunk, flatten, identity, map, omit} from 'lodash';
 import Promise from 'bluebird';
 import {Readable} from 'stream';
 import {createReadStream} from 'fs';
@@ -168,27 +168,65 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Sets multiple user flairs at the same time
+  * @desc Due to the behavior of the reddit API endpoint that this function uses, if any of the provided user flairs are
+  invalid, reddit will make note of this in its response, but it will still attempt to set the remaining user flairs. If this
+  occurs, the Promise returned by snoowrap will be rejected, and the rejection reason will be an array containing the 'error'
+  responses from reddit.
   * @param {object[]} flair_array
   * @param {string} flair_array[].name A user's name
   * @param {string} flair_array[].text The flair text to assign to this user
   * @param {string} flair_array[].css_class The flair CSS class to assign to this user
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   * @example
-  r.get_subreddit('snoowrap').set_multiple_user_flairs([
-    {name: 'actually_an_aardvark', 'text': "this is /u/actually_an_aardvark's flair text", css_class: 'some-css-class'},
-    {name: 'snoowrap_testing', 'text': "this is /u/snoowrap_testing's flair text", css_class: 'some-css-class'}
+  * r.get_subreddit('snoowrap').set_multiple_user_flairs([
+  *   {name: 'actually_an_aardvark', text: "this is /u/actually_an_aardvark's flair text", css_class: 'some-css-class'},
+  *   {name: 'snoowrap_testing', text: "this is /u/snoowrap_testing's flair text", css_class: 'some-css-class'}
+  * ]);
+  * // the above request gets completed successfully
+  *
+  * r.get_subreddit('snoowrap').set_multiple_user_flairs([
+  *   {name: 'actually_an_aardvark', text: 'foo', css_class: 'valid-css-class'},
+  *   {name: 'snoowrap_testing', text: 'bar', css_class: "this isn't a valid css class"},
+  *   {name: 'not_an_aardvark', text: 'baz', css_class: "this also isn't a valid css class"}
   * ])
+  * // the Promise from the above request gets rejected, with the following rejection reason:
+  * [
+  *   {
+  *     status: 'skipped',
+  *     errors: { css: 'invalid css class `this isn\'t a valid css class\', ignoring' },
+  *     ok: false,
+  *     warnings: {}
+  *   },
+  *   {
+  *     status: 'skipped',
+  *     errors: { css: 'invalid css class `this also isn\'t a valid css class\', ignoring' },
+  *     ok: false,
+  *     warnings: {}
+  *   }
+  * ]
+  * // note that /u/actually_an_aardvark's flair still got set by the request, even though the other two flairs caused errors.
   */
   set_multiple_user_flairs (flair_array) {
-    const flair_arr = clone(flair_array);
-    const requests = [];
-    while (flair_arr.length > 0) {
-      // The endpoint only accepts at most 100 lines of csv at a time, so split the array into chunks of 100.
-      requests.push(this._set_flair_from_csv(flair_arr.splice(0, 100).map(item =>
-        `${item.name},${item.text || item.flair_text || ''},${item.css_class || item.flair_css_class || ''}`).join('\n')
-      ));
-    }
-    return Promise.all(requests).return(this);
+    const csv_lines = flair_array.map(item => {
+      // reddit expects to receive valid CSV data, which each line having the form `username,flair_text,css_class`.
+      return [item.name, item.text || item.flair_text || '', item.css_class || item.flair_css_class || ''].map(str => {
+        /* To escape special characters in the lines (e.g. if the flair text itself contains a comma), surround each
+        part of the line with double quotes before joining the parts together with commas (in accordance with how special
+        characters are usually escaped in CSV). If double quotes are themselves part of the flair text, replace them with a
+        pair of consecutive double quotes. */
+        return `"${str.replace(/"/g, '""')}"`;
+      }).join(',');
+    });
+    /* Due to an API limitation, this endpoint can only set the flair of 100 users at a time.
+    Send multiple requests if necessary to ensure that all users in the array are accounted for. */
+    return Promise.map(chunk(csv_lines, 100), flair_chunk => {
+      return this._post({uri: `r/${this.display_name}/api/flaircsv`, form: {flair_csv: flair_chunk.join('\n')}});
+    }).then(flatten).tap(results => {
+      const error_rows = results.filter(row => !row.ok);
+      if (error_rows.length) {
+        throw error_rows;
+      }
+    }).return(this);
   }
   /**
   * @summary Gets a list of all user flairs on this subreddit.
