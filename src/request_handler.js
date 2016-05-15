@@ -106,15 +106,10 @@ export function _await_ratelimit () {
 }
 
 export function _await_request_delay () {
-  /* this._throttle is a timer that gets reset to r._config.request_delay whenever a request is sent. This ensures that
-  requests are throttled correctly according to the user's config settings, and that no requests are lost. _await_request_delay
-  is called recursively to ensure that if multiple requests are queued waiting for the throttle, only one request request gets
-  sent when the throttle resolves, and the other requests await the throttle again. */
-  if (this._throttle.isFulfilled()) {
-    this._throttle = Promise.delay(this._config.request_delay);
-    return Promise.resolve();
-  }
-  return this._throttle.then(() => this._await_request_delay());
+  const now = Date.now();
+  const wait_time = this._next_request_timestamp - now;
+  this._next_request_timestamp = Math.max(now, this._next_request_timestamp) + this._config.request_delay;
+  return Promise.delay(wait_time);
 }
 
 /**

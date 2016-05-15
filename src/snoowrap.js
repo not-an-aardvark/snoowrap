@@ -54,7 +54,7 @@ const snoowrap = class {
       token_expiration: null,
       scope: null,
       _config: default_config,
-      _throttle: Promise.resolve()
+      _next_request_timestamp: -Infinity
     });
   }
   static get name () {
