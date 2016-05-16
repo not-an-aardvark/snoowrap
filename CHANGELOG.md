@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.1.1 (2016-05-15)
+
+* Fixed an issue where a setting a high `request_delay` would delay script termination
+* Fixed an issue where `LiveThread#revoke_contributor_invite` would throw errors if Proxies were disabled
+* Fixed an issue where `Subreddit#set_multiple_user_flairs` could incorrectly report success if an error occurred
+* Fixed an issue where `Subreddit#set_multiple_user_flairs` would fail if a flair text contained special characters.
+
 ## v1.1.0 (2016-05-13)
 
 * Added `snoowrap#mark_messages_as_read` and `snoowrap#mark_messages_as_unread` functions for dealing with multiple private messages simultaneously
