@@ -1,5 +1,5 @@
-import {assign, defaults, forEach, forOwn, findKey, includes, isEmpty, isObject, isString, isUndefined, map, mapValues, omit,
-  omitBy} from 'lodash';
+import {assign, camelCase, defaults, forEach, forOwn, findKey, includes, isEmpty, isFunction, isObject, isString, isUndefined,
+  map, mapValues, omit, omitBy, values} from 'lodash';
 import Promise from 'bluebird';
 import promise_wrap from 'promise-chains';
 import util from 'util';
@@ -1216,6 +1216,13 @@ forOwn(KINDS, value => {
   when snoowrap is minified, because the class names change (e.g. `class Comment {}` might be minified into `class n{}` which
   would change the `name` property). Explicitly defining a static getter on the constructor avoids this issue. */
   Object.defineProperty(snoowrap.objects[value], 'name', {get: () => value});
+});
+
+// Alias all functions on snoowrap's prototype and snoowrap's object prototypes in camelCase.
+values(snoowrap.objects).concat(snoowrap).map(func => func.prototype).forEach(funcProto => {
+  Object.getOwnPropertyNames(funcProto)
+    .filter(name => !name.startsWith('_') && name.includes('_') && isFunction(funcProto[name]))
+    .forEach(name => Object.defineProperty(funcProto, camelCase(name), {value: funcProto[name]}));
 });
 
 snoowrap.errors = errors;

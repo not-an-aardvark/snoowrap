@@ -144,6 +144,11 @@ describe('snoowrap', function () {
       expect(snoowrap.objects.RedditContent).to.exist();
       expect(snoowrap.objects.Comment).to.exist();
     });
+    it('exposes camelCase aliases for all prototype functions', () => {
+      expect(r.get_user).to.equal(r.getUser);
+      expect(r.get_subreddit('AskReddit').get_top).to.equal(r.getSubreddit('AskReddit').getTop);
+      expect(snoowrap.objects.Listing.prototype.fetch_more).to.equal(snoowrap.objects.Listing.prototype.fetchMore);
+    });
     afterEach(() => {
       r.config({request_delay: previous_request_delay, request_timeout: previous_request_timeout});
     });
