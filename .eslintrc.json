@@ -61,6 +61,7 @@
     "no-new-require": 2,
     "no-octal-escape": 2,
     "no-proto": 1,
+    "no-prototype-builtins": 1,
     "no-script-url": 2,
     "no-self-compare": 2,
     "no-sequences": 1,

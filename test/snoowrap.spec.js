@@ -130,7 +130,7 @@ describe('snoowrap', function () {
     it('sets all prototype functions as non-enumerable', () => {
       const ensure_prototype_funcs_arent_enumerable = obj => {
         Object.getOwnPropertyNames(obj.prototype).forEach(funcName => {
-          expect(obj.prototype.propertyIsEnumerable(funcName)).to.be.false();
+          expect(Object.prototype.propertyIsEnumerable.call(obj, funcName)).to.be.false();
         });
       };
       ensure_prototype_funcs_arent_enumerable(snoowrap);
