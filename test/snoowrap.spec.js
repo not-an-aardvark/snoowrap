@@ -1167,6 +1167,12 @@ describe('snoowrap', function () {
       expect(sent[0]).to.be.an.instanceof(snoowrap.objects.PrivateMessage);
       expect(sent[0].author.name).to.equal(await r.get_me().name);
     });
+    it('can use a filter parameter to categorize messages', async () => {
+      const messages = await r.get_inbox({filter: 'messages'});
+      expect(messages.every(m => m instanceof snoowrap.objects.PrivateMessage)).to.be.true();
+      const self_replies = await r.get_inbox({filter: 'comments'});
+      expect(self_replies.every(m => m instanceof snoowrap.objects.Comment)).to.be.true();
+    });
     after(async () => {
       await message.mark_as_read();
     });

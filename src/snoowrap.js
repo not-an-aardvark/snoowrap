@@ -581,7 +581,10 @@ const snoowrap = class {
   }
   /**
   * @summary Gets the items in the authenticated user's inbox.
-  * @param {object} [options={}] Options for the resulting Listing
+  * @param {object} [options={}] Filter options. Can also contain options for the resulting Listing.
+  * @param {string} [options.filter] A filter for the inbox items. If provided, it should be one of `unread`, (unread
+  items), `messages` (i.e. PMs), `comments` (comment replies), `selfreply` (selfpost replies), or `mentions` (username
+  mentions).
   * @returns {Promise} A Listing containing items in the user's inbox
   * @example
   *
@@ -591,8 +594,8 @@ const snoowrap = class {
   * //  Comment { body: 'this is a reply', link_title: 'Yay, a selfpost!', was_comment: true, ... }
   * // ]
   */
-  get_inbox (options = {}) {
-    return this._get_listing({uri: 'message/inbox', qs: options});
+  get_inbox ({filter, ...options} = {}) {
+    return this._get_listing({uri: `message/${filter || 'inbox'}`, qs: options});
   }
   /**
   * @summary Gets the authenticated user's modmail.
