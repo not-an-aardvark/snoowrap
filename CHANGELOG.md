@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.2.0 (2016-06-07)
+
+* Added camelCase aliases for all exposed snoowrap functions
+* Added support for passing comment IDs to `snoowrap#mark_messages_as_read` and `snoowrap#mark_messages_as_unread`
+* Added filtering options for `snoowrap#get_inbox`
+
 ## v1.1.1 (2016-05-15)
 
 * Fixed an issue where a setting a high `request_delay` would delay script termination
