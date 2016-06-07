@@ -1134,6 +1134,14 @@ describe('snoowrap', function () {
       expect(await message2.refresh().new).to.be.false();
       expect(await message3.refresh().new).to.be.false();
     });
+    it('can handle comment objects in mark_messages_as_[un]read', async () => {
+      await r.mark_messages_as_unread([message2.name, 't1_d403ctb']);
+      expect(await message2.new).to.be.true();
+      expect(_.map(await r.get_unread_messages(), 'name')).to.include('t1_d403ctb');
+      await r.mark_messages_as_read([message2.name, 't1_d403ctb']);
+      expect(await message2.refresh().new).to.be.false();
+      expect(_.map(await r.get_unread_messages(), 'name')).to.not.include('t1_d403ctb');
+    });
   });
 
   describe('inbox operations', () => {

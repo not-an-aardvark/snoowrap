@@ -626,10 +626,20 @@ const snoowrap = class {
   }
   /**
   * @summary Marks all of the given messages as read.
-  * @param {PrivateMessage[]|String[]} messages An Array of PrivateMessage objects. Can also contain strings representing
-  message IDs.
+  * @param {PrivateMessage[]|String[]} messages An Array of PrivateMessage or Comment objects. Can also contain strings
+  representing message or comment IDs. If strings are provided, they are assumed to represent PrivateMessages unless a fullname
+  prefix such as `t1_` is specified.
   * @returns {Promise} A Promise that fulfills when the request is complete
-  * @example r.mark_messages_as_read(['51shsd', '51shxv'])
+  * @example
+  *
+  * r.mark_messages_as_read(['51shsd', '51shxv'])
+  *
+  * // To reference a comment by ID, be sure to use the `t1_` prefix, otherwise snoowrap will be unable to distinguish the
+  * // comment ID from a PrivateMessage ID.
+  * r.mark_messages_as_read(['t5_51shsd', 't1_d3zhb5k'])
+  *
+  * // Alternatively, just pass in a comment object directly.
+  * r.mark_messages_as_read([r.get_message('51shsd'), r.get_comment('d3zhb5k')])
   */
   mark_messages_as_read (messages) {
     const message_ids = messages.map(message => add_fullname_prefix(message, 't4_'));
@@ -638,9 +648,19 @@ const snoowrap = class {
   /**
   * @summary Marks all of the given messages as unread.
   * @param {PrivateMessage[]|String[]} messages An Array of PrivateMessage objects. Can also contain strings representing
-  message IDs.
+  message IDs. If strings are provided, they are assumed to represent PrivateMessages unless a fullname prefix such
+  as `t1_` is included.
   * @returns {Promise} A Promise that fulfills when the request is complete
-  * @example r.mark_messages_as_unread(['51shsd', '51shxv'])
+  * @example
+  *
+  * r.mark_messages_as_unread(['51shsd', '51shxv'])
+  *
+  * // To reference a comment by ID, be sure to use the `t1_` prefix, otherwise snoowrap will be unable to distinguish the
+  * // comment ID from a PrivateMessage ID.
+  * r.mark_messages_as_unread(['t5_51shsd', 't1_d3zhb5k'])
+  *
+  * // Alternatively, just pass in a comment object directly.
+  * r.mark_messages_as_read([r.get_message('51shsd'), r.get_comment('d3zhb5k')])
   */
   mark_messages_as_unread (messages) {
     const message_ids = messages.map(message => add_fullname_prefix(message, 't4_'));

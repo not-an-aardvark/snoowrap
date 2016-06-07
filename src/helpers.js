@@ -74,7 +74,11 @@ export function build_replies_tree (child_list) {
 
 export function add_fullname_prefix (item, prefix) {
   if (typeof item === 'string') {
-    return item.startsWith(prefix) ? item : prefix + item;
+    return has_fullname_prefix(item) ? item : prefix + item;
   }
   return item.name;
+}
+
+export function has_fullname_prefix (item) {
+  return /^t\d_/.test(item);
 }
