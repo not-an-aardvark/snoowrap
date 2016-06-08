@@ -80,5 +80,5 @@ export function add_fullname_prefix (item, prefix) {
 }
 
 export function has_fullname_prefix (item) {
-  return /^t\d_/.test(item);
+  return /^(t\d|LiveUpdateEvent)_/.test(item);
 }
