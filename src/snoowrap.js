@@ -650,8 +650,8 @@ const snoowrap = class {
   }
   /**
   * @summary Marks all of the given messages as unread.
-  * @param {PrivateMessage[]|String[]} messages An Array of PrivateMessage objects. Can also contain strings representing
-  message IDs. If strings are provided, they are assumed to represent PrivateMessages unless a fullname prefix such
+  * @param {PrivateMessage[]|String[]} messages An Array of PrivateMessage or Comment objects. Can also contain strings
+  representing message IDs. If strings are provided, they are assumed to represent PrivateMessages unless a fullname prefix such
   as `t1_` is included.
   * @returns {Promise} A Promise that fulfills when the request is complete
   * @example
