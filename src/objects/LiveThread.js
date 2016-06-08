@@ -44,13 +44,19 @@ const LiveThread = class extends RedditContent {
     return `live/${this.id}/about`;
   }
   _transform_api_response (response_object) {
-    const populated_stream = new EventEmitter();
-    const raw_stream = new WebSocket(response_object.websocket_url);
-    raw_stream.on('message', data => {
-      const parsed = this._r._populate(JSON.parse(data));
-      populated_stream.emit(parsed.type, parsed.payload);
-    });
-    return {...response_object, _websocket: raw_stream, stream: populated_stream};
+    response_object._raw_stream = null;
+    response_object._populated_stream = new EventEmitter();
+    Object.defineProperty(response_object, 'stream', {get: () => {
+      if (!response_object._raw_stream) {
+        response_object._raw_stream = new WebSocket(response_object.websocket_url);
+        response_object._raw_stream.on('message', data => {
+          const parsed = this._r._populate(JSON.parse(data));
+          response_object._populated_stream.emit(parsed.type, parsed.payload);
+        });
+      }
+      return response_object._populated_stream;
+    }});
+    return response_object;
   }
   /**
   * @summary Adds a new update to this thread.
@@ -259,7 +265,7 @@ const LiveThread = class extends RedditContent {
   *
   */
   close_stream () {
-    this._websocket.close();
+    this._raw_stream.close();
   }
 };
 
