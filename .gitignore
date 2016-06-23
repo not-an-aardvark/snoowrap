@@ -1,7 +1,7 @@
 node_modules/
 .DS_Store
 npm-debug.log
-lib/
+dist/
 doc/
 coverage/
 oauth_info.json

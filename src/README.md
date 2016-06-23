@@ -43,7 +43,7 @@ npm run docs # builds the documentation into a doc/ folder
 ```
 
 ## Build tools
-snoowrap's source code is written with some ES7 syntax. It gets transpiled by [babel](https://babeljs.io/) from the `src/` folder into a `lib/` folder (which is on gitigngore). The resulting `lib/` folder is the only code that is actually included when the module is installed with npm.
+snoowrap's source code is written with some ES7 syntax. It gets transpiled by [babel](https://babeljs.io/) from the `src/` folder into a `dist/` folder (which is on gitigngore). The resulting `dist/` folder is the only code that is actually included when the module is installed with npm.
 
 The documentation is generated automatically from inline comments with [ink-docstrap](https://github.com/docstrap/docstrap).
 
