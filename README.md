@@ -1,4 +1,4 @@
-# snoowrap [![Build Status](https://travis-ci.org/not-an-aardvark/snoowrap.svg?branch=v1.2.0)](https://travis-ci.org/not-an-aardvark/snoowrap)
+# snoowrap [![Build Status](https://travis-ci.org/not-an-aardvark/snoowrap.svg?branch=v1.3.0)](https://travis-ci.org/not-an-aardvark/snoowrap)
 
 A fully-featured Node.js wrapper for the reddit API. ([Documentation](https://not-an-aardvark.github.io/snoowrap))
 
@@ -157,12 +157,26 @@ r.get_submission('47v7tm').fetch().then(submission => {
 ---
 
 ### To include in a project
+
+**Node:**
+
 ```bash
 npm install snoowrap --save
 ```
 ```js
 var snoowrap = require('snoowrap');
 ```
+
+**Browsers:**
+
+snoowrap is usable with module bundlers such as [browserify](http://browserify.org/).
+
+Alternatively, prebuilt versions are available:
+
+* [snoowrap.js](https://not-an-aardvark.github.io/snoowrap/snoowrap.js)
+* [snoowrap.min.js](https://not-an-aardvark.github.io/snoowrap/snoowrap.min.js)
+
+When run in a browser, snoowrap will be assigned to the global variable `window.snoowrap`.
 
 ### To build/run the tests independently
 See the [contributing guide](https://github.com/not-an-aardvark/snoowrap/blob/master/CONTRIBUTING.md) and the [getting started](https://github.com/not-an-aardvark/snoowrap/blob/master/src/README.md) page.
