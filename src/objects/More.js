@@ -1,5 +1,5 @@
-import {assign, clone, concat, flatten, forEach, pick, remove} from 'lodash';
-import {default as Promise, mapSeries} from 'bluebird';
+import {assign, concat, flatten, forEach, pick, remove} from 'lodash';
+import Promise from 'bluebird';
 import {add_empty_replies_listing, build_replies_tree, handle_json_errors} from '../helpers.js';
 import {MAX_API_INFO_AMOUNT, MAX_API_MORECHILDREN_AMOUNT} from '../constants.js';
 const api_type = 'json';
@@ -53,7 +53,7 @@ const More = class {
       qs: {api_type, children: ids.join(','), link_id: this.link_id || this.parent_id}
     }).tap(handle_json_errors)
       .then(res => res.json.data.things)
-      .mapSeries(add_empty_replies_listing)
+      .map(add_empty_replies_listing)
       .then(build_replies_tree)
       .then(result_trees => {
         /* Sometimes, when sending a request to reddit to get multiple comments from a `more` object, reddit decides to only
@@ -63,15 +63,15 @@ const More = class {
         forEach(child_mores, c => {
           c.link_id = this.link_id || this.parent_id;
         });
-        return mapSeries(child_mores, c => c.fetch_tree({...options, amount: Infinity}, 0)).then(flatten).then(expanded => {
+        return Promise.mapSeries(child_mores, c => c.fetch_tree({...options, amount: Infinity}, 0)).then(expanded_trees => {
           return this.fetch_more({...options, amount: options.amount - ids.length}, start_index + ids.length).then(nexts => {
-            return concat(result_trees, expanded, nexts);
+            return concat(result_trees, flatten(expanded_trees), nexts);
           });
         });
       });
   }
   _clone () {
-    return new More(clone(pick(this, Object.getOwnPropertyNames(this))), this._r);
+    return new More(pick(this, Object.getOwnPropertyNames(this)), this._r);
   }
 };
 
