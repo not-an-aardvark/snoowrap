@@ -145,11 +145,11 @@ const Listing = class extends Array {
     }).then(this._transform).then(response => {
       const cloned = this._clone();
       if (cloned._query.before) {
-        cloned.unshift(...Array.from(response));
+        cloned.unshift(...response);
         cloned._query.before = response._query.before;
         cloned._query.after = null;
       } else {
-        cloned.push(...Array.from(response));
+        cloned.push(...response);
         cloned._query.before = null;
         cloned._query.after = response._query.after;
       }
@@ -168,7 +168,7 @@ const Listing = class extends Array {
   _fetch_more_comments (options) {
     return this._more.fetch_more(options).then(more_comments => {
       const cloned = this._clone();
-      cloned.push(...Array.from(more_comments));
+      cloned.push(...more_comments);
       cloned._more.children = cloned._more.children.slice(options.amount);
       return cloned;
     });
