@@ -432,7 +432,6 @@ const Subreddit = class extends RedditContent {
   }
   /**
   * @summary Gets a single random Submission from this subreddit.
-  * @param {object} [options={}] Options for the resulting Listing
   * @returns {Promise} The retrieved Submission object
   * @example
   *
