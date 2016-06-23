@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.3.0 (2016-06-22)
+
+* Added support for username/password authentication by passing `username` and `password` into the snoowrap constructor
+
 ## v1.2.0 (2016-06-07)
 
 * Added camelCase aliases for all exposed snoowrap functions
