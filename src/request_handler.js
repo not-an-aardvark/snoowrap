@@ -173,18 +173,21 @@ a stable feature, using it is rarely necessary unless an access token is needed 
 * @example r.update_access_token()
 */
 export function update_access_token () {
-  return this.access_token && Date.now() < this.token_expiration || !this.refresh_token
-    // If the access token already exists and has not expired, just return a Promise for it.
-    ? Promise.resolve(this.access_token)
-    // Otherwise, get a new one from reddit.
-    : this.credentialed_client_request({
+  // If the current access token is missing or expired, and it is possible to get a new one, do so.
+  if ((!this.access_token || Date.now() > this.token_expiration) && (this.refresh_token || this.username && this.password)) {
+    return this.credentialed_client_request({
       method: 'post',
       uri: 'api/v1/access_token',
-      form: {grant_type: 'refresh_token', refresh_token: this.refresh_token}
+      form: this.refresh_token
+        ? {grant_type: 'refresh_token', refresh_token: this.refresh_token}
+        : {grant_type: 'password', username: this.username, password: this.password}
     }).then(token_info => {
       this.access_token = token_info.access_token;
       this.token_expiration = Date.now() + token_info.expires_in * 1000;
       this.scope = token_info.scope.split(' ');
       return this.access_token;
     });
+  }
+  // Otherwise, just return the existing token.
+  return Promise.resolve(this.access_token);
 }

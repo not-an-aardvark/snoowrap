@@ -7,7 +7,7 @@ const snoowrap = require('..');
 describe('snoowrap', function () {
   this.timeout(300000);
   this.slow(Infinity);
-  let r;
+  let r, r2;
   before(() => {
     if (process.env.CI) {
       r = new snoowrap({
@@ -16,9 +16,29 @@ describe('snoowrap', function () {
         client_secret: process.env.SNOOWRAP_CLIENT_SECRET,
         refresh_token: process.env.SNOOWRAP_REFRESH_TOKEN
       });
+      r2 = new snoowrap({
+        user_agent: process.env.SNOOWRAP_USER_AGENT,
+        client_id: process.env.SNOOWRAP_CLIENT_ID,
+        client_secret: process.env.SNOOWRAP_CLIENT_SECRET,
+        username: process.env.SNOOWRAP_USERNAME,
+        password: process.env.SNOOWRAP_PASSWORD
+      });
     } else {
-      // oauth_info.json has the properties `user_agent`, `client_id`, `client_secret`, and `refresh_token`.
-      r = new snoowrap(require('../oauth_info.json'));
+      // oauth_info.json has properties `user_agent`, `client_id`, `client_secret`, `username`, `password`, and `refresh_token`.
+      const oauth_info = require('../oauth_info.json');
+      r = new snoowrap({
+        user_agent: oauth_info.user_agent,
+        client_id: oauth_info.client_id,
+        client_secret: oauth_info.client_secret,
+        refresh_token: oauth_info.refresh_token
+      });
+      r2 = new snoowrap({
+        user_agent: oauth_info.user_agent,
+        client_id: oauth_info.client_id,
+        client_secret: oauth_info.client_secret,
+        username: oauth_info.username,
+        password: oauth_info.password
+      });
     }
     r.config({request_delay: 1000});
   });
@@ -39,6 +59,11 @@ describe('snoowrap', function () {
     });
     it('does not throw an error if a user_agent, client_id, client_secret, and refresh_token are provided', () => {
       expect(() => new snoowrap({user_agent: 'a', client_id: 'b', client_secret: 'c', refresh_token: 'd'})).not.to.throw();
+    });
+    it('does not throw an error if a user_agent, client_id, client_secret, username, and password are provided', () => {
+      expect(() => {
+        return new snoowrap({user_agent: 'a', client_id: 'b', client_secret: 'c', username: 'd', password: 'e'});
+      }).not.to.throw();
     });
     it('allows the client_secret to be an empty string', () => {
       expect(() => new snoowrap({user_agent: 'a', client_id: 'b', client_secret: '', refresh_token: 'd'})).not.to.throw();
@@ -240,9 +265,11 @@ describe('snoowrap', function () {
   describe('smoketest', () => {
     it("can get the requester's profile", async () => {
       expect(await r.get_me()).to.be.an.instanceof(snoowrap.objects.RedditUser);
+      expect(await r2.get_me()).to.be.an.instanceof(snoowrap.objects.RedditUser);
     });
     it("can get a user's overview", async () => {
       expect(await r.get_me().get_overview()).to.be.an.instanceof(snoowrap.objects.Listing);
+      expect(await r2.get_me().get_overview()).to.be.an.instanceof(snoowrap.objects.Listing);
     });
   });
 

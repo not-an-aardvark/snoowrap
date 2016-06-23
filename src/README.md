@@ -23,7 +23,9 @@ Put these credentials in a file called `oauth_info.json` in the project root dir
   "client_id": "put_your_client_id_here",
   "client_secret": "put_your_client_secret_here",
   "refresh_token": "put_your_refresh_token_here",
-  "user_agent": "put_a_descriptive_useragent_string_here"
+  "user_agent": "put_a_descriptive_useragent_string_here",
+  "username": "put a username here",
+  "password": "put a password here"
 }
 ```
 

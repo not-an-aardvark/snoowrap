@@ -25,30 +25,44 @@ exposed since they are useful externally as well.
 const snoowrap = class {
   /**
   * @summary Constructs a new requester. This will be necessary if you want to do anything.
-  * @param {object} options An Object containing credentials.  This should have the properties (a) `user_agent`,
-  `client_id`, `client_secret`, and `refresh_token`, **or** (b) `user_agent` and `access_token`.
+  * @desc snoowrap supports several different options for authentication.
+  * 1. *Refresh token*: To authenticate with a refresh token, pass an object with the properties `user_agent`, `client_id`,
+  `client_secret`, and `refresh_token` to the snoowrap constructor. You will need to get the refresh token from reddit
+  beforehand. A script to automatically generate refresh tokens for you can be found
+  [here](https://github.com/not-an-aardvark/reddit-oauth-helper).
+  * 1. *Username/password*: To authenticate with a username and password, pass an object with the properties `user_agent`,
+  `client_id`, `client_secret`, `username`, and `password` to the snoowrap constructor. Note that username/password
+  authentication is only possible for `script`-type apps.
+  * 1. *Access token*: To authenticate with an access token, pass an object with the properties `user_agent` and `access_token`
+  to the snoowrap constructor. Note that all access tokens expire one hour after being generated, so this method is
+  not recommended for long-term use.
+  * @param {object} options An object containing authentication options. This should always have the property `user_agent`. It
+  must also contain some combination of credentials (see above)
   * @param {string} options.user_agent A unique description of what your app does
   * @param {string} [options.client_id] The client ID of your app (assigned by reddit)
   * @param {string} [options.client_secret] The client secret of your app (assigned by reddit)
-  * @param {string} [options.refresh_token] A refresh token for your app. You will need to get this from reddit beforehand. A
-  script to automatically generate refresh tokens for you can be found
-  [here](https://github.com/not-an-aardvark/reddit-oauth-helper).
-  * @param {string} [options.access_token] An access token for your app. If this is provided, then the
-  client ID/client secret/refresh token are not required. Note that all access tokens expire one hour after being
-  generated; if you want to retain access for longer than that, provide the other credentials instead.
+  * @param {string} [options.username] The username of the account to access
+  * @param {string} [options.password] The password of the account to access
+  * @param {string} [options.refresh_token] A refresh token for your app
+  * @param {string} [options.access_token] An access token for your app
   */
-  constructor ({user_agent, client_id, client_secret, refresh_token, access_token} = {}) {
+  constructor ({user_agent, client_id, client_secret, refresh_token, access_token, username, password} = {}) {
     if (!user_agent) {
       throw new errors.MissingUserAgentError();
     }
-    if (!access_token && (isUndefined(client_id) || isUndefined(client_secret) || isUndefined(refresh_token))) {
+    if (!access_token &&
+        (isUndefined(client_id) || isUndefined(client_secret) || isUndefined(refresh_token)) &&
+        (isUndefined(client_id) || isUndefined(client_secret) || isUndefined(username) || isUndefined(password))
+    ) {
       throw new errors.NoCredentialsError();
     }
-    defaults(this, {user_agent, client_id, client_secret, refresh_token, access_token}, {
+    defaults(this, {user_agent, client_id, client_secret, refresh_token, access_token, username, password}, {
       client_id: null,
       client_secret: null,
       refresh_token: null,
       access_token: null,
+      username: null,
+      password: null,
       ratelimit_remaining: null,
       ratelimit_expiration: null,
       token_expiration: null,
@@ -105,7 +119,7 @@ const snoowrap = class {
   }
   inspect () {
     // Hide confidential information (tokens, client IDs, etc.), as well as private properties, from the console.log output.
-    const keys_for_hidden_values = ['client_secret', 'refresh_token', 'access_token'];
+    const keys_for_hidden_values = ['client_secret', 'refresh_token', 'access_token', 'password'];
     const formatted = mapValues(omitBy(this, (value, key) => key.startsWith('_')), (value, key) => {
       return includes(keys_for_hidden_values, key) ? value && '(redacted)' : value;
     });
