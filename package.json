@@ -11,7 +11,7 @@
     "pretest": "npm run lint && npm run compile",
     "test": "mocha --compilers js:babel-core/register",
     "smoketest": "npm run test -- -g 'smoketest'",
-    "docs": "npm run bundle && jsdoc -c jsdoc.conf.json dist/snoowrap.js dist/request_handler.js dist/objects/RedditContent.js dist/objects/ReplyableContent.js dist/objects/VoteableContent.js dist/objects/Comment.js dist/objects/RedditUser.js dist/objects/Submission.js dist/objects/LiveThread.js dist/objects/PrivateMessage.js dist/objects/Subreddit.js dist/objects/MultiReddit.js dist/objects/WikiPage.js dist/objects/Listing.js",
+    "docs": "mkdir doc || true && npm run bundle && jsdoc -c jsdoc.conf.json dist/snoowrap.js dist/request_handler.js dist/objects/RedditContent.js dist/objects/ReplyableContent.js dist/objects/VoteableContent.js dist/objects/Comment.js dist/objects/RedditUser.js dist/objects/Submission.js dist/objects/LiveThread.js dist/objects/PrivateMessage.js dist/objects/Subreddit.js dist/objects/MultiReddit.js dist/objects/WikiPage.js dist/objects/Listing.js",
     "coverage": "istanbul cover _mocha -- --compilers js:babel-core/register"
   },
   "files": [

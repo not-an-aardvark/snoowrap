@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 rm -rf doc/ || exit 0
-mkdir doc/
 npm run docs
 cd doc/
 git init
