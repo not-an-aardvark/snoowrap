@@ -8,7 +8,7 @@
     "outputSourceFiles": false,
     "outputSourcePath": false,
     "systemName": "snoowrap",
-    "footer": "<script src=\"snoowrap.min.js\"></script>\n\n<script>\nvar DO_NOT_TRACK = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;\nif (DO_NOT_TRACK !== '1' && DO_NOT_TRACK !== 'yes') {\n  !function(s,n,u,w,r,a,p){s.GoogleAnalyticsObject=u;s[u]||(s[u]=function(){\n  (s[u].q=s[u].q||[]).push(arguments)});s[u].l=+new Date;a=n.createElement(w);\n  p=n.getElementsByTagName(w)[0];a.src=r;p.parentNode.insertBefore(a,p)}\n  (window,document,'ga','script','//www.google-analytics.com/analytics.js');\n\n  ga('create', 'UA-77745074-1', 'auto');\n  ga('send', 'pageview');\n}\n</script>",
+    "footer": "<script src=\"snoowrap.min.js\"></script>\n\n<script>\nvar DO_NOT_TRACK = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;\nif (DO_NOT_TRACK !== '1' && DO_NOT_TRACK !== 'yes') {\n  !function(s,n,u,w,r,a,p){s.GoogleAnalyticsObject=u;s[u]||(s[u]=function(){\n  (s[u].q=s[u].q||[]).push(arguments)});s[u].l=+new Date;a=n.createElement(w);\n  p=n.getElementsByTagName(w)[0];a.src=r;p.parentNode.insertBefore(a,p)}\n  (window,document,'ga','script','//www.google-analytics.com/analytics.js');\n\n  ga('create', 'UA-77745074-1', 'auto');\n  ga('send', 'pageview');\n}\n\nconsole.log('Thanks for reading the snoowrap docs! Try using the `snoowrap` global in the dev console.');\n</script>",
     "copyright": "",
     "navType": "vertical",
     "theme": "yeti",
