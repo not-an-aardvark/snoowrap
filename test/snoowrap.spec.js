@@ -1412,7 +1412,7 @@ describe('snoowrap', function () {
       const subs = await multi.subreddits;
       expect(subs).to.be.an.instanceof(Array);
       expect(subs[0]).to.be.an.instanceof(snoowrap.objects.Subreddit);
-      expect(subs[0].display_name).to.equal('AcademicPhilosophy');
+      expect(subs[0].display_name).to.equal('linguistics');
     });
     it('can copy and delete a multireddit', async () => {
       const copied = await multi.copy({new_name: 'copied_multi'});
