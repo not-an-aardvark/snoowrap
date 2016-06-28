@@ -11,7 +11,7 @@ const api_type = 'json';
 * // Get a submission by ID
 * r.get_submission('2np694')
 */
-const Submission = class extends VoteableContent {
+const Submission = class Submission extends VoteableContent {
   constructor (data, _r, _has_fetched) {
     super(data, _r, _has_fetched);
     if (_has_fetched) {
@@ -155,7 +155,7 @@ const Submission = class extends VoteableContent {
   */
   get_related (options = {}) {
     return this._get_listing({uri: `related/${this.name.slice(3)}`, qs: options}).tap(result => {
-      if (result.constructor.name === 'Submission') {
+      if (result.constructor._name === 'Submission') {
         this._r.log.warn('Submission.prototype.get_related has been deprecated upstream, and will not work as expected.');
       }
     });

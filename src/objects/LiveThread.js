@@ -39,7 +39,7 @@ some_livethread.stream.on('update', data => {
 
 * @extends RedditContent
 */
-const LiveThread = class extends RedditContent {
+const LiveThread = class Listing extends RedditContent {
   get _uri () {
     return `live/${this.id}/about`;
   }

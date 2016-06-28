@@ -65,7 +65,7 @@ export function oauth_request (options, attempts = 1) {
       })(options);
     }).then(response => {
       const populated = this._populate(response.body);
-      if (populated && populated.constructor.name === 'Listing') {
+      if (populated && populated.constructor._name === 'Listing') {
         populated._set_uri(response.request.uri.path);
       }
       return populated || response;

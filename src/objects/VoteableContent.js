@@ -9,7 +9,7 @@ const api_type = 'json';
 * <style> #VoteableContent {display: none} </style>
 * @extends ReplyableContent
 */
-const VoteableContent = class extends ReplyableContent {
+const VoteableContent = class VoteableContent extends ReplyableContent {
   /**
   * @summary Casts a vote on this Comment or Submission.
   * @private
@@ -119,14 +119,6 @@ const VoteableContent = class extends ReplyableContent {
   gild () {
     return this._post({uri: `api/v1/gold/gild/${this.name}`}).return(this);
   }
-  /**
-  * @summary Deletes this Comment or Submission
-  * @returns {Promise} A Promise that fulfills with this Comment/Submission when this request is complete
-  * @example r.get_comment('coip909').delete()
-  */
-  delete () {
-    return this._post({uri: 'api/del', form: {id: this.name}}).return(this);
-  }
   _set_inbox_replies_enabled (state) {
     return this._post({uri: 'api/sendreplies', form: {state, id: this.name}});
   }
@@ -150,7 +142,7 @@ const VoteableContent = class extends ReplyableContent {
     if (depth <= 0) {
       return Promise.resolve(this);
     }
-    const replies_key = this.constructor.name === 'Submission' ? 'comments' : 'replies';
+    const replies_key = this.constructor._name === 'Submission' ? 'comments' : 'replies';
     return this[replies_key].fetch_more({amount: limit - this[replies_key].length})
       .tap(replies => {
         this[replies_key] = replies;
@@ -194,5 +186,19 @@ const VoteableContent = class extends ReplyableContent {
     }));
   }
 };
+
+// VoteableContent#delete is not in the class body since Safari 9 can't parse the `delete` function name in class bodies.
+/**
+* @function
+* @name delete
+* @summary Deletes this Comment or Submission
+* @returns {Promise} A Promise that fulfills with this Comment/Submission when this request is complete
+* @example r.get_comment('coip909').delete()
+* @memberof VoteableContent
+* @instance
+*/
+Object.defineProperty(VoteableContent.prototype, 'delete', {value () {
+  return this._post({uri: 'api/del', form: {id: this.name}}).return(this);
+}, configurable: true, writable: true});
 
 export default VoteableContent;

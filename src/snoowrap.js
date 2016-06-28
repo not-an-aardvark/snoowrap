@@ -22,7 +22,7 @@ and `ratelimit_remaining` (the number of requests remaining for the current 10-m
 [API rules](https://github.com/reddit/reddit/wiki/API).) These properties primarily exist for internal use, but they are
 exposed since they are useful externally as well.
 */
-const snoowrap = class {
+const snoowrap = class snoowrap {
   /**
   * @summary Constructs a new requester. This will be necessary if you want to do anything.
   * @desc snoowrap supports several different options for authentication.
@@ -70,9 +70,6 @@ const snoowrap = class {
       _config: default_config,
       _next_request_timestamp: -Infinity
     });
-  }
-  static get name () {
-    return MODULE_NAME;
   }
   _new_object (object_type, content, _has_fetched = false) {
     return Array.isArray(content) ? content : new snoowrap.objects[object_type](content, this, _has_fetched);
@@ -1247,12 +1244,7 @@ snoowrap.objects = mapValues(objects, value => value);
 
 forOwn(KINDS, value => {
   snoowrap.objects[value] = snoowrap.objects[value] || class extends objects.RedditContent {};
-  /* Ensure that for any instance `x` of a snoowrap object, `x.constructor.name` will return the expected name (e.g. 'Comment').
-  This is done by defining a static `name` getter on each constructor. The alternative to this would be to define the
-  constructor name as part of the class syntax (e.g. `class Comment {}` rather than just `class {}`), but that causes issues
-  when snoowrap is minified, because the class names change (e.g. `class Comment {}` might be minified into `class n{}` which
-  would change the `name` property). Explicitly defining a static getter on the constructor avoids this issue. */
-  Object.defineProperty(snoowrap.objects[value], 'name', {get: () => value});
+  Object.defineProperty(snoowrap.objects[value], '_name', {get: () => value});
 });
 
 // Alias all functions on snoowrap's prototype and snoowrap's object prototypes in camelCase.

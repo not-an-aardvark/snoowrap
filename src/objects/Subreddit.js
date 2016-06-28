@@ -16,7 +16,7 @@ const api_type = 'json';
 * // Get a subreddit by name
 * r.get_subreddit('AskReddit')
 */
-const Subreddit = class extends RedditContent {
+const Subreddit = class Subreddit extends RedditContent {
   get _uri () {
     return `r/${this.display_name}/about`;
   }

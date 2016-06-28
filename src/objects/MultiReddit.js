@@ -8,7 +8,7 @@ import RedditContent from './RedditContent.js';
 * // Get a multireddit belonging to a specific user
 * r.get_user('multi-mod').get_multireddit('coding_languages')
 */
-const MultiReddit = class extends RedditContent {
+const MultiReddit = class MultiReddit extends RedditContent {
   constructor (options, _r, _has_fetched) {
     super(options, _r, _has_fetched);
     if (_has_fetched) {
@@ -53,14 +53,6 @@ const MultiReddit = class extends RedditContent {
     })).then(res => {
       this.name = res.name;
     }).return(this);
-  }
-  /**
-  * @summary Deletes this multireddit.
-  * @returns {Promise} A Promise that fulfills when this request is complete
-  * @example r.get_user('not_an_aardvark').get_multireddit('cookie_languages').delete()
-  */
-  delete () {
-    return this._delete({uri: `api/multi${this._path}`});
   }
   /**
   * @summary Edits the properties of this multireddit.
@@ -110,5 +102,19 @@ const MultiReddit = class extends RedditContent {
   /* Note: The endpoints GET/PUT /api/multi/multipath/description and GET /api/multi/multipath/r/srname are intentionally not
   included, because they're redundant and the same thing can be achieved by simply using fetch() and edit(). */
 };
+
+// MultiReddit#delete is not in the class body since Safari 9 can't parse the `delete` function name in class bodies.
+/**
+* @function
+* @name delete
+* @summary Deletes this multireddit.
+* @returns {Promise} A Promise that fulfills when this request is complete
+* @example r.get_user('not_an_aardvark').get_multireddit('cookie_languages').delete()
+* @memberof MultiReddit
+* @instance
+*/
+Object.defineProperty(MultiReddit.prototype, 'delete', {value () {
+  return this._delete({uri: `api/multi${this._path}`});
+}, configurable: true, writable: true});
 
 export default MultiReddit;

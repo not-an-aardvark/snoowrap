@@ -9,7 +9,7 @@ import RedditContent from './RedditContent.js';
 * // Get a wiki page on a given subreddit by name
 * r.get_subreddit('AskReddit').get_wiki_page('rules')
 */
-const WikiPage = class extends RedditContent {
+const WikiPage = class WikiPage extends RedditContent {
   get _uri () {
     return `r/${this.subreddit.display_name}/wiki/${this.title}`;
   }

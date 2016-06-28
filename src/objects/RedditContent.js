@@ -11,7 +11,7 @@ import Listing from './Listing.js';
 * instantiate it directly.
 * <style> #RedditContent {display: none} </style>
 */
-const RedditContent = class {
+const RedditContent = class RedditContent {
   constructor (options, _r, _has_fetched) {
     // _r refers to the snoowrap requester that is used to fetch this content.
     this._r = _r;
@@ -88,10 +88,10 @@ const RedditContent = class {
   toJSON () {
     return mapValues(this._strip_private_props(), (value, key) => {
       if (value instanceof RedditContent && !value._has_fetched) {
-        if (value.constructor.name === 'RedditUser' && USER_KEYS.has(key)) {
+        if (value.constructor._name === 'RedditUser' && USER_KEYS.has(key)) {
           return value.name;
         }
-        if (value.constructor.name === 'Subreddit' && SUBREDDIT_KEYS.has(key)) {
+        if (value.constructor._name === 'Subreddit' && SUBREDDIT_KEYS.has(key)) {
           return value.display_name;
         }
       }
@@ -99,7 +99,7 @@ const RedditContent = class {
     });
   }
   inspect () {
-    return `${this.constructor.name} ${inspect(this._strip_private_props())}`;
+    return `${this.constructor._name} ${inspect(this._strip_private_props())}`;
   }
   _strip_private_props () {
     return pick(this, keys(this).filter(key => !key.startsWith('_')));
@@ -114,7 +114,7 @@ const RedditContent = class {
       }
       return value;
     });
-    return this._r._new_object(this.constructor.name, cloned_props, this._has_fetched);
+    return this._r._new_object(this.constructor._name, cloned_props, this._has_fetched);
   }
   _get_listing (...args) {
     return this._r._get_listing(...args);

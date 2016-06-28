@@ -3,7 +3,7 @@ import {MODERATOR_PERMISSIONS, LIVETHREAD_PERMISSIONS} from './constants.js';
 import {empty_children as empty_more_object} from './objects/More.js';
 
 export function get_empty_replies_listing (item) {
-  if (item.constructor.name === 'Comment') {
+  if (item.constructor._name === 'Comment') {
     return item._r._new_object('Listing', {
       _uri: `comments/${item.link_id.slice(3)}`,
       _query: {comment: item.name.slice(3)},
@@ -12,7 +12,7 @@ export function get_empty_replies_listing (item) {
       _is_comment_list: true
     });
   }
-  if (item.constructor.name === 'Submission') {
+  if (item.constructor._name === 'Submission') {
     return item._r._new_object('Listing', {
       _uri: `comments/${item.id}`,
       _transform: property('comments'),
@@ -58,11 +58,11 @@ tree so that replies are threaded properly. */
 export function build_replies_tree (child_list) {
   const child_map = keyBy(child_list, 'name');
   forEach(child_list, add_empty_replies_listing);
-  forEach(filter(child_list, child => child.constructor.name === 'Comment'), child => {
+  forEach(filter(child_list, child => child.constructor._name === 'Comment'), child => {
     child.replies._more = empty_more_object;
   });
   remove(child_list, child => child_map[child.parent_id]).forEach(child => {
-    if (child.constructor.name === 'More') {
+    if (child.constructor._name === 'More') {
       child_map[child.parent_id].replies._set_more(child);
       child.link_id = child_map[child.parent_id].link_id;
     } else {

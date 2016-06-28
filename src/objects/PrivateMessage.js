@@ -10,7 +10,7 @@ import ReplyableContent from './ReplyableContent.js';
 * r.get_message('51shnw')
 * @extends ReplyableContent
 */
-const PrivateMessage = class extends ReplyableContent {
+const PrivateMessage = class PrivateMessage extends ReplyableContent {
   get _uri () {
     return `message/messages/${this.name.slice(3)}`;
   }

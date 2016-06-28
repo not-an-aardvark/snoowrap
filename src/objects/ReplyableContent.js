@@ -7,7 +7,7 @@ const api_type = 'json';
 * <style> #ReplyableContent {display: none} </style>
 * @extends RedditContent
 */
-const ReplyableContent = class extends RedditContent {
+const ReplyableContent = class ReplyableContent extends RedditContent {
   /**
   * @summary Removes this Comment, Submission or PrivateMessage from public listings.
   * @desc This requires the authenticated user to be a moderator of the subreddit with the `posts` permission.

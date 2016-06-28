@@ -12,7 +12,7 @@ import VoteableContent from './VoteableContent.js';
 *
 * @extends VoteableContent
 */
-const Comment = class extends VoteableContent {
+const Comment = class Comment extends VoteableContent {
   constructor (options, _r, _has_fetched) {
     super(options, _r, _has_fetched);
     if (_has_fetched) {

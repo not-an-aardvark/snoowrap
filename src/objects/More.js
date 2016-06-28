@@ -20,7 +20,7 @@ of available information (e.g. all the child IDs of a `more` object are known on
 behavior.
 */
 
-const More = class {
+const More = class More {
   constructor (options, _r) {
     assign(this, options);
     this._r = _r;

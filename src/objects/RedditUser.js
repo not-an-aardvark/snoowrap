@@ -11,7 +11,7 @@ import RedditContent from './RedditContent.js';
 * // Get a user with the given username
 * r.get_user('spez')
 */
-const RedditUser = class extends RedditContent {
+const RedditUser = class RedditUser extends RedditContent {
   get _uri () {
     if (typeof this.name !== 'string' || !USERNAME_REGEX.test(this.name)) {
       throw new InvalidUserError(this.name);

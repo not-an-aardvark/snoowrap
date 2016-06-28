@@ -39,7 +39,7 @@ you don't have to worry about the distinction.
 * <style> #Listing {display: none} </style>
 * @extends Array
 */
-const Listing = class extends Array {
+const Listing = class Listing extends Array {
   constructor (options = {}, _r) {
     super();
     this.push(...options.children || []);
