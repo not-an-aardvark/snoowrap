@@ -541,6 +541,26 @@ describe('snoowrap', function () {
     it('allows fetch_more() et al. to be chained', async () => {
       expect(await comments.fetch_more(1)[0]).to.exist();
     });
+    it('allows an `append` parameter indicating whether new elements should be appended to regular Listings', async () => {
+      const initial_list = await r.get_top({t: 'all', limit: 20});
+      expect(initial_list).to.have.lengthOf(20);
+      const expanded_list = await initial_list.fetch_more({amount: 30});
+      expect(expanded_list).to.have.lengthOf(50);
+      const next_list_part = await initial_list.fetch_more({amount: 30, append: false});
+      expect(next_list_part).to.have.lengthOf(30);
+      expect(initial_list).to.have.lengthOf(20);
+      expect(_.map(expanded_list, 'id').slice(0, 20)).to.eql(_.map(initial_list, 'id'));
+      expect(_.map(expanded_list, 'id').slice(20)).to.eql(_.map(next_list_part, 'id'));
+    });
+    it('allows an `append` parameter indicating whether new elements should be passed to comment Listings', async () => {
+      const initial_comment_length = comments.length;
+      const expanded_comments = await comments.fetch_more({amount: 10});
+      expect(expanded_comments).to.have.lengthOf(initial_comment_length + 10);
+      const next_comments = await comments.fetch_more({amount: 10, append: false});
+      expect(next_comments).to.have.lengthOf(10);
+      expect(_.map(expanded_comments, 'id').slice(0, initial_comment_length)).to.eql(_.map(comments, 'id'));
+      expect(_.map(expanded_comments, 'id').slice(initial_comment_length)).to.eql(_.map(next_comments, 'id'));
+    });
     it('allows backwards pagination by supplying a `count` parameter to Listing fetches', async () => {
       const top_twenty_posts = await r.get_top({time: 'all', limit: 20});
       expect(top_twenty_posts).to.have.lengthOf(20);
@@ -550,6 +570,18 @@ describe('snoowrap', function () {
       const extended_reverse_listing = await reverse_listing.fetch_more(20);
       expect(extended_reverse_listing).to.have.lengthOf(19);
       expect(_.map(extended_reverse_listing, 'name').slice(-10)).to.eql(_.map(reverse_listing, 'name'));
+    });
+    it('allows an `append` parameter with backwards pagination', async () => {
+      const top_twenty_posts = await r.get_top({time: 'all', limit: 20});
+      expect(top_twenty_posts).to.have.lengthOf(20);
+      const reverse_listing = await r.get_top({time: 'all', limit: 10, before: _.last(top_twenty_posts).name});
+      expect(reverse_listing).to.have.lengthOf(10);
+      const extended_reverse_listing = await reverse_listing.fetch_more(20);
+      const next_listing_part = await reverse_listing.fetch_more({amount: 20, append: false});
+      expect(extended_reverse_listing).to.have.lengthOf(19);
+      expect(next_listing_part).to.have.lengthOf(9);
+      expect(_.map(extended_reverse_listing, 'id').slice(0, 9)).to.eql(_.map(next_listing_part, 'id'));
+      expect(_.map(extended_reverse_listing, 'id').slice(9)).to.eql(_.map(reverse_listing, 'id'));
     });
     it('allows more than 100 items to be fetched initially by repeatedly making requests', async () => {
       const lots_of_top_posts = await r.get_top({time: 'all', limit: 120});

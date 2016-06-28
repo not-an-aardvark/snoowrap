@@ -105,7 +105,9 @@ const Listing = class extends Array {
   * });
   */
   fetch_more (options) {
-    const parsed_options = defaults(isObject(options) ? clone(options) : {amount: options}, {skip_replies: false});
+    const parsed_options = defaults(
+      isObject(options) ? clone(options) : {amount: options}, {skip_replies: false, append: true}
+    );
     if (!isNumber(parsed_options.amount) || Number.isNaN(parsed_options.amount)) {
       throw new InvalidMethodCallError('Failed to fetch Listing. (`amount` parameter was missing or invalid)');
     }
@@ -144,6 +146,9 @@ const Listing = class extends Array {
       method: this._method
     }).then(this._transform).then(response => {
       const cloned = this._clone();
+      if (!options.append) {
+        cloned._empty();
+      }
       if (cloned._query.before) {
         cloned.unshift(...response);
         cloned._query.before = response._query.before;
@@ -168,6 +173,9 @@ const Listing = class extends Array {
   _fetch_more_comments (options) {
     return this._more.fetch_more(options).then(more_comments => {
       const cloned = this._clone();
+      if (!options.append) {
+        cloned._empty();
+      }
       cloned.push(...more_comments);
       cloned._more.children = cloned._more.children.slice(options.amount);
       return cloned;
@@ -175,8 +183,7 @@ const Listing = class extends Array {
   }
   /**
   * @summary Fetches all of the items in this Listing, only stopping when there are none left.
-  * @param {object} [options]
-  * @param {boolean} [options.skip_replies=false] See {@link Listing#fetch_more}
+  * @param {object} [options] Fetching options -- see {@link Listing#fetch_more}
   * @returns {Promise} A new fully-fetched Listing. Keep in mind that this method has the potential to exhaust your
   ratelimit quickly if the Listing doesn't have a clear end (e.g. with posts on the front page), so use it with discretion.
   * @example
@@ -208,6 +215,9 @@ const Listing = class extends Array {
   _set_more (more_obj) {
     this._more = more_obj;
     this._is_comment_list = true;
+  }
+  _empty () {
+    this.splice(0, this.length);
   }
   toJSON () {
     return Array.from(this).map(item => item && item.toJSON ? item.toJSON() : item);
