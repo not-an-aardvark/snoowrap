@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.4.0 (2016-07-01)
+
+* Added an `append` option to the `Listing#fetch_more` functions indicating whether fetched items should be returned with the existing Listing elements, or returned separately.
+* Fixed an issue where snoowrap wasn't working on OSX Safari
+
 ## v1.3.0 (2016-06-22)
 
 * Added support for username/password authentication by passing `username` and `password` into the snoowrap constructor
