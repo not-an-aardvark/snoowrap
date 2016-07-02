@@ -17,6 +17,7 @@
       "never"
     ],
     "brace-style": 1,
+    "comma-dangle": 1,
     "comma-spacing": 1,
     "comma-style": 1,
     "computed-property-spacing": 1,
