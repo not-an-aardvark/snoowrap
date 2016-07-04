@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.4.1 (2016-07-04)
+
+* Fixed an issue where `Subreddit#edit_settings` sometimes threw errors
+
 ## v1.4.0 (2016-07-01)
 
 * Added an `append` option to the `Listing#fetch_more` functions indicating whether fetched items should be returned with the existing Listing elements, or returned separately.
