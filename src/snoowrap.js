@@ -847,7 +847,7 @@ const snoowrap = class snoowrap {
       'header-title': header_title, hide_ads, iden: captcha_iden, lang, link_type, name, over_18, public_description,
       public_traffic, show_media, spam_comments, spam_links, spam_selfposts, sr, submit_link_label, submit_text,
       submit_text_label, suggested_comment_sort, title, type: subreddit_type || type, wiki_edit_age, wiki_edit_karma, wikimode
-    }}).then(handle_json_errors(this.get_subreddit(name)));
+    }}).then(handle_json_errors(this.get_subreddit(name || sr)));
   }
   /**
   * @summary Creates a new subreddit.
