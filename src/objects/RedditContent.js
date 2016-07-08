@@ -124,7 +124,7 @@ const RedditContent = class RedditContent {
 forEach(HTTP_VERBS, method => {
   Object.defineProperty(RedditContent.prototype, `_${method}`, {value (...args) {
     return this._r[`_${method}`](...args);
-  }});
+  }, configurable: true, writable: true});
 });
 
 export default RedditContent;

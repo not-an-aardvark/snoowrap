@@ -1225,9 +1225,11 @@ const snoowrap = class snoowrap {
   }
 };
 
+const class_func_descriptors = {configurable: true, writable: true};
+
 /* Add the request_handler functions (oauth_request, credentialed_client_request, etc.) to the snoowrap prototype. Use
 Object.defineProperties to ensure that the properties are non-enumerable. */
-Object.defineProperties(snoowrap.prototype, mapValues(request_handler, func => ({value: func})));
+Object.defineProperties(snoowrap.prototype, mapValues(request_handler, func => ({value: func, ...class_func_descriptors})));
 
 forEach(HTTP_VERBS, method => {
   /* Define method shortcuts for each of the HTTP verbs. i.e. `snoowrap.prototype._post` is the same as `oauth_request` except
@@ -1235,7 +1237,7 @@ forEach(HTTP_VERBS, method => {
   properties are non-enumerable. */
   Object.defineProperty(snoowrap.prototype, `_${method}`, {value (options) {
     return promise_wrap(this.oauth_request({...options, method}));
-  }});
+  }, ...class_func_descriptors});
 });
 
 /* `objects` will be an object containing getters for each content type, due to the way objects are exported from
@@ -1244,14 +1246,14 @@ snoowrap.objects = mapValues(objects, value => value);
 
 forOwn(KINDS, value => {
   snoowrap.objects[value] = snoowrap.objects[value] || class extends objects.RedditContent {};
-  Object.defineProperty(snoowrap.objects[value], '_name', {get: () => value});
+  Object.defineProperty(snoowrap.objects[value], '_name', {value, configurable: true});
 });
 
 // Alias all functions on snoowrap's prototype and snoowrap's object prototypes in camelCase.
 values(snoowrap.objects).concat(snoowrap).map(func => func.prototype).forEach(funcProto => {
   Object.getOwnPropertyNames(funcProto)
     .filter(name => !name.startsWith('_') && name.includes('_') && isFunction(funcProto[name]))
-    .forEach(name => Object.defineProperty(funcProto, camelCase(name), {value: funcProto[name]}));
+    .forEach(name => Object.defineProperty(funcProto, camelCase(name), {value: funcProto[name], ...class_func_descriptors}));
 });
 
 snoowrap.errors = errors;
