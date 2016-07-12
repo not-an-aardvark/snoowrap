@@ -1259,8 +1259,8 @@ values(snoowrap.objects).concat(snoowrap).map(func => func.prototype).forEach(fu
 snoowrap.errors = errors;
 snoowrap.version = VERSION;
 
-if (!module.parent && typeof window !== 'undefined') { // check if the code is being run in a browser through browserify
-  /* global window */
+if (!module.parent && typeof window !== 'undefined') { // check if the code is being run in a browser through browserify, etc.
+  // eslint-disable-next-line no-undef
   window[MODULE_NAME] = snoowrap;
 }
 
