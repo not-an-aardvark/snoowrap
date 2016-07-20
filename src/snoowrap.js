@@ -67,7 +67,7 @@ const snoowrap = class snoowrap {
       ratelimit_expiration: null,
       token_expiration: null,
       scope: null,
-      _config: default_config,
+      _config: assign(Object.create(null), default_config),
       _next_request_timestamp: -Infinity
     });
   }

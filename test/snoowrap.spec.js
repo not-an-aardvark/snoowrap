@@ -149,6 +149,12 @@ describe('snoowrap', function () {
     it('throws a TypeError if an invalid config option is set', () => {
       expect(() => r.config({invalid_config_option: true})).to.throw(TypeError);
     });
+    it('does not share config properties between snoowrap instances', () => {
+      const initial_delay = r2.config().request_delay;
+      r.config({request_delay: 100000});
+      expect(r.config().request_delay).to.equal(100000);
+      expect(r2.config().request_delay).to.equal(initial_delay);
+    });
     it('does not use Object.prototype for the config object', () => {
       expect(Object.getPrototypeOf(r.config())).to.be.null();
     });

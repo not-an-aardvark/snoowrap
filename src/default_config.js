@@ -1,7 +1,5 @@
-import {assign} from 'lodash';
 // Defines the default config values. For more information on these, see the documentation for snoowrap#config()
-const config = Object.create(null);
-assign(config, {
+export default {
   endpoint_domain: 'reddit.com',
   request_delay: 0,
   request_timeout: 30000,
@@ -10,6 +8,4 @@ assign(config, {
   max_retry_attempts: 3,
   warnings: true,
   debug: false
-});
-
-export default config;
+};
