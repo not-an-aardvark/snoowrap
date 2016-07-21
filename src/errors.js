@@ -25,7 +25,7 @@ function sub_error (name, default_message) {
 }
 
 export const RateLimitError = sub_error('RateLimitError', `${MODULE_NAME} refused to continue because reddit's ratelimit was exceeded. For more information about reddit's ratelimit, please consult reddit's API rules at ${API_RULES_LINK}.`);
-export const InvalidUserError = sub_error('InvalidUserError, Cannot fetch information on the given user. Please be sure you have the right username.');
+export const InvalidUserError = sub_error('InvalidUserError', 'Cannot fetch information on the given user. Please be sure you have the right username.');
 export const InvalidMethodCallError = sub_error('InvalidMethodCallError', '');
 export const NoCredentialsError = sub_error('NoCredentialsError', `Missing credentials passed to ${MODULE_NAME} constructor. You must pass an object containing either (a) user_agent, client_id, client_secret, and refresh_token properties, or (b) user_agent and access_token properties. For information, please read the docs at ${DOCS_LINK}.`);
 export const MissingUserAgentError = sub_error('MissingUserAgentError', `You must supply an object with the user_agent property to the snoowrap constructor. For more details on user_agent strings, please see: ${API_RULES_LINK}`);
