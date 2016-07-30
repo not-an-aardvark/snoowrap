@@ -7,6 +7,7 @@ const snoowrap = require('..');
 describe('snoowrap', function () {
   this.timeout(300000);
   this.slow(Infinity);
+  this.retries(3);
   let r, r2;
   before(() => {
     if (process.env.CI) {
