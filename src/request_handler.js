@@ -1,7 +1,7 @@
 import {includes} from 'lodash';
 import Promise from 'bluebird';
 import request_promise from 'request-promise';
-import {MAX_TOKEN_LATENCY} from './constants.js';
+import {IDEMPOTENT_HTTP_VERBS, MAX_TOKEN_LATENCY} from './constants.js';
 import {RateLimitWarning, RateLimitError} from './errors.js';
 const request = request_promise.defaults({json: true});
 
@@ -69,7 +69,10 @@ export function oauth_request (options, attempts = 1) {
         populated._set_uri(response.request.uri.path);
       }
       return populated || response;
-    }).catch(e => includes(this._config.retry_error_codes, e.statusCode) && attempts < this._config.max_retry_attempts, e => {
+    }).catch(...this._config.retry_error_codes.map(retry_code => ({statusCode: retry_code})), e => {
+      if (!includes(IDEMPOTENT_HTTP_VERBS, e.response.request.method) || attempts >= this._config.max_retry_attempts) {
+        throw e;
+      }
       /* If the error's status code is in the user's configured `retry_status_codes` and this request still has attempts
       remaining, retry this request and increment the `attempts` counter. */
       this.log.warn(
@@ -77,14 +80,17 @@ export function oauth_request (options, attempts = 1) {
         `Retrying request (attempt ${attempts + 1}/${this._config.max_retry_attempts})...`
       );
       return this.oauth_request(options, attempts + 1);
-    }).catch(e => e.statusCode === 401 && this.access_token && this.token_expiration - Date.now() < MAX_TOKEN_LATENCY, () => {
+    }).catch({statusCode: 401}, e => {
       /* If the server returns a 401 error, it's possible that the access token expired during the latency period as this
       request was being sent. In this scenario, snoowrap thought that the access token was valid for a few more seconds, so it
       didn't refresh the token, but the token had expired by the time the request reached the server. To handle this issue,
       invalidate the access token and call oauth_request again, automatically causing the token to be refreshed. */
-      this.access_token = null;
-      this.token_expiration = null;
-      return this.oauth_request(options, attempts);
+      if (this.access_token && this.token_expiration - Date.now() < MAX_TOKEN_LATENCY) {
+        this.access_token = null;
+        this.token_expiration = null;
+        return this.oauth_request(options, attempts);
+      }
+      throw e;
     });
 }
 

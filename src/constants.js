@@ -37,6 +37,7 @@ export const USERNAME_REGEX = /^[\w-]{1,20}$/;
 export const MODERATOR_PERMISSIONS = ['wiki', 'posts', 'access', 'mail', 'config', 'flair'];
 export const LIVETHREAD_PERMISSIONS = ['update', 'edit', 'manage'];
 export const HTTP_VERBS = ['delete', 'get', 'head', 'patch', 'post', 'put'];
+export const IDEMPOTENT_HTTP_VERBS = ['delete', 'get', 'head', 'put'];
 export const MAX_TOKEN_LATENCY = 10000;
 export const MAX_API_INFO_AMOUNT = 100;
 export const MAX_API_MORECHILDREN_AMOUNT = 20;

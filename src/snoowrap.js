@@ -92,9 +92,9 @@ const snoowrap = class snoowrap {
   reddit's ratelimit is exceeded. If set to `true` when the ratelimit is exceeded, snoowrap will queue all further requests,
   and will attempt to send them again after the current ratelimit period expires (which happens every 10 minutes). If set
   to `false`, snoowrap will simply throw an error when reddit's ratelimit is exceeded.
-  * @param {Number[]} [options.retry_error_codes=[502, 503, 504, 522]] If reddit responds to a request with one of these error
-  codes, snoowrap will retry the request, up to a maximum of `options.max_retry_attempts` requests in total. (These errors
-  usually indicate that there was an temporary issue on reddit's end, and retrying the request has a decent chance of
+  * @param {Number[]} [options.retry_error_codes=[502, 503, 504, 522]] If reddit responds to an idempotent request with one of
+  these error codes, snoowrap will retry the request, up to a maximum of `options.max_retry_attempts` requests in total. (Thes
+   errors usually indicate that there was an temporary issue on reddit's end, and retrying the request has a decent chance of
   success.) This behavior can be disabled by simply setting this property to an empty array.
   * @param {Number} [options.max_retry_attempts=3] See `retry_error_codes`.
   * @param {boolean} [options.warnings=true] snoowrap may occasionally log warnings, such as deprecation notices, to the
