@@ -729,7 +729,7 @@ describe('snoowrap', function () {
       const expanded_sub = await sub.expand_replies({limit: 2, depth: 20});
       const fetched_sub = await sub.fetch();
       const get_last_visible_path = comment => {
-        return comment.replies.length ? '.replies[0]' + get_last_visible_path(comment.replies[0]) : '';
+        return comment.replies.length ? 'replies[0]' + get_last_visible_path(comment.replies[0]) : '';
       };
       const first_path = get_last_visible_path(fetched_sub.comments[0]);
       const second_path = get_last_visible_path(fetched_sub.comments[1]);
