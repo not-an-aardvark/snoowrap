@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.4.2 (2016-07-30)
+
+* Fixed an issue where configurations were shared between snoowrap instances instead of being independent
+* Fixed an issue where non-idempotent API requests would be retried after 503 errors, which would occasionally lead to duplicate results. To fix this, only idempotent requests (`GET`, `PUT`, and `DELETE`) are retried.
+
 ## v1.4.1 (2016-07-04)
 
 * Fixed an issue where `Subreddit#edit_settings` sometimes threw errors
