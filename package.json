@@ -61,7 +61,7 @@
     "ink-docstrap": "^1.2.1",
     "istanbul": "^1.0.0-alpha.2",
     "jsdoc": "^3.4.0",
-    "mocha": "^2.5.3",
+    "mocha": "^3.0.0",
     "moment": "^2.14.1",
     "uglify-js-harmony": "^2.6.2"
   }
