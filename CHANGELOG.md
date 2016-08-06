@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.5.0 (2016-08-06)
+
+* Added a `Subreddit#get_modmail` function to get modmail for a specific subreddit
+* snoowrap now requests gzipped content for all requests, which should reduce the amount of bandwidth it uses ([#35](https://github.com/not-an-aardvark/snoowrap/pull/35)).
+* Fixed an issue where `RedditUser#get_saved` would return hidden content instead of saved content ([#36](https://github.com/not-an-aardvark/snoowrap/issues/36))
+
 ## v1.4.2 (2016-07-30)
 
 * Fixed an issue where configurations were shared between snoowrap instances instead of being independent

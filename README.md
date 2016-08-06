@@ -1,4 +1,4 @@
-# snoowrap [![Build Status](https://travis-ci.org/not-an-aardvark/snoowrap.svg?branch=v1.4.2)](https://travis-ci.org/not-an-aardvark/snoowrap)
+# snoowrap [![Build Status](https://travis-ci.org/not-an-aardvark/snoowrap.svg?branch=v1.5.0)](https://travis-ci.org/not-an-aardvark/snoowrap)
 
 A fully-featured Node.js wrapper for the reddit API. ([Documentation](https://not-an-aardvark.github.io/snoowrap))
 
