@@ -47,6 +47,7 @@ export function oauth_request (options, attempts = 1) {
       return request.defaults({
         headers: {'user-agent': this.user_agent},
         baseUrl: `https://oauth.${this._config.endpoint_domain}`,
+        gzip: true,
         qs: {raw_json: 1},
         auth: {bearer: token},
         resolveWithFullResponse: true,
