@@ -3,7 +3,7 @@ import Promise from 'bluebird';
 import request_promise from 'request-promise';
 import {IDEMPOTENT_HTTP_VERBS, MAX_TOKEN_LATENCY} from './constants.js';
 import {RateLimitWarning, RateLimitError} from './errors.js';
-const request = request_promise.defaults({json: true});
+const request = request_promise.defaults({json: true, gzip: true});
 
 /**
 * @summary Sends an oauth-authenticated request to the reddit server, and returns the server's response.
@@ -47,7 +47,6 @@ export function oauth_request (options, attempts = 1) {
       return request.defaults({
         headers: {'user-agent': this.user_agent},
         baseUrl: `https://oauth.${this._config.endpoint_domain}`,
-        gzip: true,
         qs: {raw_json: 1},
         auth: {bearer: token},
         resolveWithFullResponse: true,
