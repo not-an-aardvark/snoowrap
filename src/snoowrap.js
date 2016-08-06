@@ -1259,8 +1259,7 @@ snoowrap.errors = errors;
 snoowrap.version = VERSION;
 
 if (!module.parent && typeof window !== 'undefined') { // check if the code is being run in a browser through browserify, etc.
-  // eslint-disable-next-line no-undef
-  window[MODULE_NAME] = snoowrap;
+  window[MODULE_NAME] = snoowrap; // eslint-disable-line no-undef
 }
 
 module.exports = snoowrap;
