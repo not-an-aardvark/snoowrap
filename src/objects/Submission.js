@@ -156,7 +156,7 @@ const Submission = class Submission extends VoteableContent {
   get_related (options = {}) {
     return this._get_listing({uri: `related/${this.name.slice(3)}`, qs: options}).tap(result => {
       if (result.constructor._name === 'Submission') {
-        this._r.log.warn('Submission.prototype.get_related has been deprecated upstream, and will not work as expected.');
+        this._r._log.warn('Submission.prototype.get_related has been deprecated upstream, and will not work as expected.');
       }
     });
   }

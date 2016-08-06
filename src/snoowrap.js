@@ -123,21 +123,19 @@ const snoowrap = class snoowrap {
     });
     return `${MODULE_NAME} ${util.inspect(formatted)}`;
   }
-  get log () {
-    /* eslint-disable no-console */
+  get _log () {
     return {
       warn: (...args) => {
         if (this._config.warnings) {
-          console.warn('[warning]', ...args);
+          console.warn('[warning]', ...args); // eslint-disable-line no-console
         }
       },
       debug: (...args) => {
         if (this._config.debug) {
-          console.log('[debug]', ...args);
+          console.log('[debug]', ...args); // eslint-disable-line no-console
         }
       }
     };
-    /* eslint-enable no-console */
   }
   /**
   * @summary Gets information on a reddit user with a given name.

@@ -197,7 +197,7 @@ const Listing = class Listing extends Array {
     return this.fetch_more({...options, amount: Infinity});
   }
   fetch_until (options) {
-    this._r.log.warn('Listing.prototype.fetch_until is deprecated -- use Listing.prototype.fetch_more instead.');
+    this._r._log.warn('Listing.prototype.fetch_until is deprecated -- use Listing.prototype.fetch_more instead.');
     return this.fetch_more({...options, amount: options.length - this.length});
   }
   inspect () {

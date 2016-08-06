@@ -56,7 +56,7 @@ export function oauth_request (options, attempts = 1) {
             this.ratelimit_remaining = +response.headers['x-ratelimit-remaining'];
             this.ratelimit_expiration = Date.now() + response.headers['x-ratelimit-reset'] * 1000;
           }
-          this.log.debug(
+          this._log.debug(
             `Received a ${response.statusCode} status code from a \`${response.request.method}\` request`,
             `sent to ${response.request.uri.href}. ratelimit_remaining: ${this.ratelimit_remaining}`
           );
@@ -75,7 +75,7 @@ export function oauth_request (options, attempts = 1) {
       }
       /* If the error's status code is in the user's configured `retry_status_codes` and this request still has attempts
       remaining, retry this request and increment the `attempts` counter. */
-      this.log.warn(
+      this._log.warn(
         `Received status code ${e.statusCode} from reddit.`,
         `Retrying request (attempt ${attempts + 1}/${this._config.max_retry_attempts})...`
       );
@@ -101,7 +101,7 @@ export function _await_ratelimit () {
     if (this._config.continue_after_ratelimit_error) {
       /* If the `continue_after_ratelimit_error` setting is enabled, queue the request, wait until the next ratelimit
       period, and then send it. */
-      this.log.warn(RateLimitWarning(time_until_expiry));
+      this._log.warn(RateLimitWarning(time_until_expiry));
       return Promise.delay(time_until_expiry);
     }
     // Otherwise, throw an error.
