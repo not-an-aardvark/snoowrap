@@ -40,7 +40,8 @@ const snoowrap = class snoowrap {
   must also contain some combination of credentials (see above)
   * @param {string} options.user_agent A unique description of what your app does
   * @param {string} [options.client_id] The client ID of your app (assigned by reddit)
-  * @param {string} [options.client_secret] The client secret of your app (assigned by reddit)
+  * @param {string} [options.client_secret] The client secret of your app (assigned by reddit). If you are using a refresh token
+  with an installed app (which does not have a client secret), pass an empty string as your `client_secret`.
   * @param {string} [options.username] The username of the account to access
   * @param {string} [options.password] The password of the account to access
   * @param {string} [options.refresh_token] A refresh token for your app
