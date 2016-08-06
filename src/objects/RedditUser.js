@@ -215,7 +215,7 @@ const RedditUser = class RedditUser extends RedditContent {
   * // ]
   */
   get_saved_content (options) {
-    return this._get_listing({uri: `user/${this.name}/hidden`, qs: options});
+    return this._get_listing({uri: `user/${this.name}/saved`, qs: options});
   }
   /**
   * @summary Gets a Listing of this user's content which has been gilded.
