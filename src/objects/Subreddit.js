@@ -478,6 +478,15 @@ const Subreddit = class Subreddit extends RedditContent {
     return this._r.get_controversial(this.display_name, options);
   }
   /**
+  * @summary Gets the moderator mail for this subreddit.
+  * @param {object} [options] Options for the resulting Listing
+  * @returns {Promise} A Listing containing PrivateMessage objects
+  * @example r.get_subreddit('snoowrap').get_modmail().then(console.log)
+  */
+  get_modmail (options) {
+    return this._get_listing({uri: `r/${this.display_name}/about/message/moderator`, qs: options});
+  }
+  /**
   * @summary Gets the moderation log for this subreddit.
   * @param {object} [options={}] Options for the resulting Listing
   * @param {string[]} [options.mods] An array of moderator names that the results should be restricted to

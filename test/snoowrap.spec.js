@@ -1227,6 +1227,12 @@ describe('snoowrap', function () {
       expect(modmail[0]).to.be.an.instanceof(snoowrap.objects.PrivateMessage);
       expect(modmail[0].subreddit).to.be.an.instanceof(snoowrap.objects.Subreddit);
     });
+    it('can get modmail for a specific sub', async () => {
+      const modmail = await r.get_subreddit('snoowrap_testing').get_modmail({limit: 1});
+      expect(modmail).to.have.lengthOf(1);
+      expect(modmail[0]).to.be.an.instanceof(snoowrap.objects.PrivateMessage);
+      expect(modmail[0].subreddit.display_name).to.equal('snoowrap_testing');
+    });
     it('can get a list of sent messages', async () => {
       const sent = await r.get_sent_messages({limit: 1});
       expect(sent).to.have.lengthOf(1);
