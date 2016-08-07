@@ -54,7 +54,7 @@ export function oauth_request (options, attempts = 1) {
         transform: (body, response) => {
           if (Object.prototype.hasOwnProperty.call(response.headers, 'x-ratelimit-remaining')) {
             this.ratelimit_remaining = +response.headers['x-ratelimit-remaining'];
-            this.ratelimit_expiration = Date.now() + response.headers['x-ratelimit-reset'] * 1000;
+            this.ratelimit_expiration = Date.now() + (response.headers['x-ratelimit-reset'] * 1000);
           }
           this._log.debug(
             `Received a ${response.statusCode} status code from a \`${response.request.method}\` request`,
@@ -180,7 +180,7 @@ a stable feature, using it is rarely necessary unless an access token is needed 
 */
 export function update_access_token () {
   // If the current access token is missing or expired, and it is possible to get a new one, do so.
-  if ((!this.access_token || Date.now() > this.token_expiration) && (this.refresh_token || this.username && this.password)) {
+  if ((!this.access_token || Date.now() > this.token_expiration) && (this.refresh_token || (this.username && this.password))) {
     return this.credentialed_client_request({
       method: 'post',
       uri: 'api/v1/access_token',
@@ -189,7 +189,7 @@ export function update_access_token () {
         : {grant_type: 'password', username: this.username, password: this.password}
     }).then(token_info => {
       this.access_token = token_info.access_token;
-      this.token_expiration = Date.now() + token_info.expires_in * 1000;
+      this.token_expiration = Date.now() + (token_info.expires_in * 1000);
       this.scope = token_info.scope.split(' ');
       return this.access_token;
     });

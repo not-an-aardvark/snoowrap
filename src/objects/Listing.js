@@ -78,7 +78,7 @@ const Listing = class Listing extends Array {
 
       It is important to check for `null` here rather than any falsey value, because when an empty Listing is initialized, its
       `after` and `before` properties are both `undefined`, but calling these empty Listings `finished` would be incorrect. */
-      : !this._uri || isNull(this._query.after) && isNull(this._query.before);
+      : !this._uri || (isNull(this._query.after) && isNull(this._query.before));
   }
   /**
   * @summary Fetches some more items
