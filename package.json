@@ -56,7 +56,7 @@
     "browserify": "^13.1.0",
     "chai": "^3.5.0",
     "dirty-chai": "^1.2.2",
-    "eslint": "^3.0.0",
+    "eslint": "^3.3.0",
     "eslint-plugin-babel": "^3.3.0",
     "ink-docstrap": "^1.2.1",
     "istanbul": "^1.0.0-alpha.2",

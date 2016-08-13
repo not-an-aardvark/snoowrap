@@ -29,6 +29,7 @@
     ],
     "eol-last": 2,
     "eqeqeq": 2,
+    "func-call-spacing": 2,
     "indent": [
       1,
       2
@@ -55,6 +56,7 @@
     "no-extra-label": 2,
     "no-extra-parens": [2, "all", {"nestedBinaryExpressions": false}],
     "no-floating-decimal": 2,
+    "no-global-assign": 2,
     "no-implied-eval": 2,
     "no-label-var": 2,
     "no-lone-blocks": 1,
@@ -72,10 +74,11 @@
     "no-self-compare": 2,
     "no-sequences": 1,
     "no-shadow": 2,
-    "no-spaced-func": 1,
     "no-tabs": 2,
+    "no-template-curly-in-string": 2,
     "no-trailing-spaces": 1,
     "no-unneeded-ternary": 1,
+    "no-unsafe-negation": 2,
     "no-unused-expressions": 2,
     "no-unused-vars": 1,
     "no-useless-call": 2,
