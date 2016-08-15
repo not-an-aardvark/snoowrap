@@ -95,7 +95,7 @@ r.get_subreddit('some_subreddit_name').get_modqueue({limit: 100}).filter(/some-r
 
 // Automatically creating a stickied thread for a moderated subreddit
 r.get_subreddit('some_subreddit_name')
-  .create_selfpost({title: 'Daily thread', text: 'Discuss things here'})
+  .submit_selfpost({title: 'Daily thread', text: 'Discuss things here'})
   .sticky()
   .distinguish()
   .approve()
