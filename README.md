@@ -72,8 +72,7 @@ const otherRequester = new snoowrap({
   password: 'put your password here'
 })
 
-/* That's the entire setup process, now you can just make requests. I would recommend including async functions in your project
-by using babel.js (or some equivalent), but this example file uses vanilla Promises for simplicity. */
+// That's the entire setup process, now you can just make requests.
 
 // Submitting a link to a subreddit
 r.get_subreddit('gifs').submit_link({
@@ -88,7 +87,7 @@ r.get_hot().map(post => post.title).then(console.log);
 r.get_submission('4j8p6d').expand_replies({limit: Infinity, depth: Infinity}).then(console.log)
 
 // Automating moderation tasks
-r.get_subreddit('some_subreddit_name').get_modqueue({limit: 100}).filter(/some-removal-condition/.test).forEach(flaggedItem => {
+r.get_subreddit('some_subreddit_name').get_modqueue({limit: 100}).filter(someRemovalCondition).forEach(flaggedItem => {
   flaggedItem.remove();
   flaggedItem.subreddit.ban_user(flaggedItem.author);
 });
