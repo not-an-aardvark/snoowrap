@@ -78,7 +78,7 @@ const snoowrap = class snoowrap {
   /**
   * @summary Retrieves or modifies the configuration options for this requester.
   * @param {object} [options] A map of `{[config property name]: value}`. Note that any omitted config properties will simply
-  retain whatever value they had previously (In other words, if you only want to change one property, you only need to put
+  retain whatever value they had previously. (In other words, if you only want to change one property, you only need to put
   that one property in this parameter. To get the current configuration without modifying anything, simply omit this
   parameter.)
   * @param {string} [options.endpoint_domain='reddit.com'] The endpoint where requests should be sent
@@ -94,7 +94,7 @@ const snoowrap = class snoowrap {
   and will attempt to send them again after the current ratelimit period expires (which happens every 10 minutes). If set
   to `false`, snoowrap will simply throw an error when reddit's ratelimit is exceeded.
   * @param {Number[]} [options.retry_error_codes=[502, 503, 504, 522]] If reddit responds to an idempotent request with one of
-  these error codes, snoowrap will retry the request, up to a maximum of `options.max_retry_attempts` requests in total. (Thes
+  these error codes, snoowrap will retry the request, up to a maximum of `max_retry_attempts` requests in total. (These
    errors usually indicate that there was an temporary issue on reddit's end, and retrying the request has a decent chance of
   success.) This behavior can be disabled by simply setting this property to an empty array.
   * @param {Number} [options.max_retry_attempts=3] See `retry_error_codes`.
@@ -105,7 +105,7 @@ const snoowrap = class snoowrap {
   * @returns {object} An updated Object containing all of the configuration values
   * @example
   *
-  * r.config({request_delay: 1000, suppress_warnings: true});
+  * r.config({request_delay: 1000, warnings: false});
   * // sets the request delay to 1000 milliseconds, and suppresses warnings.
   */
   config (options) {
