@@ -163,7 +163,7 @@ const Listing = class Listing extends Array {
       if (this._is_comment_list) {
         cloned._more = cloned._more || response._more || empty_children;
         if (response.length > options.amount) {
-          cloned._cached_lookahead = cloned.splice(options.amount);
+          cloned._cached_lookahead = Array.from(cloned.splice(options.amount));
         }
       }
       return cloned.fetch_more({...options, amount: options.amount - response.length});
