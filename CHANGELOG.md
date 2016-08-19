@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.6.0 (2016-08-18)
+
+* Reduced the size of the browser bundle by 77%
+* Fixed an issue where snoowrap did not work on iOS Safari
+* Fixed an issue where an error could get thrown while fetching comment Listings in newer browsers
+* Changed the name of the prebuild browser files to include the snoowrap version, e.g. `snoowrap-v1.6.0.min.js`. Please use these files rather than the default `snoowrap.min.js` file from now on.
+
 ## v1.5.0 (2016-08-06)
 
 * Added a `Subreddit#get_modmail` function to get modmail for a specific subreddit
