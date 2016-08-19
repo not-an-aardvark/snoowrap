@@ -1,9 +1,11 @@
 import {includes} from 'lodash';
-import Promise from 'bluebird';
-import request_promise from 'request-promise';
+import Promise from './Promise.js';
 import {IDEMPOTENT_HTTP_VERBS, MAX_TOKEN_LATENCY} from './constants.js';
 import {RateLimitWarning, RateLimitError} from './errors.js';
-const request = request_promise.defaults({json: true, gzip: true});
+const request = (
+  // Use XHR if available, to avoid inflating the bundle size with all of the request-promise library.
+  typeof XMLHttpRequest !== 'undefined' ? require('./xhr') : require('request-promise')
+).defaults({json: true, gzip: true});
 
 /**
 * @summary Sends an oauth-authenticated request to the reddit server, and returns the server's response.
@@ -66,7 +68,7 @@ export function oauth_request (options, attempts = 1) {
     }).then(response => {
       const populated = this._populate(response.body);
       if (populated && populated.constructor._name === 'Listing') {
-        populated._set_uri(response.request.uri.path);
+        populated._set_uri(response.request.uri.href);
       }
       return populated || response;
     }).catch(...this._config.retry_error_codes.map(retry_code => ({statusCode: retry_code})), e => {

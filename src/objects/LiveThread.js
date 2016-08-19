@@ -1,5 +1,6 @@
 import {EventEmitter} from 'events';
-import WebSocket from 'ws';
+// eslint-disable-next-line no-undef
+const WebSocket = typeof window !== 'undefined' ? window.WebSocket : require('ws');
 import {format_livethread_permissions, handle_json_errors} from '../helpers.js';
 import RedditContent from './RedditContent.js';
 const api_type = 'json';
@@ -49,10 +50,12 @@ const LiveThread = class Listing extends RedditContent {
     Object.defineProperty(response_object, 'stream', {get: () => {
       if (!response_object._raw_stream) {
         response_object._raw_stream = new WebSocket(response_object.websocket_url);
-        response_object._raw_stream.on('message', data => {
+        const handler = data => {
           const parsed = this._r._populate(JSON.parse(data));
           response_object._populated_stream.emit(parsed.type, parsed.payload);
-        });
+        };
+        if (typeof response_object._raw_stream.on === 'function') response_object._raw_stream.on('message', handler);
+        else response_object._raw_stream.onmessage = messageEvent => handler(messageEvent.data);
       }
       return response_object._populated_stream;
     }});

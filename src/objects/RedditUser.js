@@ -54,7 +54,7 @@ const RedditUser = class RedditUser extends RedditContent {
   * @example r.get_user('actually_an_aardvark').friend({note: 'Is an aardvark'})
   */
   friend ({note} = {}) {
-    return this._put({uri: `api/v1/me/friends/${this.name}`, json: {user: this.name, note}}).return(this);
+    return this._put({uri: `api/v1/me/friends/${this.name}`, body: {user: this.name, note}}).return(this);
   }
   /**
   * @summary Removes this user from the requester's friend list.

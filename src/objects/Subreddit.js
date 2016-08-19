@@ -1,5 +1,5 @@
 import {chunk, flatten, identity, map, omit} from 'lodash';
-import Promise from 'bluebird';
+import Promise from '../Promise.js';
 import {Readable} from 'stream';
 import {createReadStream} from 'fs';
 import {format_mod_permissions, handle_json_errors, rename_key} from '../helpers.js';
@@ -432,6 +432,8 @@ const Subreddit = class Subreddit extends RedditContent {
   }
   /**
   * @summary Gets a single random Submission from this subreddit.
+  * @desc **Note**: This function will not work when snoowrap is running in a browser, because the reddit server sends a
+  redirect which cannot be followed by a CORS request.
   * @returns {Promise} The retrieved Submission object
   * @example
   *
@@ -632,6 +634,8 @@ const Subreddit = class Subreddit extends RedditContent {
   }
   /**
   * @summary Gets a subreddit's CSS stylesheet.
+  * @desc **Note**: This function will not work when snoowrap is running in a browser, because the reddit server sends a
+  redirect which cannot be followed by a CORS request.
   * @desc **Note**: This method will return a 404 error if the subreddit in question does not have a custom stylesheet.
   * @returns {Promise} A Promise for a string containing the subreddit's CSS.
   * @example

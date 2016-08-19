@@ -1,5 +1,5 @@
 import {assign, concat, flatten, forEach, pick, remove} from 'lodash';
-import Promise from 'bluebird';
+import Promise from '../Promise.js';
 import {add_empty_replies_listing, build_replies_tree, handle_json_errors} from '../helpers.js';
 import {MAX_API_INFO_AMOUNT, MAX_API_MORECHILDREN_AMOUNT} from '../constants.js';
 const api_type = 'json';

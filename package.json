@@ -5,11 +5,12 @@
   "description": "A Node.js wrapper for the reddit API",
   "main": "dist/snoowrap.js",
   "scripts": {
-    "compile": "babel -d dist/ src/",
-    "bundle": "npm run compile && browserify --im dist/snoowrap.js -o doc/snoowrap.js && uglifyjs doc/snoowrap.js -o doc/snoowrap.min.js -m --screw-ie8",
-    "lint": "eslint src/ test/",
+    "compile": "babel -d dist/ src/ && browserify --im test/snoowrap.spec.js -o test/_browser.spec.js -t [ babelify ]",
+    "bundle": "npm run compile && browserify dist/snoowrap.js -o doc/snoowrap.js && uglifyjs doc/snoowrap.js -o doc/snoowrap.min.js -m --screw-ie8",
+    "lint": "eslint --ignore-path .gitignore .",
     "pretest": "npm run lint && npm run compile",
-    "test": "mocha --compilers js:babel-core/register",
+    "test": "mocha --compilers js:babel-core/register test/snoowrap.spec.js",
+    "test:browser": "npm run pretest && open test/run-tests.html",
     "smoketest": "npm run test -- -g 'smoketest'",
     "docs": "mkdir doc || true && npm run bundle && jsdoc -c jsdoc.conf.json dist/snoowrap.js dist/request_handler.js dist/objects/RedditContent.js dist/objects/ReplyableContent.js dist/objects/VoteableContent.js dist/objects/Comment.js dist/objects/RedditUser.js dist/objects/Submission.js dist/objects/LiveThread.js dist/objects/PrivateMessage.js dist/objects/Subreddit.js dist/objects/MultiReddit.js dist/objects/WikiPage.js dist/objects/Listing.js",
     "coverage": "istanbul cover _mocha -- --compilers js:babel-core/register"
@@ -34,7 +35,7 @@
   },
   "homepage": "https://github.com/not-an-aardvark/snoowrap",
   "dependencies": {
-    "bluebird": "^3.3.3",
+    "bluebird": "^3.4.1",
     "lodash": "^4.5.1",
     "promise-chains": "^0.3.11",
     "request-promise": "^3.0.0",
@@ -53,6 +54,7 @@
     "babel-plugin-transform-es2015-spread": "^6.8.0",
     "babel-plugin-transform-es2015-template-literals": "^6.8.0",
     "babel-plugin-transform-object-rest-spread": "^6.8.0",
+    "babelify": "^7.3.0",
     "browserify": "^13.1.0",
     "chai": "^3.5.0",
     "dirty-chai": "^1.2.2",
@@ -64,5 +66,9 @@
     "mocha": "^3.0.2",
     "moment": "^2.14.1",
     "uglify-js-harmony": "^2.6.2"
+  },
+  "browser": {
+    "request-promise": false,
+    "ws": false
   }
 }

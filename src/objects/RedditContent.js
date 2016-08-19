@@ -1,5 +1,5 @@
 import {assign, cloneDeep, forEach, keys, mapValues, pick} from 'lodash';
-import Promise from 'bluebird';
+import Promise from '../Promise.js';
 import promise_wrap from 'promise-chains';
 import {inspect} from 'util';
 import {HTTP_VERBS, USER_KEYS, SUBREDDIT_KEYS} from '../constants.js';

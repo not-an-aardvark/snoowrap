@@ -1,6 +1,6 @@
 import {assign, clone, defaults, defaultsDeep, identity, isEmpty, isFunction, isNil, isNull, isNumber, isObject, keys, last,
   omitBy, pick} from 'lodash';
-import Promise from 'bluebird';
+import Promise from '../Promise.js';
 import promise_wrap from 'promise-chains';
 import {inspect} from 'util';
 import {parse as url_parse} from 'url';

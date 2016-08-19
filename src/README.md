@@ -37,7 +37,8 @@ A few other useful commands:
 
 ```bash
 npm run lint # runs only the linter
-npm run smoketest # runs a single test and then stops. This is useful to make sure your setup is correct.
+npm run test:browser # runs the unit tests in your browser
+npm run smoketest # runs two tests and then stops. This is useful to make sure your setup is correct.
 npm run compile # compiles the source code using babel. This automatically gets run before the tests are run, but it's useful if you want to use `require('.')` in the node REPL.
 npm run docs # builds the documentation into a doc/ folder
 ```

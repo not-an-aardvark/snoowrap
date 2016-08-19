@@ -2,6 +2,10 @@ import RedditContent from './RedditContent.js';
 
 /**
 * A class representing a wiki page on a subreddit.
+*
+* **Note:** Due to a bug in reddit's CORS settings, it is not possible to fetch the contents of a wiki page on a private
+subreddit while running snoowrap in a browser. (This issue does not apply when running snoowrap in Node.js.)
+*
 * <style> #WikiPage {display: none} </style>
 * @extends RedditContent
 * @example

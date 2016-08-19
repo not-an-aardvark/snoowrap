@@ -1,6 +1,6 @@
 import {assign, camelCase, defaults, forEach, forOwn, findKey, includes, isEmpty, isFunction, isObject, isString, isUndefined,
   map, mapValues, omit, omitBy, values} from 'lodash';
-import Promise from 'bluebird';
+import Promise from './Promise.js';
 import promise_wrap from 'promise-chains';
 import util from 'util';
 import * as request_handler from './request_handler.js';
@@ -517,6 +517,8 @@ const snoowrap = class snoowrap {
   }
   /**
   * @summary Gets a single random Submission.
+  * @desc **Note**: This function will not work when snoowrap is running in a browser, because the reddit server sends a
+  redirect which cannot be followed by a CORS request.
   * @param {string} [subreddit_name] The subreddit to get the random submission. If not provided, the post is fetched from
   the front page of reddit.
   * @returns {Promise} The retrieved Submission object
@@ -1053,6 +1055,8 @@ const snoowrap = class snoowrap {
   }
   /**
   * @summary Checks whether a given username is available for registration
+  * @desc **Note:** This function will not work when snoowrap is running in a browser, due to an issue with reddit's CORS
+  settings.
   * @param {string} name The username in question
   * @returns {Promise} A Promise that fulfills with a Boolean (`true` or `false`)
   * @example

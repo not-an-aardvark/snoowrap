@@ -4,8 +4,9 @@ const Promise = require('bluebird');
 const _ = require('lodash');
 const moment = require('moment');
 const snoowrap = require('..');
+const isBrowser = typeof window !== 'undefined';
 describe('snoowrap', function () {
-  this.timeout(300000);
+  this.timeout(60000);
   this.slow(Infinity);
   this.retries(3);
   let r, r2;
@@ -367,11 +368,12 @@ describe('snoowrap', function () {
     it("can fetch information directly from a subreddit's info page", async () => {
       expect(await subreddit.created_utc).to.equal(1453703345);
     });
-    it('can get and modify a subreddit stylesheet', async () => {
+    it('can get and modify a subreddit stylesheet', async function () {
       const gibberish = require('crypto').randomBytes(4).toString('hex');
       const new_stylesheet = `.stylesheet-${gibberish}{}`; // it has to be valid CSS or reddit returns a 404 when fetching it
       await subreddit.update_stylesheet({css: new_stylesheet});
       // Reddit caches stylesheets for awhile, so this is annoying to test reliably. Make sure the sheet is fetched, at least
+      if (isBrowser) return this.skip();
       expect(await subreddit.get_stylesheet()).to.match(/^\.stylesheet-[0-9a-f]{8}/);
     });
     it("can get and modify a subreddit's settings (test skipped depending on captcha requirement)", async function () {
@@ -400,7 +402,8 @@ describe('snoowrap', function () {
       const gibberish = require('crypto').randomBytes(10).toString('hex');
       await r.get_subreddit(gibberish).unsubscribe().then(expect.fail, err => expect(err.statusCode).to.equal(404));
     });
-    it('can upload images to a subreddit', async () => {
+    it('can upload images to a subreddit from the filesystem', async function () {
+      if (isBrowser) return this.skip();
       await subreddit.upload_header_image({file: 'test/test_image.png'});
     });
     it("can get a subreddit's rules", async () => {
@@ -440,12 +443,14 @@ describe('snoowrap', function () {
     it("can get comments by index before they're fetched", async () => {
       expect(await submission.comments[6].body).to.equal('pumpkin pie');
     });
-    it('can get a random submission from a particular subreddit', async () => {
+    it('can get a random submission from a particular subreddit', async function () {
+      if (isBrowser) return this.skip();
       const random_post = await r.get_subreddit('gifs').get_random_submission();
       expect(random_post).to.be.an.instanceof(snoowrap.objects.Submission);
       expect(random_post.subreddit.display_name).to.equal('gifs');
     });
-    it('can get a random submission from any subreddit', async () => {
+    it('can get a random submission from any subreddit', async function () {
+      if (isBrowser) return this.skip();
       const random_post = await r.get_random_submission();
       expect(random_post).to.be.an.instanceof(snoowrap.objects.Submission);
     });
@@ -498,7 +503,8 @@ describe('snoowrap', function () {
       await submission.set_suggested_sort('top');
       expect(await submission.refresh().suggested_sort).to.equal('top');
     });
-    it('can get the "related submissions" endpoint (deprecated on reddit.com)', async () => {
+    it('can get the "related submissions" endpoint (deprecated on reddit.com)', async function () {
+      if (isBrowser) return this.skip();
       expect(await submission.get_related()).to.be.an.instanceof(snoowrap.objects.Submission);
     });
   });
@@ -1337,12 +1343,13 @@ describe('snoowrap', function () {
     it('can get a list of oauth scopes', async () => {
       expect(await r.get_oauth_scope_list()).to.have.property('creddits');
     });
-    it('can check whether a given username is available', async () => {
+    it('can check whether a given username is available', async function () {
+      if (isBrowser) return this.skip();
       expect(await r.check_username_availability('not_an_aardvark')).to.be.false();
     });
   });
 
-  describe('wiki content', () => {
+  (isBrowser ? describe.skip : describe)('wiki content', () => {
     let page1, page2;
     before(() => {
       const sub = r.get_subreddit('snoowrap_testing');
