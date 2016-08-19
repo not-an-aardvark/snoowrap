@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
 rm -rf doc/ || exit 0
-git clone "https://${GH_REF}" --branch gh-pages --single-branch doc
+git clone "https://$GH_REF" --branch gh-pages --single-branch doc
 npm run docs
-cp doc/snoowrap.js "doc/snoowrap-$TRAVIS_TAG.js"
-cp doc/snoowrap.min.js "doc/snoowrap-$TRAVIS_TAG.min.js"
+browserify dist/snoowrap.js -o "doc/snoowrap-$TRAVIS_TAG.js"
+uglifyjs "doc/snoowrap-$TRAVIS_TAG.js" -o "doc/snoowrap-$TRAVIS_TAG.min.js" -m --screw-ie8
 cd doc/
 git config user.name "not-an-aardvark"
 git config user.email "not-an-aardvark@users.noreply.github.com"
