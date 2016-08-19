@@ -1,3 +1,4 @@
+/* eslint-env mocha */
 'use strict';
 const expect = require('chai').use(require('dirty-chai')).expect;
 const Promise = require('bluebird');
