@@ -702,7 +702,7 @@ const snoowrap = class snoowrap {
   * @param {object} options
   * @param {RedditUser|Subreddit|string} options.to The recipient of the message.
   * @param {string} options.subject The message subject (100 characters max)
-  * @param {string} options.text The body of the message, in raw markdown text_edit
+  * @param {string} options.text The body of the message, in raw markdown text
   * @param {Subreddit|string} [options.from_subreddit] If provided, the message is sent as a modmail from the specified
   subreddit.
   * @param {string} [options.captcha_iden] A captcha identifier. This is only necessary if the authenticated account
