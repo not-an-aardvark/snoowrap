@@ -13,6 +13,10 @@ const request = (
 However, keep in mind that there are usually better alternatives to using this function. For instance, this
 function can be used to send a POST request to the 'api/vote' endpoint in order to upvote a comment, but it's generally
 easier to just use snoowrap's [upvote function]{@link VoteableContent#upvote}.
+*
+* If you're using this function to access an API feature/endpoint that is unsupported by snoowrap, please consider [creating an
+issue for it](https://github.com/not-an-aardvark/snoowrap/issues) so that the functionality can be added to snoowrap more
+directly.
 * @param {object} options Options for the request. For documentation on these options, see the
 [Request API](https://www.npmjs.com/package/request). Supported options include `uri`, `qs`, `form`, `headers`, `method`,
 `auth`, and `body`. A default `baseUrl` parameter of `this.config().endpoint_domain` is internally included by default, so it
