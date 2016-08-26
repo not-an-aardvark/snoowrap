@@ -1,4 +1,4 @@
-# snoowrap [![Build Status](https://travis-ci.org/not-an-aardvark/snoowrap.svg?branch=v1.6.0)](https://travis-ci.org/not-an-aardvark/snoowrap)
+# snoowrap [![Build Status](https://travis-ci.org/not-an-aardvark/snoowrap.svg?branch=v1.6.1)](https://travis-ci.org/not-an-aardvark/snoowrap)
 
 A fully-featured Node.js wrapper for the reddit API. ([Documentation](https://not-an-aardvark.github.io/snoowrap))
 
@@ -172,8 +172,8 @@ snoowrap is usable with module bundlers such as [browserify](http://browserify.o
 
 Alternatively, prebuilt versions are available:
 
-* [snoowrap.js](https://not-an-aardvark.github.io/snoowrap/snoowrap-v1.6.0.js)
-* [snoowrap.min.js](https://not-an-aardvark.github.io/snoowrap/snoowrap-v1.6.0.min.js) (86kB gzipped)
+* [snoowrap.js](https://not-an-aardvark.github.io/snoowrap/snoowrap-v1.6.1.js)
+* [snoowrap.min.js](https://not-an-aardvark.github.io/snoowrap/snoowrap-v1.6.1.min.js) (86kB gzipped)
 
 When run in a browser, snoowrap will be assigned to the global variable `window.snoowrap`.
 

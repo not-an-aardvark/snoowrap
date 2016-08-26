@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.6.1 (2016-08-26)
+
+* Fixed an issue where snoowrap's package.json file would cause errors when bundling with webpack
+
 ## v1.6.0 (2016-08-18)
 
 * Reduced the size of the browser bundle by 77%
