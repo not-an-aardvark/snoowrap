@@ -1,8 +1,5 @@
-import package_info from '../package.json';
-// SCREAMING_SNAKE_CASE MAKES EVERYTHING SEEM LIKE I'M SHOUTING AAAAAAAA
-export const MODULE_NAME = package_info.name;
-export const VERSION = package_info.version;
-export const ISSUE_REPORT_LINK = package_info.bugs.url;
+export const MODULE_NAME = 'snoowrap';
+export const VERSION = '1.6.0';
 export const DOCS_LINK = 'https://not-an-aardvark.github.io/snoowrap/';
 export const API_RULES_LINK = 'https://github.com/reddit/reddit/wiki/API';
 /* USER_KEYS and SUBREDDIT_KEYS are keys that are replaced by RedditUser and Subreddit objects when encountered in
