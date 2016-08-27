@@ -172,8 +172,8 @@ snoowrap is usable with module bundlers such as [browserify](http://browserify.o
 
 Alternatively, prebuilt versions are available:
 
-* [snoowrap.js](https://not-an-aardvark.github.io/snoowrap/snoowrap-v1.6.1.js)
-* [snoowrap.min.js](https://not-an-aardvark.github.io/snoowrap/snoowrap-v1.6.1.min.js) (80kB gzipped)
+* [snoowrap.js](https://not-an-aardvark.github.io/snoowrap/snoowrap-v1.js)
+* [snoowrap.min.js](https://not-an-aardvark.github.io/snoowrap/snoowrap-v1.min.js) (80kB gzipped)
 
 When run in a browser, snoowrap will be assigned to the global variable `window.snoowrap`.
 

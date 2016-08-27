@@ -1,13 +1,26 @@
 #!/bin/bash
 set -e
-rm -rf doc/ || exit 0
-git clone "https://$GH_REF" --branch gh-pages --single-branch doc
-npm run docs
-browserify dist/snoowrap.js -o "doc/snoowrap-$TRAVIS_TAG.js"
-uglifyjs "doc/snoowrap-$TRAVIS_TAG.js" -o "doc/snoowrap-$TRAVIS_TAG.min.js" -m --screw-ie8
-cd doc/
-git config user.name "not-an-aardvark"
-git config user.email "not-an-aardvark@users.noreply.github.com"
-git add -A
-git commit -qm "Docs for commit $TRAVIS_COMMIT"
-git push -q "https://${GH_TOKEN}@${GH_REF}" gh-pages > /dev/null 2>&1
+
+if [[ -n "$TRAVIS_TAG" ]]; then
+  FULL_VERSION=$TRAVIS_TAG
+else
+  FULL_VERSION="v$(npm info . version)"
+fi
+
+MAJOR_VERSION=$(echo $FULL_VERSION | grep -Eo '^v[0-9]+')
+
+# example FULL_VERSION: 'v1.2.3'
+# example MAJOR_VERSION: 'v1'
+
+mkdir doc || true
+npm run compile
+
+# List all the files explicitly rather than globbing to ensure that the classes appear in the right order in the docs
+node_modules/.bin/jsdoc -c jsdoc.conf.json dist/snoowrap.js dist/request_handler.js dist/objects/RedditContent.js dist/objects/ReplyableContent.js dist/objects/VoteableContent.js dist/objects/Comment.js dist/objects/RedditUser.js dist/objects/Submission.js dist/objects/LiveThread.js dist/objects/PrivateMessage.js dist/objects/Subreddit.js dist/objects/MultiReddit.js dist/objects/WikiPage.js dist/objects/Listing.js
+# Create the bundle files, e.g. 'snoowrap-v1.2.3.js' and 'snoowrap-v1.2.3.min.js'
+node_modules/.bin/browserify dist/snoowrap.js -o "doc/snoowrap-$FULL_VERSION.js"
+node_modules/.bin/uglifyjs "doc/snoowrap-$FULL_VERSION.js" -o "doc/snoowrap-$FULL_VERSION.min.js" -m --screw-ie8
+
+# Create aliases with only the major version number, e.g. 'snoowrap-v1.js' and 'snoowrap-v1.min.js'
+cp "doc/snoowrap-$FULL_VERSION.js" "doc/snoowrap-$MAJOR_VERSION.js"
+cp "doc/snoowrap-$FULL_VERSION.min.js" "doc/snoowrap-$MAJOR_VERSION.min.js"

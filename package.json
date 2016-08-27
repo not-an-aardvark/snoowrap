@@ -11,7 +11,7 @@
     "test": "mocha --compilers js:babel-core/register test/snoowrap.spec.js",
     "test:browser": "npm run pretest && open test/run-tests.html",
     "smoketest": "npm run test -- -g 'smoketest'",
-    "docs": "mkdir doc || true && npm run compile && jsdoc -c jsdoc.conf.json dist/snoowrap.js dist/request_handler.js dist/objects/RedditContent.js dist/objects/ReplyableContent.js dist/objects/VoteableContent.js dist/objects/Comment.js dist/objects/RedditUser.js dist/objects/Submission.js dist/objects/LiveThread.js dist/objects/PrivateMessage.js dist/objects/Subreddit.js dist/objects/MultiReddit.js dist/objects/WikiPage.js dist/objects/Listing.js",
+    "build-docs": "scripts/build_docs.sh",
     "coverage": "istanbul cover _mocha -- --compilers js:babel-core/register test/snoowrap.spec.js"
   },
   "files": [
