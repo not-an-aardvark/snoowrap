@@ -11,13 +11,13 @@ import Listing from './Listing.js';
 * <style> #RedditContent {display: none} </style>
 */
 const RedditContent = class RedditContent {
-  constructor (options, _r, _has_fetched) {
+  constructor (options, _r, _hasFetched) {
     // _r refers to the snoowrap requester that is used to fetch this content.
     this._r = _r;
     this._fetch = null;
-    this._has_fetched = !!_has_fetched;
+    this._hasFetched = !!_hasFetched;
     assign(this, options);
-    if (typeof Proxy !== 'undefined' && !this._has_fetched && _r._config.proxies) {
+    if (typeof Proxy !== 'undefined' && !this._hasFetched && _r._config.proxies) {
       return new Proxy(this, {get (target, key) {
         return key in target || key === 'length' || key in Promise.prototype ? target[key] : target.fetch()[key];
       }});
@@ -36,21 +36,21 @@ const RedditContent = class RedditContent {
   function is called again. To refresh an object, use refresh().
   * @example
   *
-  * r.get_user('not_an_aardvark').fetch().then(user_info => {
-  *   console.log(user_info.name); // 'not_an_aardvark'
-  *   console.log(user_info.created_utc); // 1419104352
+  * r.getUser('not_an_aardvark').fetch().then(userInfo => {
+  *   console.log(userInfo.name); // 'not_an_aardvark'
+  *   console.log(userInfo.created_utc); // 1419104352
   * });
   *
-  * r.get_comment('d1xchqn').fetch().then(comment => comment.body).then(console.log)
+  * r.getComment('d1xchqn').fetch().then(comment => comment.body).then(console.log)
   * // => 'This is a little too interesting for my liking'
   *
   * // In environments that support ES2015 Proxies, the above line is equivalent to:
-  * r.get_comment('d1xchqn').body.then(console.log);
+  * r.getComment('d1xchqn').body.then(console.log);
   * // => 'This is a little too interesting for my liking'
   */
   fetch () {
     if (!this._fetch) {
-      this._fetch = this._r._promise_wrap(this._r._get({uri: this._uri}).bind(this).then(this._transform_api_response));
+      this._fetch = this._r._promiseWrap(this._r._get({uri: this._uri}).then(res => this._transformApiResponse(res)));
     }
     return this._fetch;
   }
@@ -59,12 +59,12 @@ const RedditContent = class RedditContent {
   * @returns {Promise} A newly-fetched version of this content
   * @example
   *
-  * var some_comment = r.get_comment('cmfkyus');
-  * var initial_comment_body = some_comment.fetch().then(comment => comment.body);
+  * var someComment = r.getComment('cmfkyus');
+  * var initialCommentBody = some_comment.fetch().then(comment => comment.body);
   *
   * setTimeout(() => {
-  *   some_comment.refresh().then(refreshed_comment => {
-  *     if (initial_comment_body.value() !== refreshed_comment.body) {
+  *   someComment.refresh().then(refreshedComment => {
+  *     if (initialCommentBody.value() !== refreshedComment.body) {
   *       console.log('This comment has changed since 10 seconds ago.');
   *     }
   *   });
@@ -81,12 +81,12 @@ const RedditContent = class RedditContent {
   * @returns {object} A version of this object with all the private properties stripped
   * @example
   *
-  * var user = r.get_user('not_an_aardvark');
+  * var user = r.getUser('not_an_aardvark');
   * JSON.stringify(user) // => '{"name":"not_an_aardvark"}'
   */
   toJSON () {
-    return mapValues(this._strip_private_props(), (value, key) => {
-      if (value instanceof RedditContent && !value._has_fetched) {
+    return mapValues(this._stripPrivateProps(), (value, key) => {
+      if (value instanceof RedditContent && !value._hasFetched) {
         if (value.constructor._name === 'RedditUser' && USER_KEYS.has(key)) {
           return value.name;
         }
@@ -98,25 +98,25 @@ const RedditContent = class RedditContent {
     });
   }
   inspect () {
-    return `${this.constructor._name} ${inspect(this._strip_private_props())}`;
+    return `${this.constructor._name} ${inspect(this._stripPrivateProps())}`;
   }
-  _strip_private_props () {
+  _stripPrivateProps () {
     return pick(this, keys(this).filter(key => !key.startsWith('_')));
   }
-  _transform_api_response (response_object) {
-    return response_object;
+  _transformApiResponse (response) {
+    return response;
   }
   _clone ({deep = false} = {}) {
-    const cloned_props = mapValues(this, value => {
+    const clonedProps = mapValues(this, value => {
       if (deep) {
         return value instanceof RedditContent || value instanceof Listing ? value._clone({deep}) : cloneDeep(value);
       }
       return value;
     });
-    return this._r._new_object(this.constructor._name, cloned_props, this._has_fetched);
+    return this._r._newObject(this.constructor._name, clonedProps, this._hasFetched);
   }
-  _get_listing (...args) {
-    return this._r._get_listing(...args);
+  _getListing (...args) {
+    return this._r._getListing(...args);
   }
 };
 

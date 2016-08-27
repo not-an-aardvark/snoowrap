@@ -9,7 +9,7 @@ import RedditContent from './RedditContent.js';
 * @example
 *
 * // Get a user with the given username
-* r.get_user('spez')
+* r.getUser('spez')
 */
 const RedditUser = class RedditUser extends RedditContent {
   get _uri () {
@@ -22,27 +22,27 @@ const RedditUser = class RedditUser extends RedditContent {
   * @summary Gives reddit gold to a user
   * @param {number} months The number of months of gold to give. This must be a number between 1 and 36.
   * @returns {Promise} A Promise that fulfills when the request is complete
-  * @example r.get_user('not_an_aardvark').give_gold(12)
+  * @example r.getUser('not_an_aardvark').giveGold(12)
   */
-  give_gold (months) {
+  giveGold (months) {
     /* Ideally this would allow for more than 36 months by sending multiple requests, but I don't have the resources to test
     that code, and it's probably better that such a big investment be deliberate anyway. */
     if (typeof months !== 'number' || months < 1 || months > 36) {
-      throw new InvalidMethodCallError('Invalid argument to RedditUser.give_gold; `months` must be between 1 and 36.');
+      throw new InvalidMethodCallError('Invalid argument to RedditUser#giveGold; `months` must be between 1 and 36.');
     }
     return this._post({uri: `api/v1/gold/give/${this.name}`, form: {months}});
   }
   /**
   * Assigns flair to this user on a given subreddit (as a moderator).
   * @param {object} options
-  * @param {string} options.subreddit_name The subreddit that flair should be assigned on
+  * @param {string} options.subredditName The subreddit that flair should be assigned on
   * @param {string} [options.text=''] The text that the user's flair should have
   * @param {string} [options.css_class=''] The CSS class that the user's flair should have
   * @returns {Promise} A Promise that fulfills with the current user after the request is complete
-  * @example r.get_user('not_an_aardvark').assign_flair({subreddit_name: 'snoowrap', text: "Isn't an aardvark"})
+  * @example r.getUser('not_an_aardvark').assignFlair({subredditName: 'snoowrap', text: "Isn't an aardvark"})
   */
-  assign_flair (options) {
-    return this._r._assign_flair({...options, name: this.name}).return(this);
+  assignFlair (options) {
+    return this._r._assignFlair({...options, name: this.name}).return(this);
   }
   /**
   * @summary Adds this user as a friend, or modifies their friend note.
@@ -51,7 +51,7 @@ const RedditUser = class RedditUser extends RedditContent {
   * @param {object} options
   * @param {string} [options.note] An optional note to add on the user (300 characters max)
   * @returns {Promise} A Promise that fulfills when this request is complete
-  * @example r.get_user('actually_an_aardvark').friend({note: 'Is an aardvark'})
+  * @example r.getUser('actually_an_aardvark').friend({note: 'Is an aardvark'})
   */
   friend ({note} = {}) {
     return this._put({uri: `api/v1/me/friends/${this.name}`, body: {user: this.name, note}}).return(this);
@@ -59,7 +59,7 @@ const RedditUser = class RedditUser extends RedditContent {
   /**
   * @summary Removes this user from the requester's friend list.
   * @returns {Promise} A Promise that fulfills with this user when the request is complete
-  * @example r.get_user('actually_an_aardvark').unfriend()
+  * @example r.getUser('actually_an_aardvark').unfriend()
   */
   unfriend () {
     return this._delete({uri: `api/v1/me/friends/${this.name}`});
@@ -69,10 +69,10 @@ const RedditUser = class RedditUser extends RedditContent {
   * @returns {Promise} A Promise that fulfills with an object containing friend information
   * @example
   *
-  * r.get_user('not_an_aardvark').get_friend_information().then(console.log)
+  * r.getUser('not_an_aardvark').getFriendInformation().then(console.log)
   * // => { date: 1460318190, note: 'Is an aardvark', name: 'actually_an_aardvark', id: 't2_q3519' }
   */
-  get_friend_information () {
+  getFriendInformation () {
     return this._get({uri: `api/v1/me/friends/${this.name}`});
   }
   /**
@@ -80,14 +80,14 @@ const RedditUser = class RedditUser extends RedditContent {
   * @returns {Promise} A TrophyList containing this user's trophies
   * @example
   *
-  * r.get_user('not_an_aardvark').get_trophies().then(console.log)
+  * r.getUser('not_an_aardvark').getTrophies().then(console.log)
   * // => TrophyList { trophies: [
   * //  Trophy { ... },
   * //  Trophy { ... },
   * //  ...
   * // ] }
   */
-  get_trophies () {
+  getTrophies () {
     return this._get({uri: `api/v1/user/${this.name}/trophies`});
   }
   /**
@@ -96,7 +96,7 @@ const RedditUser = class RedditUser extends RedditContent {
   * @returns {Promise} A Listing containing Submissions and Comments
   * @example
   *
-  * r.get_user('spez').get_overview().then(console.log)
+  * r.getUser('spez').getOverview().then(console.log)
   * // => Listing [
   * //  Comment { ... },
   * //  Comment { ... },
@@ -104,8 +104,8 @@ const RedditUser = class RedditUser extends RedditContent {
   * //  ...
   * // ]
   */
-  get_overview (options) {
-    return this._get_listing({uri: `user/${this.name}/overview`, qs: options});
+  getOverview (options) {
+    return this._getListing({uri: `user/${this.name}/overview`, qs: options});
   }
   /**
   * @summary Gets a Listing of this user's submissions.
@@ -113,7 +113,7 @@ const RedditUser = class RedditUser extends RedditContent {
   * @returns {Promise} A Listing containing Submissions
   * @example
   *
-  * r.get_user('spez').get_submissions().then(console.log)
+  * r.getUser('spez').getSubmissions().then(console.log)
   * // => Listing [
   * //  Submission { ... },
   * //  Submission { ... },
@@ -121,8 +121,8 @@ const RedditUser = class RedditUser extends RedditContent {
   * //  ...
   * // ]
   */
-  get_submissions (options) {
-    return this._get_listing({uri: `user/${this.name}/submitted`, qs: options});
+  getSubmissions (options) {
+    return this._getListing({uri: `user/${this.name}/submitted`, qs: options});
   }
   /**
   * @summary Gets a Listing of this user's comments.
@@ -130,7 +130,7 @@ const RedditUser = class RedditUser extends RedditContent {
   * @returns {Promise} A Listing containing Comments
   * @example
   *
-  * r.get_user('spez').get_comments().then(console.log)
+  * r.getUser('spez').getComments().then(console.log)
   * // => Listing [
   * //  Comment { ... },
   * //  Comment { ... },
@@ -138,8 +138,8 @@ const RedditUser = class RedditUser extends RedditContent {
   * //  ...
   * // ]
   */
-  get_comments (options) {
-    return this._get_listing({uri: `user/${this.name}/comments`, qs: options});
+  getComments (options) {
+    return this._getListing({uri: `user/${this.name}/comments`, qs: options});
   }
   /**
   * @summary Gets a Listing of the content that this user has upvoted.
@@ -149,7 +149,7 @@ const RedditUser = class RedditUser extends RedditContent {
   * @returns {Promise} A Listing containing Submissions and Comments
   * @example
   *
-  * r.get_me().get_upvoted_content().then(console.log)
+  * r.getMe().getUpvotedContent().then(console.log)
   * // => Listing [
   * //  Comment { ... },
   * //  Comment { ... },
@@ -157,8 +157,8 @@ const RedditUser = class RedditUser extends RedditContent {
   * //  ...
   * // ]
   */
-  get_upvoted_content (options) {
-    return this._get_listing({uri: `user/${this.name}/upvoted`, qs: options});
+  getUpvotedContent (options) {
+    return this._getListing({uri: `user/${this.name}/upvoted`, qs: options});
   }
   /**
   * @summary Gets a Listing of the content that this user has downvoted.
@@ -168,7 +168,7 @@ const RedditUser = class RedditUser extends RedditContent {
   * @returns {Promise} A Listing containing Submissions and Comments
   * @example
   *
-  * r.get_me().get_downvoted_content().then(console.log)
+  * r.getMe().getDownvotedContent().then(console.log)
   * // => Listing [
   * //  Comment { ... },
   * //  Comment { ... },
@@ -176,8 +176,8 @@ const RedditUser = class RedditUser extends RedditContent {
   * //  ...
   * // ]
   */
-  get_downvoted_content (options) {
-    return this._get_listing({uri: `user/${this.name}/downvoted`, qs: options});
+  getDownvotedContent (options) {
+    return this._getListing({uri: `user/${this.name}/downvoted`, qs: options});
   }
   /**
   * @summary Gets a Listing of the submissions that this user has hidden.
@@ -187,7 +187,7 @@ const RedditUser = class RedditUser extends RedditContent {
   * @returns {Promise} A Listing containing Submissions
   * @example
   *
-  * r.get_me().get_hidden_content().then(console.log)
+  * r.getMe().getHiddenContent().then(console.log)
   * // => Listing [
   * //  Comment { ... },
   * //  Comment { ... },
@@ -195,8 +195,8 @@ const RedditUser = class RedditUser extends RedditContent {
   * //  ...
   * // ]
   */
-  get_hidden_content (options) {
-    return this._get_listing({uri: `user/${this.name}/hidden`, qs: options});
+  getHiddenContent (options) {
+    return this._getListing({uri: `user/${this.name}/hidden`, qs: options});
   }
   /**
   * @summary Gets a Listing of the content that this user has saved.
@@ -206,7 +206,7 @@ const RedditUser = class RedditUser extends RedditContent {
   * @returns {Promise} A Listing containing Submissions and Comments.
   * @example
   *
-  * r.get_me().get_saved_content().then(console.log)
+  * r.getMe().getSavedContent().then(console.log)
   * // => Listing [
   * //  Comment { ... },
   * //  Comment { ... },
@@ -214,8 +214,8 @@ const RedditUser = class RedditUser extends RedditContent {
   * //  ...
   * // ]
   */
-  get_saved_content (options) {
-    return this._get_listing({uri: `user/${this.name}/saved`, qs: options});
+  getSavedContent (options) {
+    return this._getListing({uri: `user/${this.name}/saved`, qs: options});
   }
   /**
   * @summary Gets a Listing of this user's content which has been gilded.
@@ -223,7 +223,7 @@ const RedditUser = class RedditUser extends RedditContent {
   * @returns {Promise} A Listing containing Submissions and Comments
   * @example
   *
-  * r.get_me().get_gilded_content().then(console.log)
+  * r.getMe().getGildedContent().then(console.log)
   * // => Listing [
   * //  Comment { ... },
   * //  Comment { ... },
@@ -231,8 +231,8 @@ const RedditUser = class RedditUser extends RedditContent {
   * //  ...
   * // ]
   */
-  get_gilded_content (options) {
-    return this._get_listing({uri: `user/${this.name}/gilded`, qs: options});
+  getGildedContent (options) {
+    return this._getListing({uri: `user/${this.name}/gilded`, qs: options});
   }
   /**
   * @summary Gets a multireddit belonging to this user.
@@ -240,22 +240,22 @@ const RedditUser = class RedditUser extends RedditContent {
   * @returns {MultiReddit} An unfetched MultiReddit object
   * @example
   *
-  * r.get_user('multi-mod').get_multireddit('coding_languages')
+  * r.getUser('multi-mod').getMultireddit('coding_languages')
   * // => MultiReddit {
   * //  name: 'coding_languages',
   * //  curator: RedditUser { name: 'multi-mod' },
   * //  path: '/user/multi-mod/m/coding_languages'
   * // }
   */
-  get_multireddit (name) {
-    return this._r._new_object('MultiReddit', {name, curator: this});
+  getMultireddit (name) {
+    return this._r._newObject('MultiReddit', {name, curator: this});
   }
   /**
   * @summary Gets an Array of all of this user's MultiReddits.
   * @returns {Promise} A Promise that fulfills with an Array containing MultiReddits.
   * @example
   *
-  * r.get_user('multi-mod').get_multireddits().then(console.log)
+  * r.getUser('multi-mod').getMultireddits().then(console.log)
   *
   * // => [
   *   MultiReddit { ... },
@@ -264,7 +264,7 @@ const RedditUser = class RedditUser extends RedditContent {
   *   ...
   * ]
   */
-  get_multireddits () {
+  getMultireddits () {
     return this._get({uri: `api/multi/user/${this.name}`, qs: {expand_srs: true}});
   }
 };

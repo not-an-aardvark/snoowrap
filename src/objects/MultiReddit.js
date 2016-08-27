@@ -6,14 +6,14 @@ import RedditContent from './RedditContent.js';
 * <style> #MultiReddit {display: none} </style>
 *
 * // Get a multireddit belonging to a specific user
-* r.get_user('multi-mod').get_multireddit('coding_languages')
+* r.getUser('multi-mod').getMultireddit('coding_languages')
 */
 const MultiReddit = class MultiReddit extends RedditContent {
-  constructor (options, _r, _has_fetched) {
-    super(options, _r, _has_fetched);
-    if (_has_fetched) {
-      this.curator = _r.get_user(this.path.split('/')[2]);
-      this.subreddits = this.subreddits.map(item => this._r._new_object('Subreddit', item.data || {display_name: item.name}));
+  constructor (options, _r, _hasFetched) {
+    super(options, _r, _hasFetched);
+    if (_hasFetched) {
+      this.curator = _r.getUser(this.path.split('/')[2]);
+      this.subreddits = this.subreddits.map(item => this._r._newObject('Subreddit', item.data || {display_name: item.name}));
     }
   }
   get _uri () {
@@ -25,16 +25,16 @@ const MultiReddit = class MultiReddit extends RedditContent {
   /**
   * @summary Copies this multireddit to the requester's own account.
   * @param {object} options
-  * @param {string} options.new_name The new name for the copied multireddit
+  * @param {string} options.newName The new name for the copied multireddit
   * @returns {Promise} A Promise for the newly-copied multireddit
-  * @example r.get_user('multi-mod').get_multireddit('coding_languages').copy({new_name: 'my_coding_languages_copy'})
+  * @example r.getUser('multi-mod').getMultireddit('coding_languages').copy({newName: 'my_coding_languages_copy'})
   */
-  copy ({new_name}) {
-    return this._r._get_my_name().then(name => {
+  copy ({new_name, newName = new_name}) {
+    return this._r._getMyName().then(name => {
       return this._post({uri: 'api/multi/copy', form: {
         from: this._path,
-        to: `/user/${name}/m/${new_name}`,
-        display_name: new_name
+        to: `/user/${name}/m/${newName}`,
+        display_name: newName
       }});
     });
   }
@@ -42,14 +42,14 @@ const MultiReddit = class MultiReddit extends RedditContent {
   * @summary Renames this multireddit.
   * @desc **Note**: This method mutates this MultiReddit.
   * @param {object} options
-  * @param {string} options.new_name The new name for this multireddit.
+  * @param {string} options.newName The new name for this multireddit.
   * @returns {Promise} A Promise that fulfills with this multireddit
-  * @example r.get_user('multi-mod').get_multireddit('coding_languages').copy({new_name: 'cookie_languages '})
+  * @example r.getUser('multi-mod').getMultireddit('coding_languages').copy({newName: 'cookie_languages '})
   */
-  rename ({new_name}) {
-    return this._r._get_my_name().then(my_name => this._post({
+  rename ({new_name, newName = new_name}) {
+    return this._r._getMyName().then(name => this._post({
       uri: 'api/multi/rename',
-      form: {from: this._path, to: `/user/${my_name}/m/${new_name}`, display_name: new_name}
+      form: {from: this._path, to: `/user/${name}/m/${newName}`, display_name: newName}
     })).then(res => {
       this.name = res.name;
     }).return(this);
@@ -68,7 +68,7 @@ const MultiReddit = class MultiReddit extends RedditContent {
   * @param {string} [options.key_color] A six-digit RGB hex color, preceded by '#'
   * @param {string} [options.weighting_scheme] One of 'classic', 'fresh'
   * @returns {Promise} The updated version of this multireddit
-  * @example r.get_user('not_an_aardvark').get_multireddit('cookie_languages').edit({visibility: 'hidden'})
+  * @example r.getUser('not_an_aardvark').getMultireddit('cookie_languages').edit({visibility: 'hidden'})
   */
   edit ({description, icon_name, key_color, visibility, weighting_scheme}) {
     return this._put({uri: `api/multi${this._path}`, form: {model: JSON.stringify({
@@ -84,9 +84,9 @@ const MultiReddit = class MultiReddit extends RedditContent {
   * @summary Adds a subreddit to this multireddit.
   * @param {Subreddit} sub The Subreddit object to add (or a string representing a subreddit name)
   * @returns {Promise} A Promise that fulfills with this multireddit when the reuqest is complete
-  * @example r.get_user('not_an_aardvark').get_multireddit('cookie_languages').add_subreddit('cookies')
+  * @example r.getUser('not_an_aardvark').getMultireddit('cookie_languages').addSubreddit('cookies')
   */
-  add_subreddit (sub) {
+  addSubreddit (sub) {
     sub = isString(sub) ? sub : sub.display_name;
     return this._put({uri: `api/multi${this._path}/r/${sub}`, form: {model: JSON.stringify({name: sub})}}).return(this);
   }
@@ -94,9 +94,9 @@ const MultiReddit = class MultiReddit extends RedditContent {
   * @summary Removes a subreddit from this multireddit.
   * @param {Subreddit} sub The Subreddit object to remove (or a string representing a subreddit name)
   * @returns {Promise} A Promise that fulfills with this multireddit when the request is complete
-  * @example r.get_user('not_an_aardvark').get_multireddit('cookie_languages').remove_subreddit('cookies')
+  * @example r.getUser('not_an_aardvark').getMultireddit('cookie_languages').removeSubreddit('cookies')
   */
-  remove_subreddit (sub) {
+  removeSubreddit (sub) {
     return this._delete({uri: `api/multi${this._path}/r/${isString(sub) ? sub : sub.display_name}`}).return(this);
   }
   /* Note: The endpoints GET/PUT /api/multi/multipath/description and GET /api/multi/multipath/r/srname are intentionally not
@@ -109,7 +109,7 @@ const MultiReddit = class MultiReddit extends RedditContent {
 * @name delete
 * @summary Deletes this multireddit.
 * @returns {Promise} A Promise that fulfills when this request is complete
-* @example r.get_user('not_an_aardvark').get_multireddit('cookie_languages').delete()
+* @example r.getUser('not_an_aardvark').getMultireddit('cookie_languages').delete()
 * @memberof MultiReddit
 * @instance
 */

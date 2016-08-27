@@ -1,4 +1,4 @@
-import {handle_json_errors} from '../helpers.js';
+import {handleJsonErrors} from '../helpers.js';
 import RedditContent from './RedditContent.js';
 const api_type = 'json';
 
@@ -14,7 +14,7 @@ const ReplyableContent = class ReplyableContent extends RedditContent {
   * @param {object} options
   * @param {boolean} [options.spam=false] Determines whether this should be marked as spam
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
-  * @example r.get_comment('c08pp5z').remove({spam: true})
+  * @example r.getComment('c08pp5z').remove({spam: true})
   */
   remove ({spam = false} = {}) {
     return this._post({uri: 'api/remove', form: {spam, id: this.name}}).return(this);
@@ -22,7 +22,7 @@ const ReplyableContent = class ReplyableContent extends RedditContent {
   /**
   * @summary Approves this Comment, Submission, or PrivateMessage, re-adding it to public listings if it had been removed
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
-  * @example r.get_comment('c08pp5z').remove()
+  * @example r.getComment('c08pp5z').remove()
   */
   approve () {
     return this._post({uri: 'api/approve', form: {id: this.name}}).return(this);
@@ -33,7 +33,7 @@ const ReplyableContent = class ReplyableContent extends RedditContent {
   * @param {object} [options]
   * @param {string} [options.reason] The reason for the report
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
-  * @example r.get_comment('c08pp5z').report({reason: 'Breaking the subreddit rules'})
+  * @example r.getComment('c08pp5z').report({reason: 'Breaking the subreddit rules'})
   */
   report ({reason} = {}) {
     return this._post({uri: 'api/report', form: {
@@ -43,17 +43,17 @@ const ReplyableContent = class ReplyableContent extends RedditContent {
   /**
   * @summary Ignores reports on this Comment, Submission, or PrivateMessage
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
-  * @example r.get_comment('c08pp5z').ignore_reports()
+  * @example r.getComment('c08pp5z').ignoreReports()
   */
-  ignore_reports () {
+  ignoreReports () {
     return this._post({uri: 'api/ignore_reports', form: {id: this.name}}).return(this);
   }
   /**
   * @summary Unignores reports on this Comment, Submission, or PrivateMessages
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
-  * @example r.get_comment('c08pp5z').unignore_reports()
+  * @example r.getComment('c08pp5z').unignoreReports()
   */
-  unignore_reports () {
+  unignoreReports () {
     return this._post({uri: 'api/unignore_reports', form: {id: this.name}}).return(this);
   }
   /**
@@ -61,13 +61,13 @@ const ReplyableContent = class ReplyableContent extends RedditContent {
   or a new PrivateMessage if this object is a PrivateMessage.)
   * @param {string} text The content of the reply, in raw markdown text
   * @returns {Promise} A Promise that fulfills with the newly-created reply
-  * @example r.get_submission('4e60m3').reply('This was an interesting post. Thanks.');
+  * @example r.getSubmission('4e60m3').reply('This was an interesting post. Thanks.');
   */
   reply (text) {
     return this._post({
       uri: 'api/comment',
       form: {api_type, text, thing_id: this.name}
-    }).tap(handle_json_errors(this)).then(res => res.json.data.things[0]);
+    }).tap(handleJsonErrors(this)).then(res => res.json.data.things[0]);
   }
   /**
   * @summary Blocks the author of this content.
@@ -77,11 +77,11 @@ const ReplyableContent = class ReplyableContent extends RedditContent {
   * @returns {Promise} A Promise that fulfills with this message after the request is complete
   * @example
   *
-  * r.get_inbox({limit: 1}).then(messages =>
-  *   messages[0].block_author();
+  * r.getInbox({limit: 1}).then(messages =>
+  *   messages[0].blockAuthor();
   * );
   */
-  block_author () {
+  blockAuthor () {
     return this._post({uri: 'api/block', form: {id: this.name}}).return(this);
   }
 };

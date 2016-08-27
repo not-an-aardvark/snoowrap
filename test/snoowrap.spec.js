@@ -9,7 +9,6 @@ const isBrowser = typeof window !== 'undefined';
 describe('snoowrap', function () {
   this.timeout(60000);
   this.slow(Infinity);
-  this.retries(3);
   let r, r2;
   before(() => {
     if (process.env.CI) {
@@ -26,6 +25,7 @@ describe('snoowrap', function () {
         username: process.env.SNOOWRAP_USERNAME,
         password: process.env.SNOOWRAP_PASSWORD
       });
+      this.retries(3);
     } else {
       // oauth_info.json has properties `user_agent`, `client_id`, `client_secret`, `username`, `password`, and `refresh_token`.
       const oauth_info = require('../oauth_info.json');
@@ -79,7 +79,7 @@ describe('snoowrap', function () {
       const cloned_user = some_user._clone({deep: true});
       expect(some_user.name).to.equal(cloned_user.name);
       expect(cloned_user).to.be.an.instanceof(snoowrap.objects.RedditUser);
-      expect(cloned_user._has_fetched).to.be.false();
+      expect(cloned_user._hasFetched).to.be.false();
 
       const sub = await r.get_submission('4fp36y').fetch();
       const cloned = sub._clone({deep: true});
@@ -286,7 +286,7 @@ describe('snoowrap', function () {
     });
     it("stores a user's own info on the requester after calling get_me()", async () => {
       await r.get_me();
-      expect(r._own_user_info).to.be.an.instanceof(snoowrap.objects.RedditUser);
+      expect(r._ownUserInfo).to.be.an.instanceof(snoowrap.objects.RedditUser);
     });
     it('stores the access token and the access token expiration properly', () => {
       expect(typeof r.access_token === 'string').to.be.true();
@@ -825,7 +825,7 @@ describe('snoowrap', function () {
       expect(additional_comments).to.be.an.instanceof(snoowrap.objects.Listing);
       expect(additional_comments).to.have.lengthOf(2);
       expect(additional_comments.is_finished).to.be.false();
-      expect(additional_comments._cached_lookahead).to.have.lengthOf(comments._cached_lookahead.length - 1);
+      expect(additional_comments._cachedLookahead).to.have.lengthOf(comments._cachedLookahead.length - 1);
     });
   });
 
@@ -833,7 +833,7 @@ describe('snoowrap', function () {
     it("gets information from the requester's own profile", async () => {
       const me = await r.get_me();
       expect(me).to.be.an.instanceof(snoowrap.objects.RedditUser);
-      expect(me.name).to.equal(r._own_user_info.name); // (this doesn't necessarily mean that the name is correct)
+      expect(me.name).to.equal(r._ownUserInfo.name); // (this doesn't necessarily mean that the name is correct)
       expect(me.name).to.be.a('string');
     });
     it("gets the requester's karma", async () => {
@@ -893,10 +893,10 @@ describe('snoowrap', function () {
       const text = moment().format();
       await sub.create_link_flair_template({text, css_class: '', text_editable: true});
       // Use a random link on the sub -- it doesn't seem to be possible to get the link flair options without providing a link
-      const added_flair = _.last(await sub._get_flair_options({link: 't3_43qlu8'}).choices);
+      const added_flair = _.last(await sub._getFlairOptions({link: 't3_43qlu8'}).choices);
       expect(added_flair.flair_text).to.equal(text);
       await sub.delete_flair_template(added_flair);
-      const link_flairs_afterwards = await sub._get_flair_options({link: 't3_43qlu8'}).choices;
+      const link_flairs_afterwards = await sub._getFlairOptions({link: 't3_43qlu8'}).choices;
       expect(link_flairs_afterwards.length === 0 || _.last(link_flairs_afterwards).flair_text !== text).to.be.true();
     });
     it('can delete all user flair templates', async () => {
@@ -913,7 +913,7 @@ describe('snoowrap', function () {
         sub.create_link_flair_template({text: 'some other link flair text'})
       ]);
       await sub.delete_all_link_flair_templates();
-      expect(await sub._get_flair_options({link: 't3_43qlu8'}).choices).to.eql([]);
+      expect(await sub._getFlairOptions({link: 't3_43qlu8'}).choices).to.eql([]);
     });
     it('can assign flair to a user', async () => {
       const user1 = r.get_user('not_an_aardvark');
@@ -1580,7 +1580,7 @@ describe('snoowrap', function () {
       const modmail = r.get_message('4zop6r');
       await modmail.mute_author();
       const mute_list = await modmail.subreddit.get_muted_users();
-      expect(_.find(mute_list, {name: await modmail.author.name})).to.be.defined();
+      expect(_.find(mute_list, {name: await modmail.author.name})).to.exist();
     });
     it.skip('can unmute the author of a modmail', async () => {
       const modmail = r.get_message('4zop6r');
@@ -1598,7 +1598,7 @@ describe('snoowrap', function () {
     });
     it.skip('can comment on a submission', async () => {
       const comment_body = moment().format();
-      const new_comment = await r.get_submission('43qlu8').reply(comment_body);
+      const new_comment = await r.get_submission('4gfapt').reply(comment_body);
       expect(new_comment).to.be.an.instanceof(snoowrap.objects.Comment);
       expect(await new_comment.body).to.equal(comment_body);
     });

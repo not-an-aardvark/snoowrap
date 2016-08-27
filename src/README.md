@@ -114,7 +114,7 @@ The process of getting an access token from a refresh token is handled internall
 
 ### Content objects
 
-Most content constructors (`Comment`, `Submission`, etc.) are subclasses of the [RedditContent](./objects/RedditContent.js) class. (Note: The `Listing` and `More` constructors are exceptions to this rule.) Every `RedditContent` instance carries a reference to the snoowrap instance that initially created it. This allows further requests to be made directly from the content objects. (For example, `Comment#upvote` works by sending an OAuth request from the snoowrap instance that initially created the given comment.) This snoowrap can be accessed through the `_r` property, i.e. `r.get_comment('abcdef')._r === r`.
+Most content constructors (`Comment`, `Submission`, etc.) are subclasses of the [RedditContent](./objects/RedditContent.js) class. (Note: The `Listing` and `More` constructors are exceptions to this rule.) Every `RedditContent` instance carries a reference to the snoowrap instance that initially created it. This allows further requests to be made directly from the content objects. (For example, `Comment#upvote` works by sending an OAuth request from the snoowrap instance that initially created the given comment.) This snoowrap can be accessed through the `_r` property, i.e. `r.getComment('abcdef')._r === r`.
 
 `RedditContent` instances carry shortcut functions such as `_get`, `_post`, etc. These do the same thing as the corresponding functions on the snoowrap prototype.
 

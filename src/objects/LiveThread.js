@@ -1,7 +1,7 @@
 import {EventEmitter} from 'events';
 // eslint-disable-next-line no-undef
 const WebSocket = typeof window !== 'undefined' ? window.WebSocket : require('ws');
-import {format_livethread_permissions, handle_json_errors} from '../helpers.js';
+import {formatLivethreadPermissions, handleJsonErrors} from '../helpers.js';
 import RedditContent from './RedditContent.js';
 const api_type = 'json';
 
@@ -11,7 +11,7 @@ const api_type = 'json';
 * @example
 *
 * // Get a livethread with the given ID
-* r.get_livethread('whrdxo8dg9n0')
+* r.getLivethread('whrdxo8dg9n0')
 * @desc For the most part, reddit distributes the content of live threads via websocket, rather than through the REST API.
 As such, snoowrap assigns each fetched LiveThread object a `stream` property, which takes the form of an
 [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter). To listen for new thread updates, simply
@@ -33,81 +33,81 @@ paraphrased from reddit's descriptions [here](https://www.reddit.com/dev/api#sec
 As an example, this would log all new livethread updates to the console:
 
 ```javascript
-some_livethread.stream.on('update', data => {
+someLivethread.stream.on('update', data => {
   console.log(data.body);
 });
 ```
 
 * @extends RedditContent
 */
-const LiveThread = class Listing extends RedditContent {
+const LiveThread = class LiveThread extends RedditContent {
   get _uri () {
     return `live/${this.id}/about`;
   }
-  _transform_api_response (response_object) {
-    response_object._raw_stream = null;
-    response_object._populated_stream = new EventEmitter();
-    Object.defineProperty(response_object, 'stream', {get: () => {
-      if (!response_object._raw_stream) {
-        response_object._raw_stream = new WebSocket(response_object.websocket_url);
+  _transformApiResponse (response) {
+    response._rawStream = null;
+    response._populatedStream = new EventEmitter();
+    Object.defineProperty(response, 'stream', {get: () => {
+      if (!response._rawStream) {
+        response._rawStream = new WebSocket(response.websocket_url);
         const handler = data => {
           const parsed = this._r._populate(JSON.parse(data));
-          response_object._populated_stream.emit(parsed.type, parsed.payload);
+          response._populatedStream.emit(parsed.type, parsed.payload);
         };
-        if (typeof response_object._raw_stream.on === 'function') response_object._raw_stream.on('message', handler);
-        else response_object._raw_stream.onmessage = messageEvent => handler(messageEvent.data);
+        if (typeof response._rawStream.on === 'function') response._rawStream.on('message', handler);
+        else response._rawStream.onmessage = messageEvent => handler(messageEvent.data);
       }
-      return response_object._populated_stream;
+      return response._populatedStream;
     }});
-    return response_object;
+    return response;
   }
   /**
   * @summary Adds a new update to this thread.
   * @param {string} body The body of the new update
   * @returns {Promise} A Promise that fulfills with this LiveThread when the request is complete
-  * @example r.get_livethread('whrdxo8dg9n0').add_update('Breaking: Someone is reading the snoowrap documentation \\o/')
+  * @example r.getLivethread('whrdxo8dg9n0').addUpdate('Breaking: Someone is reading the snoowrap documentation \\o/')
   */
-  add_update (body) {
-    return this._post({uri: `api/live/${this.id}/update`, form: {api_type, body}}).then(handle_json_errors(this));
+  addUpdate (body) {
+    return this._post({uri: `api/live/${this.id}/update`, form: {api_type, body}}).then(handleJsonErrors(this));
   }
   /**
   * @summary Strikes (marks incorrect and crosses out) the given update.
   * @param {object} options
   * @param {string} options.id The ID of the update that should be striked.
   * @returns {Promise} A Promise that fulfills with this LiveThread when the request is complete
-  * @example r.get_livethread('whrdxo8dg9n0').strike_update({id: 'LiveUpdate_edc34446-faf0-11e5-a1b4-0e858bca33cd'})
+  * @example r.getLivethread('whrdxo8dg9n0').strikeUpdate({id: 'LiveUpdate_edc34446-faf0-11e5-a1b4-0e858bca33cd'})
   */
-  strike_update ({id}) {
+  strikeUpdate ({id}) {
     return this._post({
       uri: `api/live/${this.id}/strike_update`,
       form: {api_type, id: `${id.startsWith('LiveUpdate_') ? '' : 'LiveUpdate_'}${id}`}
-    }).then(handle_json_errors(this));
+    }).then(handleJsonErrors(this));
   }
   /**
   * @summary Deletes an update from this LiveThread.
   * @param {object} options
   * @param {string} options.id The ID of the LiveUpdate that should be deleted
   * @returns {Promise} A Promise that fulfills with this LiveThread when the request is complete
-  * @example r.get_livethread('whrdxo8dg9n0').delete_update({id: 'LiveUpdate_edc34446-faf0-11e5-a1b4-0e858bca33cd'})
+  * @example r.getLivethread('whrdxo8dg9n0').deleteUpdate({id: 'LiveUpdate_edc34446-faf0-11e5-a1b4-0e858bca33cd'})
   */
-  delete_update ({id}) {
+  deleteUpdate ({id}) {
     return this._post({
       uri: `api/live/${this.id}/delete_update`,
       form: {api_type, id: `${id.startsWith('LiveUpdate_') ? '' : 'LiveUpdate_'}${id}`}
-    }).then(handle_json_errors(this));
+    }).then(handleJsonErrors(this));
   }
   /**
   * @summary Gets a list of this LiveThread's contributors
   * @returns {Promise} An Array containing RedditUsers
   * @example
   *
-  * r.get_livethread('whrdxo8dg9n0').get_contributors().then(console.log)
+  * r.getLivethread('whrdxo8dg9n0').getContributors().then(console.log)
   * // => [
   * //  RedditUser { permissions: ['edit'], name: 'not_an_aardvark', id: 't2_k83md' },
   * //  RedditUser { permissions: ['all'], id: 't2_u3l80', name: 'snoowrap_testing' }
   * // ]
   */
-  get_contributors () {
+  getContributors () {
     return this._get({uri: `live/${this.id}/contributors`}).then(contributors => {
       return Array.isArray(contributors[0]) ? contributors[0] : contributors;
     });
@@ -119,42 +119,42 @@ const LiveThread = class Listing extends RedditContent {
   * @param {Array} options.permissions The permissions that the invited user should receive. This should be an Array containing
   some combination of `'update', 'edit', 'manage'`. To invite a contributor with full permissions, omit this property.
   * @returns {Promise} A Promise that fulfills with this LiveThread when the request is complete
-  * @example r.get_livethread('whrdxo8dg9n0').invite_contributor({name: 'actually_an_aardvark', permissions: ['update']})
+  * @example r.getLivethread('whrdxo8dg9n0').inviteContributor({name: 'actually_an_aardvark', permissions: ['update']})
   */
-  invite_contributor ({name, permissions}) {
+  inviteContributor ({name, permissions}) {
     return this._post({uri: `api/live/${this.id}/invite_contributor`, form: {
       api_type,
       name,
-      permissions: format_livethread_permissions(permissions),
+      permissions: formatLivethreadPermissions(permissions),
       type: 'liveupdate_contributor_invite'
-    }}).then(handle_json_errors(this));
+    }}).then(handleJsonErrors(this));
   }
   /**
   * @summary Revokes an invitation for the given user to become a contributor on this LiveThread.
   * @param {object} options
   * @param {string} options.name The username of the account whose invitation should be revoked
   * @returns {Promise} A Promise that fulfills with this LiveThread when the request is complete
-  * @example r.get_livethread('whrdxo8dg9n0').revoke_contributor_invite({name: 'actually_an_aardvark'});
+  * @example r.getLivethread('whrdxo8dg9n0').revokeContributorInvite({name: 'actually_an_aardvark'});
   */
-  revoke_contributor_invite ({name}) {
-    return this._r.get_user(name).fetch().get('id').then(user_id => {
-      return this._post({uri: `api/live/${this.id}/rm_contributor_invite`, form: {api_type, id: `t2_${user_id}`}});
-    }).then(handle_json_errors(this));
+  revokeContributorInvite ({name}) {
+    return this._r.getUser(name).fetch().get('id').then(userId => {
+      return this._post({uri: `api/live/${this.id}/rm_contributor_invite`, form: {api_type, id: `t2_${userId}`}});
+    }).then(handleJsonErrors(this));
   }
   /**
   * @summary Accepts a pending contributor invitation on this LiveThread.
   * @returns {Promise} A Promise that fulfills with this LiveThread when the request is complete
-  * @example r.get_livethread('whrdxo8dg9n0').accept_contributor_invite()
+  * @example r.getLivethread('whrdxo8dg9n0').acceptContributorInvite()
   */
-  accept_contributor_invite () {
+  acceptContributorInvite () {
     return this._post({uri: `api/live/${this.id}/accept_contributor_invite`, form: {api_type}}).return(this);
   }
   /**
   * @summary Abdicates contributor status on this LiveThread.
   * @returns {Promise} A Promise that fulfills with this LiveThread when the request is complete
-  * @example r.get_livethread('whrdxo8dg9n0').leave_contributor()
+  * @example r.getLivethread('whrdxo8dg9n0').leaveContributor()
   */
-  leave_contributor () {
+  leaveContributor () {
     return this._post({uri: `api/live/${this.id}/leave_contributor`, form: {api_type}}).return(this);
   }
   /**
@@ -162,12 +162,12 @@ const LiveThread = class Listing extends RedditContent {
   * @param {object} options
   * @param {string} options.name The username of the account who should be removed
   * @returns {Promise} A Promise that fulfills with this LiveThread when the request is complete
-  * @example r.get_livethread('whrdxo8dg9n0').remove_contributor({name: 'actually_an_aardvark'})
+  * @example r.getLivethread('whrdxo8dg9n0').removeContributor({name: 'actually_an_aardvark'})
   */
-  remove_contributor ({name}) {
-    return this._r.get_user(name).fetch().get('id').then(user_id => {
-      return this._post({uri: `api/live/${this.id}/rm_contributor`, form: {api_type, id: `t2_${user_id}`}});
-    }).then(handle_json_errors(this));
+  removeContributor ({name}) {
+    return this._r.getUser(name).fetch().get('id').then(userId => {
+      return this._post({uri: `api/live/${this.id}/rm_contributor`, form: {api_type, id: `t2_${userId}`}});
+    }).then(handleJsonErrors(this));
   }
   /**
   * @summary Sets the permissions of the given contributor.
@@ -176,13 +176,13 @@ const LiveThread = class Listing extends RedditContent {
   * @param {Array} options.permissions The updated permissions that the user should have. This should be an Array containing
   some combination of `'update', 'edit', 'manage'`. To give the contributor with full permissions, omit this property.
   * @returns {Promise} A Promise that fulfills with this LiveThread when the request is complete
-  * @example r.get_livethread('whrdxo8dg9n0').set_contributor_permissions({name: 'actually_an_aardvark', permissions: ['edit']})
+  * @example r.getLivethread('whrdxo8dg9n0').setContributorPermissions({name: 'actually_an_aardvark', permissions: ['edit']})
   */
-  set_contributor_permissions ({name, permissions}) {
+  setContributorPermissions ({name, permissions}) {
     return this._post({
       uri: `api/live/${this.id}/set_contributor_permissions`,
-      form: {api_type, name, permissions: format_livethread_permissions(permissions), type: 'liveupdate_contributor'}
-    }).then(handle_json_errors(this));
+      form: {api_type, name, permissions: formatLivethreadPermissions(permissions), type: 'liveupdate_contributor'}
+    }).then(handleJsonErrors(this));
   }
   /**
   * @summary Edits the settings on this LiveThread.
@@ -192,20 +192,20 @@ const LiveThread = class Listing extends RedditContent {
   * @param {string} [options.resources] Information and useful links related to the thread. 120 characters max
   * @param {boolean} options.nsfw Determines whether the thread is Not Safe For Work
   * @returns {Promise} A Promise that fulfills with this LiveThread when the request is complete
-  * @example r.get_livethread('whrdxo8dg9n0').edit_settings({title: 'My livethread', description: 'an updated description'})
+  * @example r.getLivethread('whrdxo8dg9n0').editSettings({title: 'My livethread', description: 'an updated description'})
   */
-  edit_settings ({title, description, resources, nsfw}) {
+  editSettings ({title, description, resources, nsfw}) {
     return this._post({
       uri: `api/live/${this.id}/edit`,
       form: {api_type, description, nsfw, resources, title}
-    }).then(handle_json_errors(this));
+    }).then(handleJsonErrors(this));
   }
   /**
   * @summary Permanently closes this thread, preventing any more updates from being added.
   * @returns {Promise} A Promise that fulfills with this LiveThread when the request is complete
-  * @example r.get_livethread('whrdxo8dg9n0').close_thread()
+  * @example r.getLivethread('whrdxo8dg9n0').closeThread()
   */
-  close_thread () {
+  closeThread () {
     return this._post({uri: `api/live/${this.id}/close_thread`, form: {api_type}}).return(this);
   }
   /**
@@ -214,10 +214,10 @@ const LiveThread = class Listing extends RedditContent {
   * @param {string} options.reason The reason for the report. One of `spam`, `vote-manipulation`, `personal-information`,
   `sexualizing-minors`, `site-breaking`
   * @returns {Promise} A Promise that fulfills with this LiveThread when the request is complete
-  * @example r.get_livethread('whrdxo8dg9n0').report({reason: 'Breaking a rule blah blah blah'})
+  * @example r.getLivethread('whrdxo8dg9n0').report({reason: 'Breaking a rule blah blah blah'})
   */
   report ({reason}) {
-    return this._post({uri: `api/live/${this.id}/report`, form: {api_type, type: reason}}).then(handle_json_errors(this));
+    return this._post({uri: `api/live/${this.id}/report`, form: {api_type, type: reason}}).then(handleJsonErrors(this));
   }
   /**
   * @summary Gets a Listing containing past updates to this LiveThread.
@@ -225,15 +225,15 @@ const LiveThread = class Listing extends RedditContent {
   * @returns {Promise} A Listing containing LiveUpdates
   * @example
   *
-  * r.get_livethread('whrdxo8dg9n0').get_recent_updates().then(console.log)
+  * r.getLivethread('whrdxo8dg9n0').getRecentUpdates().then(console.log)
   * // => Listing [
   * //  LiveUpdate { ... },
   * //  LiveUpdate { ... },
   * //  ...
   * // ]
   */
-  get_recent_updates (options) {
-    return this._get_listing({uri: `live/${this.id}`, qs: options});
+  getRecentUpdates (options) {
+    return this._getListing({uri: `live/${this.id}`, qs: options});
   }
   /**
   * @summary Gets a list of reddit submissions linking to this LiveThread.
@@ -241,34 +241,34 @@ const LiveThread = class Listing extends RedditContent {
   * @returns {Promise} A Listing containing Submissions
   * @example
   *
-  * r.get_livethread('whrdxo8dg9n0').get_recent_updates().then(console.log)
+  * r.getLivethread('whrdxo8dg9n0').getDiscussions().then(console.log)
   * // => Listing [
   * //  Submission { ... },
   * //  Submission { ... },
   * //  ...
   * // ]
   */
-  get_discussions (options) {
-    return this._get_listing({uri: `live/${this.id}/discussions`, qs: options});
+  getDiscussions (options) {
+    return this._getListing({uri: `live/${this.id}/discussions`, qs: options});
   }
   /**
   * @summary Stops listening for new updates on this LiveThread.
   * @desc To avoid memory leaks that can result from open sockets, it's recommended that you call this method when you're
   finished listening for updates on this LiveThread.
   *
-  * This should not be confused with {@link LiveThread#close_thread}, which marks the thread as "closed" on reddit.
+  * This should not be confused with {@link LiveThread#closeThread}, which marks the thread as "closed" on reddit.
   * @returns undefined
   * @example
   *
-  * var my_thread = r.get_livethread('whrdxo8dg9n0');
-  * my_thread.stream.on('update', content => {
+  * var myThread = r.getLivethread('whrdxo8dg9n0');
+  * myThread.stream.on('update', content => {
   *   console.log(content);
-  *   my_stream.close_thread();
+  *   myThread.closeStream();
   * })
   *
   */
-  close_stream () {
-    this._raw_stream.close();
+  closeStream () {
+    this._rawStream.close();
   }
 };
 

@@ -2,26 +2,26 @@ import {assign, clone, defaults, defaultsDeep, identity, isEmpty, isFunction, is
   omitBy, pick} from 'lodash';
 import Promise from '../Promise.js';
 import {inspect} from 'util';
-import {parse as url_parse} from 'url';
+import {parse as urlParse} from 'url';
 import {InvalidMethodCallError} from '../errors.js';
-import {default as More, empty_children} from './More.js';
+import {default as More, emptyChildren} from './More.js';
 
 const INTERNAL_DEFAULTS = {
   _query: {},
   _transform: identity,
   _method: 'get',
-  _is_comment_list: false,
+  _isCommentList: false,
   _link_id: null,
   _uri: null,
   _more: null,
-  _cached_lookahead: null
+  _cachedLookahead: null
 };
 
 /**
 * A class representing a list of content. This is a subclass of the native Array object, so it has all the properties of
 an Array (length, forEach, etc.) in addition to some added methods. The Listing can be extended by using the
-[#fetch_more()]{@link Listing#fetch_more}, [#fetch_until]{@link Listing#fetch_until}, and
-[#fetch_all()]{@link Listing#fetch_all} functions. Note that these methods return new Listings, rather than mutating the
+[#fetchMore()]{@link Listing#fetchMore} and
+[#fetchAll()]{@link Listing#fetchAll} functions. Note that these methods return new Listings, rather than mutating the
 original Listing.
 *
 * Most methods that return Listings will also accept `limit`, `after`, `before`, `show`, and `count` properties.
@@ -29,11 +29,11 @@ original Listing.
 * If you've used the reddit API before (or used other API wrappers like [PRAW](https://praw.readthedocs.org/en/stable/)), you
 might know that reddit uses a `MoreComments` object in its raw JSON responses, representing comments that have been stubbed
 out of Listings. In snoowrap, there are no exposed `MoreComments` objects; the objects returned by the reddit API are
-stripped from Listings and are used internally as sources for the `fetch_more` functions. This means that in snoowrap, Listings
+stripped from Listings and are used internally as sources for the `fetchMore` functions. This means that in snoowrap, Listings
 that contain Comments can be used/expanded in the same manner as Listings that don't contain Comments, and for the most part
 you don't have to worry about the distinction.
 
-(Incidentally, if you encounter a Listing that *does* contain a `MoreComments` object, then it's a bug so please report it.)
+(Incidentally, if you encounter a Listing that *does* contain a `MoreComments` object then it's a bug, so please report it.)
 
 * <style> #Listing {display: none} </style>
 * @extends Array
@@ -49,18 +49,18 @@ const Listing = class Listing extends Array {
     }
     this.push(...options.children || []);
     this._r = _r;
-    this._cached_lookahead = options._cached_lookahead;
+    this._cachedLookahead = options._cachedLookahead;
     defaultsDeep(this, pick(options, keys(INTERNAL_DEFAULTS)), INTERNAL_DEFAULTS);
     assign(this._query, pick(options, ['before', 'after']));
     if (last(options.children) instanceof More) {
-      this._set_more(this.pop());
+      this._setMore(this.pop());
     }
   }
-  _set_uri (value) {
-    const parsed_uri = url_parse(value, true);
-    this._uri = parsed_uri.pathname;
-    defaultsDeep(this._query, parsed_uri.query);
-    if (parsed_uri.query.before) {
+  _setUri (value) {
+    const parsedUri = urlParse(value, true);
+    this._uri = parsedUri.pathname;
+    defaultsDeep(this._query, parsedUri.query);
+    if (parsedUri.query.before) {
       this._query.after = null;
     } else {
       this._query.before = null;
@@ -70,13 +70,13 @@ const Listing = class Listing extends Array {
   * @summary A getter that indicates whether this Listing has any more items to fetch.
   * @type {boolean}
   */
-  get is_finished () {
+  get isFinished () {
     // The process of checking whether a Listing is 'finished' varies depending on what kind of Listing it is.
-    return this._is_comment_list
+    return this._isCommentList
       /* For comment Listings (i.e. Listings containing comments and comment replies, sourced by `more` objects): A Listing is
       *never* finished if it has a cached lookahead (i.e. extra items that were fetched from a previous request). If there is
       no cached lookahead, a Listing is finished iff it has an empty `more` object. */
-      ? isEmpty(this._cached_lookahead) && !!this._more && isEmpty(this._more.children)
+      ? isEmpty(this._cachedLookahead) && !!this._more && isEmpty(this._more.children)
       /* For non-comment Listings: A Listing is always finished if it has no URI (since there would be nowhere to fetch items
       from). If it has a URI, a Listing is finished iff its `before` and `after` query are both `null`. This is because reddit
       returns a value of `null` as the `after` and `before` parameters to signify that a Listing is complete.
@@ -85,16 +85,21 @@ const Listing = class Listing extends Array {
       `after` and `before` properties are both `undefined`, but calling these empty Listings `finished` would be incorrect. */
       : !this._uri || (isNull(this._query.after) && isNull(this._query.before));
   }
+  get is_finished () {
+    // camel-case alias for backwards-compatibility.
+    // As a getter, the `isFinished` property doesn't have an alias like everything else.
+    return this.isFinished;
+  }
   /**
   * @summary Fetches some more items
   * @param {object} options
   * @param {number} options.amount The number of items to fetch.
-  * @param {boolean} [options.skip_replies=false] For a Listing that contains comment objects on a Submission, this option can
+  * @param {boolean} [options.skipReplies=false] For a Listing that contains comment objects on a Submission, this option can
   be used to save a few API calls, provided that only top-level comments are being examined. If this is set to `true`, snoowrap
   is able to fetch 100 Comments per API call rather than 20, but all returned Comments will have no fetched replies by default.
   *
-  * Internal details: When `skip_replies` is set to `true`, snoowrap uses reddit's `api/info` endpoint to fetch Comments. When
-  `skip_replies` is set to `false`, snoowrap uses reddit's `api/morechildren` endpoint. It's worth noting that reddit does
+  * Internal details: When `skipReplies` is set to `true`, snoowrap uses reddit's `api/info` endpoint to fetch Comments. When
+  `skipReplies` is set to `false`, snoowrap uses reddit's `api/morechildren` endpoint. It's worth noting that reddit does
   not allow concurrent requests to the `api/morechildren` endpoint by the same account.
   * @param {boolean} [options.append=true] If `true`, the resulting Listing will contain the existing elements in addition to
   the newly-fetched elements. If `false`, the resulting Listing will only contain the newly-fetched elements.
@@ -104,35 +109,37 @@ const Listing = class Listing extends Array {
   query parameter), then the newly-fetched elements will appear at the beginning. In any case, continuity is maintained, i.e.
   the order of items in the Listing will be the same as the order in which they appear on reddit.
   * @example
-  * r.get_hot({limit: 25}).then(my_listing => {
-  *   console.log(my_listing.length); // => 25
-  *   my_listing.fetch_more({amount: 10}).then(extended_listing => {
-  *     console.log(extended_listing.length); // => 35
+  * r.getHot({limit: 25}).then(myListing => {
+  *   console.log(myListing.length); // => 25
+  *   myListing.fetchMore({amount: 10}).then(extendedListing => {
+  *     console.log(extendedListing.length); // => 35
   *   })
   * });
   */
-  fetch_more (options) {
-    const parsed_options = defaults(
-      isObject(options) ? clone(options) : {amount: options}, {skip_replies: false, append: true}
+  fetchMore (options) {
+    const parsedOptions = defaults(
+      isObject(options) ? clone(options) : {amount: options},
+      // Accept either `skip_replies` or `skipReplies` for backwards compatibility.
+      {append: true, skipReplies: isNil(options.skip_replies) ? false : options.skip_replies}
     );
-    if (!isNumber(parsed_options.amount) || Number.isNaN(parsed_options.amount)) {
+    if (!isNumber(parsedOptions.amount) || Number.isNaN(parsedOptions.amount)) {
       throw new InvalidMethodCallError('Failed to fetch Listing. (`amount` parameter was missing or invalid)');
     }
-    if (parsed_options.amount <= 0 || this.is_finished) {
-      return this._r._promise_wrap(Promise.resolve(this._clone()));
+    if (parsedOptions.amount <= 0 || this.isFinished) {
+      return this._r._promiseWrap(Promise.resolve(this._clone()));
     }
-    if (this._cached_lookahead) {
+    if (this._cachedLookahead) {
       const cloned = this._clone();
-      cloned.push(...cloned._cached_lookahead.splice(0, parsed_options.amount));
-      return cloned.fetch_more(parsed_options.amount - cloned.length + this.length);
+      cloned.push(...cloned._cachedLookahead.splice(0, parsedOptions.amount));
+      return cloned.fetchMore(parsedOptions.amount - cloned.length + this.length);
     }
-    return this._r._promise_wrap(
-      this._more ? this._fetch_more_comments(parsed_options) : this._fetch_more_regular(parsed_options)
+    return this._r._promiseWrap(
+      this._more ? this._fetchMoreComments(parsedOptions) : this._fetchMoreRegular(parsedOptions)
     );
   }
-  _fetch_more_regular (options) {
+  _fetchMoreRegular (options) {
     const query = omitBy(clone(this._query), isNil);
-    if (!this._is_comment_list) {
+    if (!this._isCommentList) {
       /* Reddit returns a different number of items per request depending on the `limit` querystring property specified in the
       request. If no `limit` property is specified, reddit returns some number of items depending on the user's preferences
       (currently 25 items with default preferences). If a `limit` property is specified, then reddit returns `limit` items per
@@ -149,7 +156,7 @@ const Listing = class Listing extends Array {
       request if the desired amount of items is large. */
       query.limit = Math.min(options.amount, Number.MAX_SAFE_INTEGER);
     }
-    return this._r.oauth_request({
+    return this._r.oauthRequest({
       uri: this._uri,
       qs: query,
       method: this._method
@@ -167,45 +174,45 @@ const Listing = class Listing extends Array {
         cloned._query.before = null;
         cloned._query.after = response._query.after;
       }
-      if (this._is_comment_list) {
-        cloned._more = cloned._more || response._more || empty_children;
+      if (this._isCommentList) {
+        cloned._more = cloned._more || response._more || emptyChildren;
         if (response.length > options.amount) {
-          cloned._cached_lookahead = Array.from(cloned.splice(options.amount));
+          cloned._cachedLookahead = Array.from(cloned.splice(options.amount));
         }
       }
-      return cloned.fetch_more({...options, amount: options.amount - response.length});
+      return cloned.fetchMore({...options, amount: options.amount - response.length});
     });
   }
   /* Pagination for comments works differently than it does for most other things; rather than sending a link to the next page
   within a Listing, reddit sends the last comment in the list as as a `more` object, with links to all the remaining comments
   in the thread. */
-  _fetch_more_comments (options) {
-    return this._more.fetch_more(options).then(more_comments => {
+  _fetchMoreComments (options) {
+    return this._more.fetchMore(options).then(moreComments => {
       const cloned = this._clone();
       if (!options.append) {
         cloned._empty();
       }
-      cloned.push(...more_comments);
+      cloned.push(...moreComments);
       cloned._more.children = cloned._more.children.slice(options.amount);
       return cloned;
     });
   }
   /**
   * @summary Fetches all of the items in this Listing, only stopping when there are none left.
-  * @param {object} [options] Fetching options -- see {@link Listing#fetch_more}
+  * @param {object} [options] Fetching options -- see {@link Listing#fetchMore}
   * @returns {Promise} A new fully-fetched Listing. Keep in mind that this method has the potential to exhaust your
   ratelimit quickly if the Listing doesn't have a clear end (e.g. with posts on the front page), so use it with discretion.
   * @example
   *
-  * r.get_me().get_upvoted_content().fetch_all().then(console.log)
+  * r.getMe().getUpvotedContent().fetchAll().then(console.log)
   * // => Listing [ Submission { ... }, Submission { ... }, ... ]
   */
-  fetch_all (options) {
-    return this.fetch_more({...options, amount: Infinity});
+  fetchAll (options) {
+    return this.fetchMore({...options, amount: Infinity});
   }
-  fetch_until (options) {
-    this._r._log.warn('Listing.prototype.fetch_until is deprecated -- use Listing.prototype.fetch_more instead.');
-    return this.fetch_more({...options, amount: options.length - this.length});
+  fetchUntil (options) {
+    this._r._log.warn('Listing#fetchUntil is deprecated -- use Listing#fetchMore instead.');
+    return this.fetchMore({...options, amount: options.length - this.length});
   }
   inspect () {
     return `Listing ${inspect(Array.from(this))}`;
@@ -213,17 +220,17 @@ const Listing = class Listing extends Array {
   _clone ({deep = false} = {}) {
     const properties = pick(this, keys(INTERNAL_DEFAULTS));
     properties._query = clone(properties._query);
-    properties._cached_lookahead = clone(properties._cached_lookahead);
+    properties._cachedLookahead = clone(properties._cachedLookahead);
     properties._more = this._more && this._more._clone();
-    const shallow_children = Array.from(this);
+    const shallowChildren = Array.from(this);
     properties.children = deep
-      ? shallow_children.map(item => '_clone' in item && isFunction(item._clone) ? item._clone({deep}) : item)
-      : shallow_children;
+      ? shallowChildren.map(item => '_clone' in item && isFunction(item._clone) ? item._clone({deep}) : item)
+      : shallowChildren;
     return new Listing(properties, this._r);
   }
-  _set_more (more_obj) {
-    this._more = more_obj;
-    this._is_comment_list = true;
+  _setMore (moreObj) {
+    this._more = moreObj;
+    this._isCommentList = true;
   }
   _empty () {
     this.splice(0, this.length);

@@ -1,5 +1,5 @@
 import Promise from '../Promise.js';
-import {handle_json_errors} from '../helpers.js';
+import {handleJsonErrors} from '../helpers.js';
 import ReplyableContent from './ReplyableContent.js';
 const api_type = 'json';
 
@@ -25,7 +25,7 @@ const VoteableContent = class VoteableContent extends ReplyableContent {
   but bots deciding how to vote on content or amplifying a human's vote are not. See the
   [reddit rules](https://reddit.com/rules) for more details on what constitutes vote cheating. (This guideline is quoted from
   [the official reddit API documentation page](https://www.reddit.com/dev/api#POST_api_vote).)
-  * @example r.get_submission('4e62ml').upvote()
+  * @example r.getSubmission('4e62ml').upvote()
   */
   upvote () {
     return this._vote(1);
@@ -37,7 +37,7 @@ const VoteableContent = class VoteableContent extends ReplyableContent {
   bots deciding how to vote on content or amplifying a human's vote are not. See the [reddit rules](https://reddit.com/rules)
   for more details on what constitutes vote cheating. (This guideline is quoted from
   [the official reddit API documentation page](https://www.reddit.com/dev/api#POST_api_vote).)
-  * @example r.get_submission('4e62ml').downvote()
+  * @example r.getSubmission('4e62ml').downvote()
   */
   downvote () {
     return this._vote(-1);
@@ -49,7 +49,7 @@ const VoteableContent = class VoteableContent extends ReplyableContent {
   bots deciding how to vote on content or amplifying a human's vote are not. See the [reddit rules](https://reddit.com/rules)
   for more details on what constitutes vote cheating. (This guideline is quoted from
   [the official reddit API documentation page](https://www.reddit.com/dev/api#POST_api_vote).)
-  * @example r.get_submission('4e62ml').unvote()
+  * @example r.getSubmission('4e62ml').unvote()
   */
   unvote () {
     return this._vote(0);
@@ -57,7 +57,7 @@ const VoteableContent = class VoteableContent extends ReplyableContent {
   /**
   * @summary Saves this Comment or Submission (i.e. adds it to the list at reddit.com/saved)
   * @returns {Promise} A Promise that fulfills when the request is complete
-  * @example r.get_submission('4e62ml').save()
+  * @example r.getSubmission('4e62ml').save()
   */
   save () {
     return this._post({uri: 'api/save', form: {id: this.name}}).return(this);
@@ -65,7 +65,7 @@ const VoteableContent = class VoteableContent extends ReplyableContent {
   /**
   * @summary Unsaves this item
   * @returns {Promise} A Promise that fulfills when the request is complete
-  * @example r.get_submission('4e62ml').unsave()
+  * @example r.getSubmission('4e62ml').unsave()
   */
   unsave () {
     return this._post({uri: 'api/unsave', form: {id: this.name}}).return(this);
@@ -80,7 +80,7 @@ const VoteableContent = class VoteableContent extends ReplyableContent {
   * @param {boolean} [options.sticky=false] Determines whether this item should be stickied in addition to being
   distinguished. (This only applies to comments; to sticky a submission, use {@link Submission#sticky} instead.)
   * @returns {Promise} A Promise that fulfills when the request is complete.
-  * @example r.get_comment('d1xclfo').distinguish({status: true, sticky: true})
+  * @example r.getComment('d1xclfo').distinguish({status: true, sticky: true})
   */
   distinguish ({status = true, sticky = false} = {}) {
     return this._post({uri: 'api/distinguish', form: {
@@ -93,61 +93,61 @@ const VoteableContent = class VoteableContent extends ReplyableContent {
   /**
   * @summary Undistinguishes this Comment or Submission. Alias for distinguish({status: false})
   * @returns {Promise} A Promise that fulfills when the request is complete.
-  * @example r.get_submission('4e62ml').undistinguish()
+  * @example r.getSubmission('4e62ml').undistinguish()
   */
   undistinguish () {
     return this.distinguish({status: false, sticky: false}).return(this);
   }
   /**
   * @summary Edits this Comment or Submission.
-  * @param {string} updated_text The updated markdown text to use
+  * @param {string} updatedText The updated markdown text to use
   * @returns {Promise} A Promise that fulfills when this request is complete.
-  * @example r.get_comment('coip909').edit('Blah blah blah this is new updated text')
+  * @example r.getComment('coip909').edit('Blah blah blah this is new updated text')
   */
-  edit (updated_text) {
+  edit (updatedText) {
     return this._post({
       uri: 'api/editusertext',
-      form: {api_type, text: updated_text, thing_id: this.name}
-    }).tap(handle_json_errors(this));
+      form: {api_type, text: updatedText, thing_id: this.name}
+    }).tap(handleJsonErrors(this));
   }
   /**
   * @summary Gives reddit gold to the author of this Comment or Submission.
   * @returns {Promise} A Promise that fullfills with this Comment/Submission when this request is complete
-  * @example r.get_comment('coip909').gild()
+  * @example r.getComment('coip909').gild()
   */
   gild () {
     return this._post({uri: `api/v1/gold/gild/${this.name}`}).return(this);
   }
-  _set_inbox_replies_enabled (state) {
+  _setInboxRepliesEnabled (state) {
     return this._post({uri: 'api/sendreplies', form: {state, id: this.name}});
   }
   /**
   * @summary Enables inbox replies on this Comment or Submission
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
-  * @example r.get_comment('coip909').enable_inbox_replies()
+  * @example r.getComment('coip909').enableInboxReplies()
   */
-  enable_inbox_replies () {
-    return this._set_inbox_replies_enabled(true).return(this);
+  enableInboxReplies () {
+    return this._setInboxRepliesEnabled(true).return(this);
   }
   /**
   * @summary Disables inbox replies on this Comment or Submission
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
-  * @example r.get_comment('coip909').disable_inbox_replies()
+  * @example r.getComment('coip909').disableInboxReplies()
   */
-  disable_inbox_replies () {
-    return this._set_inbox_replies_enabled(false).return(this);
+  disableInboxReplies () {
+    return this._setInboxRepliesEnabled(false).return(this);
   }
-  _mutate_and_expand_replies ({limit, depth}) {
+  _mutateAndExpandReplies ({limit, depth}) {
     if (depth <= 0) {
       return Promise.resolve(this);
     }
-    const replies_key = this.constructor._name === 'Submission' ? 'comments' : 'replies';
-    return this[replies_key].fetch_more({amount: limit - this[replies_key].length})
+    const repliesKey = this.constructor._name === 'Submission' ? 'comments' : 'replies';
+    return this[repliesKey].fetchMore({amount: limit - this[repliesKey].length})
       .tap(replies => {
-        this[replies_key] = replies;
+        this[repliesKey] = replies;
       })
       .then(replies => replies.slice(0, limit))
-      .map(reply => reply._mutate_and_expand_replies({limit, depth: depth - 1}))
+      .map(reply => reply._mutateAndExpandReplies({limit, depth: depth - 1}))
       .return(this);
   }
   /**
@@ -176,12 +176,12 @@ const VoteableContent = class VoteableContent extends ReplyableContent {
   * @param {number} [options.depth=Infinity] An upper-bound for the depth of the resulting tree of replies
   * @returns {Promise} A Promise that fulfills with a new version of this object that has an expanded reply tree. The original
   object is not modified
-  * @example r.get_submission('4fuq26').expand_replies().then(console.log)
+  * @example r.getSubmission('4fuq26').expandReplies().then(console.log)
   * // => (a very large comment tree containing every viewable comment on this thread)
   */
-  expand_replies ({limit = Infinity, depth = Infinity} = {}) {
-    return this._r._promise_wrap(this.fetch().then(result => {
-      return result._clone({deep: true})._mutate_and_expand_replies({limit, depth});
+  expandReplies ({limit = Infinity, depth = Infinity} = {}) {
+    return this._r._promiseWrap(this.fetch().then(result => {
+      return result._clone({deep: true})._mutateAndExpandReplies({limit, depth});
     }));
   }
 };
@@ -192,7 +192,7 @@ const VoteableContent = class VoteableContent extends ReplyableContent {
 * @name delete
 * @summary Deletes this Comment or Submission
 * @returns {Promise} A Promise that fulfills with this Comment/Submission when this request is complete
-* @example r.get_comment('coip909').delete()
+* @example r.getComment('coip909').delete()
 * @memberof VoteableContent
 * @instance
 */

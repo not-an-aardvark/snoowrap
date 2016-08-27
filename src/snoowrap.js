@@ -1,13 +1,13 @@
-import {assign, camelCase, defaults, forEach, forOwn, findKey, identity, includes, isEmpty, isFunction, isObject, isString,
+import {assign, snakeCase, defaults, forEach, forOwn, findKey, identity, includes, isEmpty, isFunction, isObject, isString,
   isUndefined, map, mapValues, omit, omitBy, values} from 'lodash';
 import Promise from './Promise.js';
-import promise_wrap from 'promise-chains';
+import promiseWrap from 'promise-chains';
 import util from 'util';
-import * as request_handler from './request_handler.js';
+import * as requestHandler from './request_handler.js';
 import {HTTP_VERBS, KINDS, MAX_LISTING_ITEMS, MODULE_NAME, USER_KEYS, SUBREDDIT_KEYS, VERSION} from './constants.js';
 import * as errors from './errors.js';
-import {add_fullname_prefix, handle_json_errors} from './helpers.js';
-import default_config from './default_config.js';
+import {addFullnamePrefix, addSnakeCaseShadowProps, handleJsonErrors} from './helpers.js';
+import createConfig from './create_config.js';
 import * as objects from './objects/index.js';
 const api_type = 'json';
 
@@ -18,7 +18,7 @@ tokens.
 If constructed with a refresh token, a requester will be able to repeatedly generate access tokens as necessary, without any
 further user intervention. After making at least one request, a requester will have the `access_token` property, which specifies
 the access token currently in use. It will also have a few additional properties such as `scope` (an array of scope strings)
-and `ratelimit_remaining` (the number of requests remaining for the current 10-minute interval, in compliance with reddit's
+and `ratelimitRemaining` (the number of requests remaining for the current 10-minute interval, in compliance with reddit's
 [API rules](https://github.com/reddit/reddit/wiki/API).) These properties primarily exist for internal use, but they are
 exposed since they are useful externally as well.
 */
@@ -26,54 +26,63 @@ const snoowrap = class snoowrap {
   /**
   * @summary Constructs a new requester. This will be necessary if you want to do anything.
   * @desc snoowrap supports several different options for authentication.
-  * 1. *Refresh token*: To authenticate with a refresh token, pass an object with the properties `user_agent`, `client_id`,
-  `client_secret`, and `refresh_token` to the snoowrap constructor. You will need to get the refresh token from reddit
+  * 1. *Refresh token*: To authenticate with a refresh token, pass an object with the properties `userAgent`, `clientId`,
+  `clientSecret`, and `refreshToken` to the snoowrap constructor. You will need to get the refresh token from reddit
   beforehand. A script to automatically generate refresh tokens for you can be found
   [here](https://github.com/not-an-aardvark/reddit-oauth-helper).
-  * 1. *Username/password*: To authenticate with a username and password, pass an object with the properties `user_agent`,
-  `client_id`, `client_secret`, `username`, and `password` to the snoowrap constructor. Note that username/password
+  * 1. *Username/password*: To authenticate with a username and password, pass an object with the properties `userAgent`,
+  `clientId`, `clientSecret`, `username`, and `password` to the snoowrap constructor. Note that username/password
   authentication is only possible for `script`-type apps.
-  * 1. *Access token*: To authenticate with an access token, pass an object with the properties `user_agent` and `access_token`
+  * 1. *Access token*: To authenticate with an access token, pass an object with the properties `userAgent` and `accessToken`
   to the snoowrap constructor. Note that all access tokens expire one hour after being generated, so this method is
   not recommended for long-term use.
-  * @param {object} options An object containing authentication options. This should always have the property `user_agent`. It
+  * @param {object} options An object containing authentication options. This should always have the property `userAgent`. It
   must also contain some combination of credentials (see above)
-  * @param {string} options.user_agent A unique description of what your app does
-  * @param {string} [options.client_id] The client ID of your app (assigned by reddit)
-  * @param {string} [options.client_secret] The client secret of your app (assigned by reddit). If you are using a refresh token
-  with an installed app (which does not have a client secret), pass an empty string as your `client_secret`.
+  * @param {string} options.userAgent A unique description of what your app does
+  * @param {string} [options.clientId] The client ID of your app (assigned by reddit)
+  * @param {string} [options.clientSecret] The client secret of your app (assigned by reddit). If you are using a refresh token
+  with an installed app (which does not have a client secret), pass an empty string as your `clientSecret`.
   * @param {string} [options.username] The username of the account to access
   * @param {string} [options.password] The password of the account to access
-  * @param {string} [options.refresh_token] A refresh token for your app
-  * @param {string} [options.access_token] An access token for your app
+  * @param {string} [options.refreshToken] A refresh token for your app
+  * @param {string} [options.accessToken] An access token for your app
   */
-  constructor ({user_agent, client_id, client_secret, refresh_token, access_token, username, password} = {}) {
-    if (!user_agent) {
+  constructor ({
+      user_agent, userAgent = user_agent,
+      client_id, clientId = client_id,
+      client_secret, clientSecret = client_secret,
+      refresh_token, refreshToken = refresh_token,
+      access_token, accessToken = access_token,
+      username,
+      password
+  } = {}) {
+    if (!userAgent) {
       throw new errors.MissingUserAgentError();
     }
-    if (!access_token &&
-        (isUndefined(client_id) || isUndefined(client_secret) || isUndefined(refresh_token)) &&
-        (isUndefined(client_id) || isUndefined(client_secret) || isUndefined(username) || isUndefined(password))
+    if (!accessToken &&
+        (isUndefined(clientId) || isUndefined(clientSecret) || isUndefined(refreshToken)) &&
+        (isUndefined(clientId) || isUndefined(clientSecret) || isUndefined(username) || isUndefined(password))
     ) {
       throw new errors.NoCredentialsError();
     }
-    defaults(this, {user_agent, client_id, client_secret, refresh_token, access_token, username, password}, {
-      client_id: null,
-      client_secret: null,
-      refresh_token: null,
-      access_token: null,
+    defaults(this, {userAgent, clientId, clientSecret, refreshToken, accessToken, username, password}, {
+      clientId: null,
+      clientSecret: null,
+      refreshToken: null,
+      accessToken: null,
       username: null,
       password: null,
-      ratelimit_remaining: null,
-      ratelimit_expiration: null,
-      token_expiration: null,
+      ratelimitRemaining: null,
+      ratelimitExpiration: null,
+      tokenExpiration: null,
       scope: null,
-      _config: assign(Object.create(null), default_config),
-      _next_request_timestamp: -Infinity
+      _config: createConfig(),
+      _nextRequestTimestamp: -Infinity
     });
+    addSnakeCaseShadowProps(this);
   }
-  _new_object (object_type, content, _has_fetched = false) {
-    return Array.isArray(content) ? content : new snoowrap.objects[object_type](content, this, _has_fetched);
+  _newObject (objectType, content, _hasFetched = false) {
+    return Array.isArray(content) ? content : new snoowrap.objects[objectType](content, this, _hasFetched);
   }
   /**
   * @summary Retrieves or modifies the configuration options for this requester.
@@ -81,23 +90,23 @@ const snoowrap = class snoowrap {
   retain whatever value they had previously. (In other words, if you only want to change one property, you only need to put
   that one property in this parameter. To get the current configuration without modifying anything, simply omit this
   parameter.)
-  * @param {string} [options.endpoint_domain='reddit.com'] The endpoint where requests should be sent
-  * @param {Number} [options.request_delay=0] A minimum delay, in milliseconds, to enforce between API calls. If multiple
+  * @param {string} [options.endpointDomain='reddit.com'] The endpoint where requests should be sent
+  * @param {Number} [options.requestDelay=0] A minimum delay, in milliseconds, to enforce between API calls. If multiple
   api calls are requested during this timespan, they will be queued and sent one at a time. Setting this to more than 1000 will
   ensure that reddit's ratelimit is never reached, but it will make things run slower than necessary if only a few requests
   are being sent. If this is set to zero, snoowrap will not enforce any delay between individual requests. However, it will
   still refuse to continue if reddit's enforced ratelimit (600 requests per 10 minutes) is exceeded.
-  * @param {Number} [options.request_timeout=30000] A timeout for all OAuth requests, in milliseconds. If the reddit server
+  * @param {Number} [options.requestTimeout=30000] A timeout for all OAuth requests, in milliseconds. If the reddit server
   fails to return a response within this amount of time, the Promise will be rejected with a timeout error.
-  * @param {boolean} [options.continue_after_ratelimit_error=false] Determines whether snoowrap should queue API calls if
+  * @param {boolean} [options.continueAfterRatelimitError=false] Determines whether snoowrap should queue API calls if
   reddit's ratelimit is exceeded. If set to `true` when the ratelimit is exceeded, snoowrap will queue all further requests,
   and will attempt to send them again after the current ratelimit period expires (which happens every 10 minutes). If set
   to `false`, snoowrap will simply throw an error when reddit's ratelimit is exceeded.
-  * @param {Number[]} [options.retry_error_codes=[502, 503, 504, 522]] If reddit responds to an idempotent request with one of
+  * @param {Number[]} [options.retryErrorCodes=[502, 503, 504, 522]] If reddit responds to an idempotent request with one of
   these error codes, snoowrap will retry the request, up to a maximum of `max_retry_attempts` requests in total. (These
    errors usually indicate that there was an temporary issue on reddit's end, and retrying the request has a decent chance of
   success.) This behavior can be disabled by simply setting this property to an empty array.
-  * @param {Number} [options.max_retry_attempts=3] See `retry_error_codes`.
+  * @param {Number} [options.maxRetryAttempts=3] See `retryErrorCodes`.
   * @param {boolean} [options.warnings=true] snoowrap may occasionally log warnings, such as deprecation notices, to the
   console. These can be disabled by setting this to `false`.
   * @param {boolean} [options.debug=false] If set to true, snoowrap will print out potentially-useful information for debugging
@@ -109,21 +118,19 @@ const snoowrap = class snoowrap {
   * @returns {object} An updated Object containing all of the configuration values
   * @example
   *
-  * r.config({request_delay: 1000, warnings: false});
+  * r.config({requestDelay: 1000, warnings: false});
   * // sets the request delay to 1000 milliseconds, and suppresses warnings.
   */
   config (options) {
-    const invalid_key = findKey(options, (value, key) => !Object.prototype.hasOwnProperty.call(this._config, key));
-    if (invalid_key) {
-      throw new TypeError(`Invalid config option '${invalid_key}'`);
-    }
+    const invalidKey = findKey(options, (value, key) => !Object.prototype.hasOwnProperty.call(this._config, key));
+    if (invalidKey) throw new TypeError(`Invalid config option '${invalidKey}'`);
     return assign(this._config, options);
   }
   inspect () {
     // Hide confidential information (tokens, client IDs, etc.), as well as private properties, from the console.log output.
-    const keys_for_hidden_values = ['client_secret', 'refresh_token', 'access_token', 'password'];
+    const keysForHiddenValues = ['clientSecret', 'refreshToken', 'accessToken', 'password'];
     const formatted = mapValues(omitBy(this, (value, key) => key.startsWith('_')), (value, key) => {
-      return includes(keys_for_hidden_values, key) ? value && '(redacted)' : value;
+      return includes(keysForHiddenValues, key) ? value && '(redacted)' : value;
     });
     return `${MODULE_NAME} ${util.inspect(formatted)}`;
   }
@@ -141,8 +148,8 @@ const snoowrap = class snoowrap {
       }
     };
   }
-  get _promise_wrap () {
-    return this._config.proxies ? promise_wrap : identity;
+  get _promiseWrap () {
+    return this._config.proxies ? promiseWrap : identity;
   }
   /**
   * @summary Gets information on a reddit user with a given name.
@@ -150,115 +157,115 @@ const snoowrap = class snoowrap {
   * @returns {RedditUser} An unfetched RedditUser object for the requested user
   * @example
   *
-  * r.get_user('not_an_aardvark')
+  * r.getUser('not_an_aardvark')
   * // => RedditUser { name: 'not_an_aardvark' }
-  * r.get_user('not_an_aardvark').link_karma.then(console.log)
+  * r.getUser('not_an_aardvark').link_karma.then(console.log)
   * // => 6
   */
-  get_user (name) {
-    return this._new_object('RedditUser', {name: (name + '').replace(/^\/?u\//, '')});
+  getUser (name) {
+    return this._newObject('RedditUser', {name: (name + '').replace(/^\/?u\//, '')});
   }
   /**
   * @summary Gets information on a comment with a given id.
-  * @param {string} comment_id - The base36 id of the comment
+  * @param {string} commentId - The base36 id of the comment
   * @returns {Comment} An unfetched Comment object for the requested comment
   * @example
   *
-  * r.get_comment('c0b6xx0')
+  * r.getComment('c0b6xx0')
   * // => Comment { name: 't1_c0b6xx0' }
-  * r.get_comment('c0b6xx0').author.name.then(console.log)
+  * r.getComment('c0b6xx0').author.name.then(console.log)
   * // => 'Kharos'
   */
-  get_comment (comment_id) {
-    return this._new_object('Comment', {name: add_fullname_prefix(comment_id, 't1_')});
+  getComment (commentId) {
+    return this._newObject('Comment', {name: addFullnamePrefix(commentId, 't1_')});
   }
   /**
   * @summary Gets information on a given subreddit.
-  * @param {string} display_name - The name of the subreddit (e.g. 'AskReddit')
+  * @param {string} displayName - The name of the subreddit (e.g. 'AskReddit')
   * @returns {Subreddit} An unfetched Subreddit object for the requested subreddit
   * @example
   *
-  * r.get_subreddit('AskReddit')
+  * r.getSubreddit('AskReddit')
   * // => Subreddit { display_name: 'AskReddit' }
-  * r.get_subreddit('AskReddit').created_utc.then(console.log)
+  * r.getSubreddit('AskReddit').created_utc.then(console.log)
   * // => 1201233135
   */
-  get_subreddit (display_name) {
-    return this._new_object('Subreddit', {display_name: display_name.replace(/^\/?r\//, '')});
+  getSubreddit (displayName) {
+    return this._newObject('Subreddit', {display_name: displayName.replace(/^\/?r\//, '')});
   }
   /**
   * @summary Gets information on a given submission.
-  * @param {string} submission_id - The base36 id of the submission
+  * @param {string} submissionId - The base36 id of the submission
   * @returns {Submission} An unfetched Submission object for the requested submission
   * @example
   *
-  * r.get_submission('2np694')
+  * r.getSubmission('2np694')
   * // => Submission { name: 't3_2np694' }
-  * r.get_submission('2np694').title.then(console.log)
+  * r.getSubmission('2np694').title.then(console.log)
   * // => 'What tasty food would be distusting if eaten over rice?'
   */
-  get_submission (submission_id) {
-    return this._new_object('Submission', {name: add_fullname_prefix(submission_id, 't3_')});
+  getSubmission (submissionId) {
+    return this._newObject('Submission', {name: addFullnamePrefix(submissionId, 't3_')});
   }
   /**
   * @summary Gets a private message by ID.
-  * @param {string} message_id The base36 ID of the message
+  * @param {string} messageId The base36 ID of the message
   * @returns {PrivateMessage} An unfetched PrivateMessage object for the requested message
   * @example
   *
-  * r.get_message('51shnw')
+  * r.getMessage('51shnw')
   * // => PrivateMessage { name: 't4_51shnw' }
-  * r.get_message('51shnw').subject.then(console.log)
+  * r.getMessage('51shnw').subject.then(console.log)
   * // => 'Example'
   * // See here for a screenshot of the PM in question https://i.gyazo.com/24f3b97e55b6ff8e3a74cb026a58b167.png
   */
-  get_message (message_id) {
-    return this._new_object('PrivateMessage', {name: add_fullname_prefix(message_id, 't4_')});
+  getMessage (messageId) {
+    return this._newObject('PrivateMessage', {name: addFullnamePrefix(messageId, 't4_')});
   }
   /**
   * Gets a livethread by ID.
-  * @param {string} thread_id The base36 ID of the livethread
+  * @param {string} threadId The base36 ID of the livethread
   * @returns {LiveThread} An unfetched LiveThread object
   * @example
   *
-  * r.get_livethread('whrdxo8dg9n0')
+  * r.getLivethread('whrdxo8dg9n0')
   * // => LiveThread { id: 'whrdxo8dg9n0' }
-  * r.get_livethread('whrdxo8dg9n0').nsfw.then(console.log)
+  * r.getLivethread('whrdxo8dg9n0').nsfw.then(console.log)
   * // => false
   */
-  get_livethread (thread_id) {
-    return this._new_object('LiveThread', {id: add_fullname_prefix(thread_id, 'LiveUpdateEvent_').slice(16)});
+  getLivethread (threadId) {
+    return this._newObject('LiveThread', {id: addFullnamePrefix(threadId, 'LiveUpdateEvent_').slice(16)});
   }
   /**
   * @summary Gets information on the requester's own user profile.
   * @returns {RedditUser} A RedditUser object corresponding to the requester's profile
   * @example
   *
-  * r.get_me().then(console.log);
+  * r.getMe().then(console.log);
   * // => RedditUser { is_employee: false, has_mail: false, name: 'snoowrap_testing', ... }
   */
-  get_me () {
+  getMe () {
     return this._get({uri: 'api/v1/me'}).then(result => {
-      this._own_user_info = this._new_object('RedditUser', result, true);
-      return this._own_user_info;
+      this._ownUserInfo = this._newObject('RedditUser', result, true);
+      return this._ownUserInfo;
     });
   }
-  _get_my_name () {
-    return Promise.resolve(this._own_user_info ? this._own_user_info.name : this.get_me().get('name'));
+  _getMyName () {
+    return Promise.resolve(this._ownUserInfo ? this._ownUserInfo.name : this.getMe().get('name'));
   }
   /**
   * @summary Gets a distribution of the requester's own karma distribution by subreddit.
   * @returns {Promise} A Promise for an object with karma information
   * @example
   *
-  * r.get_karma().then(console.log)
+  * r.getKarma().then(console.log)
   * // => [
   * //  { sr: Subreddit { display_name: 'redditdev' }, comment_karma: 16, link_karma: 1 },
   * //  { sr: Subreddit { display_name: 'programming' }, comment_karma: 2, link_karma: 1 },
   * //  ...
   * // ]
   */
-  get_karma () {
+  getKarma () {
     return this._get({uri: 'api/v1/me/karma'});
   }
   /**
@@ -266,32 +273,32 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A promise for an object containing the user's current preferences
   * @example
   *
-  * r.get_preferences().then(console.log)
+  * r.getPreferences().then(console.log)
   * // => { default_theme_sr: null, threaded_messages: true, hide_downs: false, ... }
   */
-  get_preferences () {
+  getPreferences () {
     return this._get({uri: 'api/v1/me/prefs'});
   }
   /**
   * @summary Updates the user's current preferences.
-  * @param {object} updated_preferences An object of the form {[some preference name]: 'some value', ...}. Any preference
+  * @param {object} updatedPreferences An object of the form {[some preference name]: 'some value', ...}. Any preference
   * not included in this object will simply retain its current value.
   * @returns {Promise} A Promise that fulfills when the request is complete
   * @example
   *
-  * r.update_preferences({threaded_messages: false, hide_downs: true})
+  * r.updatePreferences({threaded_messages: false, hide_downs: true})
   * // => { default_theme_sr: null, threaded_messages: false,hide_downs: true, ... }
   * // (preferences updated on reddit)
   */
-  update_preferences (updated_preferences) {
-    return this._patch({uri: 'api/v1/me/prefs', body: updated_preferences});
+  updatePreferences (updatedPreferences) {
+    return this._patch({uri: 'api/v1/me/prefs', body: updatedPreferences});
   }
   /**
   * @summary Gets the currently-authenticated user's trophies.
   * @returns {Promise} A TrophyList containing the user's trophies
   * @example
   *
-  * r.get_my_trophies().then(console.log)
+  * r.getMyTrophies().then(console.log)
   * // => TrophyList { trophies: [
   * //   Trophy { icon_70: 'https://s3.amazonaws.com/redditstatic/award/verified_email-70.png',
   * //     description: null,
@@ -303,7 +310,7 @@ const snoowrap = class snoowrap {
   * //   }
   * // ] }
   */
-  get_my_trophies () {
+  getMyTrophies () {
     return this._get({uri: 'api/v1/me/trophies'});
   }
   /**
@@ -311,10 +318,10 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Promise that resolves with a list of friends
   * @example
   *
-  * r.get_friends().then(console.log)
+  * r.getFriends().then(console.log)
   * // => [ [ RedditUser { date: 1457927963, name: 'not_an_aardvark', id: 't2_k83md' } ], [] ]
   */
-  get_friends () {
+  getFriends () {
     return this._get({uri: 'prefs/friends'});
   }
   /**
@@ -322,10 +329,10 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Promise that resolves with a list of blocked users
   * @example
   *
-  * r.get_blocked_users().then(console.log)
+  * r.getBlockedUsers().then(console.log)
   * // => [ RedditUser { date: 1457928120, name: 'actually_an_aardvark', id: 't2_q3519' } ]
   */
-  get_blocked_users () {
+  getBlockedUsers () {
     return this._get({uri: 'prefs/blocked'});
   }
   /**
@@ -333,10 +340,10 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Promise that resolves with a boolean value
   * @example
   *
-  * r.check_captcha_requirement().then(console.log)
+  * r.checkCaptchaRequirement().then(console.log)
   * // => false
   */
-  check_captcha_requirement () {
+  checkCaptchaRequirement () {
     return this._get({uri: 'api/needs_captcha'});
   }
   /**
@@ -344,10 +351,10 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Promise that resolves with a string
   * @example
   *
-  * r.get_new_captcha_identifier().then(console.log)
+  * r.getNewCaptchaIdentifier().then(console.log)
   * // => 'o5M18uy4mk0IW4hs0fu2GNPdXb1Dxe9d'
   */
-  get_new_captcha_identifier () {
+  getNewCaptchaIdentifier () {
     return this._post({uri: 'api/new_captcha', form: {api_type}}).then(res => res.json.data.iden);
   }
   /**
@@ -356,10 +363,10 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A string containing raw image data in PNG format
   * @example
   *
-  * r.get_captcha_image('o5M18uy4mk0IW4hs0fu2GNPdXb1Dxe9d').then(console.log)
+  * r.getCaptchaImage('o5M18uy4mk0IW4hs0fu2GNPdXb1Dxe9d').then(console.log)
   // => (A long, incoherent string representing the image in PNG format)
   */
-  get_captcha_image (identifier) {
+  getCaptchaImage (identifier) {
     return this._get({uri: `captcha/${identifier}`});
   }
   /**
@@ -367,10 +374,10 @@ const snoowrap = class snoowrap {
   * @returns {Promise} An array of categories
   * @example
   *
-  * r.get_saved_categories().then(console.log)
+  * r.getSavedCategories().then(console.log)
   * // => [ { category: 'cute cat pictures' }, { category: 'interesting articles' } ]
   */
-  get_saved_categories () {
+  getSavedCategories () {
     return this._get({uri: 'api/saved_categories'}).get('categories');
   }
   /**
@@ -380,121 +387,131 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Promise that fulfills when the request is complete
   * @example
   *
-  * var submissions = [r.get_submission('4a9u54'), r.get_submission('4a95nb')]
-  * r.mark_as_visited(submissions)
+  * var submissions = [r.getSubmission('4a9u54'), r.getSubmission('4a95nb')]
+  * r.markAsVisited(submissions)
   * // (the links will now appear purple on reddit)
   */
-  mark_as_visited (links) {
+  markAsVisited (links) {
     return this._post({uri: 'api/store_visits', links: map(links, 'name').join(',')});
   }
-  _submit ({captcha_response, captcha_iden, kind, resubmit = true, send_replies = true, text, title, url, subreddit_name}) {
+  _submit ({
+      captcha_response, captchaResponse = captcha_response,
+      captcha_iden, captchaIden = captcha_iden,
+      kind,
+      resubmit = true,
+      send_replies = true, sendReplies = send_replies,
+      text,
+      title,
+      url,
+      subreddit_name, subredditName = subreddit_name
+  }) {
     return this._post({uri: 'api/submit', form: {
-      api_type, captcha: captcha_response, iden: captcha_iden, sendreplies: send_replies, sr: subreddit_name, kind, resubmit,
+      api_type, captcha: captchaResponse, iden: captchaIden, sendreplies: sendReplies, sr: subredditName, kind, resubmit,
       text, title, url
-    }}).tap(handle_json_errors(this)).then(result => this.get_submission(result.json.data.id));
+    }}).tap(handleJsonErrors(this)).then(result => this.getSubmission(result.json.data.id));
   }
   /**
   * @summary Creates a new selfpost on the given subreddit.
   * @param {object} options An object containing details about the submission
-  * @param {string} options.subreddit_name The name of the subreddit that the post should be submitted to
+  * @param {string} options.subredditName The name of the subreddit that the post should be submitted to
   * @param {string} options.title The title of the submission
   * @param {string} [options.text] The selftext of the submission
-  * @param {boolean} [options.send_replies=true] Determines whether inbox replies should be enabled for this submission
-  * @param {string} [options.captcha_iden] A captcha identifier. This is only necessary if the authenticated account
+  * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission
+  * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
   requires a captcha to submit posts and comments.
-  * @param {string} [options.captcha_response] The response to the captcha with the given identifier
+  * @param {string} [options.captchaResponse] The response to the captcha with the given identifier
   * @returns {Promise} The newly-created Submission object
   * @example
   *
-  * r.submit_selfpost({
-  *   subreddit_name: 'snoowrap_testing',
+  * r.submitSelfpost({
+  *   subredditName: 'snoowrap_testing',
   *   title: 'This is a selfpost',
   *   body: 'This is the body of the selfpost'
   * }).then(console.log)
   * // => Submission { name: 't3_4abmsz' }
   * // (new selfpost created on reddit)
   */
-  submit_selfpost (options) {
+  submitSelfpost (options) {
     return this._submit({...options, kind: 'self'});
   }
   /**
   * @summary Creates a new link submission on the given subreddit.
   * @param {object} options An object containing details about the submission
-  * @param {string} options.subreddit_name The name of the subreddit that the post should be submitted to
+  * @param {string} options.subredditName The name of the subreddit that the post should be submitted to
   * @param {string} options.title The title of the submission
   * @param {string} options.url The url that the link submission should point to
-  * @param {boolean} [options.send_replies=true] Determines whether inbox replies should be enabled for this submission
+  * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission
   * @param {boolean} [options.resubmit=true] If this is false and same link has already been submitted to this subreddit in
   the past, reddit will return an error. This could be used to avoid accidental reposts.
-  * @param {string} [options.captcha_iden] A captcha identifier. This is only necessary if the authenticated account
+  * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
   requires a captcha to submit posts and comments.
-  * @param {string} [options.captcha_response] The response to the captcha with the given identifier
+  * @param {string} [options.captchaResponse] The response to the captcha with the given identifier
   * @returns {Promise} The newly-created Submission object
   * @example
   *
-  * r.submit_link({
-  *   subreddit_name: 'snoowrap_testing',
+  * r.submitLink({
+  *   subredditName: 'snoowrap_testing',
   *   title: 'I found a cool website!',
   *   url: 'https://google.com'
   * }).then(console.log)
   * // => Submission { name: 't3_4abnfe' }
   * // (new linkpost created on reddit)
   */
-  submit_link (options) {
+  submitLink (options) {
     return this._submit({...options, kind: 'link'});
   }
-  _get_sorted_frontpage (sort_type, subreddit_name, options = {}) {
+  _getSortedFrontpage (sortType, subredditName, options = {}) {
     // Handle things properly if only a time parameter is provided but not the subreddit name
     let opts = options;
-    let sub_name = subreddit_name;
-    if (typeof subreddit_name === 'object' && isEmpty(omitBy(opts, isUndefined))) {
-      /* In this case, "subreddit_name" ends up referring to the second argument, which is not actually a name since the user
+    let subName = subredditName;
+    if (typeof subredditName === 'object' && isEmpty(omitBy(opts, isUndefined))) {
+      /* In this case, "subredditName" ends up referring to the second argument, which is not actually a name since the user
       decided to omit that parameter. */
-      opts = subreddit_name;
-      sub_name = undefined;
+      opts = subredditName;
+      subName = undefined;
     }
-    const parsed_options = omit({...opts, t: opts.time || opts.t}, 'time');
-    return this._get_listing({uri: (sub_name ? `r/${sub_name}/` : '') + sort_type, qs: parsed_options});
+    const parsedOptions = omit({...opts, t: opts.time || opts.t}, 'time');
+    return this._getListing({uri: (subName ? `r/${subName}/` : '') + sortType, qs: parsedOptions});
   }
   /**
   * @summary Gets a Listing of hot posts.
-  * @param {string} [subreddit_name] The subreddit to get posts from. If not provided, posts are fetched from
+  * @param {string} [subredditName] The subreddit to get posts from. If not provided, posts are fetched from
   the front page of reddit.
   * @param {object} [options={}] Options for the resulting Listing
   * @returns {Promise} A Listing containing the retrieved submissions
   * @example
   *
-  * r.get_hot().then(console.log)
+  * r.getHot().then(console.log)
   * // => Listing [
   * //  Submission { domain: 'imgur.com', banned_by: null, subreddit: Subreddit { display_name: 'pics' }, ... },
   * //  Submission { domain: 'i.imgur.com', banned_by: null, subreddit: Subreddit { display_name: 'funny' }, ... },
   * //  ...
   * // ]
   *
-  * r.get_hot('gifs').then(console.log)
+  * r.getHot('gifs').then(console.log)
   * // => Listing [
   * //  Submission { domain: 'i.imgur.com', banned_by: null, subreddit: Subreddit { display_name: 'gifs' }, ... },
   * //  Submission { domain: 'i.imgur.com', banned_by: null, subreddit: Subreddit { display_name: 'gifs' }, ... },
   * //  ...
   * // ]
   *
-  * r.get_hot('redditdev', {limit: 1}).then(console.log)
+  * r.getHot('redditdev', {limit: 1}).then(console.log)
   * // => Listing [
     //   Submission { domain: 'self.redditdev', banned_by: null, subreddit: Subreddit { display_name: 'redditdev' }, ...}
   * // ]
   */
-  get_hot (subreddit_name, options) {
-    return this._get_sorted_frontpage('hot', subreddit_name, options);
+  getHot (subredditName, options) {
+    return this._getSortedFrontpage('hot', subredditName, options);
   }
   /**
   * @summary Gets a Listing of new posts.
-  * @param {string} [subreddit_name] The subreddit to get posts from. If not provided, posts are fetched from
+  * @param {string} [subredditName] The subreddit to get posts from. If not provided, posts are fetched from
   the front page of reddit.
   * @param {object} [options={}] Options for the resulting Listing
   * @returns {Promise} A Listing containing the retrieved submissions
   * @example
   *
-  * r.get_new().then(console.log)
+  * r.getNew().then(console.log)
   * // => Listing [
   * //  Submission { domain: 'self.Jokes', banned_by: null, subreddit: Subreddit { display_name: 'Jokes' }, ... },
   * //  Submission { domain: 'self.AskReddit', banned_by: null, subreddit: Subreddit { display_name: 'AskReddit' }, ... },
@@ -502,44 +519,44 @@ const snoowrap = class snoowrap {
   * // ]
   *
   */
-  get_new (subreddit_name, options) {
-    return this._get_sorted_frontpage('new', subreddit_name, options);
+  getNew (subredditName, options) {
+    return this._getSortedFrontpage('new', subredditName, options);
   }
   /**
   * @summary Gets a Listing of new comments.
-  * @param {string} [subreddit_name] The subreddit to get comments from. If not provided, posts are fetched from
+  * @param {string} [subredditName] The subreddit to get comments from. If not provided, posts are fetched from
   the front page of reddit.
   * @param {object} [options={}] Options for the resulting Listing
   * @returns {Promise} A Listing containing the retrieved comments
   * @example
   *
-  * r.get_new_comments().then(console.log)
+  * r.getNewComments().then(console.log)
   * // => Listing [
   * //  Comment { link_title: 'What amazing book should be made into a movie, but hasn\'t been yet?', ... }
   * //  Comment { link_title: 'How far back in time could you go and still understand English?', ... }
   * // ]
   */
-  get_new_comments (subreddit_name, options) {
-    return this._get_sorted_frontpage('comments', subreddit_name, options);
+  getNewComments (subredditName, options) {
+    return this._getSortedFrontpage('comments', subredditName, options);
   }
   /**
   * @summary Gets a single random Submission.
   * @desc **Note**: This function will not work when snoowrap is running in a browser, because the reddit server sends a
   redirect which cannot be followed by a CORS request.
-  * @param {string} [subreddit_name] The subreddit to get the random submission. If not provided, the post is fetched from
+  * @param {string} [subredditName] The subreddit to get the random submission. If not provided, the post is fetched from
   the front page of reddit.
   * @returns {Promise} The retrieved Submission object
   * @example
   *
-  * r.get_random_submission('aww').then(console.log)
+  * r.getRandomSubmission('aww').then(console.log)
   * // => Submission { domain: 'i.imgur.com', banned_by: null, subreddit: Subreddit { display_name: 'aww' }, ... }
   */
-  get_random_submission (subreddit_name) {
-    return this._get({uri: `${subreddit_name ? `r/${subreddit_name}/` : ''}random`});
+  getRandomSubmission (subredditName) {
+    return this._get({uri: `${subredditName ? `r/${subredditName}/` : ''}random`});
   }
   /**
   * @summary Gets a Listing of top posts.
-  * @param {string} [subreddit_name] The subreddit to get posts from. If not provided, posts are fetched from
+  * @param {string} [subredditName] The subreddit to get posts from. If not provided, posts are fetched from
   the front page of reddit.
   * @param {object} [options={}] Options for the resulting Listing
   * @param {string} [options.time] Describes the timespan that posts should be retrieved from. Should be one of
@@ -547,13 +564,13 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Listing containing the retrieved submissions
   * @example
   *
-  * r.get_top({time: 'all', limit: 2}).then(console.log)
+  * r.getTop({time: 'all', limit: 2}).then(console.log)
   * // => Listing [
   * //  Submission { domain: 'self.AskReddit', banned_by: null, subreddit: Subreddit { display_name: 'AskReddit' }, ... },
   * //  Submission { domain: 'imgur.com', banned_by: null, subreddit: Subreddit { display_name: 'funny' }, ... }
   * // ]
   *
-  * r.get_top('AskReddit').then(console.log)
+  * r.getTop('AskReddit').then(console.log)
   * // => Listing [
   * //  Submission { domain: 'self.AskReddit', banned_by: null, subreddit: Subreddit { display_name: 'AskReddit' }, ... },
   * //  Submission { domain: 'self.AskReddit', banned_by: null, subreddit: Subreddit { display_name: 'AskReddit' }, ... },
@@ -561,12 +578,12 @@ const snoowrap = class snoowrap {
   * //  ...
   * // ]
   */
-  get_top (subreddit_name, options) {
-    return this._get_sorted_frontpage('top', subreddit_name, options);
+  getTop (subredditName, options) {
+    return this._getSortedFrontpage('top', subredditName, options);
   }
   /**
   * @summary Gets a Listing of controversial posts.
-  * @param {string} [subreddit_name] The subreddit to get posts from. If not provided, posts are fetched from
+  * @param {string} [subredditName] The subreddit to get posts from. If not provided, posts are fetched from
   the front page of reddit.
   * @param {object} [options={}] Options for the resulting Listing
   * @param {string} [options.time] Describes the timespan that posts should be retrieved from. Should be one of
@@ -574,14 +591,14 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Listing containing the retrieved submissions
   * @example
   *
-  * r.get_controversial('technology').then(console.log)
+  * r.getControversial('technology').then(console.log)
   * // => Listing [
   * //  Submission { domain: 'thenextweb.com', banned_by: null, subreddit: Subreddit { display_name: 'technology' }, ... },
   * //  Submission { domain: 'pcmag.com', banned_by: null, subreddit: Subreddit { display_name: 'technology' }, ... }
   * // ]
   */
-  get_controversial (subreddit_name, options) {
-    return this._get_sorted_frontpage('controversial', subreddit_name, options);
+  getControversial (subredditName, options) {
+    return this._getSortedFrontpage('controversial', subredditName, options);
   }
   /**
   * @summary Gets the authenticated user's unread messages.
@@ -589,14 +606,14 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Listing containing unread items in the user's inbox
   * @example
   *
-  * r.get_unread_messages().then(console.log)
+  * r.getUnreadMessages().then(console.log)
   * // => Listing [
   * //  PrivateMessage { body: 'hi!', was_comment: false, first_message: null, ... },
   * //  Comment { body: 'this is a reply', link_title: 'Yay, a selfpost!', was_comment: true, ... }
   * // ]
   */
-  get_unread_messages (options = {}) {
-    return this._get_listing({uri: 'message/unread', qs: options});
+  getUnreadMessages (options = {}) {
+    return this._getListing({uri: 'message/unread', qs: options});
   }
   /**
   * @summary Gets the items in the authenticated user's inbox.
@@ -607,14 +624,14 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Listing containing items in the user's inbox
   * @example
   *
-  * r.get_unread_messages().then(console.log)
+  * r.getInbox().then(console.log)
   * // => Listing [
   * //  PrivateMessage { body: 'hi!', was_comment: false, first_message: null, ... },
   * //  Comment { body: 'this is a reply', link_title: 'Yay, a selfpost!', was_comment: true, ... }
   * // ]
   */
-  get_inbox ({filter, ...options} = {}) {
-    return this._get_listing({uri: `message/${filter || 'inbox'}`, qs: options});
+  getInbox ({filter, ...options} = {}) {
+    return this._getListing({uri: `message/${filter || 'inbox'}`, qs: options});
   }
   /**
   * @summary Gets the authenticated user's modmail.
@@ -622,14 +639,14 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Listing of the user's modmail
   * @example
   *
-  * r.get_modmail({limit: 2}).then(console.log)
+  * r.getModmail({limit: 2}).then(console.log)
   * // => Listing [
   * //  PrivateMessage { body: '/u/not_an_aardvark has accepted an invitation to become moderator ... ', ... },
   * //  PrivateMessage { body: '/u/not_an_aardvark has been invited by /u/actually_an_aardvark to ...', ... }
   * // ]
   */
-  get_modmail (options = {}) {
-    return this._get_listing({uri: 'message/moderator', qs: options});
+  getModmail (options = {}) {
+    return this._getListing({uri: 'message/moderator', qs: options});
   }
   /**
   * @summary Gets the user's sent messages.
@@ -637,14 +654,14 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Listing of the user's sent messages
   * @example
   *
-  * r.get_sent_messages().then(console.log)
+  * r.getSentMessages().then(console.log)
   * // => Listing [
   * //  PrivateMessage { body: 'you have been added as an approved submitter to ...', ... },
   * //  PrivateMessage { body: 'you have been banned from posting to ...' ... }
   * // ]
   */
-  get_sent_messages (options = {}) {
-    return this._get_listing({uri: 'message/sent', qs: options});
+  getSentMessages (options = {}) {
+    return this._getListing({uri: 'message/sent', qs: options});
   }
   /**
   * @summary Marks all of the given messages as read.
@@ -654,18 +671,18 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Promise that fulfills when the request is complete
   * @example
   *
-  * r.mark_messages_as_read(['51shsd', '51shxv'])
+  * r.markMessagesAsRead(['51shsd', '51shxv'])
   *
   * // To reference a comment by ID, be sure to use the `t1_` prefix, otherwise snoowrap will be unable to distinguish the
   * // comment ID from a PrivateMessage ID.
-  * r.mark_messages_as_read(['t5_51shsd', 't1_d3zhb5k'])
+  * r.markMessagesAsRead(['t5_51shsd', 't1_d3zhb5k'])
   *
   * // Alternatively, just pass in a comment object directly.
-  * r.mark_messages_as_read([r.get_message('51shsd'), r.get_comment('d3zhb5k')])
+  * r.markMessagesAsRead([r.getMessage('51shsd'), r.getComment('d3zhb5k')])
   */
-  mark_messages_as_read (messages) {
-    const message_ids = messages.map(message => add_fullname_prefix(message, 't4_'));
-    return this._post({uri: 'api/read_message', form: {id: message_ids.join(',')}});
+  markMessagesAsRead (messages) {
+    const messageIds = messages.map(message => addFullnamePrefix(message, 't4_'));
+    return this._post({uri: 'api/read_message', form: {id: messageIds.join(',')}});
   }
   /**
   * @summary Marks all of the given messages as unread.
@@ -675,33 +692,33 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Promise that fulfills when the request is complete
   * @example
   *
-  * r.mark_messages_as_unread(['51shsd', '51shxv'])
+  * r.markMessagesAsUnread(['51shsd', '51shxv'])
   *
   * // To reference a comment by ID, be sure to use the `t1_` prefix, otherwise snoowrap will be unable to distinguish the
   * // comment ID from a PrivateMessage ID.
-  * r.mark_messages_as_unread(['t5_51shsd', 't1_d3zhb5k'])
+  * r.markMessagesAsUnread(['t5_51shsd', 't1_d3zhb5k'])
   *
   * // Alternatively, just pass in a comment object directly.
-  * r.mark_messages_as_read([r.get_message('51shsd'), r.get_comment('d3zhb5k')])
+  * r.markMessagesAsRead([r.getMessage('51shsd'), r.getComment('d3zhb5k')])
   */
-  mark_messages_as_unread (messages) {
-    const message_ids = messages.map(message => add_fullname_prefix(message, 't4_'));
-    return this._post({uri: 'api/unread_message', form: {id: message_ids.join(',')}});
+  markMessagesAsUnread (messages) {
+    const messageIds = messages.map(message => addFullnamePrefix(message, 't4_'));
+    return this._post({uri: 'api/unread_message', form: {id: messageIds.join(',')}});
   }
   /**
   * @summary Marks all of the user's messages as read.
   * @desc **Note:** The reddit.com site imposes a ratelimit of approximately 1 request every 10 minutes on this endpoint.
-  Further requests will cause the API to return a 429 error
+  Further requests will cause the API to return a 429 error.
   * @returns {Promise} A Promise that resolves when the request is complete
   * @example
   *
-  * r.read_all_messages().then(function () {
-  *   r.get_unread_messages().then(console.log)
+  * r.readAllMessages().then(function () {
+  *   r.getUnreadMessages().then(console.log)
   * })
   * // => Listing []
   * // (messages marked as 'read' on reddit)
   */
-  read_all_messages () {
+  readAllMessages () {
     return this._post({uri: 'api/read_all_messages'});
   }
   /**
@@ -710,37 +727,44 @@ const snoowrap = class snoowrap {
   * @param {RedditUser|Subreddit|string} options.to The recipient of the message.
   * @param {string} options.subject The message subject (100 characters max)
   * @param {string} options.text The body of the message, in raw markdown text
-  * @param {Subreddit|string} [options.from_subreddit] If provided, the message is sent as a modmail from the specified
+  * @param {Subreddit|string} [options.fromSubreddit] If provided, the message is sent as a modmail from the specified
   subreddit.
-  * @param {string} [options.captcha_iden] A captcha identifier. This is only necessary if the authenticated account
+  * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
   requires a captcha to submit posts and comments.
-  * @param {string} [options.captcha_response] The response to the captcha with the given identifier
+  * @param {string} [options.captchaResponse] The response to the captcha with the given identifier
   * @returns {Promise} A Promise that fulfills when the request is complete
   * @example
   *
-  * r.compose_message({
+  * r.composeMessage({
   *   to: 'actually_an_aardvark',
   *   subject: "Hi, how's it going?",
   *   text: 'Long time no see'
   * })
   * // (message created on reddit)
   */
-  compose_message ({captcha, from_subreddit, captcha_iden, subject, text, to}) {
-    let parsed_to = to;
-    let parsed_from_sr = from_subreddit;
+  composeMessage ({
+      captcha,
+      from_subreddit, fromSubreddit = from_subreddit,
+      captcha_iden, captchaIden = captcha_iden,
+      subject,
+      text,
+      to
+  }) {
+    let parsedTo = to;
+    let parsedFromSr = fromSubreddit;
     if (to instanceof snoowrap.objects.RedditUser) {
-      parsed_to = to.name;
+      parsedTo = to.name;
     } else if (to instanceof snoowrap.objects.Subreddit) {
-      parsed_to = `/r/${to.display_name}`;
+      parsedTo = `/r/${to.display_name}`;
     }
-    if (from_subreddit instanceof snoowrap.objects.Subreddit) {
-      parsed_from_sr = from_subreddit.display_name;
-    } else if (typeof from_subreddit === 'string') {
-      parsed_from_sr = from_subreddit.replace(/^\/?r\//, ''); // Convert '/r/subreddit_name' to 'subreddit_name'
+    if (fromSubreddit instanceof snoowrap.objects.Subreddit) {
+      parsedFromSr = fromSubreddit.display_name;
+    } else if (typeof fromSubreddit === 'string') {
+      parsedFromSr = fromSubreddit.replace(/^\/?r\//, ''); // Convert '/r/subreddit_name' to 'subreddit_name'
     }
     return this._post({uri: 'api/compose', form: {
-      api_type, captcha, iden: captcha_iden, from_sr: parsed_from_sr, subject, text, to: parsed_to
-    }}).tap(handle_json_errors(this)).return({});
+      api_type, captcha, iden: captchaIden, from_sr: parsedFromSr, subject, text, to: parsedTo
+    }}).tap(handleJsonErrors(this)).return({});
   }
   /**
   * @summary Gets a list of all oauth scopes supported by the reddit API.
@@ -748,7 +772,7 @@ const snoowrap = class snoowrap {
   * @returns {Promise} An object containing oauth scopes.
   * @example
   *
-  * r.get_oauth_scope_list().then(console.log)
+  * r.getOauthScopeList().then(console.log)
   * // => {
   * //  creddits: {
   * //    description: 'Spend my reddit gold creddits on giving gold to other users.',
@@ -763,7 +787,7 @@ const snoowrap = class snoowrap {
   * //  ...
   * // }
   */
-  get_oauth_scope_list () {
+  getOauthScopeList () {
     return this._get({uri: 'api/v1/scopes'});
   }
   /**
@@ -773,7 +797,7 @@ const snoowrap = class snoowrap {
   * @param {string} [options.time] Describes the timespan that posts should be retrieved from. One of
   `hour, day, week, month, year, all`
   * @param {Subreddit|string} [options.subreddit] The subreddit to conduct the search on.
-  * @param {boolean} [options.restrict_sr=true] Restricts search results to the given subreddit
+  * @param {boolean} [options.restrictSubreddit=true] Restricts search results to the given subreddit
   * @param {string} [options.sort] Determines how the results should be sorted. One of `relevance, hot, top, new, comments`
   * @param {string} [options.syntax='plain'] Specifies a syntax for the search. One of `cloudsearch, lucene, plain`
   * @returns {Promise} A Listing containing the search results.
@@ -794,20 +818,23 @@ const snoowrap = class snoowrap {
     if (options.subreddit instanceof snoowrap.objects.Subreddit) {
       options.subreddit = options.subreddit.display_name;
     }
-    defaults(options, {restrict_sr: true, syntax: 'plain'});
-    const parsed_query = omit({...options, t: options.time, q: options.query}, ['time', 'query']);
-    return this._get_listing({uri: `${options.subreddit ? `r/${options.subreddit}/` : ''}search`, qs: parsed_query});
+    defaults(options, {restrictSr: true, syntax: 'plain'});
+    const parsedQuery = omit(
+      {...options, t: options.time, q: options.query, restrict_sr: options.restrictSr},
+      ['time', 'query']
+    );
+    return this._getListing({uri: `${options.subreddit ? `r/${options.subreddit}/` : ''}search`, qs: parsedQuery});
   }
   /**
   * @summary Searches for subreddits given a query.
   * @param {object} options
   * @param {string} options.query A search query (50 characters max)
   * @param {boolean} [options.exact=false] Determines whether the results shouldbe limited to exact matches.
-  * @param {boolean} [options.include_nsfw=true] Determines whether the results should include NSFW subreddits.
+  * @param {boolean} [options.includeNsfw=true] Determines whether the results should include NSFW subreddits.
   * @returns {Promise} An Array containing subreddit names
   * @example
   *
-  * r.search_subreddit_names({query: 'programming'}).then(console.log)
+  * r.searchSubredditNames({query: 'programming'}).then(console.log)
   * // => [
   * //  'programming',
   * //  'programmingcirclejerk',
@@ -815,10 +842,10 @@ const snoowrap = class snoowrap {
   * //  ...
   * // ]
   */
-  search_subreddit_names ({exact = false, include_nsfw = true, query}) {
-    return this._post({uri: 'api/search_reddit_names', qs: {exact, include_over_18: include_nsfw, query}}).get('names');
+  searchSubredditNames ({exact = false, include_nsfw = true, includeNsfw = include_nsfw, query}) {
+    return this._post({uri: 'api/search_reddit_names', qs: {exact, include_over_18: includeNsfw, query}}).get('names');
   }
-  _create_or_edit_subreddit ({
+  _createOrEditSubreddit ({
     allow_top = true,
     captcha,
     captcha_iden,
@@ -855,7 +882,7 @@ const snoowrap = class snoowrap {
       'header-title': header_title, hide_ads, iden: captcha_iden, lang, link_type, name, over_18, public_description,
       public_traffic, show_media, spam_comments, spam_links, spam_selfposts, sr, submit_link_label, submit_text,
       submit_text_label, suggested_comment_sort, title, type: subreddit_type || type, wiki_edit_age, wiki_edit_karma, wikimode
-    }}).then(handle_json_errors(this.get_subreddit(name || sr)));
+    }}).then(handleJsonErrors(this.getSubreddit(name || sr)));
   }
   /**
   * @summary Creates a new subreddit.
@@ -905,7 +932,7 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Promise for the newly-created subreddit object.
   * @example
   *
-  * r.create_subreddit({
+  * r.createSubreddit({
   *   name: 'snoowrap_testing2',
   *   title: 'snoowrap testing: the sequel',
   *   public_description: 'thanks for reading the snoowrap docs!',
@@ -915,8 +942,8 @@ const snoowrap = class snoowrap {
   * // => Subreddit { display_name: 'snoowrap_testing2' }
   * // (/r/snoowrap_testing2 created on reddit)
   */
-  create_subreddit (options) {
-    return this._create_or_edit_subreddit(options);
+  createSubreddit (options) {
+    return this._createOrEditSubreddit(options);
   }
   /**
   * @summary Searches subreddits by topic.
@@ -925,7 +952,7 @@ const snoowrap = class snoowrap {
   * @returns {Promise} An Array of subreddit objects corresponding to the search results
   * @example
   *
-  * r.search_subreddit_topics({query: 'movies'}).then(console.log)
+  * r.searchSubredditTopics({query: 'movies'}).then(console.log)
   * // => [
   * //  Subreddit { display_name: 'tipofmytongue' },
   * //  Subreddit { display_name: 'remove' },
@@ -933,9 +960,9 @@ const snoowrap = class snoowrap {
   * //  ...
   * // ]
   */
-  search_subreddit_topics ({query}) {
+  searchSubredditTopics ({query}) {
     return this._get({uri: 'api/subreddits_by_topic', qs: {query}}).then(results =>
-      map(results, 'name').map(this.get_subreddit.bind(this))
+      map(results, 'name').map(result => this.getSubreddit(result))
     );
   }
   /**
@@ -944,7 +971,7 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Listing containing Subreddits
   * @example
   *
-  * r.get_subscriptions({limit: 2}).then(console.log)
+  * r.getSubscriptions({limit: 2}).then(console.log)
   * // => Listing [
   * //  Subreddit {
   * //    display_name: 'gadgets',
@@ -958,8 +985,8 @@ const snoowrap = class snoowrap {
   * //  }
   * // ]
   */
-  get_subscriptions (options) {
-    return this._get_listing({uri: 'subreddits/mine/subscriber', qs: options});
+  getSubscriptions (options) {
+    return this._getListing({uri: 'subreddits/mine/subscriber', qs: options});
   }
   /**
   * @summary Gets a list of subreddits in which the currently-authenticated user is an approved submitter.
@@ -967,7 +994,7 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Listing containing Subreddits
   * @example
   *
-  * r.get_contributor_subreddits().then(console.log)
+  * r.getContributorSubreddits().then(console.log)
   * // => Listing [
   * //  Subreddit {
   * //    display_name: 'snoowrap_testing',
@@ -977,8 +1004,8 @@ const snoowrap = class snoowrap {
   * // ]
   *
   */
-  get_contributor_subreddits (options) {
-    return this._get_listing({uri: 'subreddits/mine/contributor', qs: options});
+  getContributorSubreddits (options) {
+    return this._getListing({uri: 'subreddits/mine/contributor', qs: options});
   }
   /**
   * @summary Gets a list of subreddits in which the currently-authenticated user is a moderator.
@@ -986,7 +1013,7 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Listing containing Subreddits
   * @example
   *
-  * r.get_moderated_subreddits().then(console.log)
+  * r.getModeratedSubreddits().then(console.log)
   * // => Listing [
   * //  Subreddit {
   * //    display_name: 'snoowrap_testing',
@@ -995,8 +1022,8 @@ const snoowrap = class snoowrap {
   * //  }
   * // ]
   */
-  get_moderated_subreddits (options) {
-    return this._get_listing({uri: 'subreddits/mine/moderator', qs: options});
+  getModeratedSubreddits (options) {
+    return this._getListing({uri: 'subreddits/mine/moderator', qs: options});
   }
   /**
   * @summary Searches subreddits by title and description.
@@ -1005,12 +1032,12 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Listing containing Subreddits
   * @example
   *
-  * r.search_subreddits({query: 'cookies'}).then(console.log)
+  * r.searchSubreddits({query: 'cookies'}).then(console.log)
   * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
   */
-  search_subreddits (options) {
+  searchSubreddits (options) {
     options.q = options.query;
-    return this._get_listing({uri: 'subreddits/search', qs: omit(options, 'query')});
+    return this._getListing({uri: 'subreddits/search', qs: omit(options, 'query')});
   }
   /**
   * @summary Gets a list of subreddits, arranged by popularity.
@@ -1018,11 +1045,11 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Listing containing Subreddits
   * @example
   *
-  * r.get_popular_subreddits().then(console.log)
+  * r.getPopularSubreddits().then(console.log)
   * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
   */
-  get_popular_subreddits (options) {
-    return this._get_listing({uri: 'subreddits/popular', qs: options});
+  getPopularSubreddits (options) {
+    return this._getListing({uri: 'subreddits/popular', qs: options});
   }
   /**
   * @summary Gets a list of subreddits, arranged by age.
@@ -1030,11 +1057,11 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Listing containing Subreddits
   * @example
   *
-  * r.get_new_subreddits().then(console.log)
+  * r.getNewSubreddits().then(console.log)
   * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
   */
-  get_new_subreddits (options) {
-    return this._get_listing({uri: 'subreddits/new', qs: options});
+  getNewSubreddits (options) {
+    return this._getListing({uri: 'subreddits/new', qs: options});
   }
   /**
   * @summary Gets a list of gold-exclusive subreddits.
@@ -1042,11 +1069,11 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Listing containing Subreddits
   * @example
   *
-  * r.get_gold_subreddits().then(console.log)
+  * r.getGoldSubreddits().then(console.log)
   * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
   */
-  get_gold_subreddits (options) {
-    return this._get_listing({uri: 'subreddits/gold', qs: options});
+  getGoldSubreddits (options) {
+    return this._getListing({uri: 'subreddits/gold', qs: options});
   }
   /**
   * @summary Gets a list of default subreddits.
@@ -1054,11 +1081,11 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Listing containing Subreddits
   * @example
   *
-  * r.get_default_subreddits().then(console.log)
+  * r.getDefaultSubreddits().then(console.log)
   * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
   */
-  get_default_subreddits (options) {
-    return this._get_listing({uri: 'subreddits/default', qs: options});
+  getDefaultSubreddits (options) {
+    return this._getListing({uri: 'subreddits/default', qs: options});
   }
   /**
   * @summary Checks whether a given username is available for registration
@@ -1068,14 +1095,14 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Promise that fulfills with a Boolean (`true` or `false`)
   * @example
   *
-  * r.check_username_availability('not_an_aardvark').then(console.log)
+  * r.checkUsernameAvailability('not_an_aardvark').then(console.log)
   * // => false
-  * r.check_username_availability('eqwZAr9qunx7IHqzWVeF').then(console.log)
+  * r.checkUsernameAvailability('eqwZAr9qunx7IHqzWVeF').then(console.log)
   * // => true
   */
-  check_username_availability (name) {
+  checkUsernameAvailability (name) {
     // The oauth endpoint listed in reddit's documentation doesn't actually work, so just send an unauthenticated request.
-    return this.unauthenticated_request({uri: 'api/username_available.json', qs: {user: name}});
+    return this.unauthenticatedRequest({uri: 'api/username_available.json', qs: {user: name}});
   }
   /**
   * @summary Creates a new LiveThread.
@@ -1087,24 +1114,24 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Promise that fulfills with the new LiveThread when the request is complete
   * @example
   *
-  * r.create_livethread({title: 'My livethread'}).then(console.log)
+  * r.createLivethread({title: 'My livethread'}).then(console.log)
   * // => LiveThread { id: 'wpimncm1f01j' }
   */
-  create_livethread ({title, description, resources, nsfw = false}) {
+  createLivethread ({title, description, resources, nsfw = false}) {
     return this._post({
       uri: 'api/live/create',
       form: {api_type, description, nsfw, resources, title}
-    }).tap(handle_json_errors(this)).then(result => this.get_livethread(result.json.data.id));
+    }).tap(handleJsonErrors(this)).then(result => this.getLivethread(result.json.data.id));
   }
   /**
   * @summary Gets the user's own multireddits.
   * @returns {Promise} A Promise for an Array containing the requester's MultiReddits.
   * @example
   *
-  * r.get_my_multireddits().then(console.log)
+  * r.getMyMultireddits().then(console.log)
   * => [ MultiReddit { ... }, MultiReddit { ... }, ... ]
   */
-  get_my_multireddits () {
+  getMyMultireddits () {
     return this._get({uri: 'api/multi/mine', qs: {expand_srs: true}});
   }
   /**
@@ -1123,14 +1150,14 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Promise for the newly-created MultiReddit object
   * @example
   *
-  * r.create_multireddit({
+  * r.createMultireddit({
   *   name: 'myMulti',
   *   description: 'An example multireddit',
   *   subreddits: ['snoowrap', 'snoowrap_testing']
   * }).then(console.log)
   * => MultiReddit { display_name: 'myMulti', ... }
   */
-  create_multireddit ({name, description, subreddits, visibility = 'private', icon_name = '', key_color = '#000000',
+  createMultireddit ({name, description, subreddits, visibility = 'private', icon_name = '', key_color = '#000000',
       weighting_scheme = 'classic'}) {
     return this._post({uri: 'api/multi', form: {model: JSON.stringify({
       display_name: name,
@@ -1142,8 +1169,8 @@ const snoowrap = class snoowrap {
       weighting_scheme
     })}});
   }
-  _revoke_token (token) {
-    return this.credentialed_client_request({uri: 'api/v1/revoke_token', form: {token}, method: 'post'});
+  _revokeToken (token) {
+    return this.credentialedClientRequest({uri: 'api/v1/revoke_token', form: {token}, method: 'post'});
   }
   /**
   * @summary Invalidates the current access token.
@@ -1151,12 +1178,12 @@ const snoowrap = class snoowrap {
   * @desc **Note**: This can only be used if the current requester was supplied with a `client_id` and `client_secret`. If the
   current requester was supplied with a refresh token, it will automatically create a new access token if any more requests
   are made after this one.
-  * @example r.revoke_access_token();
+  * @example r.revokeAccessToken();
   */
-  revoke_access_token () {
-    return this._revoke_token(this.access_token).then(() => {
-      this.access_token = null;
-      this.token_expiration = null;
+  revokeAccessToken () {
+    return this._revokeToken(this.accessToken).then(() => {
+      this.accessToken = null;
+      this.tokenExpiration = null;
     });
   }
   /**
@@ -1166,41 +1193,41 @@ const snoowrap = class snoowrap {
   access tokens generated by this refresh token will also be invalidated. This effectively de-authenticates the requester and
   prevents it from making any more valid requests. This should only be used in a few cases, e.g. if this token has
   been accidentally leaked to a third party.
-  * @example r.revoke_refresh_token();
+  * @example r.revokeRefreshToken();
   */
-  revoke_refresh_token () {
-    return this._revoke_token(this.refresh_token).then(() => {
-      this.refresh_token = null;
-      this.access_token = null; // Revoking a refresh token also revokes any associated access tokens.
-      this.token_expiration = null;
+  revokeRefreshToken () {
+    return this._revokeToken(this.refreshToken).then(() => {
+      this.refreshToken = null;
+      this.accessToken = null; // Revoking a refresh token also revokes any associated access tokens.
+      this.tokenExpiration = null;
     });
   }
-  _select_flair ({flair_template_id, link, name, text, subreddit_name}) {
+  _selectFlair ({flair_template_id, link, name, text, subredditName}) {
     if (!flair_template_id) {
       throw new errors.InvalidMethodCallError('No flair template ID provided');
     }
-    return Promise.resolve(subreddit_name).then(sub_name => {
-      return this._post({uri: `r/${sub_name}/api/selectflair`, form: {api_type, flair_template_id, link, name, text}});
+    return Promise.resolve(subredditName).then(subName => {
+      return this._post({uri: `r/${subName}/api/selectflair`, form: {api_type, flair_template_id, link, name, text}});
     });
   }
-  _assign_flair ({css_class, link, name, text, subreddit_name}) {
-    return this._promise_wrap(Promise.resolve(subreddit_name).then(display_name => {
-      return this._post({uri: `r/${display_name}/api/flair`, form: {api_type, name, text, link, css_class}});
+  _assignFlair ({css_class, link, name, text, subreddit_name, subredditName = subreddit_name}) {
+    return this._promiseWrap(Promise.resolve(subredditName).then(displayName => {
+      return this._post({uri: `r/${displayName}/api/flair`, form: {api_type, name, text, link, css_class}});
     }));
   }
-  _populate (response_tree) {
-    if (isObject(response_tree)) {
+  _populate (responseTree) {
+    if (isObject(responseTree)) {
       // Map {kind: 't2', data: {name: 'some_username', ... }} to a RedditUser (e.g.) with the same properties
-      if (Object.keys(response_tree).length === 2 && response_tree.kind && response_tree.data) {
-        return this._new_object(KINDS[response_tree.kind] || 'RedditContent', this._populate(response_tree.data), true);
+      if (Object.keys(responseTree).length === 2 && responseTree.kind && responseTree.data) {
+        return this._newObject(KINDS[responseTree.kind] || 'RedditContent', this._populate(responseTree.data), true);
       }
-      const result = (Array.isArray(response_tree) ? map : mapValues)(response_tree, (value, key) => {
+      const result = (Array.isArray(responseTree) ? map : mapValues)(responseTree, (value, key) => {
         // Maps {author: 'some_username'} to {author: RedditUser { name: 'some_username' } }
         if (value !== null && USER_KEYS.has(key)) {
-          return this._new_object('RedditUser', {name: value});
+          return this._newObject('RedditUser', {name: value});
         }
         if (value !== null && SUBREDDIT_KEYS.has(key)) {
-          return this._new_object('Subreddit', {display_name: value});
+          return this._newObject('Subreddit', {display_name: value});
         }
         return this._populate(value);
       });
@@ -1214,40 +1241,40 @@ const snoowrap = class snoowrap {
       }
       return result;
     }
-    return response_tree;
+    return responseTree;
   }
-  _get_listing ({uri, qs = {}, ...options}) {
+  _getListing ({uri, qs = {}, ...options}) {
     /* When the response type is expected to be a Listing, add a `count` parameter with a very high number.
     This ensures that reddit returns a `before` property in the resulting Listing to enable pagination.
     (Aside from the additional parameter, this function is equivalent to snoowrap.prototype._get) */
-    const merged_query = {count: 9999, ...qs};
+    const mergedQuery = {count: 9999, ...qs};
     return qs.limit || !isEmpty(options)
-      ? this._new_object('Listing', {_query: merged_query, _uri: uri, ...options}).fetch_more(qs.limit || MAX_LISTING_ITEMS)
+      ? this._newObject('Listing', {_query: mergedQuery, _uri: uri, ...options}).fetchMore(qs.limit || MAX_LISTING_ITEMS)
       /* This second case is used as a fallback in case the endpoint unexpectedly ends up returning something other than a
-      Listing (e.g. Submission#get_related, which used to return a Listing but no longer does due to upstream reddit API
+      Listing (e.g. Submission#getRelated, which used to return a Listing but no longer does due to upstream reddit API
       changes), in which case using fetch_more() as above will throw an error.
 
       This fallback only works if there are no other meta-properties provided for the Listing, such as _transform. If there are
       other meta-properties,  the function will still end up throwing an error, but there's not really any good way to handle it
       (predicting upstream changes can only go so far). More importantly, in the limited cases where it's used, the fallback
       should have no effect on the returned results */
-      : this._get({uri, qs: merged_query});
+      : this._get({uri, qs: mergedQuery});
   }
 };
 
-const class_func_descriptors = {configurable: true, writable: true};
+const classFuncDescriptors = {configurable: true, writable: true};
 
 /* Add the request_handler functions (oauth_request, credentialed_client_request, etc.) to the snoowrap prototype. Use
 Object.defineProperties to ensure that the properties are non-enumerable. */
-Object.defineProperties(snoowrap.prototype, mapValues(request_handler, func => ({value: func, ...class_func_descriptors})));
+Object.defineProperties(snoowrap.prototype, mapValues(requestHandler, func => ({value: func, ...classFuncDescriptors})));
 
 forEach(HTTP_VERBS, method => {
   /* Define method shortcuts for each of the HTTP verbs. i.e. `snoowrap.prototype._post` is the same as `oauth_request` except
   that the HTTP method defaults to `post`, and the result is promise-wrapped. Use Object.defineProperty to ensure that the
   properties are non-enumerable. */
   Object.defineProperty(snoowrap.prototype, `_${method}`, {value (options) {
-    return this._promise_wrap(this.oauth_request({...options, method}));
-  }, ...class_func_descriptors});
+    return this._promiseWrap(this.oauthRequest({...options, method}));
+  }, ...classFuncDescriptors});
 });
 
 /* `objects` will be an object containing getters for each content type, due to the way objects are exported from
@@ -1259,11 +1286,11 @@ forOwn(KINDS, value => {
   Object.defineProperty(snoowrap.objects[value], '_name', {value, configurable: true});
 });
 
-// Alias all functions on snoowrap's prototype and snoowrap's object prototypes in camelCase.
+// Alias all functions on snoowrap's prototype and snoowrap's object prototypes in snake_case.
 values(snoowrap.objects).concat(snoowrap).map(func => func.prototype).forEach(funcProto => {
   Object.getOwnPropertyNames(funcProto)
-    .filter(name => !name.startsWith('_') && name.includes('_') && isFunction(funcProto[name]))
-    .forEach(name => Object.defineProperty(funcProto, camelCase(name), {value: funcProto[name], ...class_func_descriptors}));
+    .filter(name => !name.startsWith('_') && name !== snakeCase(name) && isFunction(funcProto[name]))
+    .forEach(name => Object.defineProperty(funcProto, snakeCase(name), {value: funcProto[name], ...classFuncDescriptors}));
 });
 
 snoowrap.errors = errors;
