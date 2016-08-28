@@ -87,12 +87,12 @@ const Listing = class Listing extends Array {
   * @param {boolean} [options.skip_replies=false] For a Listing that contains comment objects on a Submission, this option can
   be used to save a few API calls, provided that only top-level comments are being examined. If this is set to `true`, snoowrap
   is able to fetch 100 Comments per API call rather than 20, but all returned Comments will have no fetched replies by default.
-  * @param {boolean} [options.append=true] If `true`, the resulting Listing will contain the existing elements in addition to
-  the newly-fetched elements. If `false`, the resulting Listing will only contain the newly-fetched elements.
   *
   * Internal details: When `skip_replies` is set to `true`, snoowrap uses reddit's `api/info` endpoint to fetch Comments. When
   `skip_replies` is set to `false`, snoowrap uses reddit's `api/morechildren` endpoint. It's worth noting that reddit does
   not allow concurrent requests to the `api/morechildren` endpoint by the same account.
+  * @param {boolean} [options.append=true] If `true`, the resulting Listing will contain the existing elements in addition to
+  the newly-fetched elements. If `false`, the resulting Listing will only contain the newly-fetched elements.
   * @returns {Promise} A new Listing containing the newly-fetched elements. If `options.append` is `true`, the new Listing will
   also contain all elements that were in the original Listing. Under most circumstances, the newly-fetched elements will appear
   at the end of the new Listing. However, if reverse pagination is enabled (i.e. if this Listing was created with a `before`
