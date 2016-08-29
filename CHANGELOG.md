@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.6.2 (2016-08-28)
+
+* Fixed an issue where `credentialed_client_request` could not be used in browsers without creating a snoowrap instance
+
 ## v1.6.1 (2016-08-26)
 
 * Fixed an issue where snoowrap's package.json file would cause errors when bundling with webpack
