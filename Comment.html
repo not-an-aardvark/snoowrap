@@ -1,0 +1,3725 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>snoowrap Class: Comment</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.dark.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.yeti.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top ">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">snoowrap</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="snoowrap.html">snoowrap</a></li><li><a href="RedditContent.html">RedditContent</a></li><li><a href="ReplyableContent.html">ReplyableContent</a></li><li><a href="VoteableContent.html">VoteableContent</a></li><li><a href="Comment.html">Comment</a></li><li><a href="RedditUser.html">RedditUser</a></li><li><a href="Submission.html">Submission</a></li><li><a href="LiveThread.html">LiveThread</a></li><li><a href="PrivateMessage.html">PrivateMessage</a></li><li><a href="Subreddit.html">Subreddit</a></li><li><a href="MultiReddit.html">MultiReddit</a></li><li><a href="WikiPage.html">WikiPage</a></li><li><a href="Listing.html">Listing</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+		<div class="col-sm-3 col-md-3">
+            <form class="navbar-form" role="search">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-8">
+	
+		<div id="main">
+			
+
+	<h1 class="page-title">Class: Comment</h1>
+<section>
+
+<header>
+    
+        <h2>
+        Comment
+        </h2>
+        
+            <div class="class-description"><p>A class representing a reddit comment</p>
+<style> #Comment {display: none} </style></div>
+        
+    
+</header>
+
+
+<article>
+    <div class="container-overview">
+    
+        
+<hr>
+<dt>
+    <h4 class="name" id="Comment"><span class="type-signature"></span>new Comment()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">// Get a comment with the given ID
+r.get_comment(&#x27;c0hkuyq&#x27;)</pre>
+
+
+    
+</dd>
+
+    
+    </div>
+
+    
+        <h3 class="subsection-title">Extends</h3>
+
+        
+
+
+    <ul>
+        <li><a href="VoteableContent.html">VoteableContent</a></li>
+    </ul>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+            
+<hr>
+<dt>
+    <h4 class="name" id="upvote"><span class="type-signature"></span>upvote()</h4>
+    
+    
+    <p class="summary">Upvotes this Comment or Submission.</p>
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p><strong>Note: votes must be cast by humans.</strong> That is, API clients proxying a human's action one-for-one are OK,
+  but bots deciding how to vote on content or amplifying a human's vote are not. See the
+  <a href="https://reddit.com/rules">reddit rules</a> for more details on what constitutes vote cheating. (This guideline is quoted from
+  <a href="https://www.reddit.com/dev/api#POST_api_vote">the official reddit API documentation page</a>.)</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="VoteableContent.html#upvote">VoteableContent#upvote</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Promise that fulfills with this Comment/Submission when the request is complete</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.get_submission(&#x27;4e62ml&#x27;).upvote()</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="downvote"><span class="type-signature"></span>downvote()</h4>
+    
+    
+    <p class="summary">Downvotes this Comment or Submission.</p>
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p><strong>Note: votes must be cast by humans.</strong> That is, API clients proxying a human's action one-for-one are OK, but
+  bots deciding how to vote on content or amplifying a human's vote are not. See the <a href="https://reddit.com/rules">reddit rules</a>
+  for more details on what constitutes vote cheating. (This guideline is quoted from
+  <a href="https://www.reddit.com/dev/api#POST_api_vote">the official reddit API documentation page</a>.)</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="VoteableContent.html#downvote">VoteableContent#downvote</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Promise that fulfills with this Comment/Submission when the request is complete.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.get_submission(&#x27;4e62ml&#x27;).downvote()</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="unvote"><span class="type-signature"></span>unvote()</h4>
+    
+    
+    <p class="summary">Removes any existing vote on this Comment or Submission.</p>
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p><strong>Note: votes must be cast by humans.</strong> That is, API clients proxying a human's action one-for-one are OK, but
+  bots deciding how to vote on content or amplifying a human's vote are not. See the <a href="https://reddit.com/rules">reddit rules</a>
+  for more details on what constitutes vote cheating. (This guideline is quoted from
+  <a href="https://www.reddit.com/dev/api#POST_api_vote">the official reddit API documentation page</a>.)</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="VoteableContent.html#unvote">VoteableContent#unvote</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Promise that fulfills with this Comment/Submission when the request is complete.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.get_submission(&#x27;4e62ml&#x27;).unvote()</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="save"><span class="type-signature"></span>save()</h4>
+    
+    
+    <p class="summary">Saves this Comment or Submission (i.e. adds it to the list at reddit.com/saved)</p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="VoteableContent.html#save">VoteableContent#save</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Promise that fulfills when the request is complete</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.get_submission(&#x27;4e62ml&#x27;).save()</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="unsave"><span class="type-signature"></span>unsave()</h4>
+    
+    
+    <p class="summary">Unsaves this item</p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="VoteableContent.html#unsave">VoteableContent#unsave</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Promise that fulfills when the request is complete</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.get_submission(&#x27;4e62ml&#x27;).unsave()</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="distinguish"><span class="type-signature"></span>distinguish()</h4>
+    
+    
+    <p class="summary">Distinguishes this Comment or Submission with a sigil.</p>
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p><strong>Note:</strong> This function will only work if the requester is the author of this Comment/Submission.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options.status</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+|
+
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"><p>Determines how the item should be distinguished.
+  <code>true</code> (default) signifies that the item should be moderator-distinguished, and
+  <code>false</code> signifies that the item should not be distinguished. Passing a string (e.g.
+  <code>admin</code>) will cause the item to get distinguished with that string, if possible.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options.sticky</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last"><p>Determines whether this item should be stickied in addition to being
+  distinguished. (This only applies to comments; to sticky a submission, use <a href="Submission.html#sticky"><code>Submission#sticky</code></a> instead.)</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="VoteableContent.html#distinguish">VoteableContent#distinguish</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Promise that fulfills when the request is complete.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.get_comment(&#x27;d1xclfo&#x27;).distinguish({status: true, sticky: true})</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="undistinguish"><span class="type-signature"></span>undistinguish()</h4>
+    
+    
+    <p class="summary">Undistinguishes this Comment or Submission. Alias for distinguish({status: false})</p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="VoteableContent.html#undistinguish">VoteableContent#undistinguish</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Promise that fulfills when the request is complete.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.get_submission(&#x27;4e62ml&#x27;).undistinguish()</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="edit"><span class="type-signature"></span>edit(updated_text)</h4>
+    
+    
+    <p class="summary">Edits this Comment or Submission.</p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>updated_text</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The updated markdown text to use</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="VoteableContent.html#edit">VoteableContent#edit</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Promise that fulfills when this request is complete.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.get_comment(&#x27;coip909&#x27;).edit(&#x27;Blah blah blah this is new updated text&#x27;)</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="gild"><span class="type-signature"></span>gild()</h4>
+    
+    
+    <p class="summary">Gives reddit gold to the author of this Comment or Submission.</p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="VoteableContent.html#gild">VoteableContent#gild</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Promise that fullfills with this Comment/Submission when this request is complete</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.get_comment(&#x27;coip909&#x27;).gild()</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="enable_inbox_replies"><span class="type-signature"></span>enable_inbox_replies()</h4>
+    
+    
+    <p class="summary">Enables inbox replies on this Comment or Submission</p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="VoteableContent.html#enable_inbox_replies">VoteableContent#enable_inbox_replies</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Promise that fulfills with this content when the request is complete</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.get_comment(&#x27;coip909&#x27;).enable_inbox_replies()</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="disable_inbox_replies"><span class="type-signature"></span>disable_inbox_replies()</h4>
+    
+    
+    <p class="summary">Disables inbox replies on this Comment or Submission</p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="VoteableContent.html#disable_inbox_replies">VoteableContent#disable_inbox_replies</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Promise that fulfills with this content when the request is complete</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.get_comment(&#x27;coip909&#x27;).disable_inbox_replies()</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="expand_replies"><span class="type-signature"></span>expand_replies( [options])</h4>
+    
+    
+    <p class="summary">Expands the reply Listings on this Comment/Submission.</p>
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>This is useful in cases where one wants to enumerate all comments on a
+  thread, even the ones that are initially hidden when viewing it (e.g. long comment chains).</p>
+<p>This function accepts two optional parameters <code>options.limit</code> and <code>options.depth</code>. <code>options.limit</code> sets an upper bound
+  for the branching factor of the resulting replies tree, i.e. the number of comments that are fetched in reply to any given
+  item. <code>options.depth</code> sets an upper bound for the depth of the resulting replies tree (where a depth of 0 signifies that no
+  replies should be fetched at all).</p>
+<p>Note that regardless of the <code>limit</code> and <code>depth</code> parameters used, any reply that appeared in the original reply tree will
+  appear in the expanded reply tree. In certain cases, the depth of the resulting tree may also be larger than <code>options.depth</code>,
+  if the reddit API returns more of a comment tree than needed.</p>
+<p>These parameters should primarily be used to keep the request count low; if a precise limit and depth are needed, it is
+  recommended to manually verify the comments in the tree afterwards.</p>
+<p>Both parameters default to <code>Infinity</code> if omitted, i.e. the resulting tree contains every single comment available. It should
+  be noted that depending on the size and depth of the thread, fetching every single comment can use up a significant number
+  of ratelimited requests. (To give an intuitive estimate, consider how many clicks would be needed to view all the
+  comments on the thread using the HTML site.)</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    {}
+                
+                </td>
+            
+
+            <td class="description last">
+                <h6 class="method-params-label method-subparams-label">Properties</h6>
+                
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>limit</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    Infinity
+                
+                </td>
+            
+
+            <td class="description last"><p>An upper-bound for the branching factor of the resulting tree of replies</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>depth</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    Infinity
+                
+                </td>
+            
+
+            <td class="description last"><p>An upper-bound for the depth of the resulting tree of replies</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="VoteableContent.html#expand_replies">VoteableContent#expand_replies</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Promise that fulfills with a new version of this object that has an expanded reply tree. The original
+  object is not modified</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.get_submission(&#x27;4fuq26&#x27;).expand_replies().then(console.log)
+// =&gt; (a very large comment tree containing every viewable comment on this thread)</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="delete"><span class="type-signature"></span>delete()</h4>
+    
+    
+    <p class="summary">Deletes this Comment or Submission</p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="VoteableContent.html#delete">VoteableContent#delete</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Promise that fulfills with this Comment/Submission when this request is complete</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.get_comment(&#x27;coip909&#x27;).delete()</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="remove"><span class="type-signature"></span>remove(options)</h4>
+    
+    
+    <p class="summary">Removes this Comment, Submission or PrivateMessage from public listings.</p>
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>This requires the authenticated user to be a moderator of the subreddit with the <code>posts</code> permission.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <h6 class="method-params-label method-subparams-label">Properties</h6>
+                
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>spam</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last"><p>Determines whether this should be marked as spam</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="ReplyableContent.html#remove">ReplyableContent#remove</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Promise that fulfills with this content when the request is complete</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.get_comment(&#x27;c08pp5z&#x27;).remove({spam: true})</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="approve"><span class="type-signature"></span>approve()</h4>
+    
+    
+    <p class="summary">Approves this Comment, Submission, or PrivateMessage, re-adding it to public listings if it had been removed</p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="ReplyableContent.html#approve">ReplyableContent#approve</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Promise that fulfills with this content when the request is complete</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.get_comment(&#x27;c08pp5z&#x27;).remove()</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="report"><span class="type-signature"></span>report( [options])</h4>
+    
+    
+    <p class="summary">Reports this content anonymously to subreddit moderators (for Comments and Submissions)
+  or to the reddit admins (for PrivateMessages)</p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">
+                <h6 class="method-params-label method-subparams-label">Properties</h6>
+                
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>reason</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The reason for the report</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="ReplyableContent.html#report">ReplyableContent#report</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Promise that fulfills with this content when the request is complete</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.get_comment(&#x27;c08pp5z&#x27;).report({reason: &#x27;Breaking the subreddit rules&#x27;})</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="ignore_reports"><span class="type-signature"></span>ignore_reports()</h4>
+    
+    
+    <p class="summary">Ignores reports on this Comment, Submission, or PrivateMessage</p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="ReplyableContent.html#ignore_reports">ReplyableContent#ignore_reports</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Promise that fulfills with this content when the request is complete</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.get_comment(&#x27;c08pp5z&#x27;).ignore_reports()</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="unignore_reports"><span class="type-signature"></span>unignore_reports()</h4>
+    
+    
+    <p class="summary">Unignores reports on this Comment, Submission, or PrivateMessages</p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="ReplyableContent.html#unignore_reports">ReplyableContent#unignore_reports</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Promise that fulfills with this content when the request is complete</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.get_comment(&#x27;c08pp5z&#x27;).unignore_reports()</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="reply"><span class="type-signature"></span>reply(text)</h4>
+    
+    
+    <p class="summary">Submits a new reply to this object. (This takes the form of a new Comment if this object is a Submission/Comment,
+  or a new PrivateMessage if this object is a PrivateMessage.)</p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>text</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The content of the reply, in raw markdown text</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="ReplyableContent.html#reply">ReplyableContent#reply</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Promise that fulfills with the newly-created reply</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.get_submission(&#x27;4e60m3&#x27;).reply(&#x27;This was an interesting post. Thanks.&#x27;);</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="block_author"><span class="type-signature"></span>block_author()</h4>
+    
+    
+    <p class="summary">Blocks the author of this content.</p>
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p><strong>Note:</strong> In order for this function to have an effect, this item <strong>must</strong> be in the authenticated account's inbox or
+  modmail somewhere. The reddit API gives no outward indication of whether this condition is satisfied, so the returned Promise
+  will fulfill even if this is not the case.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="ReplyableContent.html#block_author">ReplyableContent#block_author</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Promise that fulfills with this message after the request is complete</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.get_inbox({limit: 1}).then(messages =&gt;
+  messages[0].block_author();
+);</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="fetch"><span class="type-signature"></span>fetch()</h4>
+    
+    
+    <p class="summary">Fetches this content from reddit.</p>
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>This will not mutate the original content object; all Promise properties will remain as Promises after the content has
+been fetched. However, the information on this object will be cached, so it may become out-of-date with the content on
+reddit. To clear the cache and fetch this object from reddit again, use <code>refresh()</code>.</p>
+<p>If snoowrap is running in an environment that supports ES2015 Proxies (e.g. Chrome 49+), then <code>fetch()</code> will get
+automatically called when an unknown property is accessed on an unfetched content object.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="RedditContent.html#fetch">RedditContent#fetch</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A version of this object with all of its fetched properties from reddit. This will not mutate the
+  object. Once an object has been fetched once, its properties will be cached, so they might end up out-of-date if this
+  function is called again. To refresh an object, use refresh().</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.get_user(&#x27;not_an_aardvark&#x27;).fetch().then(user_info =&gt; {
+  console.log(user_info.name); // &#x27;not_an_aardvark&#x27;
+  console.log(user_info.created_utc); // 1419104352
+});
+
+r.get_comment(&#x27;d1xchqn&#x27;).fetch().then(comment =&gt; comment.body).then(console.log)
+// =&gt; &#x27;This is a little too interesting for my liking&#x27;
+
+// In environments that support ES2015 Proxies, the above line is equivalent to:
+r.get_comment(&#x27;d1xchqn&#x27;).body.then(console.log);
+// =&gt; &#x27;This is a little too interesting for my liking&#x27;</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="refresh"><span class="type-signature"></span>refresh()</h4>
+    
+    
+    <p class="summary">Refreshes this content.</p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="RedditContent.html#refresh">RedditContent#refresh</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A newly-fetched version of this content</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">var some_comment = r.get_comment(&#x27;cmfkyus&#x27;);
+var initial_comment_body = some_comment.fetch().then(comment =&gt; comment.body);
+
+setTimeout(() =&gt; {
+  some_comment.refresh().then(refreshed_comment =&gt; {
+    if (initial_comment_body.value() !== refreshed_comment.body) {
+      console.log(&#x27;This comment has changed since 10 seconds ago.&#x27;);
+    }
+  });
+}, 10000);</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="toJSON"><span class="type-signature"></span>toJSON()</h4>
+    
+    
+    <p class="summary">Returns a stringifyable version of this object.</p>
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>It is usually not necessary to call this method directly; simply running JSON.stringify(some_object) will strip the
+  private properties anyway.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="RedditContent.html#toJSON">RedditContent#toJSON</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A version of this object with all the private properties stripped</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">object</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">var user = r.get_user(&#x27;not_an_aardvark&#x27;);
+JSON.stringify(user) // =&gt; &#x27;{&quot;name&quot;:&quot;not_an_aardvark&quot;}&#x27;</pre>
+
+
+    
+</dd>
+
+        </dl>
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
+		</div>
+	
+
+</div>
+</div>
+
+<div class="modal fade" id="searchResults">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Search results</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
+
+<footer>
+
+	<script src="snoowrap-v1.min.js"></script>
+
+<script>
+var DO_NOT_TRACK = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+if (DO_NOT_TRACK !== '1' && DO_NOT_TRACK !== 'yes') {
+  !function(s,n,u,w,r,a,p){s.GoogleAnalyticsObject=u;s[u]||(s[u]=function(){
+  (s[u].q=s[u].q||[]).push(arguments)});s[u].l=+new Date;a=n.createElement(w);
+  p=n.getElementsByTagName(w)[0];a.src=r;p.parentNode.insertBefore(a,p)}
+  (window,document,'ga','script','//www.google-analytics.com/analytics.js');
+
+  ga('create', 'UA-77745074-1', 'auto');
+  ga('send', 'pageview');
+}
+
+console.log('Thanks for reading the snoowrap docs! Try using the `snoowrap` global in the dev console.');
+</script>
+
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+<script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : false,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		SearcherDisplay.init();
+	});
+</script>
+
+</body>
+</html>

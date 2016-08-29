@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>snoowrap Index</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.dark.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.yeti.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top ">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">snoowrap</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="snoowrap.html">snoowrap</a></li><li><a href="RedditContent.html">RedditContent</a></li><li><a href="ReplyableContent.html">ReplyableContent</a></li><li><a href="VoteableContent.html">VoteableContent</a></li><li><a href="Comment.html">Comment</a></li><li><a href="RedditUser.html">RedditUser</a></li><li><a href="Submission.html">Submission</a></li><li><a href="LiveThread.html">LiveThread</a></li><li><a href="PrivateMessage.html">PrivateMessage</a></li><li><a href="Subreddit.html">Subreddit</a></li><li><a href="MultiReddit.html">MultiReddit</a></li><li><a href="WikiPage.html">WikiPage</a></li><li><a href="Listing.html">Listing</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+		<div class="col-sm-3 col-md-3">
+            <form class="navbar-form" role="search">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-8">
+	
+		<div id="main">
+			
+
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+	
+	
+
+
+
+
+
+    <section class="readme-section">
+        <article><h1>snoowrap <a href="https://travis-ci.org/not-an-aardvark/snoowrap"><img src="https://travis-ci.org/not-an-aardvark/snoowrap.svg?branch=master" alt="Build Status"></a></h1><p>A fully-featured Node.js wrapper for the reddit API. (<a href="https://not-an-aardvark.github.io/snoowrap">Documentation</a>)</p>
+<h3>Features</h3><ul>
+<li>snoowrap provides a simple interface to access every reddit API endpoint. For example, the method to get a user profile is just <code>get_user()</code>, and the method to upvote something is just <code>upvote()</code>.</li>
+<li>snoowrap is non-blocking; all of its API calls are asynchronous and return bluebird Promises. This means that you can handle concurrent requests however you want to, and you can use snoowrap as part of a larger process without it holding everything back.</li>
+<li>Each snoowrap object is completely independent. This means that you can have scripts from separate accounts making requests at the same time.</li>
+<li>After you provide a token once, snoowrap will refresh it on its own from then on -- you won't have to worry about authentication again.</li>
+<li>snoowrap uses lazy objects, so it never fetches more than it needs to.</li>
+<li>snoowrap has built-in ratelimit protection. If you hit reddit's ratelimit, you can choose to queue the request, and then run it after the current ratelimit period runs out. That way you won't lose a request if you go a bit too fast.</li>
+<li>snoowrap will retry its request a few times if reddit returns an error due to its servers being overloaded.</li>
+</ul>
+<p>These features ensure that you can write less boilerplate code and focus more on actually doing what you want to do.</p>
+<hr>
+<p>snoowrap's methods are designed to be as simple and consistent as possible. So the following expression:</p>
+<pre class="prettyprint source lang-js"><code>r.get_submission('2np694').body</code></pre><p>...will return a Promise. So will this one:</p>
+<pre class="prettyprint source lang-js"><code> r.get_submission('2np694').author.name
+ // --> returns a Promise for the string 'DO_U_EVN_SPAGHETTI'
+ // (this submission's author's name)</code></pre><p>The above will return a Promise for the author's name, without having to deal with callback hell or <code>.then</code> statements. You can chain multiple API calls together:</p>
+<pre class="prettyprint source lang-js"><code>r.get_submission('2np694').subreddit.get_moderators()[0].name
+// --> returns a Promise for the string 'krispykrackers'
+// (this submission's subreddit's first mod's name)</code></pre><p>...or chain actions together with fluent syntax:</p>
+<pre class="prettyprint source lang-js"><code>r.get_subreddit('snoowrap')
+  .submit_selfpost({title: 'Discussion Thread', text: 'Hello! This is a thread'})
+  .sticky()
+  .distinguish()
+  .ignore_reports()
+  .assign_flair({text: 'Exciting Flair Text', css_class: 'modpost'})</code></pre><p>snoowrap works on Node.js 4+, as well as most common browsers.</p>
+<hr>
+<h3>Examples</h3><pre class="prettyprint source lang-js"><code>'use strict';
+const snoowrap = require('snoowrap');
+
+/* Create a new snoowrap requester with OAuth credentials. For more information on how to get valid credentials, see here: https://github.com/not-an-aardvark/reddit-oauth-helper */
+const r = new snoowrap({
+  user_agent: 'put your user-agent string here', // for more information, see: https://github.com/reddit/reddit/wiki/API
+  client_id: 'put your client id here',
+  client_secret: 'put your client secret here',
+  refresh_token: 'put your refresh token here'
+});
+
+// Alternatively, just pass in a username and password for script-type apps.
+const otherRequester = new snoowrap({
+  user_agent: 'put your user-agent string here',
+  client_id: 'put your client id here',
+  client_secret: 'put your client secret here',
+  username: 'put your username here',
+  password: 'put your password here'
+})
+
+// That's the entire setup process, now you can just make requests.
+
+// Submitting a link to a subreddit
+r.get_subreddit('gifs').submit_link({
+  title: 'Mt. Cameramanjaro',
+  url: 'https://i.imgur.com/n5iOc72.gifv'
+});
+
+// Printing a list of the titles on the front page
+r.get_hot().map(post => post.title).then(console.log);
+
+// Extracting every comment on a thread
+r.get_submission('4j8p6d').expand_replies({limit: Infinity, depth: Infinity}).then(console.log)
+
+// Automating moderation tasks
+r.get_subreddit('some_subreddit_name').get_modqueue({limit: 100}).filter(someRemovalCondition).forEach(flaggedItem => {
+  flaggedItem.remove();
+  flaggedItem.subreddit.ban_user(flaggedItem.author);
+});
+
+// Automatically creating a stickied thread for a moderated subreddit
+r.get_subreddit('some_subreddit_name')
+  .submit_selfpost({title: 'Daily thread', text: 'Discuss things here'})
+  .sticky()
+  .distinguish()
+  .approve()
+  .assign_flair({text: 'Daily Thread flair text', css_class: 'daily-thread'})
+  .reply('This is a comment that appears on that daily thread');
+  // etc. etc.
+
+// Printing the content of a wiki page
+r.get_subreddit('AskReddit').get_wiki_page('bestof').content_md.then(console.log);</code></pre><p>For more examples of what can be done with snoowrap, take a look at the <a href="https://not-an-aardvark.github.io/snoowrap">documentation</a>.</p>
+<hr>
+<h3>Live threads</h3><p>Reddit's <a href="https://www.reddit.com/r/live/wiki/index">live threads</a> are different from most other content, in that messages are distributed through websockets instead of a RESTful API. snoowrap supports this protocol under the hood by representing the content stream as an <a href="https://nodejs.org/api/events.html#events_class_eventemitter">EventEmitter</a>. For example, the following script will stream all livethread updates to the console as they appear:</p>
+<pre class="prettyprint source lang-js"><code>r.get_livethread('whrdxo8dg9n0').stream.on('update', console.log);</code></pre><p>For more information, see the <a href="https://not-an-aardvark.github.io/snoowrap/LiveThread.html">LiveThread documentation page</a>.</p>
+<hr>
+<h3>Important note on ES6</h3><p>snoowrap uses the <code>Proxy</code> object introduced in ES6.</p>
+<p>If your target environment does not support Proxies, snoowrap will still function. However, method chaining as described above won't work, so your syntax will need to be a bit heavier.</p>
+<h4>Environments that support the ES6 Proxy object</h4><ul>
+<li>Node 6+</li>
+<li>Chrome 49+</li>
+<li>Firefox 4+</li>
+<li>Edge</li>
+<li>Node 4 and 5 (requires the <code>--harmony_proxies</code> runtime flag to be enabled. e.g. <code>node --harmony_proxies yourFile.js</code>)</li>
+</ul>
+<p>Example of how Proxy support affects behavior:</p>
+<pre class="prettyprint source lang-js"><code>// This works in environments that support Proxies.
+// However, it throws a TypeError if Proxies are not available.
+r.get_submission('47v7tm').comments[0].upvote();
+
+// ----------
+
+// This is equivalent and works on all platforms, but the syntax isn't as nice.
+r.get_submission('47v7tm').fetch().then(submission => {
+  return submission.comments[0].upvote();
+});</code></pre><hr>
+<h3>To include in a project</h3><p><strong>Node:</strong></p>
+<pre class="prettyprint source lang-bash"><code>npm install snoowrap --save</code></pre><pre class="prettyprint source lang-js"><code>var snoowrap = require('snoowrap');</code></pre><p><strong>Browsers:</strong></p>
+<p>snoowrap is usable with module bundlers such as <a href="http://browserify.org/">browserify</a>.</p>
+<p>Alternatively, prebuilt versions are available:</p>
+<ul>
+<li><a href="https://not-an-aardvark.github.io/snoowrap/snoowrap-v1.js">snoowrap.js</a></li>
+<li><a href="https://not-an-aardvark.github.io/snoowrap/snoowrap-v1.min.js">snoowrap.min.js</a> (80kB gzipped)</li>
+</ul>
+<p>When run in a browser, snoowrap will be assigned to the global variable <code>window.snoowrap</code>.</p>
+<h3>To build/run the tests independently</h3><p>See the <a href="https://github.com/not-an-aardvark/snoowrap/blob/master/CONTRIBUTING.md">contributing guide</a> and the <a href="https://github.com/not-an-aardvark/snoowrap/blob/master/src/README.md">getting started</a> page.</p>
+<hr>
+<h3>License</h3><p>This software is freely distributable under the <a href="https://github.com/not-an-aardvark/snoowrap/blob/master/LICENSE.md">MIT License</a>.</p></article>
+    </section>
+
+
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
+		</div>
+	
+
+</div>
+</div>
+
+<div class="modal fade" id="searchResults">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Search results</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
+
+<footer>
+
+	<script src="snoowrap-v1.min.js"></script>
+
+<script>
+var DO_NOT_TRACK = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+if (DO_NOT_TRACK !== '1' && DO_NOT_TRACK !== 'yes') {
+  !function(s,n,u,w,r,a,p){s.GoogleAnalyticsObject=u;s[u]||(s[u]=function(){
+  (s[u].q=s[u].q||[]).push(arguments)});s[u].l=+new Date;a=n.createElement(w);
+  p=n.getElementsByTagName(w)[0];a.src=r;p.parentNode.insertBefore(a,p)}
+  (window,document,'ga','script','//www.google-analytics.com/analytics.js');
+
+  ga('create', 'UA-77745074-1', 'auto');
+  ga('send', 'pageview');
+}
+
+console.log('Thanks for reading the snoowrap docs! Try using the `snoowrap` global in the dev console.');
+</script>
+
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+<script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : false,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		SearcherDisplay.init();
+	});
+</script>
+
+</body>
+</html>
