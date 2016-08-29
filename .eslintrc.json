@@ -122,6 +122,7 @@
     "space-unary-ops": 1,
     "spaced-comment": 1,
     "template-curly-spacing": 1,
+    "valid-typeof": [2, {"requireStringLiterals": true}],
     "wrap-iife": 2,
     "yoda": 1
   },
