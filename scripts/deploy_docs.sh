@@ -2,7 +2,7 @@
 set -e
 rm -rf doc/ || true
 
-GH_REF='github.com/not-an-aardvark/snoowrap'
+GH_REF='github.com/not-an-aardvark/snoowrap.git'
 
 git clone "https://$GH_REF" --branch gh-pages --single-branch --depth 1 doc
 scripts/build_docs.sh
