@@ -183,6 +183,31 @@ describe('snoowrap', function () {
       expect(r.get_subreddit('AskReddit').get_top).to.equal(r.getSubreddit('AskReddit').getTop);
       expect(snoowrap.objects.Listing.prototype.fetch_more).to.equal(snoowrap.objects.Listing.prototype.fetchMore);
     });
+    describe('`proxies` config option', async () => {
+      it('allows method chaining when set to true', async () => {
+        r.config({proxies: true});
+        const chained_prop = r.get_user('snoowrap_testing').created_utc;
+        expect(chained_prop).to.be.ok();
+        expect(chained_prop.then).to.be.a('function');
+
+        const sub = await r.get_submission('4abn1k').fetch();
+        expect(sub.author.created_utc.then).to.be.a('function');
+
+        expect(r.get_hot({limit: 1})[0].then).to.be.a('function');
+      });
+      it('does not allow method chaining when set to false', async () => {
+        r.config({proxies: false});
+        expect(r.get_user('snoowrap_testing').created_utc).to.be.undefined();
+
+        const sub = await r.get_submission('4abn1k').fetch();
+        expect(sub.author.created_utc).to.be.undefined();
+
+        expect(r.get_hot({limit: 1})[0]).to.be.undefined();
+      });
+      afterEach(() => {
+        r.config({proxies: true});
+      });
+    });
     afterEach(() => {
       r.config({request_delay: previous_request_delay, request_timeout: previous_request_timeout});
     });

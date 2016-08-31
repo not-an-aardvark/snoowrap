@@ -7,5 +7,6 @@ export default {
   retry_error_codes: [502, 503, 504, 522],
   max_retry_attempts: 3,
   warnings: true,
-  debug: false
+  debug: false,
+  proxies: true
 };

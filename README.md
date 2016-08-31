@@ -133,7 +133,7 @@ If your target environment does not support Proxies, snoowrap will still functio
 
 * Node 6+
 * Chrome 49+
-* Firefox 4+
+* Firefox 18+
 * Edge
 * Node 4 and 5 (requires the `--harmony_proxies` runtime flag to be enabled. e.g. `node --harmony_proxies yourFile.js`)
 
@@ -152,6 +152,8 @@ r.get_submission('47v7tm').fetch().then(submission => {
 });
 
 ```
+
+You can explicitly disable method chaining with `r.config({proxies: false})`.
 
 ---
 

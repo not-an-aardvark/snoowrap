@@ -1,6 +1,5 @@
 import {assign, cloneDeep, forEach, keys, mapValues, pick} from 'lodash';
 import Promise from '../Promise.js';
-import promise_wrap from 'promise-chains';
 import {inspect} from 'util';
 import {HTTP_VERBS, USER_KEYS, SUBREDDIT_KEYS} from '../constants.js';
 import Listing from './Listing.js';
@@ -18,7 +17,7 @@ const RedditContent = class RedditContent {
     this._fetch = null;
     this._has_fetched = !!_has_fetched;
     assign(this, options);
-    if (typeof Proxy !== 'undefined' && !this._has_fetched) {
+    if (typeof Proxy !== 'undefined' && !this._has_fetched && _r._config.proxies) {
       return new Proxy(this, {get (target, key) {
         return key in target || key === 'length' || key in Promise.prototype ? target[key] : target.fetch()[key];
       }});
@@ -51,7 +50,7 @@ const RedditContent = class RedditContent {
   */
   fetch () {
     if (!this._fetch) {
-      this._fetch = promise_wrap(this._r._get({uri: this._uri}).bind(this).then(this._transform_api_response));
+      this._fetch = this._r._promise_wrap(this._r._get({uri: this._uri}).bind(this).then(this._transform_api_response));
     }
     return this._fetch;
   }

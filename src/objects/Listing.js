@@ -1,7 +1,6 @@
 import {assign, clone, defaults, defaultsDeep, identity, isEmpty, isFunction, isNil, isNull, isNumber, isObject, keys, last,
   omitBy, pick} from 'lodash';
 import Promise from '../Promise.js';
-import promise_wrap from 'promise-chains';
 import {inspect} from 'util';
 import {parse as url_parse} from 'url';
 import {InvalidMethodCallError} from '../errors.js';
@@ -114,14 +113,16 @@ const Listing = class Listing extends Array {
       throw new InvalidMethodCallError('Failed to fetch Listing. (`amount` parameter was missing or invalid)');
     }
     if (parsed_options.amount <= 0 || this.is_finished) {
-      return promise_wrap(Promise.resolve(this._clone()));
+      return this._r._promise_wrap(Promise.resolve(this._clone()));
     }
     if (this._cached_lookahead) {
       const cloned = this._clone();
       cloned.push(...cloned._cached_lookahead.splice(0, parsed_options.amount));
       return cloned.fetch_more(parsed_options.amount - cloned.length + this.length);
     }
-    return promise_wrap(this._more ? this._fetch_more_comments(parsed_options) : this._fetch_more_regular(parsed_options));
+    return this._r._promise_wrap(
+      this._more ? this._fetch_more_comments(parsed_options) : this._fetch_more_regular(parsed_options)
+    );
   }
   _fetch_more_regular (options) {
     const query = omitBy(clone(this._query), isNil);

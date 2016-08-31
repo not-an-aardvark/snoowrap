@@ -1,5 +1,4 @@
 import Promise from '../Promise.js';
-import promise_wrap from 'promise-chains';
 import {handle_json_errors} from '../helpers.js';
 import ReplyableContent from './ReplyableContent.js';
 const api_type = 'json';
@@ -181,7 +180,7 @@ const VoteableContent = class VoteableContent extends ReplyableContent {
   * // => (a very large comment tree containing every viewable comment on this thread)
   */
   expand_replies ({limit = Infinity, depth = Infinity} = {}) {
-    return promise_wrap(this.fetch().then(result => {
+    return this._r._promise_wrap(this.fetch().then(result => {
       return result._clone({deep: true})._mutate_and_expand_replies({limit, depth});
     }));
   }
