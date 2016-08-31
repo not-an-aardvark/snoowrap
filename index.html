@@ -172,7 +172,7 @@ r.get_subreddit('AskReddit').get_wiki_page('bestof').content_md.then(console.log
 <h4>Environments that support the ES6 Proxy object</h4><ul>
 <li>Node 6+</li>
 <li>Chrome 49+</li>
-<li>Firefox 4+</li>
+<li>Firefox 18+</li>
 <li>Edge</li>
 <li>Node 4 and 5 (requires the <code>--harmony_proxies</code> runtime flag to be enabled. e.g. <code>node --harmony_proxies yourFile.js</code>)</li>
 </ul>
@@ -186,7 +186,8 @@ r.get_submission('47v7tm').comments[0].upvote();
 // This is equivalent and works on all platforms, but the syntax isn't as nice.
 r.get_submission('47v7tm').fetch().then(submission => {
   return submission.comments[0].upvote();
-});</code></pre><hr>
+});</code></pre><p>You can explicitly disable method chaining with <code>r.config({proxies: false})</code>.</p>
+<hr>
 <h3>To include in a project</h3><p><strong>Node:</strong></p>
 <pre class="prettyprint source lang-bash"><code>npm install snoowrap --save</code></pre><pre class="prettyprint source lang-js"><code>var snoowrap = require('snoowrap');</code></pre><p><strong>Browsers:</strong></p>
 <p>snoowrap is usable with module bundlers such as <a href="http://browserify.org/">browserify</a>.</p>

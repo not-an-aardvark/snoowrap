@@ -949,6 +949,49 @@ not recommended for long-term use.</li>
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>proxies</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"><p>Setting this to <code>false</code> disables snoowrap's method-chaining feature. This causes
+  the syntax for using snoowrap to become a bit heavier, but allows for consistency between environments that support the ES6
+  <code>Proxy</code> object and environments that don't. This option is a no-op in environments that don't support the <code>Proxy</code> object,
+  since method chaining is always disabled in those environments.</p></td>
+        </tr>
+
+    
     </tbody>
 </table>
 
