@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.7.0 (2016-08-31)
+
+* Added a `proxies` config option to explicitly disable method chaining even if the runtime environment supports the `Proxy` object
+
 ## v1.6.2 (2016-08-28)
 
 * Fixed an issue where `credentialed_client_request` could not be used in browsers without creating a snoowrap instance
