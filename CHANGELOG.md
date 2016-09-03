@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.7.1 (2016-09-03)
+
+* Fixed an issue where Listings sometimes threw errors in Safari
+
 ## v1.7.0 (2016-08-31)
 
 * Added a `proxies` config option to explicitly disable method chaining even if the runtime environment supports the `Proxy` object
