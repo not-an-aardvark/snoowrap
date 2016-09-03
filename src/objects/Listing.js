@@ -41,6 +41,12 @@ you don't have to worry about the distinction.
 const Listing = class Listing extends Array {
   constructor (options = {}, _r) {
     super();
+    if (!(this instanceof Listing)) {
+      // Safari 9 has an incorrect implementation of classes that extend Arrays. As a workaround,
+      // manually set the constructor and prototype.
+      this.constructor = Listing;
+      Object.setPrototypeOf(this, Listing.prototype);
+    }
     this.push(...options.children || []);
     this._r = _r;
     this._cached_lookahead = options._cached_lookahead;
