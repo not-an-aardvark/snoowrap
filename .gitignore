@@ -6,3 +6,4 @@ doc/
 coverage/
 test/_browser.spec.js
 oauth_info.json
+.eslintcache

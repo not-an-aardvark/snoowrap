@@ -6,7 +6,7 @@
   "main": "dist/snoowrap.js",
   "scripts": {
     "compile": "babel -d dist/ src/ && browserify --im test/snoowrap.spec.js -o test/_browser.spec.js -t [ babelify ]",
-    "lint": "eslint --ignore-path .gitignore .",
+    "lint": "eslint --ignore-path .gitignore . --cache",
     "pretest": "npm run lint && npm run compile",
     "test": "mocha --compilers js:babel-core/register test/snoowrap.spec.js",
     "test:browser": "npm run pretest && open test/run-tests.html",
