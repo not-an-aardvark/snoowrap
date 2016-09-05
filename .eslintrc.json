@@ -2,20 +2,11 @@
   "parser": "babel-eslint",
   "rules": {
     "accessor-pairs": 2,
-    "array-bracket-spacing": [
-      1,
-      "never"
-    ],
+    "array-bracket-spacing": [1, "never"],
     "array-callback-return": 1,
-    "babel/arrow-parens": [
-      1,
-      "as-needed"
-    ],
+    "babel/arrow-parens": [1, "as-needed"],
     "arrow-spacing": 1,
-    "block-spacing": [
-      1,
-      "never"
-    ],
+    "block-spacing": [1, "never"],
     "brace-style": 1,
     "comma-dangle": 1,
     "comma-spacing": 1,
@@ -23,27 +14,15 @@
     "computed-property-spacing": 1,
     "curly": [1, "multi-line"],
     "dot-notation": 1,
-    "dot-location": [
-      1,
-      "property"
-    ],
+    "dot-location": [1, "property"],
     "eol-last": 2,
     "eqeqeq": 2,
     "func-call-spacing": 2,
-    "indent": [
-      1,
-      2
-    ],
+    "indent": [1, 2],
     "key-spacing": 1,
     "keyword-spacing": 1,
-    "linebreak-style": [
-      2,
-      "unix"
-    ],
-    "max-len": [
-      1,
-      128
-    ],
+    "linebreak-style": [2, "unix"],
+    "max-len": [1, 128],
     "max-statements-per-line": 1,
     "new-parens": 1,
     "no-caller": 2,
@@ -93,27 +72,14 @@
     "object-curly-spacing": 1,
     "object-shorthand": 1,
     "operator-assignment": 1,
-    "padded-blocks": [
-      1,
-      "never"
-    ],
+    "padded-blocks": [1, "never"],
     "prefer-arrow-callback": 1,
     "prefer-const": 1,
     "prefer-rest-params": 1,
     "prefer-spread": 1,
-    "quote-props": [
-      1,
-      "as-needed"
-    ],
-    "quotes": [
-      1,
-      "single",
-      "avoid-escape"
-    ],
-    "semi": [
-      1,
-      "always"
-    ],
+    "quote-props": [1, "as-needed"],
+    "quotes": [1, "single", "avoid-escape"],
+    "semi": [1, "always"],
     "semi-spacing": 1,
     "space-before-blocks": 1,
     "space-before-function-paren": 1,
