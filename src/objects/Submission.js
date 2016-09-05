@@ -180,9 +180,9 @@ const Submission = class Submission extends VoteableContent {
   * @summary Assigns flair on this Submission (as a moderator; also see [selectFlair]{@link Submission#selectFlair})
   * @param {object} options
   * @param {string} options.text The text that this link's flair should have
-  * @param {string} options.css_class The CSS class that the link's flair should have
+  * @param {string} options.cssClass The CSS class that the link's flair should have
   * @returns {Promise} A Promise that fulfills with an updated version of this Submission
-  * @example r.getSubmission('2np694').assignFlair({text: 'this is a flair text', css_class: 'these are css classes'})
+  * @example r.getSubmission('2np694').assignFlair({text: 'this is a flair text', cssClass: 'these are css classes'})
   */
   assignFlair (options) {
     return this._r._assignFlair({...options, link: this.name, subredditName: this.subreddit.display_name}).return(this);

@@ -1210,9 +1210,9 @@ const snoowrap = class snoowrap {
       return this._post({uri: `r/${subName}/api/selectflair`, form: {api_type, flair_template_id, link, name, text}});
     });
   }
-  _assignFlair ({css_class, link, name, text, subreddit_name, subredditName = subreddit_name}) {
+  _assignFlair ({css_class, cssClass = css_class, link, name, text, subreddit_name, subredditName = subreddit_name}) {
     return this._promiseWrap(Promise.resolve(subredditName).then(displayName => {
-      return this._post({uri: `r/${displayName}/api/flair`, form: {api_type, name, text, link, css_class}});
+      return this._post({uri: `r/${displayName}/api/flair`, form: {api_type, name, text, link, css_class: cssClass}});
     }));
   }
   _populate (responseTree) {

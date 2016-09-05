@@ -58,21 +58,23 @@ const Subreddit = class Subreddit extends RedditContent {
       form: {api_type, flair_template_id}
     }).return(this);
   }
-  _createFlairTemplate ({text, cssClass, css_class = cssClass, flair_type, text_editable = false}) {
+  _createFlairTemplate ({
+      text, css_class, cssClass = css_class, flair_type, text_editable = false, textEditable = text_editable
+  }) {
     return this._post({
       uri: `r/${this.display_name}/api/flairtemplate`,
-      form: {api_type, text, css_class, flair_type, text_editable}
+      form: {api_type, text, css_class: cssClass, flair_type, text_editable: textEditable}
     }).return(this);
   }
   /**
   * @summary Creates a new user flair template for this subreddit
   * @param {object} options
   * @param {string} options.text The flair text for this template
-  * @param {string} [options.css_class=''] The CSS class for this template
-  * @param {boolean} [options.text_editable=false] Determines whether users should be able to edit their flair text
+  * @param {string} [options.cssClass=''] The CSS class for this template
+  * @param {boolean} [options.textEditable=false] Determines whether users should be able to edit their flair text
   when it has this template
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
-  * @example r.getSubreddit('snoowrap').createUserFlairTemplate({text: 'Some Flair Text', css_class: 'some-css-class'})
+  * @example r.getSubreddit('snoowrap').createUserFlairTemplate({text: 'Some Flair Text', cssClass: 'some-css-class'})
   */
   createUserFlairTemplate (options) {
     return this._createFlairTemplate({...options, flair_type: 'USER_FLAIR'});
@@ -81,11 +83,11 @@ const Subreddit = class Subreddit extends RedditContent {
   * @summary Creates a new link flair template for this subreddit
   * @param {object} options
   * @param {string} options.text The flair text for this template
-  * @param {string} [options.css_class=''] The CSS class for this template
-  * @param {boolean} [options.text_editable=false] Determines whether users should be able to edit the flair text of their
+  * @param {string} [options.cssClass=''] The CSS class for this template
+  * @param {boolean} [options.textEditable=false] Determines whether users should be able to edit the flair text of their
   links when it has this template
   * @returns {Promise} A Promise that fulfills with this Subredit when the request is complete.
-  * @example r.getSubreddit('snoowrap').createLinkFlairTemplate({text: 'Some Flair Text', css_class: 'some-css-class'})
+  * @example r.getSubreddit('snoowrap').createLinkFlairTemplate({text: 'Some Flair Text', cssClass: 'some-css-class'})
   */
   createLinkFlairTemplate (options) {
     return this._createFlairTemplate({...options, flair_type: 'LINK_FLAIR'});
@@ -172,19 +174,19 @@ const Subreddit = class Subreddit extends RedditContent {
   * @param {object[]} flairArray
   * @param {string} flairArray[].name A user's name
   * @param {string} flairArray[].text The flair text to assign to this user
-  * @param {string} flairArray[].css_class The flair CSS class to assign to this user
+  * @param {string} flairArray[].cssClass The flair CSS class to assign to this user
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
   * @example
   * r.getSubreddit('snoowrap').setMultipleUserFlairs([
-  *   {name: 'actually_an_aardvark', text: "this is /u/actually_an_aardvark's flair text", css_class: 'some-css-class'},
-  *   {name: 'snoowrap_testing', text: "this is /u/snoowrap_testing's flair text", css_class: 'some-css-class'}
+  *   {name: 'actually_an_aardvark', text: "this is /u/actually_an_aardvark's flair text", cssClass: 'some-css-class'},
+  *   {name: 'snoowrap_testing', text: "this is /u/snoowrap_testing's flair text", cssClass: 'some-css-class'}
   * ]);
   * // the above request gets completed successfully
   *
   * r.getSubreddit('snoowrap').setMultipleUserFlairs([
-  *   {name: 'actually_an_aardvark', text: 'foo', css_class: 'valid-css-class'},
-  *   {name: 'snoowrap_testing', text: 'bar', css_class: "this isn't a valid css class"},
-  *   {name: 'not_an_aardvark', text: 'baz', css_class: "this also isn't a valid css class"}
+  *   {name: 'actually_an_aardvark', text: 'foo', cssClass: 'valid-css-class'},
+  *   {name: 'snoowrap_testing', text: 'bar', cssClass: "this isn't a valid css class"},
+  *   {name: 'not_an_aardvark', text: 'baz', cssClass: "this also isn't a valid css class"}
   * ])
   * // the Promise from the above request gets rejected, with the following rejection reason:
   * [
@@ -206,7 +208,10 @@ const Subreddit = class Subreddit extends RedditContent {
   setMultipleUserFlairs (flairArray) {
     const csvLines = flairArray.map(item => {
       // reddit expects to receive valid CSV data, which each line having the form `username,flair_text,css_class`.
-      return [item.name, item.text || item.flair_text || '', item.css_class || item.flair_css_class || ''].map(str => {
+      return [
+        item.name, item.text || item.flairText || item.flair_text || '',
+        item.cssClass || item.css_class || item.flairCssClass || item.flair_css_class || ''
+      ].map(str => {
         /* To escape special characters in the lines (e.g. if the flair text itself contains a comma), surround each
         part of the line with double quotes before joining the parts together with commas (in accordance with how special
         characters are usually escaped in CSV). If double quotes are themselves part of the flair text, replace them with a
