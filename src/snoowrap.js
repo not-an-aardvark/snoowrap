@@ -48,6 +48,11 @@ const snoowrap = class snoowrap {
   * @param {string} [options.accessToken] An access token for your app
   */
   constructor ({
+      // The function signature for the constructor is a bit large due to the snake_case aliases. Essentially, it accepts an
+      // object with properties {userAgent, clientId, clientSecret, refreshToken, accessToken, username, password}.
+      // Additionally, if snake_case properties are provided and camelCase properties are not (e.g. `user_agent` is provided but
+      // `userAgent` is not), then the `userAgent` identifier gets set to the provided `user_agent` property. This is needed for
+      // backwards compatibility; snoowrap previously only accepted snake_case props, but now it also accepts camelCase props.
       user_agent, userAgent = user_agent,
       client_id, clientId = client_id,
       client_secret, clientSecret = client_secret,
