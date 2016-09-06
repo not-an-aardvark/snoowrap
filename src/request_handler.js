@@ -128,7 +128,7 @@ export function _awaitRequestDelay () {
 /**
 * @summary Sends a request to the reddit server, authenticated with the user's client ID and client secret.
 * @desc **Note**: This is used internally as part of the authentication process, but it cannot be used to actually fetch
-content from reddit. To do that, use {@link snoowrap#oauth_request} or another of snoowrap's helper functions.
+content from reddit. To do that, use {@link snoowrap#oauthRequest} or another of snoowrap's helper functions.
 *
 * This function can work with alternate `this`-bindings, provided that the binding has the `clientId`, `clientSecret`, and
 `userAgent` properties. This allows it be used if no snoowrap requester has been created yet.
