@@ -1260,6 +1260,16 @@ const snoowrap = class snoowrap {
       should have no effect on the returned results */
       : this._get({uri, qs: mergedQuery});
   }
+  /**
+  * @summary In browsers, restores the `window.snoowrap` property to whatever it was before this instance of snoowrap was
+  loaded. This is a no-op in Node.
+  * @returns This instance of the snoowrap constructor
+  * @example var snoowrap = window.snoowrap.noConflict();
+  */
+  static noConflict () {
+    if (typeof window !== 'undefined') window[MODULE_NAME] = this._previousSnoowrap; // eslint-disable-line no-undef
+    return this;
+  }
 };
 
 const classFuncDescriptors = {configurable: true, writable: true};
@@ -1297,6 +1307,7 @@ snoowrap.errors = errors;
 snoowrap.version = VERSION;
 
 if (!module.parent && typeof window !== 'undefined') { // check if the code is being run in a browser through browserify, etc.
+  snoowrap._previousSnoowrap = window[MODULE_NAME]; // eslint-disable-line no-undef
   window[MODULE_NAME] = snoowrap; // eslint-disable-line no-undef
 }
 

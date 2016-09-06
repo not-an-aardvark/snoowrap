@@ -208,6 +208,9 @@ describe('snoowrap', function () {
         r.config({proxies: true});
       });
     });
+    it('exposes a noConflict function to restore the previous version of window.snoowrap', () => {
+      expect(snoowrap.noConflict()).to.equal(snoowrap);
+    });
     afterEach(() => {
       r.config({request_delay: previous_request_delay, request_timeout: previous_request_timeout});
     });

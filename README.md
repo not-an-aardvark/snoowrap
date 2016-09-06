@@ -177,7 +177,7 @@ Alternatively, prebuilt versions are available:
 * [snoowrap.js](https://not-an-aardvark.github.io/snoowrap/snoowrap-v1.js)
 * [snoowrap.min.js](https://not-an-aardvark.github.io/snoowrap/snoowrap-v1.min.js) (80kB gzipped)
 
-When run in a browser, snoowrap will be assigned to the global variable `window.snoowrap`.
+When run in a browser, snoowrap will be assigned to the global variable `window.snoowrap`. If you want to avoid global state (or you're using two versions of snoowrap on the same page for some reason), use `snoowrap.noConflict()` to restore `window.snoowrap` to its previous value.
 
 ### To build/run the tests independently
 See the [contributing guide](https://github.com/not-an-aardvark/snoowrap/blob/master/CONTRIBUTING.md) and the [getting started](https://github.com/not-an-aardvark/snoowrap/blob/master/src/README.md) page.
