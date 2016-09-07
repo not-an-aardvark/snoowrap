@@ -1,5 +1,5 @@
-import {assign, snakeCase, defaults, forEach, forOwn, findKey, identity, includes, isEmpty, isFunction, isObject, isString,
-  isUndefined, map, mapValues, omit, omitBy, values} from 'lodash';
+import {assign, snakeCase, defaults, forEach, forOwn, identity, includes, isEmpty, isFunction, isObject, isString, isUndefined,
+  map, mapValues, omit, omitBy, values} from 'lodash';
 import Promise from './Promise.js';
 import promiseWrap from 'promise-chains';
 import util from 'util';
@@ -126,8 +126,8 @@ const snoowrap = class snoowrap {
   * r.config({requestDelay: 1000, warnings: false});
   * // sets the request delay to 1000 milliseconds, and suppresses warnings.
   */
-  config (options) {
-    const invalidKey = findKey(options, (value, key) => !Object.prototype.hasOwnProperty.call(this._config, key));
+  config (options = {}) {
+    const invalidKey = Object.keys(options).find(key => !(key in this._config));
     if (invalidKey) throw new TypeError(`Invalid config option '${invalidKey}'`);
     return assign(this._config, options);
   }
