@@ -58,7 +58,9 @@ function makeRequest (options) {
   if (options.formData) {
     requestBody = new FormData();
     Object.keys(options.formData).forEach(key => requestBody.append(key, options.formData[key]));
-    if (options.form) Object.keys(options.form).forEach(key => requestBody.append(key, options.form[key]));
+    if (options.form) {
+      Object.keys(options.form).forEach(key => requestBody.append(key, options.form[key]));
+    }
     xhr.setRequestHeader('Content-Type', 'multipart/form-data');
   } else if (options.form) {
     requestBody = createQueryString(options.form);

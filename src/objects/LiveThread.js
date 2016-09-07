@@ -54,8 +54,11 @@ const LiveThread = class LiveThread extends RedditContent {
           const parsed = this._r._populate(JSON.parse(data));
           response._populatedStream.emit(parsed.type, parsed.payload);
         };
-        if (typeof response._rawStream.on === 'function') response._rawStream.on('message', handler);
-        else response._rawStream.onmessage = messageEvent => handler(messageEvent.data);
+        if (typeof response._rawStream.on === 'function') {
+          response._rawStream.on('message', handler);
+        } else {
+          response._rawStream.onmessage = messageEvent => handler(messageEvent.data);
+        }
       }
       return response._populatedStream;
     }});

@@ -128,7 +128,9 @@ const snoowrap = class snoowrap {
   */
   config (options = {}) {
     const invalidKey = Object.keys(options).find(key => !(key in this._config));
-    if (invalidKey) throw new TypeError(`Invalid config option '${invalidKey}'`);
+    if (invalidKey) {
+      throw new TypeError(`Invalid config option '${invalidKey}'`);
+    }
     return assign(this._config, options);
   }
   inspect () {
@@ -140,10 +142,14 @@ const snoowrap = class snoowrap {
     return `${MODULE_NAME} ${util.inspect(formatted)}`;
   }
   _warn (...args) {
-    if (this._config.warnings) console.warn('[warning]', ...args); // eslint-disable-line no-console
+    if (this._config.warnings) {
+      console.warn('[warning]', ...args); // eslint-disable-line no-console
+    }
   }
   _debug (...args) {
-    if (this._config.debug) console.log('[debug]', ...args); // eslint-disable-line no-console
+    if (this._config.debug) {
+      console.log('[debug]', ...args); // eslint-disable-line no-console
+    }
   }
   get _promiseWrap () {
     return this._config.proxies ? promiseWrap : identity;
@@ -1264,7 +1270,9 @@ const snoowrap = class snoowrap {
   * @example var snoowrap = window.snoowrap.noConflict();
   */
   static noConflict () {
-    if (typeof window !== 'undefined') window[MODULE_NAME] = this._previousSnoowrap; // eslint-disable-line no-undef
+    if (typeof window !== 'undefined') {
+      window[MODULE_NAME] = this._previousSnoowrap; // eslint-disable-line no-undef
+    }
     return this;
   }
 };

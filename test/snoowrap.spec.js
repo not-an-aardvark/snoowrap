@@ -402,7 +402,9 @@ describe('snoowrap', function () {
       const new_stylesheet = `.stylesheet-${gibberish}{}`; // it has to be valid CSS or reddit returns a 404 when fetching it
       await subreddit.update_stylesheet({css: new_stylesheet});
       // Reddit caches stylesheets for awhile, so this is annoying to test reliably. Make sure the sheet is fetched, at least
-      if (isBrowser) return this.skip();
+      if (isBrowser) {
+        return this.skip();
+      }
       expect(await subreddit.get_stylesheet()).to.match(/^\.stylesheet-[0-9a-f]{8}/);
     });
     it("can get and modify a subreddit's settings (test skipped depending on captcha requirement)", async function () {
@@ -432,7 +434,9 @@ describe('snoowrap', function () {
       await r.get_subreddit(gibberish).unsubscribe().then(expect.fail, err => expect(err.statusCode).to.equal(404));
     });
     it('can upload images to a subreddit from the filesystem', async function () {
-      if (isBrowser) return this.skip();
+      if (isBrowser) {
+        return this.skip();
+      }
       await subreddit.upload_header_image({file: 'test/test_image.png'});
     });
     it("can get a subreddit's rules", async () => {
@@ -473,13 +477,17 @@ describe('snoowrap', function () {
       expect(await submission.comments[6].body).to.equal('pumpkin pie');
     });
     it('can get a random submission from a particular subreddit', async function () {
-      if (isBrowser) return this.skip();
+      if (isBrowser) {
+        return this.skip();
+      }
       const random_post = await r.get_subreddit('gifs').get_random_submission();
       expect(random_post).to.be.an.instanceof(snoowrap.objects.Submission);
       expect(random_post.subreddit.display_name).to.equal('gifs');
     });
     it('can get a random submission from any subreddit', async function () {
-      if (isBrowser) return this.skip();
+      if (isBrowser) {
+        return this.skip();
+      }
       const random_post = await r.get_random_submission();
       expect(random_post).to.be.an.instanceof(snoowrap.objects.Submission);
     });
@@ -533,7 +541,9 @@ describe('snoowrap', function () {
       expect(await submission.refresh().suggested_sort).to.equal('top');
     });
     it('can get the "related submissions" endpoint (deprecated on reddit.com)', async function () {
-      if (isBrowser) return this.skip();
+      if (isBrowser) {
+        return this.skip();
+      }
       expect(await submission.get_related()).to.be.an.instanceof(snoowrap.objects.Submission);
     });
   });
@@ -1373,7 +1383,9 @@ describe('snoowrap', function () {
       expect(await r.get_oauth_scope_list()).to.have.property('creddits');
     });
     it('can check whether a given username is available', async function () {
-      if (isBrowser) return this.skip();
+      if (isBrowser) {
+        return this.skip();
+      }
       expect(await r.check_username_availability('not_an_aardvark')).to.be.false();
     });
   });

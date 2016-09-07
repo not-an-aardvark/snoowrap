@@ -12,7 +12,7 @@
     "comma-spacing": 1,
     "comma-style": 1,
     "computed-property-spacing": 1,
-    "curly": [1, "multi-line"],
+    "curly": 1,
     "dot-notation": 1,
     "dot-location": [1, "property"],
     "eol-last": 2,
