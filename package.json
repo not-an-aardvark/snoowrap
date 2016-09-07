@@ -2,7 +2,7 @@
   "name": "snoowrap",
   "version": "1.7.1",
   "license": "MIT",
-  "description": "A Node.js wrapper for the reddit API",
+  "description": "A JavaScript wrapper for the reddit API",
   "main": "dist/snoowrap.js",
   "scripts": {
     "compile": "babel -d dist/ src/ && browserify --im test/snoowrap.spec.js -o test/_browser.spec.js -t [ babelify ]",
