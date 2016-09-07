@@ -139,19 +139,11 @@ const snoowrap = class snoowrap {
     });
     return `${MODULE_NAME} ${util.inspect(formatted)}`;
   }
-  get _log () {
-    return {
-      warn: (...args) => {
-        if (this._config.warnings) {
-          console.warn('[warning]', ...args); // eslint-disable-line no-console
-        }
-      },
-      debug: (...args) => {
-        if (this._config.debug) {
-          console.log('[debug]', ...args); // eslint-disable-line no-console
-        }
-      }
-    };
+  _warn (...args) {
+    if (this._config.warnings) console.warn('[warning]', ...args); // eslint-disable-line no-console
+  }
+  _debug (...args) {
+    if (this._config.debug) console.log('[debug]', ...args); // eslint-disable-line no-console
   }
   get _promiseWrap () {
     return this._config.proxies ? promiseWrap : identity;
