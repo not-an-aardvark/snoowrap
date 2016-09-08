@@ -4,6 +4,7 @@ import RedditContent from './RedditContent.js';
 /**
 * @summary A class representing a multireddit.
 * <style> #MultiReddit {display: none} </style>
+* @example
 *
 * // Get a multireddit belonging to a specific user
 * r.getUser('multi-mod').getMultireddit('coding_languages')
