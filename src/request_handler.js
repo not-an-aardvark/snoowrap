@@ -155,7 +155,7 @@ snoowrap.prototype.credentialedClientRequest.call({
 */
 export function credentialedClientRequest (options) {
   return request.defaults({
-    auth: {user: this.clientId, pass: this.clientSecret},
+    auth: {user: this.clientId || this.client_id || '', pass: this.clientSecret || this.client_secret || ''},
     headers: {'user-agent': this.userAgent},
     baseUrl: this._config ? `https://www.${this._config.endpointDomain}` : undefined
   })(options);
