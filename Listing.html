@@ -76,17 +76,17 @@
         
             <div class="class-description"><p>A class representing a list of content. This is a subclass of the native Array object, so it has all the properties of
 an Array (length, forEach, etc.) in addition to some added methods. The Listing can be extended by using the
-<a href="Listing.html#fetch_more"><code>#fetch_more()</code></a>, <code>#fetch_until</code>, and
-<a href="Listing.html#fetch_all"><code>#fetch_all()</code></a> functions. Note that these methods return new Listings, rather than mutating the
+<a href="Listing.html#fetchMore"><code>#fetchMore()</code></a> and
+<a href="Listing.html#fetchAll"><code>#fetchAll()</code></a> functions. Note that these methods return new Listings, rather than mutating the
 original Listing.</p>
 <p>Most methods that return Listings will also accept <code>limit</code>, <code>after</code>, <code>before</code>, <code>show</code>, and <code>count</code> properties.</p>
 <p>If you've used the reddit API before (or used other API wrappers like <a href="https://praw.readthedocs.org/en/stable/">PRAW</a>), you
 might know that reddit uses a <code>MoreComments</code> object in its raw JSON responses, representing comments that have been stubbed
 out of Listings. In snoowrap, there are no exposed <code>MoreComments</code> objects; the objects returned by the reddit API are
-stripped from Listings and are used internally as sources for the <code>fetch_more</code> functions. This means that in snoowrap, Listings
+stripped from Listings and are used internally as sources for the <code>fetchMore</code> functions. This means that in snoowrap, Listings
 that contain Comments can be used/expanded in the same manner as Listings that don't contain Comments, and for the most part
 you don't have to worry about the distinction.</p>
-<p>(Incidentally, if you encounter a Listing that <em>does</em> contain a <code>MoreComments</code> object, then it's a bug so please report it.)</p>
+<p>(Incidentally, if you encounter a Listing that <em>does</em> contain a <code>MoreComments</code> object then it's a bug, so please report it.)</p>
 <style> #Listing {display: none} </style></div>
         
     
@@ -199,8 +199,8 @@ you don't have to worry about the distinction.</p>
         <dl>
             
 <hr>
-<dt class="name" id="is_finished">
-    <h4 id="is_finished"><span class="type-signature"></span>is_finished<span class="type-signature"> :boolean</span></h4>
+<dt class="name" id="isFinished">
+    <h4 id="isFinished"><span class="type-signature"></span>isFinished<span class="type-signature"> :boolean</span></h4>
 
     
     <p class="summary">A getter that indicates whether this Listing has any more items to fetch.</p>
@@ -275,7 +275,7 @@ you don't have to worry about the distinction.</p>
             
 <hr>
 <dt>
-    <h4 class="name" id="fetch_more"><span class="type-signature"></span>fetch_more(options)</h4>
+    <h4 class="name" id="fetchMore"><span class="type-signature"></span>fetchMore(options)</h4>
     
     
     <p class="summary">Fetches some more items</p>
@@ -399,7 +399,7 @@ you don't have to worry about the distinction.</p>
 
         <tr>
             
-                <td class="name"><code>skip_replies</code></td>
+                <td class="name"><code>skipReplies</code></td>
             
 
             <td class="type">
@@ -435,8 +435,8 @@ you don't have to worry about the distinction.</p>
             <td class="description last"><p>For a Listing that contains comment objects on a Submission, this option can
   be used to save a few API calls, provided that only top-level comments are being examined. If this is set to <code>true</code>, snoowrap
   is able to fetch 100 Comments per API call rather than 20, but all returned Comments will have no fetched replies by default.</p>
-<p>Internal details: When <code>skip_replies</code> is set to <code>true</code>, snoowrap uses reddit's <code>api/info</code> endpoint to fetch Comments. When
-  <code>skip_replies</code> is set to <code>false</code>, snoowrap uses reddit's <code>api/morechildren</code> endpoint. It's worth noting that reddit does
+<p>Internal details: When <code>skipReplies</code> is set to <code>true</code>, snoowrap uses reddit's <code>api/info</code> endpoint to fetch Comments. When
+  <code>skipReplies</code> is set to <code>false</code>, snoowrap uses reddit's <code>api/morechildren</code> endpoint. It's worth noting that reddit does
   not allow concurrent requests to the <code>api/morechildren</code> endpoint by the same account.</p></td>
         </tr>
 
@@ -577,10 +577,10 @@ you don't have to worry about the distinction.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_hot({limit: 25}).then(my_listing =&gt; {
-  console.log(my_listing.length); // =&gt; 25
-  my_listing.fetch_more({amount: 10}).then(extended_listing =&gt; {
-    console.log(extended_listing.length); // =&gt; 35
+    <pre class="sunlight-highlight-javascript">r.getHot({limit: 25}).then(myListing =&gt; {
+  console.log(myListing.length); // =&gt; 25
+  myListing.fetchMore({amount: 10}).then(extendedListing =&gt; {
+    console.log(extendedListing.length); // =&gt; 35
   })
 });</pre>
 
@@ -592,7 +592,7 @@ you don't have to worry about the distinction.</p>
             
 <hr>
 <dt>
-    <h4 class="name" id="fetch_all"><span class="type-signature"></span>fetch_all( [options])</h4>
+    <h4 class="name" id="fetchAll"><span class="type-signature"></span>fetchAll( [options])</h4>
     
     
     <p class="summary">Fetches all of the items in this Listing, only stopping when there are none left.</p>
@@ -662,7 +662,7 @@ you don't have to worry about the distinction.</p>
 
             
 
-            <td class="description last"><p>Fetching options -- see <a href="Listing.html#fetch_more"><code>Listing#fetch_more</code></a></p></td>
+            <td class="description last"><p>Fetching options -- see <a href="Listing.html#fetchMore"><code>Listing#fetchMore</code></a></p></td>
         </tr>
 
     
@@ -751,7 +751,7 @@ you don't have to worry about the distinction.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_me().get_upvoted_content().fetch_all().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getMe().getUpvotedContent().fetchAll().then(console.log)
 // =&gt; Listing [ Submission { ... }, Submission { ... }, ... ]</pre>
 
 

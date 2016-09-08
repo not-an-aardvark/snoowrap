@@ -160,7 +160,7 @@ subreddit while running snoowrap in a browser. (This issue does not apply when r
         <h5>Example</h5>
         
     <pre class="sunlight-highlight-javascript">// Get a wiki page on a given subreddit by name
-r.get_subreddit(&#x27;AskReddit&#x27;).get_wiki_page(&#x27;rules&#x27;)</pre>
+r.getSubreddit(&#x27;AskReddit&#x27;).getWikiPage(&#x27;rules&#x27;)</pre>
 
 
     
@@ -199,7 +199,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;).get_wiki_page(&#x27;rules&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_settings"><span class="type-signature"></span>get_settings()</h4>
+    <h4 class="name" id="getSettings"><span class="type-signature"></span>getSettings()</h4>
     
     
     <p class="summary">Gets the current settings for this wiki page.</p>
@@ -295,7 +295,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;).get_wiki_page(&#x27;rules&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_wiki_page(&#x27;index&#x27;).get_settings().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikiPage(&#x27;index&#x27;).getSettings().then(console.log)
 // =&gt; WikiPageSettings { permlevel: 0, editors: [], listed: true }</pre>
 
 
@@ -306,7 +306,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;).get_wiki_page(&#x27;rules&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="edit_settings"><span class="type-signature"></span>edit_settings(options)</h4>
+    <h4 class="name" id="editSettings"><span class="type-signature"></span>editSettings(options)</h4>
     
     
     <p class="summary">Edits the settings for this wiki page.</p>
@@ -415,7 +415,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;).get_wiki_page(&#x27;rules&#x27;)</pre>
 
         <tr>
             
-                <td class="name"><code>permission_level</code></td>
+                <td class="name"><code>permissionLevel</code></td>
             
 
             <td class="type">
@@ -529,7 +529,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;).get_wiki_page(&#x27;rules&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_wiki_page(&#x27;index&#x27;).edit_settings({listed: false, permission_level: 1})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikiPage(&#x27;index&#x27;).editSettings({listed: false, permission_level: 1})</pre>
 
 
     
@@ -539,7 +539,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;).get_wiki_page(&#x27;rules&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="add_editor"><span class="type-signature"></span>add_editor(options)</h4>
+    <h4 class="name" id="addEditor"><span class="type-signature"></span>addEditor(options)</h4>
     
     
     <p class="summary">Makes the given user an approved editor of this wiki page.</p>
@@ -735,7 +735,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;).get_wiki_page(&#x27;rules&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_wiki_page(&#x27;index&#x27;).add_editor({name: &#x27;actually_an_aardvark&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikiPage(&#x27;index&#x27;).addEditor({name: &#x27;actually_an_aardvark&#x27;})</pre>
 
 
     
@@ -745,7 +745,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;).get_wiki_page(&#x27;rules&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="remove_editor"><span class="type-signature"></span>remove_editor(options)</h4>
+    <h4 class="name" id="removeEditor"><span class="type-signature"></span>removeEditor(options)</h4>
     
     
     <p class="summary">Revokes this user's approved editor status for this wiki page</p>
@@ -941,7 +941,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;).get_wiki_page(&#x27;rules&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_wiki_page(&#x27;index&#x27;).remove_editor({name: &#x27;actually_an_aardvark&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikiPage(&#x27;index&#x27;).removeEditor({name: &#x27;actually_an_aardvark&#x27;})</pre>
 
 
     
@@ -1103,7 +1103,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;).get_wiki_page(&#x27;rules&#x27;)</pre>
 
         <tr>
             
-                <td class="name"><code>previous_revision</code></td>
+                <td class="name"><code>previousRevision</code></td>
             
 
             <td class="type">
@@ -1226,7 +1226,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;).get_wiki_page(&#x27;rules&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_wiki_page(&#x27;index&#x27;).edit({text: &#x27;Welcome&#x27;, reason: &#x27;Added a welcome message&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikiPage(&#x27;index&#x27;).edit({text: &#x27;Welcome&#x27;, reason: &#x27;Added a welcome message&#x27;})</pre>
 
 
     
@@ -1236,7 +1236,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;).get_wiki_page(&#x27;rules&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_revisions"><span class="type-signature"></span>get_revisions( [options])</h4>
+    <h4 class="name" id="getRevisions"><span class="type-signature"></span>getRevisions( [options])</h4>
     
     
     <p class="summary">Gets a list of revisions for this wiki page.</p>
@@ -1394,7 +1394,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;).get_wiki_page(&#x27;rules&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_revisions({limit: 1}).then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getRevisions({limit: 1}).then(console.log)
 // =&gt; Listing [
 //  {
 //    timestamp: 1460973194,
@@ -1413,7 +1413,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;).get_wiki_page(&#x27;rules&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="hide_revision"><span class="type-signature"></span>hide_revision(options)</h4>
+    <h4 class="name" id="hideRevision"><span class="type-signature"></span>hideRevision(options)</h4>
     
     
     <p class="summary">Hides the given revision from this page's public revision history.</p>
@@ -1609,7 +1609,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;).get_wiki_page(&#x27;rules&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_wiki_page(&#x27;index&#x27;).hide_revision({id: &#x27;506370b4-0508-11e6-b550-0e69f29e0c4d&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikiPage(&#x27;index&#x27;).hideRevision({id: &#x27;506370b4-0508-11e6-b550-0e69f29e0c4d&#x27;})</pre>
 
 
     
@@ -1815,7 +1815,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;).get_wiki_page(&#x27;rules&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_wiki_page(&#x27;index&#x27;).revert({id: &#x27;506370b4-0508-11e6-b550-0e69f29e0c4d&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikiPage(&#x27;index&#x27;).revert({id: &#x27;506370b4-0508-11e6-b550-0e69f29e0c4d&#x27;})</pre>
 
 
     
@@ -1825,7 +1825,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;).get_wiki_page(&#x27;rules&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_discussions"><span class="type-signature"></span>get_discussions( [options])</h4>
+    <h4 class="name" id="getDiscussions"><span class="type-signature"></span>getDiscussions( [options])</h4>
     
     
     <p class="summary">Gets a list of discussions about this wiki page.</p>
@@ -1983,7 +1983,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;).get_wiki_page(&#x27;rules&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_wiki_page(&#x27;index&#x27;).get_discussions().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikiPage(&#x27;index&#x27;).getDiscussions().then(console.log)
 // =&gt; Listing [
 //  Submission { ... },
 //  Submission { ... },
@@ -2113,16 +2113,16 @@ automatically called when an unknown property is accessed on an unfetched conten
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_user(&#x27;not_an_aardvark&#x27;).fetch().then(user_info =&gt; {
-  console.log(user_info.name); // &#x27;not_an_aardvark&#x27;
-  console.log(user_info.created_utc); // 1419104352
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;).fetch().then(userInfo =&gt; {
+  console.log(userInfo.name); // &#x27;not_an_aardvark&#x27;
+  console.log(userInfo.created_utc); // 1419104352
 });
 
-r.get_comment(&#x27;d1xchqn&#x27;).fetch().then(comment =&gt; comment.body).then(console.log)
+r.getComment(&#x27;d1xchqn&#x27;).fetch().then(comment =&gt; comment.body).then(console.log)
 // =&gt; &#x27;This is a little too interesting for my liking&#x27;
 
 // In environments that support ES2015 Proxies, the above line is equivalent to:
-r.get_comment(&#x27;d1xchqn&#x27;).body.then(console.log);
+r.getComment(&#x27;d1xchqn&#x27;).body.then(console.log);
 // =&gt; &#x27;This is a little too interesting for my liking&#x27;</pre>
 
 
@@ -2238,12 +2238,12 @@ r.get_comment(&#x27;d1xchqn&#x27;).body.then(console.log);
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var some_comment = r.get_comment(&#x27;cmfkyus&#x27;);
-var initial_comment_body = some_comment.fetch().then(comment =&gt; comment.body);
+    <pre class="sunlight-highlight-javascript">var someComment = r.getComment(&#x27;cmfkyus&#x27;);
+var initialCommentBody = some_comment.fetch().then(comment =&gt; comment.body);
 
 setTimeout(() =&gt; {
-  some_comment.refresh().then(refreshed_comment =&gt; {
-    if (initial_comment_body.value() !== refreshed_comment.body) {
+  someComment.refresh().then(refreshedComment =&gt; {
+    if (initialCommentBody.value() !== refreshedComment.body) {
       console.log(&#x27;This comment has changed since 10 seconds ago.&#x27;);
     }
   });
@@ -2367,7 +2367,7 @@ setTimeout(() =&gt; {
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var user = r.get_user(&#x27;not_an_aardvark&#x27;);
+    <pre class="sunlight-highlight-javascript">var user = r.getUser(&#x27;not_an_aardvark&#x27;);
 JSON.stringify(user) // =&gt; &#x27;{&quot;name&quot;:&quot;not_an_aardvark&quot;}&#x27;</pre>
 
 

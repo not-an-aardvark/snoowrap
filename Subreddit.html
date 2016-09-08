@@ -158,7 +158,7 @@
         <h5>Example</h5>
         
     <pre class="sunlight-highlight-javascript">// Get a subreddit by name
-r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
+r.getSubreddit(&#x27;AskReddit&#x27;)</pre>
 
 
     
@@ -197,7 +197,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="delete_all_user_flair_templates"><span class="type-signature"></span>delete_all_user_flair_templates()</h4>
+    <h4 class="name" id="deleteAllUserFlairTemplates"><span class="type-signature"></span>deleteAllUserFlairTemplates()</h4>
     
     
     <p class="summary">Deletes all of this subreddit's user flair templates</p>
@@ -293,7 +293,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).delete_all_user_flair_templates()</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).deleteAllUserFlairTemplates()</pre>
 
 
     
@@ -303,7 +303,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="delete_all_link_flair_templates"><span class="type-signature"></span>delete_all_link_flair_templates()</h4>
+    <h4 class="name" id="deleteAllLinkFlairTemplates"><span class="type-signature"></span>deleteAllLinkFlairTemplates()</h4>
     
     
     <p class="summary">Deletes all of this subreddit's link flair templates</p>
@@ -399,7 +399,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).delete_all_link_flair_templates()</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).deleteAllLinkFlairTemplates()</pre>
 
 
     
@@ -409,7 +409,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="delete_flair_template"><span class="type-signature"></span>delete_flair_template(options)</h4>
+    <h4 class="name" id="deleteFlairTemplate"><span class="type-signature"></span>deleteFlairTemplate(options)</h4>
     
     
     <p class="summary">Deletes one of this subreddit's flair templates</p>
@@ -605,7 +605,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).delete_flair_template({flair_template_id: &#x27;fdfd8532-c91e-11e5-b4d4-0e082084d721&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).deleteFlairTemplate({flair_template_id: &#x27;fdfd8532-c91e-11e5-b4d4-0e082084d721&#x27;})</pre>
 
 
     
@@ -615,7 +615,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="create_user_flair_template"><span class="type-signature"></span>create_user_flair_template(options)</h4>
+    <h4 class="name" id="createUserFlairTemplate"><span class="type-signature"></span>createUserFlairTemplate(options)</h4>
     
     
     <p class="summary">Creates a new user flair template for this subreddit</p>
@@ -739,7 +739,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
 
         <tr>
             
-                <td class="name"><code>css_class</code></td>
+                <td class="name"><code>cssClass</code></td>
             
 
             <td class="type">
@@ -779,7 +779,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
 
         <tr>
             
-                <td class="name"><code>text_editable</code></td>
+                <td class="name"><code>textEditable</code></td>
             
 
             <td class="type">
@@ -908,7 +908,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).create_user_flair_template({text: &#x27;Some Flair Text&#x27;, css_class: &#x27;some-css-class&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).createUserFlairTemplate({text: &#x27;Some Flair Text&#x27;, cssClass: &#x27;some-css-class&#x27;})</pre>
 
 
     
@@ -918,7 +918,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="create_link_flair_template"><span class="type-signature"></span>create_link_flair_template(options)</h4>
+    <h4 class="name" id="createLinkFlairTemplate"><span class="type-signature"></span>createLinkFlairTemplate(options)</h4>
     
     
     <p class="summary">Creates a new link flair template for this subreddit</p>
@@ -1042,7 +1042,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
 
         <tr>
             
-                <td class="name"><code>css_class</code></td>
+                <td class="name"><code>cssClass</code></td>
             
 
             <td class="type">
@@ -1082,7 +1082,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
 
         <tr>
             
-                <td class="name"><code>text_editable</code></td>
+                <td class="name"><code>textEditable</code></td>
             
 
             <td class="type">
@@ -1211,7 +1211,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).create_link_flair_template({text: &#x27;Some Flair Text&#x27;, css_class: &#x27;some-css-class&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).createLinkFlairTemplate({text: &#x27;Some Flair Text&#x27;, cssClass: &#x27;some-css-class&#x27;})</pre>
 
 
     
@@ -1221,7 +1221,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_link_flair_templates"><span class="type-signature"></span>get_link_flair_templates(link_id)</h4>
+    <h4 class="name" id="getLinkFlairTemplates"><span class="type-signature"></span>getLinkFlairTemplates(linkId)</h4>
     
     
     <p class="summary">Gets the flair templates for a given link.</p>
@@ -1262,7 +1262,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
 
         <tr>
             
-                <td class="name"><code>link_id</code></td>
+                <td class="name"><code>linkId</code></td>
             
 
             <td class="type">
@@ -1367,7 +1367,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_link_flair_templates(&#x27;4fp36y&#x27;).then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getLinkFlairTemplates(&#x27;4fp36y&#x27;).then(console.log)
   // =&gt; [ { flair_css_class: &#x27;&#x27;,
   //  flair_template_id: &#x27;fdfd8532-c91e-11e5-b4d4-0e082084d721&#x27;,
   //  flair_text_editable: true,
@@ -1389,7 +1389,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_user_flair_templates"><span class="type-signature"></span>get_user_flair_templates()</h4>
+    <h4 class="name" id="getUserFlairTemplates"><span class="type-signature"></span>getUserFlairTemplates()</h4>
     
     
     <p class="summary">Gets the list of user flair templates on this subreddit.</p>
@@ -1485,7 +1485,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_user_flair_templates().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getUserFlairTemplates().then(console.log)
   // =&gt; [ { flair_css_class: &#x27;&#x27;,
   //  flair_template_id: &#x27;fdfd8532-c91e-11e5-b4d4-0e082084d721&#x27;,
   //  flair_text_editable: true,
@@ -1507,7 +1507,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="delete_user_flair"><span class="type-signature"></span>delete_user_flair(name)</h4>
+    <h4 class="name" id="deleteUserFlair"><span class="type-signature"></span>deleteUserFlair(name)</h4>
     
     
     <p class="summary">Clears a user's flair on this subreddit.</p>
@@ -1653,7 +1653,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).delete_user_flair(&#x27;actually_an_aardvark&#x27;)</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).deleteUserFlair(&#x27;actually_an_aardvark&#x27;)</pre>
 
 
     
@@ -1663,7 +1663,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_user_flair"><span class="type-signature"></span>get_user_flair(name)</h4>
+    <h4 class="name" id="getUserFlair"><span class="type-signature"></span>getUserFlair(name)</h4>
     
     
     <p class="summary">Gets a user's flair on this subreddit.</p>
@@ -1809,7 +1809,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_user_flair(&#x27;actually_an_aardvark&#x27;).then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getUserFlair(&#x27;actually_an_aardvark&#x27;).then(console.log)
   // =&gt; { flair_css_class: &#x27;&#x27;,
   //  flair_template_id: &#x27;fdfd8532-c91e-11e5-b4d4-0e082084d721&#x27;,
   //  flair_text: &#x27;&#x27;,
@@ -1824,7 +1824,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="set_multiple_user_flairs"><span class="type-signature"></span>set_multiple_user_flairs(flair_array)</h4>
+    <h4 class="name" id="setMultipleUserFlairs"><span class="type-signature"></span>setMultipleUserFlairs(flairArray)</h4>
     
     
     <p class="summary">Sets multiple user flairs at the same time</p>
@@ -1872,7 +1872,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
 
         <tr>
             
-                <td class="name"><code>flair_array</code></td>
+                <td class="name"><code>flairArray</code></td>
             
 
             <td class="type">
@@ -1896,7 +1896,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
 
         <tr>
             
-                <td class="name"><code>flair_array[].name</code></td>
+                <td class="name"><code>flairArray[].name</code></td>
             
 
             <td class="type">
@@ -1920,7 +1920,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
 
         <tr>
             
-                <td class="name"><code>flair_array[].text</code></td>
+                <td class="name"><code>flairArray[].text</code></td>
             
 
             <td class="type">
@@ -1944,7 +1944,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
 
         <tr>
             
-                <td class="name"><code>flair_array[].css_class</code></td>
+                <td class="name"><code>flairArray[].cssClass</code></td>
             
 
             <td class="type">
@@ -2049,16 +2049,16 @@ r.get_subreddit(&#x27;AskReddit&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
-  {name: &#x27;actually_an_aardvark&#x27;, text: &quot;this is /u/actually_an_aardvark&#x27;s flair text&quot;, css_class: &#x27;some-css-class&#x27;},
-  {name: &#x27;snoowrap_testing&#x27;, text: &quot;this is /u/snoowrap_testing&#x27;s flair text&quot;, css_class: &#x27;some-css-class&#x27;}
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).setMultipleUserFlairs([
+  {name: &#x27;actually_an_aardvark&#x27;, text: &quot;this is /u/actually_an_aardvark&#x27;s flair text&quot;, cssClass: &#x27;some-css-class&#x27;},
+  {name: &#x27;snoowrap_testing&#x27;, text: &quot;this is /u/snoowrap_testing&#x27;s flair text&quot;, cssClass: &#x27;some-css-class&#x27;}
 ]);
 // the above request gets completed successfully
 
-r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
-  {name: &#x27;actually_an_aardvark&#x27;, text: &#x27;foo&#x27;, css_class: &#x27;valid-css-class&#x27;},
-  {name: &#x27;snoowrap_testing&#x27;, text: &#x27;bar&#x27;, css_class: &quot;this isn&#x27;t a valid css class&quot;},
-  {name: &#x27;not_an_aardvark&#x27;, text: &#x27;baz&#x27;, css_class: &quot;this also isn&#x27;t a valid css class&quot;}
+r.getSubreddit(&#x27;snoowrap&#x27;).setMultipleUserFlairs([
+  {name: &#x27;actually_an_aardvark&#x27;, text: &#x27;foo&#x27;, cssClass: &#x27;valid-css-class&#x27;},
+  {name: &#x27;snoowrap_testing&#x27;, text: &#x27;bar&#x27;, cssClass: &quot;this isn&#x27;t a valid css class&quot;},
+  {name: &#x27;not_an_aardvark&#x27;, text: &#x27;baz&#x27;, cssClass: &quot;this also isn&#x27;t a valid css class&quot;}
 ])
 // the Promise from the above request gets rejected, with the following rejection reason:
 [
@@ -2085,7 +2085,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_user_flair_list"><span class="type-signature"></span>get_user_flair_list(options)</h4>
+    <h4 class="name" id="getUserFlairList"><span class="type-signature"></span>getUserFlairList(options)</h4>
     
     
     <p class="summary">Gets a list of all user flairs on this subreddit.</p>
@@ -2293,7 +2293,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_user_flair_list().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getUserFlairList().then(console.log)
   // =&gt; Listing [
   //  { flair_css_class: null,
   //  user: &#x27;not_an_aardvark&#x27;,
@@ -2314,7 +2314,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="configure_flair"><span class="type-signature"></span>configure_flair(options)</h4>
+    <h4 class="name" id="configureFlair"><span class="type-signature"></span>configureFlair(options)</h4>
     
     
     <p class="summary">Configures the flair settings for this subreddit.</p>
@@ -2398,7 +2398,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
 
         <tr>
             
-                <td class="name"><code>user_flair_enabled</code></td>
+                <td class="name"><code>userFlairEnabled</code></td>
             
 
             <td class="type">
@@ -2422,7 +2422,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
 
         <tr>
             
-                <td class="name"><code>user_flair_position</code></td>
+                <td class="name"><code>userFlairPosition</code></td>
             
 
             <td class="type">
@@ -2447,7 +2447,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
 
         <tr>
             
-                <td class="name"><code>user_flair_self_assign_enabled</code></td>
+                <td class="name"><code>userFlairSelfAssignEnabled</code></td>
             
 
             <td class="type">
@@ -2471,7 +2471,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
 
         <tr>
             
-                <td class="name"><code>link_flair_position</code></td>
+                <td class="name"><code>linkFlairPosition</code></td>
             
 
             <td class="type">
@@ -2496,7 +2496,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
 
         <tr>
             
-                <td class="name"><code>link_flair_self_assign_enabled</code></td>
+                <td class="name"><code>linkFlairSelfAssignEnabled</code></td>
             
 
             <td class="type">
@@ -2609,12 +2609,12 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).configure_flair({
-    user_flair_enabled: true,
-    user_flair_position: &#x27;left&#x27;,
-    user_flair_self_assign_enabled: false,
-    link_flair_position: &#x27;right&#x27;,
-    link_flair_self_assign_enabled: false
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).configure_flair({
+    userFlairEnabled: true,
+    userFlairPosition: &#x27;left&#x27;,
+    userFlairSelfAssignEnabled: false,
+    linkFlairPosition: &#x27;right&#x27;,
+    linkFlairSelfAssignEnabled: false
 })</pre>
 
 
@@ -2625,7 +2625,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_my_flair"><span class="type-signature"></span>get_my_flair()</h4>
+    <h4 class="name" id="getMyFlair"><span class="type-signature"></span>getMyFlair()</h4>
     
     
     <p class="summary">Gets the requester's flair on this subreddit.</p>
@@ -2721,7 +2721,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_my_flair().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getMyFlair().then(console.log)
   // =&gt; { flair_css_class: &#x27;some-css-class&#x27;,
   //  flair_template_id: null,
   //  flair_text: &#x27;this is /u/snoowrap_testing\&#x27;s flair text&#x27;,
@@ -2736,7 +2736,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="select_my_flair"><span class="type-signature"></span>select_my_flair(options)</h4>
+    <h4 class="name" id="selectMyFlair"><span class="type-signature"></span>selectMyFlair(options)</h4>
     
     
     <p class="summary">Sets the requester's flair on this subreddit.</p>
@@ -2848,7 +2848,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 
             <td class="description last"><p>A flair template ID to use. (This should be obtained beforehand using
-  <code>get_user_flair_templates</code>.)</p></td>
+  <code>getUserFlairTemplates</code>.)</p></td>
         </tr>
 
     
@@ -2978,7 +2978,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).select_my_flair({flair_template_id: &#x27;fdfd8532-c91e-11e5-b4d4-0e082084d721&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).selectMyFlair({flair_template_id: &#x27;fdfd8532-c91e-11e5-b4d4-0e082084d721&#x27;})</pre>
 
 
     
@@ -2988,7 +2988,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="show_my_flair"><span class="type-signature"></span>show_my_flair()</h4>
+    <h4 class="name" id="showMyFlair"><span class="type-signature"></span>showMyFlair()</h4>
     
     
     <p class="summary">Makes the requester's flair visible on this subreddit.</p>
@@ -3084,7 +3084,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).show_my_flair()</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).showMyFlair()</pre>
 
 
     
@@ -3094,7 +3094,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="hide_my_flair"><span class="type-signature"></span>hide_my_flair()</h4>
+    <h4 class="name" id="hideMyFlair"><span class="type-signature"></span>hideMyFlair()</h4>
     
     
     <p class="summary">Makes the requester's flair invisible on this subreddit.</p>
@@ -3190,7 +3190,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).hide_my_flair()</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).hideMyFlair()</pre>
 
 
     
@@ -3200,7 +3200,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="submit_selfpost"><span class="type-signature"></span>submit_selfpost(options)</h4>
+    <h4 class="name" id="submitSelfpost"><span class="type-signature"></span>submitSelfpost(options)</h4>
     
     
     <p class="summary">Creates a new selfpost on this subreddit.</p>
@@ -3362,7 +3362,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
 
         <tr>
             
-                <td class="name"><code>send_replies</code></td>
+                <td class="name"><code>sendReplies</code></td>
             
 
             <td class="type">
@@ -3402,7 +3402,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
 
         <tr>
             
-                <td class="name"><code>captcha_iden</code></td>
+                <td class="name"><code>captchaIden</code></td>
             
 
             <td class="type">
@@ -3441,7 +3441,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
 
         <tr>
             
-                <td class="name"><code>captcha_response</code></td>
+                <td class="name"><code>captchaResponse</code></td>
             
 
             <td class="type">
@@ -3567,7 +3567,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).submit_selfpost({title: &#x27;this is a selfpost&#x27;, text: &quot;hi, how&#x27;s it going?&quot;}).then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).submitSelfpost({title: &#x27;this is a selfpost&#x27;, text: &quot;hi, how&#x27;s it going?&quot;}).then(console.log)
 // =&gt; Submission { title: &#x27;this is a selfpost&#x27;, ... }</pre>
 
 
@@ -3578,7 +3578,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="submit_link"><span class="type-signature"></span>submit_link(options)</h4>
+    <h4 class="name" id="submitLink"><span class="type-signature"></span>submitLink(options)</h4>
     
     
     <p class="summary">Creates a new link submission on this subreddit.</p>
@@ -3738,7 +3738,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
 
         <tr>
             
-                <td class="name"><code>send_replies</code></td>
+                <td class="name"><code>sendReplies</code></td>
             
 
             <td class="type">
@@ -3819,7 +3819,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
 
         <tr>
             
-                <td class="name"><code>captcha_iden</code></td>
+                <td class="name"><code>captchaIden</code></td>
             
 
             <td class="type">
@@ -3858,7 +3858,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
 
         <tr>
             
-                <td class="name"><code>captcha_response</code></td>
+                <td class="name"><code>captchaResponse</code></td>
             
 
             <td class="type">
@@ -3984,7 +3984,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).submit_link({title: &#x27;I found a cool website&#x27;, url: &#x27;https://google.com&#x27;}).then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).submitLink({title: &#x27;I found a cool website&#x27;, url: &#x27;https://google.com&#x27;}).then(console.log)
 // =&gt; Submission { title: &#x27;I found a cool website&#x27;, ... }</pre>
 
 
@@ -3995,7 +3995,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_hot"><span class="type-signature"></span>get_hot( [options])</h4>
+    <h4 class="name" id="getHot"><span class="type-signature"></span>getHot( [options])</h4>
     
     
     <p class="summary">Gets a Listing of hot posts on this subreddit.</p>
@@ -4161,7 +4161,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_hot().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getHot().then(console.log)
 // =&gt; Listing [
 //  Submission { ... },
 //  Submission { ... },
@@ -4176,7 +4176,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_new"><span class="type-signature"></span>get_new( [options])</h4>
+    <h4 class="name" id="getNew"><span class="type-signature"></span>getNew( [options])</h4>
     
     
     <p class="summary">Gets a Listing of new posts on this subreddit.</p>
@@ -4342,7 +4342,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_new().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getNew().then(console.log)
 // =&gt; Listing [
 //  Submission { ... },
 //  Submission { ... },
@@ -4357,7 +4357,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_new_comments"><span class="type-signature"></span>get_new_comments( [options])</h4>
+    <h4 class="name" id="getNewComments"><span class="type-signature"></span>getNewComments( [options])</h4>
     
     
     <p class="summary">Gets a Listing of new comments on this subreddit.</p>
@@ -4523,7 +4523,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_hot().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getHot().then(console.log)
 // =&gt; Listing [
 //  Comment { ... },
 //  Comment { ... },
@@ -4538,7 +4538,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_random_submission"><span class="type-signature"></span>get_random_submission()</h4>
+    <h4 class="name" id="getRandomSubmission"><span class="type-signature"></span>getRandomSubmission()</h4>
     
     
     <p class="summary">Gets a single random Submission from this subreddit.</p>
@@ -4639,7 +4639,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_random_submission.then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getRandomSubmission.then(console.log)
 // =&gt; Submission { ... }</pre>
 
 
@@ -4650,7 +4650,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_top"><span class="type-signature"></span>get_top( [options])</h4>
+    <h4 class="name" id="getTop"><span class="type-signature"></span>getTop( [options])</h4>
     
     
     <p class="summary">Gets a Listing of top posts on this subreddit.</p>
@@ -4879,7 +4879,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_top({time: &#x27;all&#x27;}).then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getTop({time: &#x27;all&#x27;}).then(console.log)
 // =&gt; Listing [
 //  Comment { ... },
 //  Comment { ... },
@@ -4894,7 +4894,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_controversial"><span class="type-signature"></span>get_controversial( [options])</h4>
+    <h4 class="name" id="getControversial"><span class="type-signature"></span>getControversial( [options])</h4>
     
     
     <p class="summary">Gets a Listing of controversial posts on this subreddit.</p>
@@ -5123,7 +5123,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_controversial({time: &#x27;week&#x27;}).then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getControversial({time: &#x27;week&#x27;}).then(console.log)
 // =&gt; Listing [
 //  Comment { ... },
 //  Comment { ... },
@@ -5138,7 +5138,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_modmail"><span class="type-signature"></span>get_modmail( [options])</h4>
+    <h4 class="name" id="getModmail"><span class="type-signature"></span>getModmail( [options])</h4>
     
     
     <p class="summary">Gets the moderator mail for this subreddit.</p>
@@ -5296,7 +5296,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_modmail().then(console.log)</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getModmail().then(console.log)</pre>
 
 
     
@@ -5306,7 +5306,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_moderation_log"><span class="type-signature"></span>get_moderation_log( [options])</h4>
+    <h4 class="name" id="getModerationLog"><span class="type-signature"></span>getModerationLog( [options])</h4>
     
     
     <p class="summary">Gets the moderation log for this subreddit.</p>
@@ -5573,7 +5573,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_moderation_log().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getModerationLog().then(console.log)
 
 // =&gt; Listing [
 //  ModAction { description: null, mod: &#x27;snoowrap_testing&#x27;, action: &#x27;editflair&#x27;, ... }
@@ -5589,7 +5589,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_reports"><span class="type-signature"></span>get_reports( [options])</h4>
+    <h4 class="name" id="getReports"><span class="type-signature"></span>getReports( [options])</h4>
     
     
     <p class="summary">Gets a list of reported items on this subreddit.</p>
@@ -5817,7 +5817,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_reports().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getReports().then(console.log)
 // =&gt; Listing [
 //  Comment { ... },
 //  Comment { ... },
@@ -5833,7 +5833,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_spam"><span class="type-signature"></span>get_spam( [options])</h4>
+    <h4 class="name" id="getSpam"><span class="type-signature"></span>getSpam( [options])</h4>
     
     
     <p class="summary">Gets a list of removed items on this subreddit.</p>
@@ -6061,7 +6061,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_spam().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getSpam().then(console.log)
 // =&gt; Listing [
 //  Comment { ... },
 //  Comment { ... },
@@ -6077,7 +6077,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_modqueue"><span class="type-signature"></span>get_modqueue( [options])</h4>
+    <h4 class="name" id="getModqueue"><span class="type-signature"></span>getModqueue( [options])</h4>
     
     
     <p class="summary">Gets a list of items on the modqueue on this subreddit.</p>
@@ -6305,7 +6305,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_modqueue().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getModqueue().then(console.log)
 // =&gt; Listing [
 //  Comment { ... },
 //  Comment { ... },
@@ -6321,7 +6321,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_unmoderated"><span class="type-signature"></span>get_unmoderated( [options])</h4>
+    <h4 class="name" id="getUnmoderated"><span class="type-signature"></span>getUnmoderated( [options])</h4>
     
     
     <p class="summary">Gets a list of unmoderated items on this subreddit.</p>
@@ -6549,7 +6549,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_unmoderated().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getUnmoderated().then(console.log)
 // =&gt; Listing [
 //  Comment { ... },
 //  Comment { ... },
@@ -6565,7 +6565,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_edited"><span class="type-signature"></span>get_edited( [options])</h4>
+    <h4 class="name" id="getEdited"><span class="type-signature"></span>getEdited( [options])</h4>
     
     
     <p class="summary">Gets a list of edited items on this subreddit.</p>
@@ -6793,7 +6793,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_edited().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getEdited().then(console.log)
 // =&gt; Listing [
 //  Comment { ... },
 //  Comment { ... },
@@ -6809,7 +6809,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="accept_moderator_invite"><span class="type-signature"></span>accept_moderator_invite()</h4>
+    <h4 class="name" id="acceptModeratorInvite"><span class="type-signature"></span>acceptModeratorInvite()</h4>
     
     
     <p class="summary">Accepts an invite to become a moderator of this subreddit.</p>
@@ -6905,7 +6905,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).accept_moderator_invite()</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).acceptModeratorInvite()</pre>
 
 
     
@@ -6915,7 +6915,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="leave_moderator"><span class="type-signature"></span>leave_moderator()</h4>
+    <h4 class="name" id="leaveModerator"><span class="type-signature"></span>leaveModerator()</h4>
     
     
     <p class="summary">Abdicates moderator status on this subreddit.</p>
@@ -7011,7 +7011,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).leave_moderator()</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).leaveModerator()</pre>
 
 
     
@@ -7021,7 +7021,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="leave_contributor"><span class="type-signature"></span>leave_contributor()</h4>
+    <h4 class="name" id="leaveContributor"><span class="type-signature"></span>leaveContributor()</h4>
     
     
     <p class="summary">Abdicates approved submitter status on this subreddit.</p>
@@ -7117,7 +7117,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).leave_contributor()</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).leaveContributor()</pre>
 
 
     
@@ -7127,7 +7127,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_stylesheet"><span class="type-signature"></span>get_stylesheet()</h4>
+    <h4 class="name" id="getStylesheet"><span class="type-signature"></span>getStylesheet()</h4>
     
     
     <p class="summary">Gets a subreddit's CSS stylesheet.</p>
@@ -7227,7 +7227,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_stylesheet().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getStylesheet().then(console.log)
 // =&gt; &#x27;.md blockquote,.md del,body{color:#121212}.usertext-body ... &#x27;</pre>
 
 
@@ -7567,7 +7567,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).search({query: &#x27;blah&#x27;, sort: &#x27;year&#x27;}).then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).search({query: &#x27;blah&#x27;, sort: &#x27;year&#x27;}).then(console.log)
 // =&gt; Listing [
 //  Submission { ... },
 //  Submission { ... },
@@ -7582,7 +7582,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_banned_users"><span class="type-signature"></span>get_banned_users(options)</h4>
+    <h4 class="name" id="getBannedUsers"><span class="type-signature"></span>getBannedUsers(options)</h4>
     
     
     <p class="summary">Gets the list of banned users on this subreddit.</p>
@@ -7778,7 +7778,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_banned_users().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getBannedUsers().then(console.log)
 // =&gt; Listing [
 //  { date: 1461720936, note: &#x27;&#x27;, name: &#x27;actually_an_aardvark&#x27;, id: &#x27;t2_q3519&#x27; }
 //  ...
@@ -7792,7 +7792,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_muted_users"><span class="type-signature"></span>get_muted_users(options)</h4>
+    <h4 class="name" id="getMutedUsers"><span class="type-signature"></span>getMutedUsers(options)</h4>
     
     
     <p class="summary">Gets the list of muted users on this subreddit.</p>
@@ -7988,7 +7988,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_banned_users().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getBannedUsers().then(console.log)
 // =&gt; Listing [
 //  { date: 1461720936, name: &#x27;actually_an_aardvark&#x27;, id: &#x27;t2_q3519&#x27; }
 //  ...
@@ -8002,7 +8002,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_wikibanned_users"><span class="type-signature"></span>get_wikibanned_users(options)</h4>
+    <h4 class="name" id="getWikibannedUsers"><span class="type-signature"></span>getWikibannedUsers(options)</h4>
     
     
     <p class="summary">Gets the list of users banned from this subreddit's wiki.</p>
@@ -8198,7 +8198,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_wikibanned_users().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikibannedUsers().then(console.log)
 // =&gt; Listing [
 //  { date: 1461720936, note: &#x27;&#x27;, name: &#x27;actually_an_aardvark&#x27;, id: &#x27;t2_q3519&#x27; }
 //  ...
@@ -8212,7 +8212,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_contributors"><span class="type-signature"></span>get_contributors(options)</h4>
+    <h4 class="name" id="getContributors"><span class="type-signature"></span>getContributors(options)</h4>
     
     
     <p class="summary">Gets the list of approved submitters on this subreddit.</p>
@@ -8408,7 +8408,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_contributors().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getContributors().then(console.log)
 // =&gt; Listing [
 //  { date: 1461720936, name: &#x27;actually_an_aardvark&#x27;, id: &#x27;t2_q3519&#x27; }
 //  ...
@@ -8422,7 +8422,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_wiki_contributors"><span class="type-signature"></span>get_wiki_contributors(options)</h4>
+    <h4 class="name" id="getWikiContributors"><span class="type-signature"></span>getWikiContributors(options)</h4>
     
     
     <p class="summary">Gets the list of approved wiki submitters on this subreddit .</p>
@@ -8618,7 +8618,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_wiki_contributors().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikiContributors().then(console.log)
 // =&gt; Listing [
 //  { date: 1461720936, name: &#x27;actually_an_aardvark&#x27;, id: &#x27;t2_q3519&#x27; }
 //  ...
@@ -8632,7 +8632,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_moderators"><span class="type-signature"></span>get_moderators(options)</h4>
+    <h4 class="name" id="getModerators"><span class="type-signature"></span>getModerators(options)</h4>
     
     
     <p class="summary">Gets the list of moderators on this subreddit.</p>
@@ -8840,7 +8840,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;AskReddit&#x27;).get_moderators().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;AskReddit&#x27;).getModerators().then(console.log)
 // =&gt; [
 //  RedditUser { date: 1453862639, mod_permissions: [ &#x27;all&#x27; ], name: &#x27;not_an_aardvark&#x27;, id: &#x27;t2_k83md&#x27; },
 //  ...
@@ -8854,7 +8854,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="delete_banner"><span class="type-signature"></span>delete_banner()</h4>
+    <h4 class="name" id="deleteBanner"><span class="type-signature"></span>deleteBanner()</h4>
     
     
     <p class="summary">Deletes the banner for this Subreddit.</p>
@@ -8950,7 +8950,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).delete_banner()</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).deleteBanner()</pre>
 
 
     
@@ -8960,7 +8960,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="delete_header"><span class="type-signature"></span>delete_header()</h4>
+    <h4 class="name" id="deleteHeader"><span class="type-signature"></span>deleteHeader()</h4>
     
     
     <p class="summary">Deletes the header image for this Subreddit.</p>
@@ -9056,7 +9056,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).delete_header()</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).deleteHeader()</pre>
 
 
     
@@ -9066,7 +9066,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="delete_icon"><span class="type-signature"></span>delete_icon()</h4>
+    <h4 class="name" id="deleteIcon"><span class="type-signature"></span>deleteIcon()</h4>
     
     
     <p class="summary">Deletes this subreddit's icon.</p>
@@ -9162,7 +9162,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).delete_icon()</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).deleteIcon()</pre>
 
 
     
@@ -9172,7 +9172,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="delete_image"><span class="type-signature"></span>delete_image(options)</h4>
+    <h4 class="name" id="deleteImage"><span class="type-signature"></span>deleteImage(options)</h4>
     
     
     <p class="summary">Deletes an image from this subreddit.</p>
@@ -9256,7 +9256,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
 
         <tr>
             
-                <td class="name"><code>image_name</code></td>
+                <td class="name"><code>imageName</code></td>
             
 
             <td class="type">
@@ -9368,7 +9368,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).delete_image()</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).deleteImage()</pre>
 
 
     
@@ -9378,7 +9378,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_settings"><span class="type-signature"></span>get_settings()</h4>
+    <h4 class="name" id="getSettings"><span class="type-signature"></span>getSettings()</h4>
     
     
     <p class="summary">Gets this subreddit's current settings.</p>
@@ -9474,7 +9474,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_settings().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getSettings().then(console.log)
 // =&gt; SubredditSettings { default_set: true, submit_text: &#x27;&#x27;, subreddit_type: &#x27;private&#x27;, ... }</pre>
 
 
@@ -9485,7 +9485,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="edit_settings"><span class="type-signature"></span>edit_settings(options)</h4>
+    <h4 class="name" id="editSettings"><span class="type-signature"></span>editSettings(options)</h4>
     
     
     <p class="summary">Edits this subreddit's settings.</p>
@@ -10582,7 +10582,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).edit_settings({submit_text: &#x27;Welcome! Please be sure to read the rules.&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).editSettings({submit_text: &#x27;Welcome! Please be sure to read the rules.&#x27;})</pre>
 
 
     
@@ -10592,7 +10592,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_recommended_subreddits"><span class="type-signature"></span>get_recommended_subreddits( [options])</h4>
+    <h4 class="name" id="getRecommendedSubreddits"><span class="type-signature"></span>getRecommendedSubreddits( [options])</h4>
     
     
     <p class="summary">Gets a list of recommended other subreddits given this one.</p>
@@ -10820,7 +10820,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;AskReddit&#x27;).get_recommended_subreddits().then(console.log);
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;AskReddit&#x27;).getRecommendedSubreddits().then(console.log);
 // [ &#x27;TheChurchOfRogers&#x27;, &#x27;Sleepycabin&#x27;, ... ]</pre>
 
 
@@ -10831,7 +10831,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_submit_text"><span class="type-signature"></span>get_submit_text()</h4>
+    <h4 class="name" id="getSubmitText"><span class="type-signature"></span>getSubmitText()</h4>
     
     
     <p class="summary">Gets the submit text (which displays on the submission form) for this subreddit.</p>
@@ -10927,7 +10927,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_submit_text().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getSubmitText().then(console.log)
 // =&gt; &#x27;Welcome! Please be sure to read the rules.&#x27;</pre>
 
 
@@ -10938,7 +10938,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="update_stylesheet"><span class="type-signature"></span>update_stylesheet(options)</h4>
+    <h4 class="name" id="updateStylesheet"><span class="type-signature"></span>updateStylesheet(options)</h4>
     
     
     <p class="summary">Updates this subreddit's stylesheet.</p>
@@ -11178,7 +11178,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).update_stylesheet({css: &#x27;body {color:#00ff00;}&#x27;, reason: &#x27;yay green&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).updateStylesheet({css: &#x27;body {color:#00ff00;}&#x27;, reason: &#x27;yay green&#x27;})</pre>
 
 
     
@@ -11284,7 +11284,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).subscribe()</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).subscribe()</pre>
 
 
     
@@ -11390,7 +11390,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).unsubscribe()</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).unsubscribe()</pre>
 
 
     
@@ -11400,7 +11400,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="upload_stylesheet_image"><span class="type-signature"></span>upload_stylesheet_image(options)</h4>
+    <h4 class="name" id="uploadStylesheetImage"><span class="type-signature"></span>uploadStylesheetImage(options)</h4>
     
     
     <p class="summary">Uploads an image for use in this subreddit's stylesheet.</p>
@@ -11565,7 +11565,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
 
         <tr>
             
-                <td class="name"><code>image_type</code></td>
+                <td class="name"><code>imageType</code></td>
             
 
             <td class="type">
@@ -11693,7 +11693,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).upload_subreddit_image({name: &#x27;the cookie monster&#x27;, file: &#x27;./cookie_monster.png&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).uploadSubredditImage({name: &#x27;the cookie monster&#x27;, file: &#x27;./cookie_monster.png&#x27;})</pre>
 
 
     
@@ -11703,7 +11703,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="upload_header_image"><span class="type-signature"></span>upload_header_image(options)</h4>
+    <h4 class="name" id="uploadHeaderImage"><span class="type-signature"></span>uploadHeaderImage(options)</h4>
     
     
     <p class="summary">Uploads an image to use as this subreddit's header.</p>
@@ -11832,7 +11832,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
 
         <tr>
             
-                <td class="name"><code>image_type</code></td>
+                <td class="name"><code>imageType</code></td>
             
 
             <td class="type">
@@ -11960,7 +11960,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).upload_header_image({name: &#x27;the cookie monster&#x27;, file: &#x27;./cookie_monster.png&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).uploadHeaderImage({name: &#x27;the cookie monster&#x27;, file: &#x27;./cookie_monster.png&#x27;})</pre>
 
 
     
@@ -11970,7 +11970,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="upload_icon"><span class="type-signature"></span>upload_icon(options)</h4>
+    <h4 class="name" id="uploadIcon"><span class="type-signature"></span>uploadIcon(options)</h4>
     
     
     <p class="summary">Uploads an image to use as this subreddit's mobile icon.</p>
@@ -12099,7 +12099,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
 
         <tr>
             
-                <td class="name"><code>image_type</code></td>
+                <td class="name"><code>imageType</code></td>
             
 
             <td class="type">
@@ -12227,7 +12227,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).upload_icon({name: &#x27;the cookie monster&#x27;, file: &#x27;./cookie_monster.png&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).uploadIcon({name: &#x27;the cookie monster&#x27;, file: &#x27;./cookie_monster.png&#x27;})</pre>
 
 
     
@@ -12237,7 +12237,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="upload_banner_image"><span class="type-signature"></span>upload_banner_image(options)</h4>
+    <h4 class="name" id="uploadBannerImage"><span class="type-signature"></span>uploadBannerImage(options)</h4>
     
     
     <p class="summary">Uploads an image to use as this subreddit's mobile banner.</p>
@@ -12366,7 +12366,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
 
         <tr>
             
-                <td class="name"><code>image_type</code></td>
+                <td class="name"><code>imageType</code></td>
             
 
             <td class="type">
@@ -12494,7 +12494,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).upload_banner_image({name: &#x27;the cookie monster&#x27;, file: &#x27;./cookie_monster.png&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).uploadBannerImage({name: &#x27;the cookie monster&#x27;, file: &#x27;./cookie_monster.png&#x27;})</pre>
 
 
     
@@ -12504,7 +12504,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_rules"><span class="type-signature"></span>get_rules()</h4>
+    <h4 class="name" id="getRules"><span class="type-signature"></span>getRules()</h4>
     
     
     <p class="summary">Gets information on this subreddit's rules.</p>
@@ -12600,7 +12600,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_rules().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getRules().then(console.log)
 
 // =&gt; {
   rules: [
@@ -12627,7 +12627,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_sticky"><span class="type-signature"></span>get_sticky( [options])</h4>
+    <h4 class="name" id="getSticky"><span class="type-signature"></span>getSticky( [options])</h4>
     
     
     <p class="summary">Gets the stickied post on this subreddit, or throws a 404 error if none exists.</p>
@@ -12855,7 +12855,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_sticky({num: 2})
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getSticky({num: 2})
 // =&gt; Submission { ... }</pre>
 
 
@@ -12866,7 +12866,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="invite_moderator"><span class="type-signature"></span>invite_moderator(options)</h4>
+    <h4 class="name" id="inviteModerator"><span class="type-signature"></span>inviteModerator(options)</h4>
     
     
     <p class="summary">Invites the given user to be a moderator of this subreddit.</p>
@@ -13108,7 +13108,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).invite_moderator({name: &#x27;actually_an_aardvark&#x27;, permissions: [&#x27;posts&#x27;, &#x27;wiki&#x27;]})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).inviteModerator({name: &#x27;actually_an_aardvark&#x27;, permissions: [&#x27;posts&#x27;, &#x27;wiki&#x27;]})</pre>
 
 
     
@@ -13118,7 +13118,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="revoke_moderator_invite"><span class="type-signature"></span>revoke_moderator_invite(options)</h4>
+    <h4 class="name" id="revokeModeratorInvite"><span class="type-signature"></span>revokeModeratorInvite(options)</h4>
     
     
     <p class="summary">Revokes an invitation for the given user to be a moderator.</p>
@@ -13314,7 +13314,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).revoke_moderator_invite({name: &#x27;actually_an_aardvark&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).revokeModeratorInvite({name: &#x27;actually_an_aardvark&#x27;})</pre>
 
 
     
@@ -13324,7 +13324,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="remove_moderator"><span class="type-signature"></span>remove_moderator(options)</h4>
+    <h4 class="name" id="removeModerator"><span class="type-signature"></span>removeModerator(options)</h4>
     
     
     <p class="summary">Removes the given user's moderator status on this subreddit.</p>
@@ -13520,7 +13520,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).remove_moderator({name: &#x27;actually_an_aardvark&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).removeModerator({name: &#x27;actually_an_aardvark&#x27;})</pre>
 
 
     
@@ -13530,7 +13530,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="add_contributor"><span class="type-signature"></span>add_contributor(options)</h4>
+    <h4 class="name" id="addContributor"><span class="type-signature"></span>addContributor(options)</h4>
     
     
     <p class="summary">Makes the given user an approved submitter of this subreddit.</p>
@@ -13726,7 +13726,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).add_contributor({name: &#x27;actually_an_aardvark&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).addContributor({name: &#x27;actually_an_aardvark&#x27;})</pre>
 
 
     
@@ -13736,7 +13736,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="remove_contributor"><span class="type-signature"></span>remove_contributor(options)</h4>
+    <h4 class="name" id="removeContributor"><span class="type-signature"></span>removeContributor(options)</h4>
     
     
     <p class="summary">Revokes this user's approved submitter status on this subreddit.</p>
@@ -13932,7 +13932,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).remove_contributor({name: &#x27;actually_an_aardvark&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).removeContributor({name: &#x27;actually_an_aardvark&#x27;})</pre>
 
 
     
@@ -13942,7 +13942,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="ban_user"><span class="type-signature"></span>ban_user(options)</h4>
+    <h4 class="name" id="banUser"><span class="type-signature"></span>banUser(options)</h4>
     
     
     <p class="summary">Bans the given user from this subreddit.</p>
@@ -14060,7 +14060,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
 
         <tr>
             
-                <td class="name"><code>ban_message</code></td>
+                <td class="name"><code>banMessage</code></td>
             
 
             <td class="type">
@@ -14095,7 +14095,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
 
         <tr>
             
-                <td class="name"><code>ban_reason</code></td>
+                <td class="name"><code>banReason</code></td>
             
 
             <td class="type">
@@ -14163,7 +14163,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
 
         <tr>
             
-                <td class="name"><code>ban_note</code></td>
+                <td class="name"><code>banNote</code></td>
             
 
             <td class="type">
@@ -14286,7 +14286,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).ban_user({name: &#x27;actually_an_aardvark&#x27;, ban_message: &#x27;You are now banned LOL&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).banUser({name: &#x27;actually_an_aardvark&#x27;, banMessage: &#x27;You are now banned LOL&#x27;})</pre>
 
 
     
@@ -14296,7 +14296,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="unban_user"><span class="type-signature"></span>unban_user(options)</h4>
+    <h4 class="name" id="unbanUser"><span class="type-signature"></span>unbanUser(options)</h4>
     
     
     <p class="summary">Unbans the given user from this subreddit.</p>
@@ -14492,7 +14492,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).unban_user({name: &#x27;actually_an_aardvark&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).unbanUser({name: &#x27;actually_an_aardvark&#x27;})</pre>
 
 
     
@@ -14502,7 +14502,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="mute_user"><span class="type-signature"></span>mute_user(options)</h4>
+    <h4 class="name" id="muteUser"><span class="type-signature"></span>muteUser(options)</h4>
     
     
     <p class="summary">Mutes the given user from messaging this subreddit for 72 hours.</p>
@@ -14698,7 +14698,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).mute_user({name: &#x27;actually_an_aardvark&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).muteUser({name: &#x27;actually_an_aardvark&#x27;})</pre>
 
 
     
@@ -14708,7 +14708,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="unmute_user"><span class="type-signature"></span>unmute_user(options)</h4>
+    <h4 class="name" id="unmuteUser"><span class="type-signature"></span>unmuteUser(options)</h4>
     
     
     <p class="summary">Unmutes the given user from messaging this subreddit.</p>
@@ -14904,7 +14904,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).unmute_user({name: &#x27;actually_an_aardvark&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).unmuteUser({name: &#x27;actually_an_aardvark&#x27;})</pre>
 
 
     
@@ -14914,7 +14914,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="wikiban_user"><span class="type-signature"></span>wikiban_user(options)</h4>
+    <h4 class="name" id="wikibanUser"><span class="type-signature"></span>wikibanUser(options)</h4>
     
     
     <p class="summary">Bans the given user from editing this subreddit's wiki.</p>
@@ -15110,7 +15110,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).wikiban_user({name: &#x27;actually_an_aardvark&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).wikibanUser({name: &#x27;actually_an_aardvark&#x27;})</pre>
 
 
     
@@ -15120,7 +15120,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="unwikiban_user"><span class="type-signature"></span>unwikiban_user(options)</h4>
+    <h4 class="name" id="unwikibanUser"><span class="type-signature"></span>unwikibanUser(options)</h4>
     
     
     <p class="summary">Unbans the given user from editing this subreddit's wiki.</p>
@@ -15316,7 +15316,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).unwikiban_user({name: &#x27;actually_an_aardvark&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).unwikibanUser({name: &#x27;actually_an_aardvark&#x27;})</pre>
 
 
     
@@ -15326,7 +15326,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="add_wiki_contributor"><span class="type-signature"></span>add_wiki_contributor(options)</h4>
+    <h4 class="name" id="addWikiContributor"><span class="type-signature"></span>addWikiContributor(options)</h4>
     
     
     <p class="summary">Adds the given user to this subreddit's list of approved wiki editors.</p>
@@ -15522,7 +15522,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).add_wiki_contributor({name: &#x27;actually_an_aardvark&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).addWikiContributor({name: &#x27;actually_an_aardvark&#x27;})</pre>
 
 
     
@@ -15532,7 +15532,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="remove_wiki_contributor"><span class="type-signature"></span>remove_wiki_contributor(options)</h4>
+    <h4 class="name" id="removeWikiContributor"><span class="type-signature"></span>removeWikiContributor(options)</h4>
     
     
     <p class="summary">Removes the given user from this subreddit's list of approved wiki editors.</p>
@@ -15728,7 +15728,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).remove_wiki_contributor({name: &#x27;actually_an_aardvark&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).removeWikiContributor({name: &#x27;actually_an_aardvark&#x27;})</pre>
 
 
     
@@ -15738,7 +15738,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="set_moderator_permissions"><span class="type-signature"></span>set_moderator_permissions(options)</h4>
+    <h4 class="name" id="setModeratorPermissions"><span class="type-signature"></span>setModeratorPermissions(options)</h4>
     
     
     <p class="summary">Sets the permissions for a given moderator on this subreddit.</p>
@@ -15980,7 +15980,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).set_moderator_permissions({name: &#x27;actually_an_aardvark&#x27;, permissions: [&#x27;mail&#x27;]})</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).setModeratorPermissions({name: &#x27;actually_an_aardvark&#x27;, permissions: [&#x27;mail&#x27;]})</pre>
 
 
     
@@ -15990,7 +15990,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_wiki_page"><span class="type-signature"></span>get_wiki_page(title)</h4>
+    <h4 class="name" id="getWikiPage"><span class="type-signature"></span>getWikiPage(title)</h4>
     
     
     <p class="summary">Gets a given wiki page on this subreddit.</p>
@@ -16136,7 +16136,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_wiki_page(&#x27;index&#x27;)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikiPage(&#x27;index&#x27;)
 // =&gt; WikiPage { title: &#x27;index&#x27;, subreddit: Subreddit { display_name: &#x27;snoowrap&#x27; } }</pre>
 
 
@@ -16147,7 +16147,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_wiki_pages"><span class="type-signature"></span>get_wiki_pages()</h4>
+    <h4 class="name" id="getWikiPages"><span class="type-signature"></span>getWikiPages()</h4>
     
     
     <p class="summary">Gets the list of wiki pages on this subreddit.</p>
@@ -16243,7 +16243,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_wiki_pages().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikiPages().then(console.log)
 // =&gt; [
 //   WikiPage { title: &#x27;index&#x27;, subreddit: Subreddit { display_name: &#x27;snoowrap&#x27;} }
 //   WikiPage { title: &#x27;config/sidebar&#x27;, subreddit: Subreddit { display_name: &#x27;snoowrap&#x27;} }
@@ -16259,7 +16259,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
             
 <hr>
 <dt>
-    <h4 class="name" id="get_wiki_revisions"><span class="type-signature"></span>get_wiki_revisions( [options])</h4>
+    <h4 class="name" id="getWikiRevisions"><span class="type-signature"></span>getWikiRevisions( [options])</h4>
     
     
     <p class="summary">Gets a list of revisions on this subreddit's wiki.</p>
@@ -16417,7 +16417,7 @@ r.get_subreddit(&#x27;snoowrap&#x27;).set_multiple_user_flairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;snoowrap&#x27;).get_wiki_revisions().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikiRevisions().then(console.log)
 // =&gt; Listing [
 //  { page: &#x27;index&#x27;, reason: &#x27;added cookies&#x27;, ... },
 //  ...
@@ -16546,16 +16546,16 @@ automatically called when an unknown property is accessed on an unfetched conten
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_user(&#x27;not_an_aardvark&#x27;).fetch().then(user_info =&gt; {
-  console.log(user_info.name); // &#x27;not_an_aardvark&#x27;
-  console.log(user_info.created_utc); // 1419104352
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;).fetch().then(userInfo =&gt; {
+  console.log(userInfo.name); // &#x27;not_an_aardvark&#x27;
+  console.log(userInfo.created_utc); // 1419104352
 });
 
-r.get_comment(&#x27;d1xchqn&#x27;).fetch().then(comment =&gt; comment.body).then(console.log)
+r.getComment(&#x27;d1xchqn&#x27;).fetch().then(comment =&gt; comment.body).then(console.log)
 // =&gt; &#x27;This is a little too interesting for my liking&#x27;
 
 // In environments that support ES2015 Proxies, the above line is equivalent to:
-r.get_comment(&#x27;d1xchqn&#x27;).body.then(console.log);
+r.getComment(&#x27;d1xchqn&#x27;).body.then(console.log);
 // =&gt; &#x27;This is a little too interesting for my liking&#x27;</pre>
 
 
@@ -16671,12 +16671,12 @@ r.get_comment(&#x27;d1xchqn&#x27;).body.then(console.log);
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var some_comment = r.get_comment(&#x27;cmfkyus&#x27;);
-var initial_comment_body = some_comment.fetch().then(comment =&gt; comment.body);
+    <pre class="sunlight-highlight-javascript">var someComment = r.getComment(&#x27;cmfkyus&#x27;);
+var initialCommentBody = some_comment.fetch().then(comment =&gt; comment.body);
 
 setTimeout(() =&gt; {
-  some_comment.refresh().then(refreshed_comment =&gt; {
-    if (initial_comment_body.value() !== refreshed_comment.body) {
+  someComment.refresh().then(refreshedComment =&gt; {
+    if (initialCommentBody.value() !== refreshedComment.body) {
       console.log(&#x27;This comment has changed since 10 seconds ago.&#x27;);
     }
   });
@@ -16800,7 +16800,7 @@ setTimeout(() =&gt; {
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var user = r.get_user(&#x27;not_an_aardvark&#x27;);
+    <pre class="sunlight-highlight-javascript">var user = r.getUser(&#x27;not_an_aardvark&#x27;);
 JSON.stringify(user) // =&gt; &#x27;{&quot;name&quot;:&quot;not_an_aardvark&quot;}&#x27;</pre>
 
 

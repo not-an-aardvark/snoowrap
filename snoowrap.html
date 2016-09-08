@@ -80,7 +80,7 @@ tokens.</p>
 <p>If constructed with a refresh token, a requester will be able to repeatedly generate access tokens as necessary, without any
 further user intervention. After making at least one request, a requester will have the <code>access_token</code> property, which specifies
 the access token currently in use. It will also have a few additional properties such as <code>scope</code> (an array of scope strings)
-and <code>ratelimit_remaining</code> (the number of requests remaining for the current 10-minute interval, in compliance with reddit's
+and <code>ratelimitRemaining</code> (the number of requests remaining for the current 10-minute interval, in compliance with reddit's
 <a href="https://github.com/reddit/reddit/wiki/API">API rules</a>.) These properties primarily exist for internal use, but they are
 exposed since they are useful externally as well.</p></div>
         
@@ -104,14 +104,14 @@ exposed since they are useful externally as well.</p></div>
     <div class="description">
         <p>snoowrap supports several different options for authentication.</p>
 <ol>
-<li><em>Refresh token</em>: To authenticate with a refresh token, pass an object with the properties <code>user_agent</code>, <code>client_id</code>,
-<code>client_secret</code>, and <code>refresh_token</code> to the snoowrap constructor. You will need to get the refresh token from reddit
+<li><em>Refresh token</em>: To authenticate with a refresh token, pass an object with the properties <code>userAgent</code>, <code>clientId</code>,
+<code>clientSecret</code>, and <code>refreshToken</code> to the snoowrap constructor. You will need to get the refresh token from reddit
 beforehand. A script to automatically generate refresh tokens for you can be found
 <a href="https://github.com/not-an-aardvark/reddit-oauth-helper">here</a>.</li>
-<li><em>Username/password</em>: To authenticate with a username and password, pass an object with the properties <code>user_agent</code>,
-<code>client_id</code>, <code>client_secret</code>, <code>username</code>, and <code>password</code> to the snoowrap constructor. Note that username/password
+<li><em>Username/password</em>: To authenticate with a username and password, pass an object with the properties <code>userAgent</code>,
+<code>clientId</code>, <code>clientSecret</code>, <code>username</code>, and <code>password</code> to the snoowrap constructor. Note that username/password
 authentication is only possible for <code>script</code>-type apps.</li>
-<li><em>Access token</em>: To authenticate with an access token, pass an object with the properties <code>user_agent</code> and <code>access_token</code>
+<li><em>Access token</em>: To authenticate with an access token, pass an object with the properties <code>userAgent</code> and <code>accessToken</code>
 to the snoowrap constructor. Note that all access tokens expire one hour after being generated, so this method is
 not recommended for long-term use.</li>
 </ol>
@@ -166,7 +166,7 @@ not recommended for long-term use.</li>
 
             
 
-            <td class="description last"><p>An object containing authentication options. This should always have the property <code>user_agent</code>. It
+            <td class="description last"><p>An object containing authentication options. This should always have the property <code>userAgent</code>. It
   must also contain some combination of credentials (see above)</p>
                 <h6 class="method-params-label method-subparams-label">Properties</h6>
                 
@@ -195,7 +195,7 @@ not recommended for long-term use.</li>
 
         <tr>
             
-                <td class="name"><code>user_agent</code></td>
+                <td class="name"><code>userAgent</code></td>
             
 
             <td class="type">
@@ -227,7 +227,7 @@ not recommended for long-term use.</li>
 
         <tr>
             
-                <td class="name"><code>client_id</code></td>
+                <td class="name"><code>clientId</code></td>
             
 
             <td class="type">
@@ -261,7 +261,7 @@ not recommended for long-term use.</li>
 
         <tr>
             
-                <td class="name"><code>client_secret</code></td>
+                <td class="name"><code>clientSecret</code></td>
             
 
             <td class="type">
@@ -289,7 +289,7 @@ not recommended for long-term use.</li>
             
 
             <td class="description last"><p>The client secret of your app (assigned by reddit). If you are using a refresh token
-  with an installed app (which does not have a client secret), pass an empty string as your <code>client_secret</code>.</p></td>
+  with an installed app (which does not have a client secret), pass an empty string as your <code>clientSecret</code>.</p></td>
         </tr>
 
     
@@ -364,7 +364,7 @@ not recommended for long-term use.</li>
 
         <tr>
             
-                <td class="name"><code>refresh_token</code></td>
+                <td class="name"><code>refreshToken</code></td>
             
 
             <td class="type">
@@ -398,7 +398,7 @@ not recommended for long-term use.</li>
 
         <tr>
             
-                <td class="name"><code>access_token</code></td>
+                <td class="name"><code>accessToken</code></td>
             
 
             <td class="type">
@@ -621,7 +621,7 @@ not recommended for long-term use.</li>
 
         <tr>
             
-                <td class="name"><code>endpoint_domain</code></td>
+                <td class="name"><code>endpointDomain</code></td>
             
 
             <td class="type">
@@ -661,7 +661,7 @@ not recommended for long-term use.</li>
 
         <tr>
             
-                <td class="name"><code>request_delay</code></td>
+                <td class="name"><code>requestDelay</code></td>
             
 
             <td class="type">
@@ -705,7 +705,7 @@ not recommended for long-term use.</li>
 
         <tr>
             
-                <td class="name"><code>request_timeout</code></td>
+                <td class="name"><code>requestTimeout</code></td>
             
 
             <td class="type">
@@ -746,7 +746,7 @@ not recommended for long-term use.</li>
 
         <tr>
             
-                <td class="name"><code>continue_after_ratelimit_error</code></td>
+                <td class="name"><code>continueAfterRatelimitError</code></td>
             
 
             <td class="type">
@@ -789,7 +789,7 @@ not recommended for long-term use.</li>
 
         <tr>
             
-                <td class="name"><code>retry_error_codes</code></td>
+                <td class="name"><code>retryErrorCodes</code></td>
             
 
             <td class="type">
@@ -832,7 +832,7 @@ not recommended for long-term use.</li>
 
         <tr>
             
-                <td class="name"><code>max_retry_attempts</code></td>
+                <td class="name"><code>maxRetryAttempts</code></td>
             
 
             <td class="type">
@@ -865,7 +865,7 @@ not recommended for long-term use.</li>
                 </td>
             
 
-            <td class="description last"><p>See <code>retry_error_codes</code>.</p></td>
+            <td class="description last"><p>See <code>retryErrorCodes</code>.</p></td>
         </tr>
 
     
@@ -1085,7 +1085,7 @@ not recommended for long-term use.</li>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.config({request_delay: 1000, warnings: false});
+    <pre class="sunlight-highlight-javascript">r.config({requestDelay: 1000, warnings: false});
 // sets the request delay to 1000 milliseconds, and suppresses warnings.</pre>
 
 
@@ -1096,7 +1096,7 @@ not recommended for long-term use.</li>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_user"><span class="type-signature"></span>get_user(name)</h4>
+    <h4 class="name" id="getUser"><span class="type-signature"></span>getUser(name)</h4>
     
     
     <p class="summary">Gets information on a reddit user with a given name.</p>
@@ -1242,9 +1242,9 @@ not recommended for long-term use.</li>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_user(&#x27;not_an_aardvark&#x27;)
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;)
 // =&gt; RedditUser { name: &#x27;not_an_aardvark&#x27; }
-r.get_user(&#x27;not_an_aardvark&#x27;).link_karma.then(console.log)
+r.getUser(&#x27;not_an_aardvark&#x27;).link_karma.then(console.log)
 // =&gt; 6</pre>
 
 
@@ -1255,7 +1255,7 @@ r.get_user(&#x27;not_an_aardvark&#x27;).link_karma.then(console.log)
             
 <hr>
 <dt>
-    <h4 class="name" id="get_comment"><span class="type-signature"></span>get_comment(comment_id)</h4>
+    <h4 class="name" id="getComment"><span class="type-signature"></span>getComment(commentId)</h4>
     
     
     <p class="summary">Gets information on a comment with a given id.</p>
@@ -1296,7 +1296,7 @@ r.get_user(&#x27;not_an_aardvark&#x27;).link_karma.then(console.log)
 
         <tr>
             
-                <td class="name"><code>comment_id</code></td>
+                <td class="name"><code>commentId</code></td>
             
 
             <td class="type">
@@ -1401,9 +1401,9 @@ r.get_user(&#x27;not_an_aardvark&#x27;).link_karma.then(console.log)
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_comment(&#x27;c0b6xx0&#x27;)
+    <pre class="sunlight-highlight-javascript">r.getComment(&#x27;c0b6xx0&#x27;)
 // =&gt; Comment { name: &#x27;t1_c0b6xx0&#x27; }
-r.get_comment(&#x27;c0b6xx0&#x27;).author.name.then(console.log)
+r.getComment(&#x27;c0b6xx0&#x27;).author.name.then(console.log)
 // =&gt; &#x27;Kharos&#x27;</pre>
 
 
@@ -1414,7 +1414,7 @@ r.get_comment(&#x27;c0b6xx0&#x27;).author.name.then(console.log)
             
 <hr>
 <dt>
-    <h4 class="name" id="get_subreddit"><span class="type-signature"></span>get_subreddit(display_name)</h4>
+    <h4 class="name" id="getSubreddit"><span class="type-signature"></span>getSubreddit(displayName)</h4>
     
     
     <p class="summary">Gets information on a given subreddit.</p>
@@ -1455,7 +1455,7 @@ r.get_comment(&#x27;c0b6xx0&#x27;).author.name.then(console.log)
 
         <tr>
             
-                <td class="name"><code>display_name</code></td>
+                <td class="name"><code>displayName</code></td>
             
 
             <td class="type">
@@ -1560,9 +1560,9 @@ r.get_comment(&#x27;c0b6xx0&#x27;).author.name.then(console.log)
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subreddit(&#x27;AskReddit&#x27;)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;AskReddit&#x27;)
 // =&gt; Subreddit { display_name: &#x27;AskReddit&#x27; }
-r.get_subreddit(&#x27;AskReddit&#x27;).created_utc.then(console.log)
+r.getSubreddit(&#x27;AskReddit&#x27;).created_utc.then(console.log)
 // =&gt; 1201233135</pre>
 
 
@@ -1573,7 +1573,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;).created_utc.then(console.log)
             
 <hr>
 <dt>
-    <h4 class="name" id="get_submission"><span class="type-signature"></span>get_submission(submission_id)</h4>
+    <h4 class="name" id="getSubmission"><span class="type-signature"></span>getSubmission(submissionId)</h4>
     
     
     <p class="summary">Gets information on a given submission.</p>
@@ -1614,7 +1614,7 @@ r.get_subreddit(&#x27;AskReddit&#x27;).created_utc.then(console.log)
 
         <tr>
             
-                <td class="name"><code>submission_id</code></td>
+                <td class="name"><code>submissionId</code></td>
             
 
             <td class="type">
@@ -1719,9 +1719,9 @@ r.get_subreddit(&#x27;AskReddit&#x27;).created_utc.then(console.log)
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_submission(&#x27;2np694&#x27;)
+    <pre class="sunlight-highlight-javascript">r.getSubmission(&#x27;2np694&#x27;)
 // =&gt; Submission { name: &#x27;t3_2np694&#x27; }
-r.get_submission(&#x27;2np694&#x27;).title.then(console.log)
+r.getSubmission(&#x27;2np694&#x27;).title.then(console.log)
 // =&gt; &#x27;What tasty food would be distusting if eaten over rice?&#x27;</pre>
 
 
@@ -1732,7 +1732,7 @@ r.get_submission(&#x27;2np694&#x27;).title.then(console.log)
             
 <hr>
 <dt>
-    <h4 class="name" id="get_message"><span class="type-signature"></span>get_message(message_id)</h4>
+    <h4 class="name" id="getMessage"><span class="type-signature"></span>getMessage(messageId)</h4>
     
     
     <p class="summary">Gets a private message by ID.</p>
@@ -1773,7 +1773,7 @@ r.get_submission(&#x27;2np694&#x27;).title.then(console.log)
 
         <tr>
             
-                <td class="name"><code>message_id</code></td>
+                <td class="name"><code>messageId</code></td>
             
 
             <td class="type">
@@ -1878,9 +1878,9 @@ r.get_submission(&#x27;2np694&#x27;).title.then(console.log)
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_message(&#x27;51shnw&#x27;)
+    <pre class="sunlight-highlight-javascript">r.getMessage(&#x27;51shnw&#x27;)
 // =&gt; PrivateMessage { name: &#x27;t4_51shnw&#x27; }
-r.get_message(&#x27;51shnw&#x27;).subject.then(console.log)
+r.getMessage(&#x27;51shnw&#x27;).subject.then(console.log)
 // =&gt; &#x27;Example&#x27;
 // See here for a screenshot of the PM in question https://i.gyazo.com/24f3b97e55b6ff8e3a74cb026a58b167.png</pre>
 
@@ -1892,7 +1892,7 @@ r.get_message(&#x27;51shnw&#x27;).subject.then(console.log)
             
 <hr>
 <dt>
-    <h4 class="name" id="get_livethread"><span class="type-signature"></span>get_livethread(thread_id)</h4>
+    <h4 class="name" id="getLivethread"><span class="type-signature"></span>getLivethread(threadId)</h4>
     
     
 </dt>
@@ -1935,7 +1935,7 @@ r.get_message(&#x27;51shnw&#x27;).subject.then(console.log)
 
         <tr>
             
-                <td class="name"><code>thread_id</code></td>
+                <td class="name"><code>threadId</code></td>
             
 
             <td class="type">
@@ -2040,9 +2040,9 @@ r.get_message(&#x27;51shnw&#x27;).subject.then(console.log)
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)
+    <pre class="sunlight-highlight-javascript">r.getLivethread(&#x27;whrdxo8dg9n0&#x27;)
 // =&gt; LiveThread { id: &#x27;whrdxo8dg9n0&#x27; }
-r.get_livethread(&#x27;whrdxo8dg9n0&#x27;).nsfw.then(console.log)
+r.getLivethread(&#x27;whrdxo8dg9n0&#x27;).nsfw.then(console.log)
 // =&gt; false</pre>
 
 
@@ -2053,7 +2053,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;).nsfw.then(console.log)
             
 <hr>
 <dt>
-    <h4 class="name" id="get_me"><span class="type-signature"></span>get_me()</h4>
+    <h4 class="name" id="getMe"><span class="type-signature"></span>getMe()</h4>
     
     
     <p class="summary">Gets information on the requester's own user profile.</p>
@@ -2149,7 +2149,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;).nsfw.then(console.log)
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_me().then(console.log);
+    <pre class="sunlight-highlight-javascript">r.getMe().then(console.log);
 // =&gt; RedditUser { is_employee: false, has_mail: false, name: &#x27;snoowrap_testing&#x27;, ... }</pre>
 
 
@@ -2160,7 +2160,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;).nsfw.then(console.log)
             
 <hr>
 <dt>
-    <h4 class="name" id="get_karma"><span class="type-signature"></span>get_karma()</h4>
+    <h4 class="name" id="getKarma"><span class="type-signature"></span>getKarma()</h4>
     
     
     <p class="summary">Gets a distribution of the requester's own karma distribution by subreddit.</p>
@@ -2256,7 +2256,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;).nsfw.then(console.log)
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_karma().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getKarma().then(console.log)
 // =&gt; [
 //  { sr: Subreddit { display_name: &#x27;redditdev&#x27; }, comment_karma: 16, link_karma: 1 },
 //  { sr: Subreddit { display_name: &#x27;programming&#x27; }, comment_karma: 2, link_karma: 1 },
@@ -2271,7 +2271,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;).nsfw.then(console.log)
             
 <hr>
 <dt>
-    <h4 class="name" id="get_preferences"><span class="type-signature"></span>get_preferences()</h4>
+    <h4 class="name" id="getPreferences"><span class="type-signature"></span>getPreferences()</h4>
     
     
     <p class="summary">Gets information on the user's current preferences.</p>
@@ -2367,7 +2367,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;).nsfw.then(console.log)
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_preferences().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getPreferences().then(console.log)
 // =&gt; { default_theme_sr: null, threaded_messages: true, hide_downs: false, ... }</pre>
 
 
@@ -2378,7 +2378,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;).nsfw.then(console.log)
             
 <hr>
 <dt>
-    <h4 class="name" id="update_preferences"><span class="type-signature"></span>update_preferences(updated_preferences)</h4>
+    <h4 class="name" id="updatePreferences"><span class="type-signature"></span>updatePreferences(updatedPreferences)</h4>
     
     
     <p class="summary">Updates the user's current preferences.</p>
@@ -2419,7 +2419,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;).nsfw.then(console.log)
 
         <tr>
             
-                <td class="name"><code>updated_preferences</code></td>
+                <td class="name"><code>updatedPreferences</code></td>
             
 
             <td class="type">
@@ -2525,7 +2525,7 @@ not included in this object will simply retain its current value.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.update_preferences({threaded_messages: false, hide_downs: true})
+    <pre class="sunlight-highlight-javascript">r.updatePreferences({threaded_messages: false, hide_downs: true})
 // =&gt; { default_theme_sr: null, threaded_messages: false,hide_downs: true, ... }
 // (preferences updated on reddit)</pre>
 
@@ -2537,7 +2537,7 @@ not included in this object will simply retain its current value.</p></td>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_my_trophies"><span class="type-signature"></span>get_my_trophies()</h4>
+    <h4 class="name" id="getMyTrophies"><span class="type-signature"></span>getMyTrophies()</h4>
     
     
     <p class="summary">Gets the currently-authenticated user's trophies.</p>
@@ -2633,7 +2633,7 @@ not included in this object will simply retain its current value.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_my_trophies().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getMyTrophies().then(console.log)
 // =&gt; TrophyList { trophies: [
 //   Trophy { icon_70: &#x27;https://s3.amazonaws.com/redditstatic/award/verified_email-70.png&#x27;,
 //     description: null,
@@ -2653,7 +2653,7 @@ not included in this object will simply retain its current value.</p></td>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_friends"><span class="type-signature"></span>get_friends()</h4>
+    <h4 class="name" id="getFriends"><span class="type-signature"></span>getFriends()</h4>
     
     
     <p class="summary">Gets the list of the currently-authenticated user's friends.</p>
@@ -2749,7 +2749,7 @@ not included in this object will simply retain its current value.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_friends().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getFriends().then(console.log)
 // =&gt; [ [ RedditUser { date: 1457927963, name: &#x27;not_an_aardvark&#x27;, id: &#x27;t2_k83md&#x27; } ], [] ]</pre>
 
 
@@ -2760,7 +2760,7 @@ not included in this object will simply retain its current value.</p></td>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_blocked_users"><span class="type-signature"></span>get_blocked_users()</h4>
+    <h4 class="name" id="getBlockedUsers"><span class="type-signature"></span>getBlockedUsers()</h4>
     
     
     <p class="summary">Gets the list of people that the currently-authenticated user has blocked.</p>
@@ -2856,7 +2856,7 @@ not included in this object will simply retain its current value.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_blocked_users().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getBlockedUsers().then(console.log)
 // =&gt; [ RedditUser { date: 1457928120, name: &#x27;actually_an_aardvark&#x27;, id: &#x27;t2_q3519&#x27; } ]</pre>
 
 
@@ -2867,7 +2867,7 @@ not included in this object will simply retain its current value.</p></td>
             
 <hr>
 <dt>
-    <h4 class="name" id="check_captcha_requirement"><span class="type-signature"></span>check_captcha_requirement()</h4>
+    <h4 class="name" id="checkCaptchaRequirement"><span class="type-signature"></span>checkCaptchaRequirement()</h4>
     
     
     <p class="summary">Determines whether the currently-authenticated user needs to fill out a captcha in order to submit content.</p>
@@ -2963,7 +2963,7 @@ not included in this object will simply retain its current value.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.check_captcha_requirement().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.checkCaptchaRequirement().then(console.log)
 // =&gt; false</pre>
 
 
@@ -2974,7 +2974,7 @@ not included in this object will simply retain its current value.</p></td>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_new_captcha_identifier"><span class="type-signature"></span>get_new_captcha_identifier()</h4>
+    <h4 class="name" id="getNewCaptchaIdentifier"><span class="type-signature"></span>getNewCaptchaIdentifier()</h4>
     
     
     <p class="summary">Gets the identifier (a hex string) for a new captcha image.</p>
@@ -3070,7 +3070,7 @@ not included in this object will simply retain its current value.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_new_captcha_identifier().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getNewCaptchaIdentifier().then(console.log)
 // =&gt; &#x27;o5M18uy4mk0IW4hs0fu2GNPdXb1Dxe9d&#x27;</pre>
 
 
@@ -3081,7 +3081,7 @@ not included in this object will simply retain its current value.</p></td>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_captcha_image"><span class="type-signature"></span>get_captcha_image(identifier)</h4>
+    <h4 class="name" id="getCaptchaImage"><span class="type-signature"></span>getCaptchaImage(identifier)</h4>
     
     
     <p class="summary">Gets an image for a given captcha identifier.</p>
@@ -3227,7 +3227,7 @@ not included in this object will simply retain its current value.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_captcha_image(&#x27;o5M18uy4mk0IW4hs0fu2GNPdXb1Dxe9d&#x27;).then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getCaptchaImage(&#x27;o5M18uy4mk0IW4hs0fu2GNPdXb1Dxe9d&#x27;).then(console.log)
   // =&gt; (A long, incoherent string representing the image in PNG format)</pre>
 
 
@@ -3238,7 +3238,7 @@ not included in this object will simply retain its current value.</p></td>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_saved_categories"><span class="type-signature"></span>get_saved_categories()</h4>
+    <h4 class="name" id="getSavedCategories"><span class="type-signature"></span>getSavedCategories()</h4>
     
     
     <p class="summary">Gets an array of categories that items can be saved in. (Requires reddit gold)</p>
@@ -3334,7 +3334,7 @@ not included in this object will simply retain its current value.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_saved_categories().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSavedCategories().then(console.log)
 // =&gt; [ { category: &#x27;cute cat pictures&#x27; }, { category: &#x27;interesting articles&#x27; } ]</pre>
 
 
@@ -3345,7 +3345,7 @@ not included in this object will simply retain its current value.</p></td>
             
 <hr>
 <dt>
-    <h4 class="name" id="mark_as_visited"><span class="type-signature"></span>mark_as_visited(links)</h4>
+    <h4 class="name" id="markAsVisited"><span class="type-signature"></span>markAsVisited(links)</h4>
     
     
     <p class="summary">Marks a list of submissions as 'visited'.</p>
@@ -3495,8 +3495,8 @@ not included in this object will simply retain its current value.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var submissions = [r.get_submission(&#x27;4a9u54&#x27;), r.get_submission(&#x27;4a95nb&#x27;)]
-r.mark_as_visited(submissions)
+    <pre class="sunlight-highlight-javascript">var submissions = [r.getSubmission(&#x27;4a9u54&#x27;), r.getSubmission(&#x27;4a95nb&#x27;)]
+r.markAsVisited(submissions)
 // (the links will now appear purple on reddit)</pre>
 
 
@@ -3507,7 +3507,7 @@ r.mark_as_visited(submissions)
             
 <hr>
 <dt>
-    <h4 class="name" id="submit_selfpost"><span class="type-signature"></span>submit_selfpost(options)</h4>
+    <h4 class="name" id="submitSelfpost"><span class="type-signature"></span>submitSelfpost(options)</h4>
     
     
     <p class="summary">Creates a new selfpost on the given subreddit.</p>
@@ -3595,7 +3595,7 @@ r.mark_as_visited(submissions)
 
         <tr>
             
-                <td class="name"><code>subreddit_name</code></td>
+                <td class="name"><code>subredditName</code></td>
             
 
             <td class="type">
@@ -3705,7 +3705,7 @@ r.mark_as_visited(submissions)
 
         <tr>
             
-                <td class="name"><code>send_replies</code></td>
+                <td class="name"><code>sendReplies</code></td>
             
 
             <td class="type">
@@ -3745,7 +3745,7 @@ r.mark_as_visited(submissions)
 
         <tr>
             
-                <td class="name"><code>captcha_iden</code></td>
+                <td class="name"><code>captchaIden</code></td>
             
 
             <td class="type">
@@ -3784,7 +3784,7 @@ r.mark_as_visited(submissions)
 
         <tr>
             
-                <td class="name"><code>captcha_response</code></td>
+                <td class="name"><code>captchaResponse</code></td>
             
 
             <td class="type">
@@ -3910,8 +3910,8 @@ r.mark_as_visited(submissions)
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.submit_selfpost({
-  subreddit_name: &#x27;snoowrap_testing&#x27;,
+    <pre class="sunlight-highlight-javascript">r.submitSelfpost({
+  subredditName: &#x27;snoowrap_testing&#x27;,
   title: &#x27;This is a selfpost&#x27;,
   body: &#x27;This is the body of the selfpost&#x27;
 }).then(console.log)
@@ -3926,7 +3926,7 @@ r.mark_as_visited(submissions)
             
 <hr>
 <dt>
-    <h4 class="name" id="submit_link"><span class="type-signature"></span>submit_link(options)</h4>
+    <h4 class="name" id="submitLink"><span class="type-signature"></span>submitLink(options)</h4>
     
     
     <p class="summary">Creates a new link submission on the given subreddit.</p>
@@ -4014,7 +4014,7 @@ r.mark_as_visited(submissions)
 
         <tr>
             
-                <td class="name"><code>subreddit_name</code></td>
+                <td class="name"><code>subredditName</code></td>
             
 
             <td class="type">
@@ -4122,7 +4122,7 @@ r.mark_as_visited(submissions)
 
         <tr>
             
-                <td class="name"><code>send_replies</code></td>
+                <td class="name"><code>sendReplies</code></td>
             
 
             <td class="type">
@@ -4203,7 +4203,7 @@ r.mark_as_visited(submissions)
 
         <tr>
             
-                <td class="name"><code>captcha_iden</code></td>
+                <td class="name"><code>captchaIden</code></td>
             
 
             <td class="type">
@@ -4242,7 +4242,7 @@ r.mark_as_visited(submissions)
 
         <tr>
             
-                <td class="name"><code>captcha_response</code></td>
+                <td class="name"><code>captchaResponse</code></td>
             
 
             <td class="type">
@@ -4368,8 +4368,8 @@ r.mark_as_visited(submissions)
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.submit_link({
-  subreddit_name: &#x27;snoowrap_testing&#x27;,
+    <pre class="sunlight-highlight-javascript">r.submitLink({
+  subredditName: &#x27;snoowrap_testing&#x27;,
   title: &#x27;I found a cool website!&#x27;,
   url: &#x27;https://google.com&#x27;
 }).then(console.log)
@@ -4384,7 +4384,7 @@ r.mark_as_visited(submissions)
             
 <hr>
 <dt>
-    <h4 class="name" id="get_hot"><span class="type-signature"></span>get_hot( [subreddit_name] [, options])</h4>
+    <h4 class="name" id="getHot"><span class="type-signature"></span>getHot( [subredditName] [, options])</h4>
     
     
     <p class="summary">Gets a Listing of hot posts.</p>
@@ -4429,7 +4429,7 @@ r.mark_as_visited(submissions)
 
         <tr>
             
-                <td class="name"><code>subreddit_name</code></td>
+                <td class="name"><code>subredditName</code></td>
             
 
             <td class="type">
@@ -4589,21 +4589,21 @@ r.mark_as_visited(submissions)
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_hot().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getHot().then(console.log)
 // =&gt; Listing [
 //  Submission { domain: &#x27;imgur.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;pics&#x27; }, ... },
 //  Submission { domain: &#x27;i.imgur.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;funny&#x27; }, ... },
 //  ...
 // ]
 
-r.get_hot(&#x27;gifs&#x27;).then(console.log)
+r.getHot(&#x27;gifs&#x27;).then(console.log)
 // =&gt; Listing [
 //  Submission { domain: &#x27;i.imgur.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;gifs&#x27; }, ... },
 //  Submission { domain: &#x27;i.imgur.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;gifs&#x27; }, ... },
 //  ...
 // ]
 
-r.get_hot(&#x27;redditdev&#x27;, {limit: 1}).then(console.log)
+r.getHot(&#x27;redditdev&#x27;, {limit: 1}).then(console.log)
 // =&gt; Listing [
     //   Submission { domain: &#x27;self.redditdev&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;redditdev&#x27; }, ...}
 // ]</pre>
@@ -4616,7 +4616,7 @@ r.get_hot(&#x27;redditdev&#x27;, {limit: 1}).then(console.log)
             
 <hr>
 <dt>
-    <h4 class="name" id="get_new"><span class="type-signature"></span>get_new( [subreddit_name] [, options])</h4>
+    <h4 class="name" id="getNew"><span class="type-signature"></span>getNew( [subredditName] [, options])</h4>
     
     
     <p class="summary">Gets a Listing of new posts.</p>
@@ -4661,7 +4661,7 @@ r.get_hot(&#x27;redditdev&#x27;, {limit: 1}).then(console.log)
 
         <tr>
             
-                <td class="name"><code>subreddit_name</code></td>
+                <td class="name"><code>subredditName</code></td>
             
 
             <td class="type">
@@ -4821,7 +4821,7 @@ r.get_hot(&#x27;redditdev&#x27;, {limit: 1}).then(console.log)
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_new().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getNew().then(console.log)
 // =&gt; Listing [
 //  Submission { domain: &#x27;self.Jokes&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;Jokes&#x27; }, ... },
 //  Submission { domain: &#x27;self.AskReddit&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;AskReddit&#x27; }, ... },
@@ -4836,7 +4836,7 @@ r.get_hot(&#x27;redditdev&#x27;, {limit: 1}).then(console.log)
             
 <hr>
 <dt>
-    <h4 class="name" id="get_new_comments"><span class="type-signature"></span>get_new_comments( [subreddit_name] [, options])</h4>
+    <h4 class="name" id="getNewComments"><span class="type-signature"></span>getNewComments( [subredditName] [, options])</h4>
     
     
     <p class="summary">Gets a Listing of new comments.</p>
@@ -4881,7 +4881,7 @@ r.get_hot(&#x27;redditdev&#x27;, {limit: 1}).then(console.log)
 
         <tr>
             
-                <td class="name"><code>subreddit_name</code></td>
+                <td class="name"><code>subredditName</code></td>
             
 
             <td class="type">
@@ -5041,7 +5041,7 @@ r.get_hot(&#x27;redditdev&#x27;, {limit: 1}).then(console.log)
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_new_comments().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getNewComments().then(console.log)
 // =&gt; Listing [
 //  Comment { link_title: &#x27;What amazing book should be made into a movie, but hasn\&#x27;t been yet?&#x27;, ... }
 //  Comment { link_title: &#x27;How far back in time could you go and still understand English?&#x27;, ... }
@@ -5055,7 +5055,7 @@ r.get_hot(&#x27;redditdev&#x27;, {limit: 1}).then(console.log)
             
 <hr>
 <dt>
-    <h4 class="name" id="get_random_submission"><span class="type-signature"></span>get_random_submission( [subreddit_name])</h4>
+    <h4 class="name" id="getRandomSubmission"><span class="type-signature"></span>getRandomSubmission( [subredditName])</h4>
     
     
     <p class="summary">Gets a single random Submission.</p>
@@ -5103,7 +5103,7 @@ r.get_hot(&#x27;redditdev&#x27;, {limit: 1}).then(console.log)
 
         <tr>
             
-                <td class="name"><code>subreddit_name</code></td>
+                <td class="name"><code>subredditName</code></td>
             
 
             <td class="type">
@@ -5219,7 +5219,7 @@ r.get_hot(&#x27;redditdev&#x27;, {limit: 1}).then(console.log)
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_random_submission(&#x27;aww&#x27;).then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getRandomSubmission(&#x27;aww&#x27;).then(console.log)
 // =&gt; Submission { domain: &#x27;i.imgur.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;aww&#x27; }, ... }</pre>
 
 
@@ -5230,7 +5230,7 @@ r.get_hot(&#x27;redditdev&#x27;, {limit: 1}).then(console.log)
             
 <hr>
 <dt>
-    <h4 class="name" id="get_top"><span class="type-signature"></span>get_top( [subreddit_name] [, options])</h4>
+    <h4 class="name" id="getTop"><span class="type-signature"></span>getTop( [subredditName] [, options])</h4>
     
     
     <p class="summary">Gets a Listing of top posts.</p>
@@ -5275,7 +5275,7 @@ r.get_hot(&#x27;redditdev&#x27;, {limit: 1}).then(console.log)
 
         <tr>
             
-                <td class="name"><code>subreddit_name</code></td>
+                <td class="name"><code>subredditName</code></td>
             
 
             <td class="type">
@@ -5498,13 +5498,13 @@ r.get_hot(&#x27;redditdev&#x27;, {limit: 1}).then(console.log)
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_top({time: &#x27;all&#x27;, limit: 2}).then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getTop({time: &#x27;all&#x27;, limit: 2}).then(console.log)
 // =&gt; Listing [
 //  Submission { domain: &#x27;self.AskReddit&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;AskReddit&#x27; }, ... },
 //  Submission { domain: &#x27;imgur.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;funny&#x27; }, ... }
 // ]
 
-r.get_top(&#x27;AskReddit&#x27;).then(console.log)
+r.getTop(&#x27;AskReddit&#x27;).then(console.log)
 // =&gt; Listing [
 //  Submission { domain: &#x27;self.AskReddit&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;AskReddit&#x27; }, ... },
 //  Submission { domain: &#x27;self.AskReddit&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;AskReddit&#x27; }, ... },
@@ -5520,7 +5520,7 @@ r.get_top(&#x27;AskReddit&#x27;).then(console.log)
             
 <hr>
 <dt>
-    <h4 class="name" id="get_controversial"><span class="type-signature"></span>get_controversial( [subreddit_name] [, options])</h4>
+    <h4 class="name" id="getControversial"><span class="type-signature"></span>getControversial( [subredditName] [, options])</h4>
     
     
     <p class="summary">Gets a Listing of controversial posts.</p>
@@ -5565,7 +5565,7 @@ r.get_top(&#x27;AskReddit&#x27;).then(console.log)
 
         <tr>
             
-                <td class="name"><code>subreddit_name</code></td>
+                <td class="name"><code>subredditName</code></td>
             
 
             <td class="type">
@@ -5788,7 +5788,7 @@ r.get_top(&#x27;AskReddit&#x27;).then(console.log)
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_controversial(&#x27;technology&#x27;).then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getControversial(&#x27;technology&#x27;).then(console.log)
 // =&gt; Listing [
 //  Submission { domain: &#x27;thenextweb.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;technology&#x27; }, ... },
 //  Submission { domain: &#x27;pcmag.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;technology&#x27; }, ... }
@@ -5802,7 +5802,7 @@ r.get_top(&#x27;AskReddit&#x27;).then(console.log)
             
 <hr>
 <dt>
-    <h4 class="name" id="get_unread_messages"><span class="type-signature"></span>get_unread_messages( [options])</h4>
+    <h4 class="name" id="getUnreadMessages"><span class="type-signature"></span>getUnreadMessages( [options])</h4>
     
     
     <p class="summary">Gets the authenticated user's unread messages.</p>
@@ -5968,7 +5968,7 @@ r.get_top(&#x27;AskReddit&#x27;).then(console.log)
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_unread_messages().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getUnreadMessages().then(console.log)
 // =&gt; Listing [
 //  PrivateMessage { body: &#x27;hi!&#x27;, was_comment: false, first_message: null, ... },
 //  Comment { body: &#x27;this is a reply&#x27;, link_title: &#x27;Yay, a selfpost!&#x27;, was_comment: true, ... }
@@ -5982,7 +5982,7 @@ r.get_top(&#x27;AskReddit&#x27;).then(console.log)
             
 <hr>
 <dt>
-    <h4 class="name" id="get_inbox"><span class="type-signature"></span>get_inbox( [options])</h4>
+    <h4 class="name" id="getInbox"><span class="type-signature"></span>getInbox( [options])</h4>
     
     
     <p class="summary">Gets the items in the authenticated user's inbox.</p>
@@ -6212,7 +6212,7 @@ r.get_top(&#x27;AskReddit&#x27;).then(console.log)
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_unread_messages().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getInbox().then(console.log)
 // =&gt; Listing [
 //  PrivateMessage { body: &#x27;hi!&#x27;, was_comment: false, first_message: null, ... },
 //  Comment { body: &#x27;this is a reply&#x27;, link_title: &#x27;Yay, a selfpost!&#x27;, was_comment: true, ... }
@@ -6226,7 +6226,7 @@ r.get_top(&#x27;AskReddit&#x27;).then(console.log)
             
 <hr>
 <dt>
-    <h4 class="name" id="get_modmail"><span class="type-signature"></span>get_modmail( [options])</h4>
+    <h4 class="name" id="getModmail"><span class="type-signature"></span>getModmail( [options])</h4>
     
     
     <p class="summary">Gets the authenticated user's modmail.</p>
@@ -6392,7 +6392,7 @@ r.get_top(&#x27;AskReddit&#x27;).then(console.log)
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_modmail({limit: 2}).then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getModmail({limit: 2}).then(console.log)
 // =&gt; Listing [
 //  PrivateMessage { body: &#x27;/u/not_an_aardvark has accepted an invitation to become moderator ... &#x27;, ... },
 //  PrivateMessage { body: &#x27;/u/not_an_aardvark has been invited by /u/actually_an_aardvark to ...&#x27;, ... }
@@ -6406,7 +6406,7 @@ r.get_top(&#x27;AskReddit&#x27;).then(console.log)
             
 <hr>
 <dt>
-    <h4 class="name" id="get_sent_messages"><span class="type-signature"></span>get_sent_messages( [options])</h4>
+    <h4 class="name" id="getSentMessages"><span class="type-signature"></span>getSentMessages( [options])</h4>
     
     
     <p class="summary">Gets the user's sent messages.</p>
@@ -6572,7 +6572,7 @@ r.get_top(&#x27;AskReddit&#x27;).then(console.log)
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_sent_messages().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSentMessages().then(console.log)
 // =&gt; Listing [
 //  PrivateMessage { body: &#x27;you have been added as an approved submitter to ...&#x27;, ... },
 //  PrivateMessage { body: &#x27;you have been banned from posting to ...&#x27; ... }
@@ -6586,7 +6586,7 @@ r.get_top(&#x27;AskReddit&#x27;).then(console.log)
             
 <hr>
 <dt>
-    <h4 class="name" id="mark_messages_as_read"><span class="type-signature"></span>mark_messages_as_read(messages)</h4>
+    <h4 class="name" id="markMessagesAsRead"><span class="type-signature"></span>markMessagesAsRead(messages)</h4>
     
     
     <p class="summary">Marks all of the given messages as read.</p>
@@ -6737,14 +6737,14 @@ r.get_top(&#x27;AskReddit&#x27;).then(console.log)
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.mark_messages_as_read([&#x27;51shsd&#x27;, &#x27;51shxv&#x27;])
+    <pre class="sunlight-highlight-javascript">r.markMessagesAsRead([&#x27;51shsd&#x27;, &#x27;51shxv&#x27;])
 
 // To reference a comment by ID, be sure to use the &#x60;t1_&#x60; prefix, otherwise snoowrap will be unable to distinguish the
 // comment ID from a PrivateMessage ID.
-r.mark_messages_as_read([&#x27;t5_51shsd&#x27;, &#x27;t1_d3zhb5k&#x27;])
+r.markMessagesAsRead([&#x27;t5_51shsd&#x27;, &#x27;t1_d3zhb5k&#x27;])
 
 // Alternatively, just pass in a comment object directly.
-r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;d3zhb5k&#x27;)])</pre>
+r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb5k&#x27;)])</pre>
 
 
     
@@ -6754,7 +6754,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
             
 <hr>
 <dt>
-    <h4 class="name" id="mark_messages_as_unread"><span class="type-signature"></span>mark_messages_as_unread(messages)</h4>
+    <h4 class="name" id="markMessagesAsUnread"><span class="type-signature"></span>markMessagesAsUnread(messages)</h4>
     
     
     <p class="summary">Marks all of the given messages as unread.</p>
@@ -6905,14 +6905,14 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.mark_messages_as_unread([&#x27;51shsd&#x27;, &#x27;51shxv&#x27;])
+    <pre class="sunlight-highlight-javascript">r.markMessagesAsUnread([&#x27;51shsd&#x27;, &#x27;51shxv&#x27;])
 
 // To reference a comment by ID, be sure to use the &#x60;t1_&#x60; prefix, otherwise snoowrap will be unable to distinguish the
 // comment ID from a PrivateMessage ID.
-r.mark_messages_as_unread([&#x27;t5_51shsd&#x27;, &#x27;t1_d3zhb5k&#x27;])
+r.markMessagesAsUnread([&#x27;t5_51shsd&#x27;, &#x27;t1_d3zhb5k&#x27;])
 
 // Alternatively, just pass in a comment object directly.
-r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;d3zhb5k&#x27;)])</pre>
+r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb5k&#x27;)])</pre>
 
 
     
@@ -6922,7 +6922,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
             
 <hr>
 <dt>
-    <h4 class="name" id="read_all_messages"><span class="type-signature"></span>read_all_messages()</h4>
+    <h4 class="name" id="readAllMessages"><span class="type-signature"></span>readAllMessages()</h4>
     
     
     <p class="summary">Marks all of the user's messages as read.</p>
@@ -6933,7 +6933,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
     
     <div class="description">
         <p><strong>Note:</strong> The reddit.com site imposes a ratelimit of approximately 1 request every 10 minutes on this endpoint.
-  Further requests will cause the API to return a 429 error</p>
+  Further requests will cause the API to return a 429 error.</p>
     </div>
     
 
@@ -7023,8 +7023,8 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.read_all_messages().then(function () {
-  r.get_unread_messages().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.readAllMessages().then(function () {
+  r.getUnreadMessages().then(console.log)
 })
 // =&gt; Listing []
 // (messages marked as &#x27;read&#x27; on reddit)</pre>
@@ -7037,7 +7037,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
             
 <hr>
 <dt>
-    <h4 class="name" id="compose_message"><span class="type-signature"></span>compose_message(options)</h4>
+    <h4 class="name" id="composeMessage"><span class="type-signature"></span>composeMessage(options)</h4>
     
     
     <p class="summary">Composes a new private message.</p>
@@ -7225,7 +7225,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
 
         <tr>
             
-                <td class="name"><code>from_subreddit</code></td>
+                <td class="name"><code>fromSubreddit</code></td>
             
 
             <td class="type">
@@ -7263,7 +7263,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
 
         <tr>
             
-                <td class="name"><code>captcha_iden</code></td>
+                <td class="name"><code>captchaIden</code></td>
             
 
             <td class="type">
@@ -7298,7 +7298,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
 
         <tr>
             
-                <td class="name"><code>captcha_response</code></td>
+                <td class="name"><code>captchaResponse</code></td>
             
 
             <td class="type">
@@ -7420,7 +7420,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.compose_message({
+    <pre class="sunlight-highlight-javascript">r.composeMessage({
   to: &#x27;actually_an_aardvark&#x27;,
   subject: &quot;Hi, how&#x27;s it going?&quot;,
   text: &#x27;Long time no see&#x27;
@@ -7435,7 +7435,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
             
 <hr>
 <dt>
-    <h4 class="name" id="get_oauth_scope_list"><span class="type-signature"></span>get_oauth_scope_list()</h4>
+    <h4 class="name" id="getOauthScopeList"><span class="type-signature"></span>getOauthScopeList()</h4>
     
     
     <p class="summary">Gets a list of all oauth scopes supported by the reddit API.</p>
@@ -7535,7 +7535,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_oauth_scope_list().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getOauthScopeList().then(console.log)
 // =&gt; {
 //  creddits: {
 //    description: &#x27;Spend my reddit gold creddits on giving gold to other users.&#x27;,
@@ -7762,7 +7762,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
 
         <tr>
             
-                <td class="name"><code>restrict_sr</code></td>
+                <td class="name"><code>restrictSr</code></td>
             
 
             <td class="type">
@@ -7987,7 +7987,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
             
 <hr>
 <dt>
-    <h4 class="name" id="search_subreddit_names"><span class="type-signature"></span>search_subreddit_names(options)</h4>
+    <h4 class="name" id="searchSubredditNames"><span class="type-signature"></span>searchSubredditNames(options)</h4>
     
     
     <p class="summary">Searches for subreddits given a query.</p>
@@ -8151,7 +8151,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
 
         <tr>
             
-                <td class="name"><code>include_nsfw</code></td>
+                <td class="name"><code>includeNsfw</code></td>
             
 
             <td class="type">
@@ -8279,7 +8279,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.search_subreddit_names({query: &#x27;programming&#x27;}).then(console.log)
+    <pre class="sunlight-highlight-javascript">r.searchSubredditNames({query: &#x27;programming&#x27;}).then(console.log)
 // =&gt; [
 //  &#x27;programming&#x27;,
 //  &#x27;programmingcirclejerk&#x27;,
@@ -8295,7 +8295,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
             
 <hr>
 <dt>
-    <h4 class="name" id="create_subreddit"><span class="type-signature"></span>create_subreddit(options)</h4>
+    <h4 class="name" id="createSubreddit"><span class="type-signature"></span>createSubreddit(options)</h4>
     
     
     <p class="summary">Creates a new subreddit.</p>
@@ -9427,7 +9427,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.create_subreddit({
+    <pre class="sunlight-highlight-javascript">r.createSubreddit({
   name: &#x27;snoowrap_testing2&#x27;,
   title: &#x27;snoowrap testing: the sequel&#x27;,
   public_description: &#x27;thanks for reading the snoowrap docs!&#x27;,
@@ -9445,7 +9445,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
             
 <hr>
 <dt>
-    <h4 class="name" id="search_subreddit_topics"><span class="type-signature"></span>search_subreddit_topics(options)</h4>
+    <h4 class="name" id="searchSubredditTopics"><span class="type-signature"></span>searchSubredditTopics(options)</h4>
     
     
     <p class="summary">Searches subreddits by topic.</p>
@@ -9641,7 +9641,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.search_subreddit_topics({query: &#x27;movies&#x27;}).then(console.log)
+    <pre class="sunlight-highlight-javascript">r.searchSubredditTopics({query: &#x27;movies&#x27;}).then(console.log)
 // =&gt; [
 //  Subreddit { display_name: &#x27;tipofmytongue&#x27; },
 //  Subreddit { display_name: &#x27;remove&#x27; },
@@ -9657,7 +9657,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
             
 <hr>
 <dt>
-    <h4 class="name" id="get_subscriptions"><span class="type-signature"></span>get_subscriptions( [options])</h4>
+    <h4 class="name" id="getSubscriptions"><span class="type-signature"></span>getSubscriptions( [options])</h4>
     
     
     <p class="summary">Gets a list of subreddits that the currently-authenticated user is subscribed to.</p>
@@ -9815,7 +9815,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_subscriptions({limit: 2}).then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubscriptions({limit: 2}).then(console.log)
 // =&gt; Listing [
 //  Subreddit {
 //    display_name: &#x27;gadgets&#x27;,
@@ -9837,7 +9837,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
             
 <hr>
 <dt>
-    <h4 class="name" id="get_contributor_subreddits"><span class="type-signature"></span>get_contributor_subreddits( [options])</h4>
+    <h4 class="name" id="getContributorSubreddits"><span class="type-signature"></span>getContributorSubreddits( [options])</h4>
     
     
     <p class="summary">Gets a list of subreddits in which the currently-authenticated user is an approved submitter.</p>
@@ -9995,7 +9995,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_contributor_subreddits().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getContributorSubreddits().then(console.log)
 // =&gt; Listing [
 //  Subreddit {
 //    display_name: &#x27;snoowrap_testing&#x27;,
@@ -10012,7 +10012,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
             
 <hr>
 <dt>
-    <h4 class="name" id="get_moderated_subreddits"><span class="type-signature"></span>get_moderated_subreddits( [options])</h4>
+    <h4 class="name" id="getModeratedSubreddits"><span class="type-signature"></span>getModeratedSubreddits( [options])</h4>
     
     
     <p class="summary">Gets a list of subreddits in which the currently-authenticated user is a moderator.</p>
@@ -10170,7 +10170,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_moderated_subreddits().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getModeratedSubreddits().then(console.log)
 // =&gt; Listing [
 //  Subreddit {
 //    display_name: &#x27;snoowrap_testing&#x27;,
@@ -10187,7 +10187,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
             
 <hr>
 <dt>
-    <h4 class="name" id="search_subreddits"><span class="type-signature"></span>search_subreddits(options)</h4>
+    <h4 class="name" id="searchSubreddits"><span class="type-signature"></span>searchSubreddits(options)</h4>
     
     
     <p class="summary">Searches subreddits by title and description.</p>
@@ -10383,7 +10383,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.search_subreddits({query: &#x27;cookies&#x27;}).then(console.log)
+    <pre class="sunlight-highlight-javascript">r.searchSubreddits({query: &#x27;cookies&#x27;}).then(console.log)
 // =&gt; Listing [ Subreddit { ... }, Subreddit { ... }, ...]</pre>
 
 
@@ -10394,7 +10394,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
             
 <hr>
 <dt>
-    <h4 class="name" id="get_popular_subreddits"><span class="type-signature"></span>get_popular_subreddits( [options])</h4>
+    <h4 class="name" id="getPopularSubreddits"><span class="type-signature"></span>getPopularSubreddits( [options])</h4>
     
     
     <p class="summary">Gets a list of subreddits, arranged by popularity.</p>
@@ -10552,7 +10552,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_popular_subreddits().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getPopularSubreddits().then(console.log)
 // =&gt; Listing [ Subreddit { ... }, Subreddit { ... }, ...]</pre>
 
 
@@ -10563,7 +10563,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
             
 <hr>
 <dt>
-    <h4 class="name" id="get_new_subreddits"><span class="type-signature"></span>get_new_subreddits( [options])</h4>
+    <h4 class="name" id="getNewSubreddits"><span class="type-signature"></span>getNewSubreddits( [options])</h4>
     
     
     <p class="summary">Gets a list of subreddits, arranged by age.</p>
@@ -10721,7 +10721,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_new_subreddits().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getNewSubreddits().then(console.log)
 // =&gt; Listing [ Subreddit { ... }, Subreddit { ... }, ...]</pre>
 
 
@@ -10732,7 +10732,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
             
 <hr>
 <dt>
-    <h4 class="name" id="get_gold_subreddits"><span class="type-signature"></span>get_gold_subreddits( [options])</h4>
+    <h4 class="name" id="getGoldSubreddits"><span class="type-signature"></span>getGoldSubreddits( [options])</h4>
     
     
     <p class="summary">Gets a list of gold-exclusive subreddits.</p>
@@ -10890,7 +10890,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_gold_subreddits().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getGoldSubreddits().then(console.log)
 // =&gt; Listing [ Subreddit { ... }, Subreddit { ... }, ...]</pre>
 
 
@@ -10901,7 +10901,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
             
 <hr>
 <dt>
-    <h4 class="name" id="get_default_subreddits"><span class="type-signature"></span>get_default_subreddits( [options])</h4>
+    <h4 class="name" id="getDefaultSubreddits"><span class="type-signature"></span>getDefaultSubreddits( [options])</h4>
     
     
     <p class="summary">Gets a list of default subreddits.</p>
@@ -11059,7 +11059,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_default_subreddits().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getDefaultSubreddits().then(console.log)
 // =&gt; Listing [ Subreddit { ... }, Subreddit { ... }, ...]</pre>
 
 
@@ -11070,7 +11070,7 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
             
 <hr>
 <dt>
-    <h4 class="name" id="check_username_availability"><span class="type-signature"></span>check_username_availability(name)</h4>
+    <h4 class="name" id="checkUsernameAvailability"><span class="type-signature"></span>checkUsernameAvailability(name)</h4>
     
     
     <p class="summary">Checks whether a given username is available for registration</p>
@@ -11221,9 +11221,9 @@ r.mark_messages_as_read([r.get_message(&#x27;51shsd&#x27;), r.get_comment(&#x27;
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.check_username_availability(&#x27;not_an_aardvark&#x27;).then(console.log)
+    <pre class="sunlight-highlight-javascript">r.checkUsernameAvailability(&#x27;not_an_aardvark&#x27;).then(console.log)
 // =&gt; false
-r.check_username_availability(&#x27;eqwZAr9qunx7IHqzWVeF&#x27;).then(console.log)
+r.checkUsernameAvailability(&#x27;eqwZAr9qunx7IHqzWVeF&#x27;).then(console.log)
 // =&gt; true</pre>
 
 
@@ -11234,7 +11234,7 @@ r.check_username_availability(&#x27;eqwZAr9qunx7IHqzWVeF&#x27;).then(console.log
             
 <hr>
 <dt>
-    <h4 class="name" id="create_livethread"><span class="type-signature"></span>create_livethread(options)</h4>
+    <h4 class="name" id="createLivethread"><span class="type-signature"></span>createLivethread(options)</h4>
     
     
     <p class="summary">Creates a new LiveThread.</p>
@@ -11562,7 +11562,7 @@ r.check_username_availability(&#x27;eqwZAr9qunx7IHqzWVeF&#x27;).then(console.log
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.create_livethread({title: &#x27;My livethread&#x27;}).then(console.log)
+    <pre class="sunlight-highlight-javascript">r.createLivethread({title: &#x27;My livethread&#x27;}).then(console.log)
 // =&gt; LiveThread { id: &#x27;wpimncm1f01j&#x27; }</pre>
 
 
@@ -11573,7 +11573,7 @@ r.check_username_availability(&#x27;eqwZAr9qunx7IHqzWVeF&#x27;).then(console.log
             
 <hr>
 <dt>
-    <h4 class="name" id="get_my_multireddits"><span class="type-signature"></span>get_my_multireddits()</h4>
+    <h4 class="name" id="getMyMultireddits"><span class="type-signature"></span>getMyMultireddits()</h4>
     
     
     <p class="summary">Gets the user's own multireddits.</p>
@@ -11669,7 +11669,7 @@ r.check_username_availability(&#x27;eqwZAr9qunx7IHqzWVeF&#x27;).then(console.log
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_my_multireddits().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getMyMultireddits().then(console.log)
 =&gt; [ MultiReddit { ... }, MultiReddit { ... }, ... ]</pre>
 
 
@@ -11680,7 +11680,7 @@ r.check_username_availability(&#x27;eqwZAr9qunx7IHqzWVeF&#x27;).then(console.log
             
 <hr>
 <dt>
-    <h4 class="name" id="create_multireddit"><span class="type-signature"></span>create_multireddit(options)</h4>
+    <h4 class="name" id="createMultireddit"><span class="type-signature"></span>createMultireddit(options)</h4>
     
     
     <p class="summary">Creates a new multireddit.</p>
@@ -12127,7 +12127,7 @@ r.check_username_availability(&#x27;eqwZAr9qunx7IHqzWVeF&#x27;).then(console.log
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.create_multireddit({
+    <pre class="sunlight-highlight-javascript">r.createMultireddit({
   name: &#x27;myMulti&#x27;,
   description: &#x27;An example multireddit&#x27;,
   subreddits: [&#x27;snoowrap&#x27;, &#x27;snoowrap_testing&#x27;]
@@ -12142,7 +12142,7 @@ r.check_username_availability(&#x27;eqwZAr9qunx7IHqzWVeF&#x27;).then(console.log
             
 <hr>
 <dt>
-    <h4 class="name" id="revoke_access_token"><span class="type-signature"></span>revoke_access_token()</h4>
+    <h4 class="name" id="revokeAccessToken"><span class="type-signature"></span>revokeAccessToken()</h4>
     
     
     <p class="summary">Invalidates the current access token.</p>
@@ -12244,7 +12244,7 @@ r.check_username_availability(&#x27;eqwZAr9qunx7IHqzWVeF&#x27;).then(console.log
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.revoke_access_token();</pre>
+    <pre class="sunlight-highlight-javascript">r.revokeAccessToken();</pre>
 
 
     
@@ -12254,7 +12254,7 @@ r.check_username_availability(&#x27;eqwZAr9qunx7IHqzWVeF&#x27;).then(console.log
             
 <hr>
 <dt>
-    <h4 class="name" id="revoke_refresh_token"><span class="type-signature"></span>revoke_refresh_token()</h4>
+    <h4 class="name" id="revokeRefreshToken"><span class="type-signature"></span>revokeRefreshToken()</h4>
     
     
     <p class="summary">Invalidates the current refresh token.</p>
@@ -12357,7 +12357,7 @@ r.check_username_availability(&#x27;eqwZAr9qunx7IHqzWVeF&#x27;).then(console.log
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.revoke_refresh_token();</pre>
+    <pre class="sunlight-highlight-javascript">r.revokeRefreshToken();</pre>
 
 
     
@@ -12367,7 +12367,101 @@ r.check_username_availability(&#x27;eqwZAr9qunx7IHqzWVeF&#x27;).then(console.log
             
 <hr>
 <dt>
-    <h4 class="name" id="oauth_request"><span class="type-signature"></span>oauth_request(options)</h4>
+    <h4 class="name" id=".noConflict"><span class="type-signature">&lt;static> </span>noConflict()</h4>
+    
+    
+    <p class="summary">In browsers, restores the `window.snoowrap` property to whatever it was before this instance of snoowrap was
+  loaded. This is a no-op in Node.</p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>This instance of the snoowrap constructor</p>
+</div>
+
+
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">var snoowrap = window.snoowrap.noConflict();</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="oauthRequest"><span class="type-signature"></span>oauthRequest(options)</h4>
     
     
     <p class="summary">Sends an oauth-authenticated request to the reddit server, and returns the server's response.</p>
@@ -12527,23 +12621,23 @@ domain name.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.oauth_request({uri: &#x27;/user/spez/about&#x27;, method: &#x27;get&#x27;}).then(console.log)
+    <pre class="sunlight-highlight-javascript">r.oauthRequest({uri: &#x27;/user/spez/about&#x27;, method: &#x27;get&#x27;}).then(console.log)
 // =&gt; RedditUser { name: &#x27;spez&#x27;, link_karma: 9567, ... }
 
 // Note that this is equivalent to:
-r.get_user(&#x27;spez&#x27;).fetch().then(console.log)
+r.getUser(&#x27;spez&#x27;).fetch().then(console.log)
 
 // ######
 
-r.oauth_request({uri: &#x27;/api/vote&#x27;, method: &#x27;post&#x27;, form: {dir: 1, id: &#x27;t3_4fzg2k&#x27;}})
+r.oauthRequest({uri: &#x27;/api/vote&#x27;, method: &#x27;post&#x27;, form: {dir: 1, id: &#x27;t3_4fzg2k&#x27;}})
 // equivalent to:
-r.get_submission(&#x27;4fzg2k&#x27;).upvote()
+r.getSubmission(&#x27;4fzg2k&#x27;).upvote()
 
 // ######
 
-r.oauth_request({uri: &#x27;/top&#x27;, method: &#x27;get&#x27;, qs: {t: &#x27;all&#x27;}})
+r.oauthRequest({uri: &#x27;/top&#x27;, method: &#x27;get&#x27;, qs: {t: &#x27;all&#x27;}})
 // equivalent to:
-r.get_top({time: &#x27;all&#x27;})</pre>
+r.getTop({time: &#x27;all&#x27;})</pre>
 
 
     
@@ -12553,7 +12647,7 @@ r.get_top({time: &#x27;all&#x27;})</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="credentialed_client_request"><span class="type-signature"></span>credentialed_client_request(options)</h4>
+    <h4 class="name" id="credentialedClientRequest"><span class="type-signature"></span>credentialedClientRequest(options)</h4>
     
     
     <p class="summary">Sends a request to the reddit server, authenticated with the user's client ID and client secret.</p>
@@ -12564,9 +12658,9 @@ r.get_top({time: &#x27;all&#x27;})</pre>
     
     <div class="description">
         <p><strong>Note</strong>: This is used internally as part of the authentication process, but it cannot be used to actually fetch
-content from reddit. To do that, use <a href="snoowrap.html#oauth_request"><code>snoowrap#oauth_request</code></a> or another of snoowrap's helper functions.</p>
-<p>This function can work with alternate <code>this</code>-bindings, provided that the binding has the <code>client_id</code>, <code>client_secret</code>, and
-<code>user_agent</code> properties. This allows it be used if no snoowrap requester has been created yet.</p>
+content from reddit. To do that, use <a href="snoowrap.html#oauthRequest"><code>snoowrap#oauthRequest</code></a> or another of snoowrap's helper functions.</p>
+<p>This function can work with alternate <code>this</code>-bindings, provided that the binding has the <code>clientId</code>, <code>clientSecret</code>, and
+<code>userAgent</code> properties. This allows it be used if no snoowrap requester has been created yet.</p>
     </div>
     
 
@@ -12711,10 +12805,10 @@ content from reddit. To do that, use <a href="snoowrap.html#oauth_request"><code
         <h5>Example</h5>
         
     <pre class="sunlight-highlight-javascript">// example: this function could be used to exchange a one-time authentication code for a refresh token.
-snoowrap.prototype.credentialed_client_request.call({
-  client_id: &#x27;client id goes here&#x27;,
-  client_secret: &#x27;client secret goes here&#x27;,
-  user_agent: &#x27;user agent goes here&#x27;
+snoowrap.prototype.credentialedClientRequest.call({
+  clientId: &#x27;client id goes here&#x27;,
+  clientSecret: &#x27;client secret goes here&#x27;,
+  userAgent: &#x27;user agent goes here&#x27;
 }, {
   method: &#x27;post&#x27;,
   baseUrl: &#x27;https://www.reddit.com&#x27;,
@@ -12732,7 +12826,7 @@ snoowrap.prototype.credentialed_client_request.call({
             
 <hr>
 <dt>
-    <h4 class="name" id="unauthenticated_request"><span class="type-signature"></span>unauthenticated_request(options)</h4>
+    <h4 class="name" id="unauthenticatedRequest"><span class="type-signature"></span>unauthenticatedRequest(options)</h4>
     
     
     <p class="summary">Sends a request to the reddit server without authentication.</p>
@@ -12886,7 +12980,7 @@ snoowrap.prototype.credentialed_client_request.call({
             
 <hr>
 <dt>
-    <h4 class="name" id="update_access_token"><span class="type-signature"></span>update_access_token()</h4>
+    <h4 class="name" id="updateAccessToken"><span class="type-signature"></span>updateAccessToken()</h4>
     
     
     <p class="summary">Updates this requester's access token if the current one is absent or expired.</p>
@@ -12963,7 +13057,7 @@ a stable feature, using it is rarely necessary unless an access token is needed 
     
             
 <div class="param-desc">
-    <p>A Promise fulfills with the access token when this request is complete</p>
+    <p>A Promise that fulfills with the access token when this request is complete</p>
 </div>
 
 
@@ -12987,7 +13081,7 @@ a stable feature, using it is rarely necessary unless an access token is needed 
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.update_access_token()</pre>
+    <pre class="sunlight-highlight-javascript">r.updateAccessToken()</pre>
 
 
     

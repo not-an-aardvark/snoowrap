@@ -86,9 +86,9 @@
 
 
     <section class="readme-section">
-        <article><h1>snoowrap <a href="https://travis-ci.org/not-an-aardvark/snoowrap"><img src="https://travis-ci.org/not-an-aardvark/snoowrap.svg?branch=master" alt="Build Status"></a></h1><p>A fully-featured Node.js wrapper for the reddit API. (<a href="https://not-an-aardvark.github.io/snoowrap">Documentation</a>)</p>
+        <article><h1>snoowrap <a href="https://travis-ci.org/not-an-aardvark/snoowrap"><img src="https://travis-ci.org/not-an-aardvark/snoowrap.svg?branch=master" alt="Build Status"></a></h1><p>A fully-featured JavaScript wrapper for the reddit API. (<a href="https://not-an-aardvark.github.io/snoowrap">Documentation</a>)</p>
 <h3>Features</h3><ul>
-<li>snoowrap provides a simple interface to access every reddit API endpoint. For example, the method to get a user profile is just <code>get_user()</code>, and the method to upvote something is just <code>upvote()</code>.</li>
+<li>snoowrap provides a simple interface to access every reddit API endpoint. For example, the method to get a user profile is just <code>getUser()</code>, and the method to upvote something is just <code>upvote()</code>.</li>
 <li>snoowrap is non-blocking; all of its API calls are asynchronous and return bluebird Promises. This means that you can handle concurrent requests however you want to, and you can use snoowrap as part of a larger process without it holding everything back.</li>
 <li>Each snoowrap object is completely independent. This means that you can have scripts from separate accounts making requests at the same time.</li>
 <li>After you provide a token once, snoowrap will refresh it on its own from then on -- you won't have to worry about authentication again.</li>
@@ -99,75 +99,81 @@
 <p>These features ensure that you can write less boilerplate code and focus more on actually doing what you want to do.</p>
 <hr>
 <p>snoowrap's methods are designed to be as simple and consistent as possible. So the following expression:</p>
-<pre class="prettyprint source lang-js"><code>r.get_submission('2np694').body</code></pre><p>...will return a Promise. So will this one:</p>
-<pre class="prettyprint source lang-js"><code> r.get_submission('2np694').author.name
+<pre class="prettyprint source lang-js"><code>r.getSubmission('2np694').body</code></pre><p>...will return a Promise. So will this one:</p>
+<pre class="prettyprint source lang-js"><code> r.getSubmission('2np694').author.name
  // --> returns a Promise for the string 'DO_U_EVN_SPAGHETTI'
  // (this submission's author's name)</code></pre><p>The above will return a Promise for the author's name, without having to deal with callback hell or <code>.then</code> statements. You can chain multiple API calls together:</p>
-<pre class="prettyprint source lang-js"><code>r.get_submission('2np694').subreddit.get_moderators()[0].name
+<pre class="prettyprint source lang-js"><code>r.getSubmission('2np694').subreddit.getModerators()[0].name
 // --> returns a Promise for the string 'krispykrackers'
 // (this submission's subreddit's first mod's name)</code></pre><p>...or chain actions together with fluent syntax:</p>
-<pre class="prettyprint source lang-js"><code>r.get_subreddit('snoowrap')
-  .submit_selfpost({title: 'Discussion Thread', text: 'Hello! This is a thread'})
+<pre class="prettyprint source lang-js"><code>r.getSubreddit('snoowrap')
+  .submitSelfpost({title: 'Discussion Thread', text: 'Hello! This is a thread'})
   .sticky()
   .distinguish()
-  .ignore_reports()
-  .assign_flair({text: 'Exciting Flair Text', css_class: 'modpost'})</code></pre><p>snoowrap works on Node.js 4+, as well as most common browsers.</p>
+  .ignoreReports()
+  .assignFlair({text: 'Exciting Flair Text', css_class: 'modpost'})</code></pre><p>snoowrap works on Node.js 4+, as well as most common browsers.</p>
 <hr>
 <h3>Examples</h3><pre class="prettyprint source lang-js"><code>'use strict';
 const snoowrap = require('snoowrap');
 
-/* Create a new snoowrap requester with OAuth credentials. For more information on how to get valid credentials, see here: https://github.com/not-an-aardvark/reddit-oauth-helper */
+// NOTE: The following examples illustrate how to use snoowrap. However, hardcoding
+// credentials directly into your source code is generally a bad idea in practice (especially
+// if you're also making your source code public). Instead, it's better to either (a) use a separate
+// config file that isn't committed into version control, or (b) use environment variables.
+
+// Create a new snoowrap requester with OAuth credentials.
+// For more information on getting credentials, see here: https://github.com/not-an-aardvark/reddit-oauth-helper
 const r = new snoowrap({
-  user_agent: 'put your user-agent string here', // for more information, see: https://github.com/reddit/reddit/wiki/API
-  client_id: 'put your client id here',
-  client_secret: 'put your client secret here',
-  refresh_token: 'put your refresh token here'
+  userAgent: 'put your user-agent string here',
+  clientId: 'put your client id here',
+  clientSecret: 'put your client secret here',
+  refreshToken: 'put your refresh token here'
 });
 
 // Alternatively, just pass in a username and password for script-type apps.
 const otherRequester = new snoowrap({
-  user_agent: 'put your user-agent string here',
-  client_id: 'put your client id here',
-  client_secret: 'put your client secret here',
+  userAgent: 'put your user-agent string here',
+  clientId: 'put your client id here',
+  clientSecret: 'put your client secret here',
   username: 'put your username here',
   password: 'put your password here'
-})
+});
 
 // That's the entire setup process, now you can just make requests.
 
 // Submitting a link to a subreddit
-r.get_subreddit('gifs').submit_link({
+r.getSubreddit('gifs').submitLink({
   title: 'Mt. Cameramanjaro',
   url: 'https://i.imgur.com/n5iOc72.gifv'
 });
 
 // Printing a list of the titles on the front page
-r.get_hot().map(post => post.title).then(console.log);
+r.getHot().map(post => post.title).then(console.log);
 
 // Extracting every comment on a thread
-r.get_submission('4j8p6d').expand_replies({limit: Infinity, depth: Infinity}).then(console.log)
+r.getSubmission('4j8p6d').expandReplies({limit: Infinity, depth: Infinity}).then(console.log)
 
 // Automating moderation tasks
-r.get_subreddit('some_subreddit_name').get_modqueue({limit: 100}).filter(someRemovalCondition).forEach(flaggedItem => {
+r.getSubreddit('some_subreddit_name').getModqueue({limit: 100}).filter(someRemovalCondition).forEach(flaggedItem => {
   flaggedItem.remove();
-  flaggedItem.subreddit.ban_user(flaggedItem.author);
+  flaggedItem.subreddit.banUser(flaggedItem.author);
 });
 
 // Automatically creating a stickied thread for a moderated subreddit
-r.get_subreddit('some_subreddit_name')
-  .submit_selfpost({title: 'Daily thread', text: 'Discuss things here'})
+r.getSubreddit('some_subreddit_name')
+  .submitSelfpost({title: 'Daily thread', text: 'Discuss things here'})
   .sticky()
   .distinguish()
   .approve()
-  .assign_flair({text: 'Daily Thread flair text', css_class: 'daily-thread'})
+  .assignFlair({text: 'Daily Thread flair text', css_class: 'daily-thread'})
   .reply('This is a comment that appears on that daily thread');
   // etc. etc.
 
 // Printing the content of a wiki page
-r.get_subreddit('AskReddit').get_wiki_page('bestof').content_md.then(console.log);</code></pre><p>For more examples of what can be done with snoowrap, take a look at the <a href="https://not-an-aardvark.github.io/snoowrap">documentation</a>.</p>
+r.getSubreddit('AskReddit').getWikiPage('bestof').content_md.then(console.log);</code></pre><p>For more examples of what can be done with snoowrap, take a look at the <a href="https://not-an-aardvark.github.io/snoowrap">documentation</a>.</p>
 <hr>
 <h3>Live threads</h3><p>Reddit's <a href="https://www.reddit.com/r/live/wiki/index">live threads</a> are different from most other content, in that messages are distributed through websockets instead of a RESTful API. snoowrap supports this protocol under the hood by representing the content stream as an <a href="https://nodejs.org/api/events.html#events_class_eventemitter">EventEmitter</a>. For example, the following script will stream all livethread updates to the console as they appear:</p>
-<pre class="prettyprint source lang-js"><code>r.get_livethread('whrdxo8dg9n0').stream.on('update', console.log);</code></pre><p>For more information, see the <a href="https://not-an-aardvark.github.io/snoowrap/LiveThread.html">LiveThread documentation page</a>.</p>
+<pre class="prettyprint source lang-js"><code>r.getLivethread('whrdxo8dg9n0').stream.on('update', console.log);</code></pre><p>For more information, see the <a href="https://not-an-aardvark.github.io/snoowrap/LiveThread.html">LiveThread documentation page</a>.</p>
 <hr>
 <h3>Important note on ES6</h3><p>snoowrap uses the <code>Proxy</code> object introduced in ES6.</p>
 <p>If your target environment does not support Proxies, snoowrap will still function. However, method chaining as described above won't work, so your syntax will need to be a bit heavier.</p>
@@ -181,12 +187,12 @@ r.get_subreddit('AskReddit').get_wiki_page('bestof').content_md.then(console.log
 <p>Example of how Proxy support affects behavior:</p>
 <pre class="prettyprint source lang-js"><code>// This works in environments that support Proxies.
 // However, it throws a TypeError if Proxies are not available.
-r.get_submission('47v7tm').comments[0].upvote();
+r.getSubmission('47v7tm').comments[0].upvote();
 
 // ----------
 
 // This is equivalent and works on all platforms, but the syntax isn't as nice.
-r.get_submission('47v7tm').fetch().then(submission => {
+r.getSubmission('47v7tm').fetch().then(submission => {
   return submission.comments[0].upvote();
 });</code></pre><p>You can explicitly disable method chaining with <code>r.config({proxies: false})</code>.</p>
 <hr>
@@ -198,7 +204,7 @@ r.get_submission('47v7tm').fetch().then(submission => {
 <li><a href="https://not-an-aardvark.github.io/snoowrap/snoowrap-v1.js">snoowrap.js</a></li>
 <li><a href="https://not-an-aardvark.github.io/snoowrap/snoowrap-v1.min.js">snoowrap.min.js</a> (80kB gzipped)</li>
 </ul>
-<p>When run in a browser, snoowrap will be assigned to the global variable <code>window.snoowrap</code>.</p>
+<p>When run in a browser, snoowrap will be assigned to the global variable <code>window.snoowrap</code>. If you want to avoid global state (or you're using two versions of snoowrap on the same page for some reason), use <code>snoowrap.noConflict()</code> to restore <code>window.snoowrap</code> to its previous value.</p>
 <h3>To build/run the tests independently</h3><p>See the <a href="https://github.com/not-an-aardvark/snoowrap/blob/master/CONTRIBUTING.md">contributing guide</a> and the <a href="https://github.com/not-an-aardvark/snoowrap/blob/master/src/README.md">getting started</a> page.</p>
 <hr>
 <h3>License</h3><p>This software is freely distributable under the <a href="https://github.com/not-an-aardvark/snoowrap/blob/master/LICENSE.md">MIT License</a>.</p></article>

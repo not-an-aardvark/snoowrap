@@ -113,7 +113,7 @@ about the new update.</li>
 <p>(Note: These event types are mapped directly from reddit's categorization of the updates. The descriptions above are
 paraphrased from reddit's descriptions <a href="https://www.reddit.com/dev/api#section_live">here</a>.)</p>
 <p>As an example, this would log all new livethread updates to the console:</p>
-<pre class="prettyprint source lang-javascript"><code>some_livethread.stream.on('update', data => {
+<pre class="prettyprint source lang-javascript"><code>someLivethread.stream.on('update', data => {
   console.log(data.body);
 });</code></pre>
     </div>
@@ -182,7 +182,7 @@ paraphrased from reddit's descriptions <a href="https://www.reddit.com/dev/api#s
         <h5>Example</h5>
         
     <pre class="sunlight-highlight-javascript">// Get a livethread with the given ID
-r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
+r.getLivethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
 
 
     
@@ -221,7 +221,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="add_update"><span class="type-signature"></span>add_update(body)</h4>
+    <h4 class="name" id="addUpdate"><span class="type-signature"></span>addUpdate(body)</h4>
     
     
     <p class="summary">Adds a new update to this thread.</p>
@@ -367,7 +367,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_livethread(&#x27;whrdxo8dg9n0&#x27;).add_update(&#x27;Breaking: Someone is reading the snoowrap documentation \\o/&#x27;)</pre>
+    <pre class="sunlight-highlight-javascript">r.getLivethread(&#x27;whrdxo8dg9n0&#x27;).addUpdate(&#x27;Breaking: Someone is reading the snoowrap documentation \\o/&#x27;)</pre>
 
 
     
@@ -377,7 +377,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="strike_update"><span class="type-signature"></span>strike_update(options)</h4>
+    <h4 class="name" id="strikeUpdate"><span class="type-signature"></span>strikeUpdate(options)</h4>
     
     
     <p class="summary">Strikes (marks incorrect and crosses out) the given update.</p>
@@ -573,7 +573,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_livethread(&#x27;whrdxo8dg9n0&#x27;).strike_update({id: &#x27;LiveUpdate_edc34446-faf0-11e5-a1b4-0e858bca33cd&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getLivethread(&#x27;whrdxo8dg9n0&#x27;).strikeUpdate({id: &#x27;LiveUpdate_edc34446-faf0-11e5-a1b4-0e858bca33cd&#x27;})</pre>
 
 
     
@@ -583,7 +583,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="delete_update"><span class="type-signature"></span>delete_update(options)</h4>
+    <h4 class="name" id="deleteUpdate"><span class="type-signature"></span>deleteUpdate(options)</h4>
     
     
     <p class="summary">Deletes an update from this LiveThread.</p>
@@ -779,7 +779,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_livethread(&#x27;whrdxo8dg9n0&#x27;).delete_update({id: &#x27;LiveUpdate_edc34446-faf0-11e5-a1b4-0e858bca33cd&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getLivethread(&#x27;whrdxo8dg9n0&#x27;).deleteUpdate({id: &#x27;LiveUpdate_edc34446-faf0-11e5-a1b4-0e858bca33cd&#x27;})</pre>
 
 
     
@@ -789,7 +789,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_contributors"><span class="type-signature"></span>get_contributors()</h4>
+    <h4 class="name" id="getContributors"><span class="type-signature"></span>getContributors()</h4>
     
     
     <p class="summary">Gets a list of this LiveThread's contributors</p>
@@ -885,7 +885,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_livethread(&#x27;whrdxo8dg9n0&#x27;).get_contributors().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getLivethread(&#x27;whrdxo8dg9n0&#x27;).getContributors().then(console.log)
 // =&gt; [
 //  RedditUser { permissions: [&#x27;edit&#x27;], name: &#x27;not_an_aardvark&#x27;, id: &#x27;t2_k83md&#x27; },
 //  RedditUser { permissions: [&#x27;all&#x27;], id: &#x27;t2_u3l80&#x27;, name: &#x27;snoowrap_testing&#x27; }
@@ -899,7 +899,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="invite_contributor"><span class="type-signature"></span>invite_contributor(options)</h4>
+    <h4 class="name" id="inviteContributor"><span class="type-signature"></span>inviteContributor(options)</h4>
     
     
     <p class="summary">Invites a contributor to this LiveThread.</p>
@@ -1120,7 +1120,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_livethread(&#x27;whrdxo8dg9n0&#x27;).invite_contributor({name: &#x27;actually_an_aardvark&#x27;, permissions: [&#x27;update&#x27;]})</pre>
+    <pre class="sunlight-highlight-javascript">r.getLivethread(&#x27;whrdxo8dg9n0&#x27;).inviteContributor({name: &#x27;actually_an_aardvark&#x27;, permissions: [&#x27;update&#x27;]})</pre>
 
 
     
@@ -1130,7 +1130,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="revoke_contributor_invite"><span class="type-signature"></span>revoke_contributor_invite(options)</h4>
+    <h4 class="name" id="revokeContributorInvite"><span class="type-signature"></span>revokeContributorInvite(options)</h4>
     
     
     <p class="summary">Revokes an invitation for the given user to become a contributor on this LiveThread.</p>
@@ -1326,7 +1326,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_livethread(&#x27;whrdxo8dg9n0&#x27;).revoke_contributor_invite({name: &#x27;actually_an_aardvark&#x27;});</pre>
+    <pre class="sunlight-highlight-javascript">r.getLivethread(&#x27;whrdxo8dg9n0&#x27;).revokeContributorInvite({name: &#x27;actually_an_aardvark&#x27;});</pre>
 
 
     
@@ -1336,7 +1336,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="accept_contributor_invite"><span class="type-signature"></span>accept_contributor_invite()</h4>
+    <h4 class="name" id="acceptContributorInvite"><span class="type-signature"></span>acceptContributorInvite()</h4>
     
     
     <p class="summary">Accepts a pending contributor invitation on this LiveThread.</p>
@@ -1432,7 +1432,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_livethread(&#x27;whrdxo8dg9n0&#x27;).accept_contributor_invite()</pre>
+    <pre class="sunlight-highlight-javascript">r.getLivethread(&#x27;whrdxo8dg9n0&#x27;).acceptContributorInvite()</pre>
 
 
     
@@ -1442,7 +1442,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="leave_contributor"><span class="type-signature"></span>leave_contributor()</h4>
+    <h4 class="name" id="leaveContributor"><span class="type-signature"></span>leaveContributor()</h4>
     
     
     <p class="summary">Abdicates contributor status on this LiveThread.</p>
@@ -1538,7 +1538,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_livethread(&#x27;whrdxo8dg9n0&#x27;).leave_contributor()</pre>
+    <pre class="sunlight-highlight-javascript">r.getLivethread(&#x27;whrdxo8dg9n0&#x27;).leaveContributor()</pre>
 
 
     
@@ -1548,7 +1548,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="remove_contributor"><span class="type-signature"></span>remove_contributor(options)</h4>
+    <h4 class="name" id="removeContributor"><span class="type-signature"></span>removeContributor(options)</h4>
     
     
     <p class="summary">Removes the given user from contributor status on this LiveThread.</p>
@@ -1744,7 +1744,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_livethread(&#x27;whrdxo8dg9n0&#x27;).remove_contributor({name: &#x27;actually_an_aardvark&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getLivethread(&#x27;whrdxo8dg9n0&#x27;).removeContributor({name: &#x27;actually_an_aardvark&#x27;})</pre>
 
 
     
@@ -1754,7 +1754,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="set_contributor_permissions"><span class="type-signature"></span>set_contributor_permissions(options)</h4>
+    <h4 class="name" id="setContributorPermissions"><span class="type-signature"></span>setContributorPermissions(options)</h4>
     
     
     <p class="summary">Sets the permissions of the given contributor.</p>
@@ -1975,7 +1975,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_livethread(&#x27;whrdxo8dg9n0&#x27;).set_contributor_permissions({name: &#x27;actually_an_aardvark&#x27;, permissions: [&#x27;edit&#x27;]})</pre>
+    <pre class="sunlight-highlight-javascript">r.getLivethread(&#x27;whrdxo8dg9n0&#x27;).setContributorPermissions({name: &#x27;actually_an_aardvark&#x27;, permissions: [&#x27;edit&#x27;]})</pre>
 
 
     
@@ -1985,7 +1985,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="edit_settings"><span class="type-signature"></span>edit_settings(options)</h4>
+    <h4 class="name" id="editSettings"><span class="type-signature"></span>editSettings(options)</h4>
     
     
     <p class="summary">Edits the settings on this LiveThread.</p>
@@ -2291,7 +2291,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_livethread(&#x27;whrdxo8dg9n0&#x27;).edit_settings({title: &#x27;My livethread&#x27;, description: &#x27;an updated description&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getLivethread(&#x27;whrdxo8dg9n0&#x27;).editSettings({title: &#x27;My livethread&#x27;, description: &#x27;an updated description&#x27;})</pre>
 
 
     
@@ -2301,7 +2301,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="close_thread"><span class="type-signature"></span>close_thread()</h4>
+    <h4 class="name" id="closeThread"><span class="type-signature"></span>closeThread()</h4>
     
     
     <p class="summary">Permanently closes this thread, preventing any more updates from being added.</p>
@@ -2397,7 +2397,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_livethread(&#x27;whrdxo8dg9n0&#x27;).close_thread()</pre>
+    <pre class="sunlight-highlight-javascript">r.getLivethread(&#x27;whrdxo8dg9n0&#x27;).closeThread()</pre>
 
 
     
@@ -2604,7 +2604,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_livethread(&#x27;whrdxo8dg9n0&#x27;).report({reason: &#x27;Breaking a rule blah blah blah&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getLivethread(&#x27;whrdxo8dg9n0&#x27;).report({reason: &#x27;Breaking a rule blah blah blah&#x27;})</pre>
 
 
     
@@ -2614,7 +2614,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_recent_updates"><span class="type-signature"></span>get_recent_updates( [options])</h4>
+    <h4 class="name" id="getRecentUpdates"><span class="type-signature"></span>getRecentUpdates( [options])</h4>
     
     
     <p class="summary">Gets a Listing containing past updates to this LiveThread.</p>
@@ -2772,7 +2772,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_livethread(&#x27;whrdxo8dg9n0&#x27;).get_recent_updates().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getLivethread(&#x27;whrdxo8dg9n0&#x27;).getRecentUpdates().then(console.log)
 // =&gt; Listing [
 //  LiveUpdate { ... },
 //  LiveUpdate { ... },
@@ -2787,7 +2787,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_discussions"><span class="type-signature"></span>get_discussions( [options])</h4>
+    <h4 class="name" id="getDiscussions"><span class="type-signature"></span>getDiscussions( [options])</h4>
     
     
     <p class="summary">Gets a list of reddit submissions linking to this LiveThread.</p>
@@ -2945,7 +2945,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_livethread(&#x27;whrdxo8dg9n0&#x27;).get_recent_updates().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getLivethread(&#x27;whrdxo8dg9n0&#x27;).getDiscussions().then(console.log)
 // =&gt; Listing [
 //  Submission { ... },
 //  Submission { ... },
@@ -2960,7 +2960,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="close_stream"><span class="type-signature"></span>close_stream()</h4>
+    <h4 class="name" id="closeStream"><span class="type-signature"></span>closeStream()</h4>
     
     
     <p class="summary">Stops listening for new updates on this LiveThread.</p>
@@ -2972,7 +2972,7 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
     <div class="description">
         <p>To avoid memory leaks that can result from open sockets, it's recommended that you call this method when you're
   finished listening for updates on this LiveThread.</p>
-<p>This should not be confused with <a href="LiveThread.html#close_thread"><code>LiveThread#close_thread</code></a>, which marks the thread as &quot;closed&quot; on reddit.</p>
+<p>This should not be confused with <a href="LiveThread.html#closeThread"><code>LiveThread#closeThread</code></a>, which marks the thread as &quot;closed&quot; on reddit.</p>
     </div>
     
 
@@ -3049,10 +3049,10 @@ r.get_livethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var my_thread = r.get_livethread(&#x27;whrdxo8dg9n0&#x27;);
-my_thread.stream.on(&#x27;update&#x27;, content =&gt; {
+    <pre class="sunlight-highlight-javascript">var myThread = r.getLivethread(&#x27;whrdxo8dg9n0&#x27;);
+myThread.stream.on(&#x27;update&#x27;, content =&gt; {
   console.log(content);
-  my_stream.close_thread();
+  myThread.closeStream();
 })</pre>
 
 
@@ -3178,16 +3178,16 @@ automatically called when an unknown property is accessed on an unfetched conten
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_user(&#x27;not_an_aardvark&#x27;).fetch().then(user_info =&gt; {
-  console.log(user_info.name); // &#x27;not_an_aardvark&#x27;
-  console.log(user_info.created_utc); // 1419104352
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;).fetch().then(userInfo =&gt; {
+  console.log(userInfo.name); // &#x27;not_an_aardvark&#x27;
+  console.log(userInfo.created_utc); // 1419104352
 });
 
-r.get_comment(&#x27;d1xchqn&#x27;).fetch().then(comment =&gt; comment.body).then(console.log)
+r.getComment(&#x27;d1xchqn&#x27;).fetch().then(comment =&gt; comment.body).then(console.log)
 // =&gt; &#x27;This is a little too interesting for my liking&#x27;
 
 // In environments that support ES2015 Proxies, the above line is equivalent to:
-r.get_comment(&#x27;d1xchqn&#x27;).body.then(console.log);
+r.getComment(&#x27;d1xchqn&#x27;).body.then(console.log);
 // =&gt; &#x27;This is a little too interesting for my liking&#x27;</pre>
 
 
@@ -3303,12 +3303,12 @@ r.get_comment(&#x27;d1xchqn&#x27;).body.then(console.log);
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var some_comment = r.get_comment(&#x27;cmfkyus&#x27;);
-var initial_comment_body = some_comment.fetch().then(comment =&gt; comment.body);
+    <pre class="sunlight-highlight-javascript">var someComment = r.getComment(&#x27;cmfkyus&#x27;);
+var initialCommentBody = some_comment.fetch().then(comment =&gt; comment.body);
 
 setTimeout(() =&gt; {
-  some_comment.refresh().then(refreshed_comment =&gt; {
-    if (initial_comment_body.value() !== refreshed_comment.body) {
+  someComment.refresh().then(refreshedComment =&gt; {
+    if (initialCommentBody.value() !== refreshedComment.body) {
       console.log(&#x27;This comment has changed since 10 seconds ago.&#x27;);
     }
   });
@@ -3432,7 +3432,7 @@ setTimeout(() =&gt; {
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var user = r.get_user(&#x27;not_an_aardvark&#x27;);
+    <pre class="sunlight-highlight-javascript">var user = r.getUser(&#x27;not_an_aardvark&#x27;);
 JSON.stringify(user) // =&gt; &#x27;{&quot;name&quot;:&quot;not_an_aardvark&quot;}&#x27;</pre>
 
 

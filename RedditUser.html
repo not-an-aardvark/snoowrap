@@ -158,7 +158,7 @@
         <h5>Example</h5>
         
     <pre class="sunlight-highlight-javascript">// Get a user with the given username
-r.get_user(&#x27;spez&#x27;)</pre>
+r.getUser(&#x27;spez&#x27;)</pre>
 
 
     
@@ -197,7 +197,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="give_gold"><span class="type-signature"></span>give_gold(months)</h4>
+    <h4 class="name" id="giveGold"><span class="type-signature"></span>giveGold(months)</h4>
     
     
     <p class="summary">Gives reddit gold to a user</p>
@@ -343,7 +343,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_user(&#x27;not_an_aardvark&#x27;).give_gold(12)</pre>
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;).giveGold(12)</pre>
 
 
     
@@ -353,7 +353,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="assign_flair"><span class="type-signature"></span>assign_flair(options)</h4>
+    <h4 class="name" id="assignFlair"><span class="type-signature"></span>assignFlair(options)</h4>
     
     
 </dt>
@@ -443,7 +443,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
 
         <tr>
             
-                <td class="name"><code>subreddit_name</code></td>
+                <td class="name"><code>subredditName</code></td>
             
 
             <td class="type">
@@ -519,7 +519,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
 
         <tr>
             
-                <td class="name"><code>css_class</code></td>
+                <td class="name"><code>cssClass</code></td>
             
 
             <td class="type">
@@ -647,7 +647,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_user(&#x27;not_an_aardvark&#x27;).assign_flair({subreddit_name: &#x27;snoowrap&#x27;, text: &quot;Isn&#x27;t an aardvark&quot;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;).assignFlair({subredditName: &#x27;snoowrap&#x27;, text: &quot;Isn&#x27;t an aardvark&quot;})</pre>
 
 
     
@@ -870,7 +870,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_user(&#x27;actually_an_aardvark&#x27;).friend({note: &#x27;Is an aardvark&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;actually_an_aardvark&#x27;).friend({note: &#x27;Is an aardvark&#x27;})</pre>
 
 
     
@@ -976,7 +976,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_user(&#x27;actually_an_aardvark&#x27;).unfriend()</pre>
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;actually_an_aardvark&#x27;).unfriend()</pre>
 
 
     
@@ -986,7 +986,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_friend_information"><span class="type-signature"></span>get_friend_information()</h4>
+    <h4 class="name" id="getFriendInformation"><span class="type-signature"></span>getFriendInformation()</h4>
     
     
     <p class="summary">Gets information on this user related to their presence on the friend list.</p>
@@ -1082,7 +1082,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_user(&#x27;not_an_aardvark&#x27;).get_friend_information().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;).getFriendInformation().then(console.log)
 // =&gt; { date: 1460318190, note: &#x27;Is an aardvark&#x27;, name: &#x27;actually_an_aardvark&#x27;, id: &#x27;t2_q3519&#x27; }</pre>
 
 
@@ -1093,7 +1093,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_trophies"><span class="type-signature"></span>get_trophies()</h4>
+    <h4 class="name" id="getTrophies"><span class="type-signature"></span>getTrophies()</h4>
     
     
     <p class="summary">Gets a list of this user's trophies.</p>
@@ -1189,7 +1189,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_user(&#x27;not_an_aardvark&#x27;).get_trophies().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;).getTrophies().then(console.log)
 // =&gt; TrophyList { trophies: [
 //  Trophy { ... },
 //  Trophy { ... },
@@ -1204,7 +1204,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_overview"><span class="type-signature"></span>get_overview( [options])</h4>
+    <h4 class="name" id="getOverview"><span class="type-signature"></span>getOverview( [options])</h4>
     
     
     <p class="summary">Gets a Listing of the content this user has submitted.</p>
@@ -1362,7 +1362,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_user(&#x27;spez&#x27;).get_overview().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;spez&#x27;).getOverview().then(console.log)
 // =&gt; Listing [
 //  Comment { ... },
 //  Comment { ... },
@@ -1378,7 +1378,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_submissions"><span class="type-signature"></span>get_submissions( [options])</h4>
+    <h4 class="name" id="getSubmissions"><span class="type-signature"></span>getSubmissions( [options])</h4>
     
     
     <p class="summary">Gets a Listing of this user's submissions.</p>
@@ -1536,7 +1536,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_user(&#x27;spez&#x27;).get_submissions().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;spez&#x27;).getSubmissions().then(console.log)
 // =&gt; Listing [
 //  Submission { ... },
 //  Submission { ... },
@@ -1552,7 +1552,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_comments"><span class="type-signature"></span>get_comments( [options])</h4>
+    <h4 class="name" id="getComments"><span class="type-signature"></span>getComments( [options])</h4>
     
     
     <p class="summary">Gets a Listing of this user's comments.</p>
@@ -1710,7 +1710,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_user(&#x27;spez&#x27;).get_comments().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;spez&#x27;).getComments().then(console.log)
 // =&gt; Listing [
 //  Comment { ... },
 //  Comment { ... },
@@ -1726,7 +1726,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_upvoted_content"><span class="type-signature"></span>get_upvoted_content( [options])</h4>
+    <h4 class="name" id="getUpvotedContent"><span class="type-signature"></span>getUpvotedContent( [options])</h4>
     
     
     <p class="summary">Gets a Listing of the content that this user has upvoted.</p>
@@ -1889,7 +1889,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_me().get_upvoted_content().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getMe().getUpvotedContent().then(console.log)
 // =&gt; Listing [
 //  Comment { ... },
 //  Comment { ... },
@@ -1905,7 +1905,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_downvoted_content"><span class="type-signature"></span>get_downvoted_content( [options])</h4>
+    <h4 class="name" id="getDownvotedContent"><span class="type-signature"></span>getDownvotedContent( [options])</h4>
     
     
     <p class="summary">Gets a Listing of the content that this user has downvoted.</p>
@@ -2068,7 +2068,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_me().get_downvoted_content().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getMe().getDownvotedContent().then(console.log)
 // =&gt; Listing [
 //  Comment { ... },
 //  Comment { ... },
@@ -2084,7 +2084,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_hidden_content"><span class="type-signature"></span>get_hidden_content( [options])</h4>
+    <h4 class="name" id="getHiddenContent"><span class="type-signature"></span>getHiddenContent( [options])</h4>
     
     
     <p class="summary">Gets a Listing of the submissions that this user has hidden.</p>
@@ -2247,7 +2247,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_me().get_hidden_content().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getMe().getHiddenContent().then(console.log)
 // =&gt; Listing [
 //  Comment { ... },
 //  Comment { ... },
@@ -2263,7 +2263,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_saved_content"><span class="type-signature"></span>get_saved_content( [options])</h4>
+    <h4 class="name" id="getSavedContent"><span class="type-signature"></span>getSavedContent( [options])</h4>
     
     
     <p class="summary">Gets a Listing of the content that this user has saved.</p>
@@ -2426,7 +2426,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_me().get_saved_content().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getMe().getSavedContent().then(console.log)
 // =&gt; Listing [
 //  Comment { ... },
 //  Comment { ... },
@@ -2442,7 +2442,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_gilded_content"><span class="type-signature"></span>get_gilded_content( [options])</h4>
+    <h4 class="name" id="getGildedContent"><span class="type-signature"></span>getGildedContent( [options])</h4>
     
     
     <p class="summary">Gets a Listing of this user's content which has been gilded.</p>
@@ -2600,7 +2600,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_me().get_gilded_content().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getMe().getGildedContent().then(console.log)
 // =&gt; Listing [
 //  Comment { ... },
 //  Comment { ... },
@@ -2616,7 +2616,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_multireddit"><span class="type-signature"></span>get_multireddit(name)</h4>
+    <h4 class="name" id="getMultireddit"><span class="type-signature"></span>getMultireddit(name)</h4>
     
     
     <p class="summary">Gets a multireddit belonging to this user.</p>
@@ -2762,7 +2762,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_user(&#x27;multi-mod&#x27;).get_multireddit(&#x27;coding_languages&#x27;)
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;multi-mod&#x27;).getMultireddit(&#x27;coding_languages&#x27;)
 // =&gt; MultiReddit {
 //  name: &#x27;coding_languages&#x27;,
 //  curator: RedditUser { name: &#x27;multi-mod&#x27; },
@@ -2777,7 +2777,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="get_multireddits"><span class="type-signature"></span>get_multireddits()</h4>
+    <h4 class="name" id="getMultireddits"><span class="type-signature"></span>getMultireddits()</h4>
     
     
     <p class="summary">Gets an Array of all of this user's MultiReddits.</p>
@@ -2873,7 +2873,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_user(&#x27;multi-mod&#x27;).get_multireddits().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;multi-mod&#x27;).getMultireddits().then(console.log)
 
 // =&gt; [
   MultiReddit { ... },
@@ -3119,7 +3119,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_comment(&#x27;c08pp5z&#x27;).remove({spam: true})</pre>
+    <pre class="sunlight-highlight-javascript">r.getComment(&#x27;c08pp5z&#x27;).remove({spam: true})</pre>
 
 
     
@@ -3234,7 +3234,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_comment(&#x27;c08pp5z&#x27;).remove()</pre>
+    <pre class="sunlight-highlight-javascript">r.getComment(&#x27;c08pp5z&#x27;).remove()</pre>
 
 
     
@@ -3474,7 +3474,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_comment(&#x27;c08pp5z&#x27;).report({reason: &#x27;Breaking the subreddit rules&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getComment(&#x27;c08pp5z&#x27;).report({reason: &#x27;Breaking the subreddit rules&#x27;})</pre>
 
 
     
@@ -3484,7 +3484,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="ignore_reports"><span class="type-signature"></span>ignore_reports()</h4>
+    <h4 class="name" id="ignoreReports"><span class="type-signature"></span>ignoreReports()</h4>
     
     
     <p class="summary">Ignores reports on this Comment, Submission, or PrivateMessage</p>
@@ -3514,7 +3514,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
 	<dd class="inherited-from">
 		<ul class="dummy">
 			<li>
-				<a href="ReplyableContent.html#ignore_reports">ReplyableContent#ignore_reports</a>
+				<a href="ReplyableContent.html#ignoreReports">ReplyableContent#ignoreReports</a>
 			</li>
 		</ul>
 	</dd>
@@ -3589,7 +3589,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_comment(&#x27;c08pp5z&#x27;).ignore_reports()</pre>
+    <pre class="sunlight-highlight-javascript">r.getComment(&#x27;c08pp5z&#x27;).ignoreReports()</pre>
 
 
     
@@ -3599,7 +3599,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="unignore_reports"><span class="type-signature"></span>unignore_reports()</h4>
+    <h4 class="name" id="unignoreReports"><span class="type-signature"></span>unignoreReports()</h4>
     
     
     <p class="summary">Unignores reports on this Comment, Submission, or PrivateMessages</p>
@@ -3629,7 +3629,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
 	<dd class="inherited-from">
 		<ul class="dummy">
 			<li>
-				<a href="ReplyableContent.html#unignore_reports">ReplyableContent#unignore_reports</a>
+				<a href="ReplyableContent.html#unignoreReports">ReplyableContent#unignoreReports</a>
 			</li>
 		</ul>
 	</dd>
@@ -3704,7 +3704,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_comment(&#x27;c08pp5z&#x27;).unignore_reports()</pre>
+    <pre class="sunlight-highlight-javascript">r.getComment(&#x27;c08pp5z&#x27;).unignoreReports()</pre>
 
 
     
@@ -3870,7 +3870,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_submission(&#x27;4e60m3&#x27;).reply(&#x27;This was an interesting post. Thanks.&#x27;);</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubmission(&#x27;4e60m3&#x27;).reply(&#x27;This was an interesting post. Thanks.&#x27;);</pre>
 
 
     
@@ -3880,7 +3880,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
             
 <hr>
 <dt>
-    <h4 class="name" id="block_author"><span class="type-signature"></span>block_author()</h4>
+    <h4 class="name" id="blockAuthor"><span class="type-signature"></span>blockAuthor()</h4>
     
     
     <p class="summary">Blocks the author of this content.</p>
@@ -3916,7 +3916,7 @@ r.get_user(&#x27;spez&#x27;)</pre>
 	<dd class="inherited-from">
 		<ul class="dummy">
 			<li>
-				<a href="ReplyableContent.html#block_author">ReplyableContent#block_author</a>
+				<a href="ReplyableContent.html#blockAuthor">ReplyableContent#blockAuthor</a>
 			</li>
 		</ul>
 	</dd>
@@ -3991,8 +3991,8 @@ r.get_user(&#x27;spez&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_inbox({limit: 1}).then(messages =&gt;
-  messages[0].block_author();
+    <pre class="sunlight-highlight-javascript">r.getInbox({limit: 1}).then(messages =&gt;
+  messages[0].blockAuthor();
 );</pre>
 
 
@@ -4118,16 +4118,16 @@ automatically called when an unknown property is accessed on an unfetched conten
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_user(&#x27;not_an_aardvark&#x27;).fetch().then(user_info =&gt; {
-  console.log(user_info.name); // &#x27;not_an_aardvark&#x27;
-  console.log(user_info.created_utc); // 1419104352
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;).fetch().then(userInfo =&gt; {
+  console.log(userInfo.name); // &#x27;not_an_aardvark&#x27;
+  console.log(userInfo.created_utc); // 1419104352
 });
 
-r.get_comment(&#x27;d1xchqn&#x27;).fetch().then(comment =&gt; comment.body).then(console.log)
+r.getComment(&#x27;d1xchqn&#x27;).fetch().then(comment =&gt; comment.body).then(console.log)
 // =&gt; &#x27;This is a little too interesting for my liking&#x27;
 
 // In environments that support ES2015 Proxies, the above line is equivalent to:
-r.get_comment(&#x27;d1xchqn&#x27;).body.then(console.log);
+r.getComment(&#x27;d1xchqn&#x27;).body.then(console.log);
 // =&gt; &#x27;This is a little too interesting for my liking&#x27;</pre>
 
 
@@ -4243,12 +4243,12 @@ r.get_comment(&#x27;d1xchqn&#x27;).body.then(console.log);
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var some_comment = r.get_comment(&#x27;cmfkyus&#x27;);
-var initial_comment_body = some_comment.fetch().then(comment =&gt; comment.body);
+    <pre class="sunlight-highlight-javascript">var someComment = r.getComment(&#x27;cmfkyus&#x27;);
+var initialCommentBody = some_comment.fetch().then(comment =&gt; comment.body);
 
 setTimeout(() =&gt; {
-  some_comment.refresh().then(refreshed_comment =&gt; {
-    if (initial_comment_body.value() !== refreshed_comment.body) {
+  someComment.refresh().then(refreshedComment =&gt; {
+    if (initialCommentBody.value() !== refreshedComment.body) {
       console.log(&#x27;This comment has changed since 10 seconds ago.&#x27;);
     }
   });
@@ -4372,7 +4372,7 @@ setTimeout(() =&gt; {
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var user = r.get_user(&#x27;not_an_aardvark&#x27;);
+    <pre class="sunlight-highlight-javascript">var user = r.getUser(&#x27;not_an_aardvark&#x27;);
 JSON.stringify(user) // =&gt; &#x27;{&quot;name&quot;:&quot;not_an_aardvark&quot;}&#x27;</pre>
 
 

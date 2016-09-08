@@ -410,7 +410,7 @@
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_comment(&#x27;c08pp5z&#x27;).remove({spam: true})</pre>
+    <pre class="sunlight-highlight-javascript">r.getComment(&#x27;c08pp5z&#x27;).remove({spam: true})</pre>
 
 
     
@@ -516,7 +516,7 @@
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_comment(&#x27;c08pp5z&#x27;).remove()</pre>
+    <pre class="sunlight-highlight-javascript">r.getComment(&#x27;c08pp5z&#x27;).remove()</pre>
 
 
     
@@ -747,7 +747,7 @@
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_comment(&#x27;c08pp5z&#x27;).report({reason: &#x27;Breaking the subreddit rules&#x27;})</pre>
+    <pre class="sunlight-highlight-javascript">r.getComment(&#x27;c08pp5z&#x27;).report({reason: &#x27;Breaking the subreddit rules&#x27;})</pre>
 
 
     
@@ -757,7 +757,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="ignore_reports"><span class="type-signature"></span>ignore_reports()</h4>
+    <h4 class="name" id="ignoreReports"><span class="type-signature"></span>ignoreReports()</h4>
     
     
     <p class="summary">Ignores reports on this Comment, Submission, or PrivateMessage</p>
@@ -853,7 +853,7 @@
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_comment(&#x27;c08pp5z&#x27;).ignore_reports()</pre>
+    <pre class="sunlight-highlight-javascript">r.getComment(&#x27;c08pp5z&#x27;).ignoreReports()</pre>
 
 
     
@@ -863,7 +863,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="unignore_reports"><span class="type-signature"></span>unignore_reports()</h4>
+    <h4 class="name" id="unignoreReports"><span class="type-signature"></span>unignoreReports()</h4>
     
     
     <p class="summary">Unignores reports on this Comment, Submission, or PrivateMessages</p>
@@ -959,7 +959,7 @@
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_comment(&#x27;c08pp5z&#x27;).unignore_reports()</pre>
+    <pre class="sunlight-highlight-javascript">r.getComment(&#x27;c08pp5z&#x27;).unignoreReports()</pre>
 
 
     
@@ -1116,7 +1116,7 @@
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_submission(&#x27;4e60m3&#x27;).reply(&#x27;This was an interesting post. Thanks.&#x27;);</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubmission(&#x27;4e60m3&#x27;).reply(&#x27;This was an interesting post. Thanks.&#x27;);</pre>
 
 
     
@@ -1126,7 +1126,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="block_author"><span class="type-signature"></span>block_author()</h4>
+    <h4 class="name" id="blockAuthor"><span class="type-signature"></span>blockAuthor()</h4>
     
     
     <p class="summary">Blocks the author of this content.</p>
@@ -1228,8 +1228,8 @@
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_inbox({limit: 1}).then(messages =&gt;
-  messages[0].block_author();
+    <pre class="sunlight-highlight-javascript">r.getInbox({limit: 1}).then(messages =&gt;
+  messages[0].blockAuthor();
 );</pre>
 
 
@@ -1355,16 +1355,16 @@ automatically called when an unknown property is accessed on an unfetched conten
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.get_user(&#x27;not_an_aardvark&#x27;).fetch().then(user_info =&gt; {
-  console.log(user_info.name); // &#x27;not_an_aardvark&#x27;
-  console.log(user_info.created_utc); // 1419104352
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;).fetch().then(userInfo =&gt; {
+  console.log(userInfo.name); // &#x27;not_an_aardvark&#x27;
+  console.log(userInfo.created_utc); // 1419104352
 });
 
-r.get_comment(&#x27;d1xchqn&#x27;).fetch().then(comment =&gt; comment.body).then(console.log)
+r.getComment(&#x27;d1xchqn&#x27;).fetch().then(comment =&gt; comment.body).then(console.log)
 // =&gt; &#x27;This is a little too interesting for my liking&#x27;
 
 // In environments that support ES2015 Proxies, the above line is equivalent to:
-r.get_comment(&#x27;d1xchqn&#x27;).body.then(console.log);
+r.getComment(&#x27;d1xchqn&#x27;).body.then(console.log);
 // =&gt; &#x27;This is a little too interesting for my liking&#x27;</pre>
 
 
@@ -1480,12 +1480,12 @@ r.get_comment(&#x27;d1xchqn&#x27;).body.then(console.log);
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var some_comment = r.get_comment(&#x27;cmfkyus&#x27;);
-var initial_comment_body = some_comment.fetch().then(comment =&gt; comment.body);
+    <pre class="sunlight-highlight-javascript">var someComment = r.getComment(&#x27;cmfkyus&#x27;);
+var initialCommentBody = some_comment.fetch().then(comment =&gt; comment.body);
 
 setTimeout(() =&gt; {
-  some_comment.refresh().then(refreshed_comment =&gt; {
-    if (initial_comment_body.value() !== refreshed_comment.body) {
+  someComment.refresh().then(refreshedComment =&gt; {
+    if (initialCommentBody.value() !== refreshedComment.body) {
       console.log(&#x27;This comment has changed since 10 seconds ago.&#x27;);
     }
   });
@@ -1609,7 +1609,7 @@ setTimeout(() =&gt; {
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var user = r.get_user(&#x27;not_an_aardvark&#x27;);
+    <pre class="sunlight-highlight-javascript">var user = r.getUser(&#x27;not_an_aardvark&#x27;);
 JSON.stringify(user) // =&gt; &#x27;{&quot;name&quot;:&quot;not_an_aardvark&quot;}&#x27;</pre>
 
 
