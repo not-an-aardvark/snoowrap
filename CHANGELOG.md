@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.8.0 (2016-09-06)
+
+* All of snoowrap's methods and parameters are now in camelCase, to be more aligned with idiomatic JS. This is not a breaking change; for backwards compatibility, snake_case aliases are provided for all methods and parameters. Existing code should still work and does not need to be migrated.
+* Added a `snoowrap.noConflict` method to avoid relying on global state in browsers
+
 ## v1.7.1 (2016-09-03)
 
 * Fixed an issue where Listings sometimes threw errors in Safari
