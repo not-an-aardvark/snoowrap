@@ -66,6 +66,9 @@
     "moment": "^2.14.1",
     "uglify-js-harmony": "^2.6.2"
   },
+  "engines": {
+    "node": ">=4.0.0"
+  },
   "browser": {
     "request-promise": false,
     "ws": false
