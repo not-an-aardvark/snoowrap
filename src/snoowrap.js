@@ -1,5 +1,5 @@
-import {assign, snakeCase, defaults, forEach, forOwn, identity, includes, isEmpty, isFunction, isObject, isString, isUndefined,
-  map, mapValues, omit, omitBy, values} from 'lodash';
+import {assign, defaults, forEach, forOwn, identity, includes, isEmpty, isFunction, isObject, isString, isUndefined,
+  map, mapValues, omit, omitBy, snakeCase, values} from 'lodash';
 import Promise from './Promise.js';
 import promiseWrap from 'promise-chains';
 import util from 'util';
