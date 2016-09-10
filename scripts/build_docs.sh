@@ -12,7 +12,7 @@ MAJOR_VERSION=$(echo $FULL_VERSION | grep -Eo '^v[0-9]+')
 # example FULL_VERSION: 'v1.2.3'
 # example MAJOR_VERSION: 'v1'
 
-mkdir doc || true
+mkdir -p doc
 npm run compile
 
 # List all the files explicitly rather than globbing to ensure that the classes appear in the right order in the docs
