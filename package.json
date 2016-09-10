@@ -12,6 +12,7 @@
     "test:browser": "npm run pretest && open test/run-tests.html",
     "smoketest": "npm run test -- -g 'smoketest'",
     "build-docs": "scripts/build_docs.sh",
+    "bundle-size": "npm run build-docs && gzip -c doc/snoowrap-v$(npm info . version).min.js | wc -c | xargs",
     "coverage": "istanbul cover _mocha -- --compilers js:babel-core/register test/snoowrap.spec.js"
   },
   "files": [
