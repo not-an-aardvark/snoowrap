@@ -22,7 +22,7 @@ node_modules/.bin/browserify dist/snoowrap.js -o "doc/snoowrap-$FULL_VERSION.js"
 # Exclude snoowrap's class names from mangling.
 # This is necessary due to a bug in Safari with ES6 classes and variable scoping.
 # https://gist.github.com/not-an-aardvark/657578882bb1e68ef3458193228d9fe7
-node_modules/.bin/uglifyjs "doc/snoowrap-$FULL_VERSION.js" -o "doc/snoowrap-$FULL_VERSION.min.js" -m --screw-ie8 -r snoowrap,RedditContent,ReplyableContent,VoteableContent,Comment,RedditUser,Submission,LiveThread,PrivateMessage,Subreddit,MultiReddit,WikiPage,Listing,More
+node_modules/.bin/uglifyjs "doc/snoowrap-$FULL_VERSION.js" -o "doc/snoowrap-$FULL_VERSION.min.js" -m --screw-ie8 -c warnings=false -r snoowrap,RedditContent,ReplyableContent,VoteableContent,Comment,RedditUser,Submission,LiveThread,PrivateMessage,Subreddit,MultiReddit,WikiPage,Listing,More
 
 # Create aliases with only the major version number, e.g. 'snoowrap-v1.js' and 'snoowrap-v1.min.js'
 cp "doc/snoowrap-$FULL_VERSION.js" "doc/snoowrap-$MAJOR_VERSION.js"
