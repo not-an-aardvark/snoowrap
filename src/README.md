@@ -1,4 +1,4 @@
-# snoowrap internal layout/contributors' map
+# snoowrap internal layout/building instructions
 
 This guide is aimed at people who are interested in contributing to snoowrap itself, or getting a general idea of how snoowrap works.
 
