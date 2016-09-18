@@ -51,6 +51,18 @@ const PrivateMessage = class PrivateMessage extends ReplyableContent {
   unmuteAuthor () {
     return this._post({uri: 'api/unmute_message_author', form: {id: this.name}}).return(this);
   }
+  /**
+  * @summary Deletes this message from the authenticated user's inbox.
+  * @desc This only removes the item from the authenticated user's inbox. It has no effect on how the item looks to the sender.
+  * @returns {Promise} A Promise that fulfills with this message when the request is complete.
+  * @example
+  *
+  * const firstMessage = r.getInbox().get(0);
+  * firstMessage.deleteFromInbox();
+  */
+  deleteFromInbox () {
+    return this._post({uri: 'api/del_msg', form: {id: this.name}}).return(this);
+  }
 };
 
 export default PrivateMessage;

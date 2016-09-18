@@ -1591,6 +1591,14 @@ describe('snoowrap', function () {
       });
       expect(await r.get_sent_messages()[0].body).to.equal(timestamp);
     });
+    it.skip('can delete a message from its inbox', async () => {
+      const firstMessage = await r.getInbox()[0];
+      await firstMessage.deleteFromInbox();
+      const inbox = await r.getInbox();
+      if (inbox.length) {
+        expect(await r.getInbox()[0].body).to.not.equal(firstMessage.body);
+      }
+    });
     it.skip('can mute the author of a modmail', async () => {
       const modmail = r.get_message('4zop6r');
       await modmail.mute_author();
