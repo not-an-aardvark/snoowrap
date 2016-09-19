@@ -1,0 +1,99 @@
+rules:
+  accessor-pairs: error
+  array-bracket-spacing: [warn, never]
+  array-callback-return: warn
+  babel/arrow-parens: [warn, as-needed]
+  arrow-spacing: warn
+  block-spacing: [warn, never]
+  brace-style: warn
+  comma-dangle: warn
+  comma-spacing: warn
+  comma-style: warn
+  computed-property-spacing: warn
+  curly: warn
+  dot-notation: warn
+  dot-location: [warn, property]
+  eol-last: error
+  eqeqeq: error
+  func-call-spacing: error
+  indent: [warn, 2, {FunctionDeclaration: {body: 1, parameters: 1}, FunctionExpression: {body: 1, parameters: 1}}]
+  key-spacing: warn
+  keyword-spacing: warn
+  linebreak-style: [error, unix]
+  max-len: [warn, 128]
+  max-statements-per-line: warn
+  new-parens: warn
+  no-caller: error
+  no-catch-shadow: error
+  no-console: warn
+  no-duplicate-imports: warn
+  no-else-return: warn
+  no-eval: error
+  no-extra-bind: error
+  no-extra-label: error
+  no-extra-parens: [error, all, {nestedBinaryExpressions: false}]
+  no-floating-decimal: error
+  no-global-assign: error
+  no-implied-eval: error
+  no-label-var: error
+  no-lone-blocks: warn
+  no-lonely-if: warn
+  no-mixed-operators: warn
+  no-multi-spaces: warn
+  no-new: error
+  no-new-func: error
+  no-new-object: error
+  no-new-require: error
+  no-octal-escape: error
+  no-proto: warn
+  no-prototype-builtins: warn
+  no-restricted-properties: [warn, {object: describe, property: only}, {object: it, property: only}]
+  no-script-url: error
+  no-self-compare: error
+  no-sequences: warn
+  no-shadow: error
+  no-tabs: error
+  no-template-curly-in-string: error
+  no-trailing-spaces: warn
+  no-unneeded-ternary: warn
+  no-unsafe-negation: error
+  no-unused-expressions: error
+  no-unused-vars: warn
+  no-useless-call: error
+  no-useless-computed-key: warn
+  no-useless-concat: warn
+  no-useless-constructor: warn
+  no-useless-escape: warn
+  no-whitespace-before-property: warn
+  no-var: warn
+  no-void: error
+  no-with: error
+  object-curly-spacing: warn
+  object-shorthand: warn
+  operator-assignment: warn
+  padded-blocks: [warn, never]
+  prefer-arrow-callback: warn
+  prefer-const: warn
+  prefer-numeric-literals: error
+  prefer-rest-params: warn
+  prefer-spread: warn
+  quote-props: [warn, as-needed]
+  quotes: [warn, single, avoid-escape]
+  semi: [warn, always]
+  semi-spacing: warn
+  space-before-blocks: warn
+  space-before-function-paren: warn
+  space-in-parens: warn
+  space-infix-ops: warn
+  space-unary-ops: warn
+  spaced-comment: warn
+  template-curly-spacing: warn
+  valid-typeof: [error, {requireStringLiterals: true}]
+  wrap-iife: error
+  yoda: warn
+env:
+  es6: true
+  node: true
+extends: eslint:recommended
+parser: babel-eslint
+plugins: [babel]
