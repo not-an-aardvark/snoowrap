@@ -2,7 +2,7 @@ rules:
   accessor-pairs: error
   array-bracket-spacing: [warn, never]
   array-callback-return: warn
-  babel/arrow-parens: [warn, as-needed]
+  arrow-parens: [warn, as-needed]
   arrow-spacing: warn
   block-spacing: [warn, never]
   brace-style: warn
@@ -91,9 +91,12 @@ rules:
   valid-typeof: [error, {requireStringLiterals: true}]
   wrap-iife: error
   yoda: warn
-env:
-  es6: true
-  node: true
 extends: eslint:recommended
-parser: babel-eslint
-plugins: [babel]
+parserOptions:
+  ecmaVersion: 8
+  sourceType: module
+  ecmaFeatures:
+    experimentalObjectRestSpread: true
+env:
+  node: true
+  es6: true
