@@ -1,4 +1,4 @@
-import {clone, defaults, defaultsDeep, isEmpty, isNumber, isObject, last, omitBy, pick} from 'lodash';
+import {clone, defaults, defaultsDeep, isEmpty, isNumber, isObject, omitBy, pick} from 'lodash';
 import Promise from '../Promise.js';
 import {inspect} from 'util';
 import {parse as urlParse} from 'url';
@@ -51,7 +51,7 @@ const Listing = class Listing extends Array {
     this._cachedLookahead = options._cachedLookahead;
     defaultsDeep(this, pick(options, Object.keys(INTERNAL_DEFAULTS)), INTERNAL_DEFAULTS);
     Object.assign(this._query, pick(options, ['before', 'after']));
-    if (last(options.children) instanceof More) {
+    if (options.children && options.children[options.children.length - 1] instanceof More) {
       this._setMore(this.pop());
     }
   }
