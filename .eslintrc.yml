@@ -1,33 +1,33 @@
 rules:
   accessor-pairs: error
-  array-bracket-spacing: [warn, never]
-  array-callback-return: warn
-  arrow-parens: [warn, as-needed]
-  arrow-spacing: warn
-  block-spacing: [warn, never]
-  brace-style: warn
-  comma-dangle: warn
-  comma-spacing: warn
-  comma-style: warn
-  computed-property-spacing: warn
-  curly: warn
-  dot-notation: warn
-  dot-location: [warn, property]
+  array-bracket-spacing: [error, never]
+  array-callback-return: error
+  arrow-parens: [error, as-needed]
+  arrow-spacing: error
+  block-spacing: [error, never]
+  brace-style: error
+  comma-dangle: error
+  comma-spacing: error
+  comma-style: error
+  computed-property-spacing: error
+  curly: error
+  dot-notation: error
+  dot-location: [error, property]
   eol-last: error
   eqeqeq: error
   func-call-spacing: error
-  indent: [warn, 2, {FunctionDeclaration: {body: 1, parameters: 1}, FunctionExpression: {body: 1, parameters: 1}}]
-  key-spacing: warn
-  keyword-spacing: warn
+  indent: [error, 2, {FunctionDeclaration: {body: 1, parameters: 1}, FunctionExpression: {body: 1, parameters: 1}}]
+  key-spacing: error
+  keyword-spacing: error
   linebreak-style: [error, unix]
-  max-len: [warn, 128]
-  max-statements-per-line: warn
-  new-parens: warn
+  max-len: [error, 128]
+  max-statements-per-line: error
+  new-parens: error
   no-caller: error
   no-catch-shadow: error
-  no-console: warn
-  no-duplicate-imports: warn
-  no-else-return: warn
+  no-console: error
+  no-duplicate-imports: error
+  no-else-return: error
   no-eval: error
   no-extra-bind: error
   no-extra-label: error
@@ -36,62 +36,62 @@ rules:
   no-global-assign: error
   no-implied-eval: error
   no-label-var: error
-  no-lone-blocks: warn
-  no-lonely-if: warn
-  no-mixed-operators: warn
-  no-multi-spaces: warn
+  no-lone-blocks: error
+  no-lonely-if: error
+  no-mixed-operators: error
+  no-multi-spaces: error
   no-new: error
   no-new-func: error
   no-new-object: error
   no-new-require: error
   no-octal-escape: error
-  no-proto: warn
-  no-prototype-builtins: warn
-  no-restricted-properties: [warn, {object: describe, property: only}, {object: it, property: only}]
+  no-proto: error
+  no-prototype-builtins: error
+  no-restricted-properties: [error, {object: describe, property: only}, {object: it, property: only}]
   no-script-url: error
   no-self-compare: error
-  no-sequences: warn
+  no-sequences: error
   no-shadow: error
   no-tabs: error
   no-template-curly-in-string: error
-  no-trailing-spaces: warn
-  no-unneeded-ternary: warn
+  no-trailing-spaces: error
+  no-unneeded-ternary: error
   no-unsafe-negation: error
   no-unused-expressions: error
-  no-unused-vars: warn
+  no-unused-vars: error
   no-useless-call: error
-  no-useless-computed-key: warn
-  no-useless-concat: warn
-  no-useless-constructor: warn
-  no-useless-escape: warn
-  no-whitespace-before-property: warn
-  no-var: warn
+  no-useless-computed-key: error
+  no-useless-concat: error
+  no-useless-constructor: error
+  no-useless-escape: error
+  no-whitespace-before-property: error
+  no-var: error
   no-void: error
   no-with: error
-  object-curly-spacing: warn
-  object-shorthand: warn
-  operator-assignment: warn
-  padded-blocks: [warn, never]
-  prefer-arrow-callback: warn
-  prefer-const: warn
+  object-curly-spacing: error
+  object-shorthand: error
+  operator-assignment: error
+  padded-blocks: [error, never]
+  prefer-arrow-callback: error
+  prefer-const: error
   prefer-numeric-literals: error
-  prefer-rest-params: warn
-  prefer-spread: warn
-  quote-props: [warn, as-needed]
-  quotes: [warn, single, avoid-escape]
-  semi: [warn, always]
-  semi-spacing: warn
-  space-before-blocks: warn
-  space-before-function-paren: warn
-  space-in-parens: warn
-  space-infix-ops: warn
-  space-unary-ops: warn
-  spaced-comment: warn
+  prefer-rest-params: error
+  prefer-spread: error
+  quote-props: [error, as-needed]
+  quotes: [error, single, avoid-escape]
+  semi: [error, always]
+  semi-spacing: error
+  space-before-blocks: error
+  space-before-function-paren: error
+  space-in-parens: error
+  space-infix-ops: error
+  space-unary-ops: error
+  spaced-comment: error
   strict: [error, global]
-  template-curly-spacing: warn
+  template-curly-spacing: error
   valid-typeof: [error, {requireStringLiterals: true}]
   wrap-iife: error
-  yoda: warn
+  yoda: error
 extends: eslint:recommended
 parserOptions:
   ecmaVersion: 8

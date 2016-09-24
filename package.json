@@ -7,9 +7,9 @@
   "scripts": {
     "compile": "babel -q -d dist/ src/ && browserify --im test/snoowrap.spec.js -o test/_browser.spec.js -t [ babelify ]",
     "lint": "eslint --ignore-path .gitignore . --cache",
-    "pretest": "npm run lint && npm run compile",
-    "test": "mocha --compilers js:babel-core/register test/snoowrap.spec.js",
-    "test:browser": "npm run pretest && open test/run-tests.html",
+    "test": "npm run lint && npm run test:mocha",
+    "test:mocha": "npm run compile && mocha --compilers js:babel-core/register test/snoowrap.spec.js",
+    "test:browser": "npm run compile && open test/run-tests.html",
     "smoketest": "npm run test -- -g 'smoketest'",
     "build-docs": "scripts/build_docs.sh",
     "bundle-size": "npm run build-docs && gzip -c doc/snoowrap-v$(npm info . version).min.js | wc -c | xargs",
