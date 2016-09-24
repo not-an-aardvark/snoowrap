@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.9.0 (2016-09-24)
+
+* Added `PrivateMessage#deleteFromInbox`, which deletes a private message from the user's inbox.
+
 ## v1.8.1 (2016-09-08)
 
 * Fixed an issue where `snoowrap#credentialedClientRequest` didn't accept `this`-bindings with snake_case key names.
