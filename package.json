@@ -70,6 +70,7 @@
   },
   "browser": {
     "request-promise": false,
+    "util": false,
     "ws": false
   }
 }

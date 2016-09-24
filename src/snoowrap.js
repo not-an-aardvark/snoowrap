@@ -132,14 +132,6 @@ const snoowrap = class snoowrap {
     }
     return Object.assign(this._config, options);
   }
-  inspect () {
-    // Hide confidential information (tokens, client IDs, etc.), as well as private properties, from the console.log output.
-    const keysForHiddenValues = ['clientSecret', 'refreshToken', 'accessToken', 'password'];
-    const formatted = mapValues(omitBy(this, (value, key) => key.startsWith('_')), (value, key) => {
-      return includes(keysForHiddenValues, key) ? value && '(redacted)' : value;
-    });
-    return `${MODULE_NAME} ${util.inspect(formatted)}`;
-  }
   _warn (...args) {
     if (this._config.warnings) {
       console.warn('[warning]', ...args); // eslint-disable-line no-console
@@ -1278,6 +1270,17 @@ const snoowrap = class snoowrap {
 
 function identity (value) {
   return value;
+}
+
+if (typeof window === 'undefined') {
+  Object.defineProperty(snoowrap.prototype, 'inspect', {writable: true, enumerable: false, configurable: true, value () {
+    // Hide confidential information (tokens, client IDs, etc.), as well as private properties, from the console.log output.
+    const keysForHiddenValues = ['clientSecret', 'refreshToken', 'accessToken', 'password'];
+    const formatted = mapValues(omitBy(this, (value, key) => key.startsWith('_')), (value, key) => {
+      return includes(keysForHiddenValues, key) ? value && '(redacted)' : value;
+    });
+    return `${MODULE_NAME} ${util.inspect(formatted)}`;
+  }});
 }
 
 const classFuncDescriptors = {configurable: true, writable: true};

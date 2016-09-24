@@ -1,6 +1,6 @@
 import {clone, defaults, defaultsDeep, isEmpty, omitBy, pick} from 'lodash';
 import Promise from '../Promise.js';
-import {inspect} from 'util';
+import util from 'util';
 import {parse as urlParse} from 'url';
 import {InvalidMethodCallError} from '../errors.js';
 import {default as More, emptyChildren} from './More.js';
@@ -213,9 +213,6 @@ const Listing = class Listing extends Array {
     this._r._warn('Listing#fetchUntil is deprecated -- use Listing#fetchMore instead.');
     return this.fetchMore({...options, amount: options.length - this.length});
   }
-  inspect () {
-    return `Listing ${inspect(Array.from(this))}`;
-  }
   _clone ({deep = false} = {}) {
     const properties = pick(this, Object.keys(INTERNAL_DEFAULTS));
     properties._query = clone(properties._query);
@@ -238,5 +235,11 @@ const Listing = class Listing extends Array {
     return Array.from(this).map(item => item && item.toJSON ? item.toJSON() : item);
   }
 };
+
+if (typeof window === 'undefined') {
+  Object.defineProperty(Listing.prototype, 'inspect', {writable: true, enumerable: false, configurable: true, value () {
+    return `Listing ${util.inspect(Array.from(this))}`;
+  }});
+}
 
 export default Listing;

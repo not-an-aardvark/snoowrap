@@ -1,6 +1,6 @@
 import {cloneDeep, forEach, mapValues, pick} from 'lodash';
 import Promise from '../Promise.js';
-import {inspect} from 'util';
+import util from 'util';
 import {HTTP_VERBS, USER_KEYS, SUBREDDIT_KEYS} from '../constants.js';
 import Listing from './Listing.js';
 
@@ -97,9 +97,6 @@ const RedditContent = class RedditContent {
       return value && value.toJSON ? value.toJSON() : value;
     });
   }
-  inspect () {
-    return `${this.constructor._name} ${inspect(this._stripPrivateProps())}`;
-  }
   _stripPrivateProps () {
     return pick(this, Object.keys(this).filter(key => !key.startsWith('_')));
   }
@@ -119,6 +116,12 @@ const RedditContent = class RedditContent {
     return this._r._getListing(...args);
   }
 };
+
+if (typeof window === 'undefined') {
+  Object.defineProperty(RedditContent.prototype, 'inspect', {writable: true, enumerable: false, configurable: true, value () {
+    return `${this.constructor._name} ${util.inspect(this._stripPrivateProps())}`;
+  }});
+}
 
 forEach(HTTP_VERBS, method => {
   Object.defineProperty(RedditContent.prototype, `_${method}`, {value (...args) {
