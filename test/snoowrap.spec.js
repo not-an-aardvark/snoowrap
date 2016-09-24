@@ -5,7 +5,7 @@ const Promise = require('bluebird');
 const _ = require('lodash');
 const moment = require('moment');
 const snoowrap = require('..');
-const isBrowser = typeof window !== 'undefined';
+const isBrowser = typeof self !== 'undefined';
 describe('snoowrap', function () {
   this.timeout(60000);
   this.slow(Infinity);

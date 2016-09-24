@@ -5,7 +5,7 @@ import util from 'util';
 import * as requestHandler from './request_handler.js';
 import {HTTP_VERBS, KINDS, MAX_LISTING_ITEMS, MODULE_NAME, USER_KEYS, SUBREDDIT_KEYS, VERSION} from './constants.js';
 import * as errors from './errors.js';
-import {addFullnamePrefix, addSnakeCaseShadowProps, handleJsonErrors} from './helpers.js';
+import {addFullnamePrefix, addSnakeCaseShadowProps, handleJsonErrors, isBrowser} from './helpers.js';
 import createConfig from './create_config.js';
 import * as objects from './objects/index.js';
 const api_type = 'json';
@@ -60,7 +60,7 @@ const snoowrap = class snoowrap {
       username,
       password
   } = {}) {
-    if (!userAgent && typeof window === 'undefined') {
+    if (!userAgent && !isBrowser) {
       throw new errors.MissingUserAgentError();
     }
     if (!accessToken &&
@@ -1261,8 +1261,8 @@ const snoowrap = class snoowrap {
   * @example var snoowrap = window.snoowrap.noConflict();
   */
   static noConflict () {
-    if (typeof window !== 'undefined') {
-      window[MODULE_NAME] = this._previousSnoowrap; // eslint-disable-line no-undef
+    if (isBrowser) {
+      global[MODULE_NAME] = this._previousSnoowrap;
     }
     return this;
   }
@@ -1272,7 +1272,7 @@ function identity (value) {
   return value;
 }
 
-if (typeof window === 'undefined') {
+if (!isBrowser) {
   Object.defineProperty(snoowrap.prototype, 'inspect', {writable: true, enumerable: false, configurable: true, value () {
     // Hide confidential information (tokens, client IDs, etc.), as well as private properties, from the console.log output.
     const keysForHiddenValues = ['clientSecret', 'refreshToken', 'accessToken', 'password'];
@@ -1317,9 +1317,9 @@ values(snoowrap.objects).concat(snoowrap).map(func => func.prototype).forEach(fu
 snoowrap.errors = errors;
 snoowrap.version = VERSION;
 
-if (!module.parent && typeof window !== 'undefined') { // check if the code is being run in a browser through browserify, etc.
-  snoowrap._previousSnoowrap = window[MODULE_NAME]; // eslint-disable-line no-undef
-  window[MODULE_NAME] = snoowrap; // eslint-disable-line no-undef
+if (!module.parent && isBrowser) { // check if the code is being run in a browser through browserify, etc.
+  snoowrap._previousSnoowrap = global[MODULE_NAME];
+  global[MODULE_NAME] = snoowrap;
 }
 
 module.exports = snoowrap;

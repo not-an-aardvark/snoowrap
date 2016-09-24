@@ -1,7 +1,6 @@
 import {EventEmitter} from 'events';
-// eslint-disable-next-line no-undef
-const WebSocket = typeof window !== 'undefined' ? window.WebSocket : require('ws');
-import {formatLivethreadPermissions, handleJsonErrors} from '../helpers.js';
+import {formatLivethreadPermissions, handleJsonErrors, isBrowser} from '../helpers.js';
+const WebSocket = isBrowser ? global.WebSocket : require('ws');
 import RedditContent from './RedditContent.js';
 const api_type = 'json';
 

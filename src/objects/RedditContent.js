@@ -1,6 +1,7 @@
 import {cloneDeep, forEach, mapValues, pick} from 'lodash';
 import Promise from '../Promise.js';
 import util from 'util';
+import {isBrowser} from '../helpers.js';
 import {HTTP_VERBS, USER_KEYS, SUBREDDIT_KEYS} from '../constants.js';
 import Listing from './Listing.js';
 
@@ -117,7 +118,7 @@ const RedditContent = class RedditContent {
   }
 };
 
-if (typeof window === 'undefined') {
+if (!isBrowser) {
   Object.defineProperty(RedditContent.prototype, 'inspect', {writable: true, enumerable: false, configurable: true, value () {
     return `${this.constructor._name} ${util.inspect(this._stripPrivateProps())}`;
   }});

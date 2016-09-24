@@ -151,3 +151,5 @@ export function addSnakeCaseShadowProps (obj) {
   });
   return obj;
 }
+
+export const isBrowser = typeof self === 'object';
