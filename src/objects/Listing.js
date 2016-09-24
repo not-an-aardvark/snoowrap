@@ -1,4 +1,4 @@
-import {clone, defaults, defaultsDeep, isEmpty, isObject, omitBy, pick} from 'lodash';
+import {clone, defaults, defaultsDeep, isEmpty, omitBy, pick} from 'lodash';
 import Promise from '../Promise.js';
 import {inspect} from 'util';
 import {parse as urlParse} from 'url';
@@ -117,7 +117,7 @@ const Listing = class Listing extends Array {
   */
   fetchMore (options) {
     const parsedOptions = defaults(
-      isObject(options) ? clone(options) : {amount: options},
+      typeof options === 'number' ? {amount: options} : clone(options),
       // Accept either `skip_replies` or `skipReplies` for backwards compatibility.
       {append: true, skipReplies: options.skip_replies}
     );

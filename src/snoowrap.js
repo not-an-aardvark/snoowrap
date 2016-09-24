@@ -1,4 +1,4 @@
-import {defaults, forEach, forOwn, includes, isEmpty, isObject, map, mapValues, omit, omitBy, snakeCase, values} from 'lodash';
+import {defaults, forEach, forOwn, includes, isEmpty, map, mapValues, omit, omitBy, snakeCase, values} from 'lodash';
 import Promise from './Promise.js';
 import promiseWrap from 'promise-chains';
 import util from 'util';
@@ -1218,7 +1218,7 @@ const snoowrap = class snoowrap {
     }));
   }
   _populate (responseTree) {
-    if (isObject(responseTree)) {
+    if (typeof responseTree === 'object' && responseTree !== null) {
       // Map {kind: 't2', data: {name: 'some_username', ... }} to a RedditUser (e.g.) with the same properties
       if (Object.keys(responseTree).length === 2 && responseTree.kind && responseTree.data) {
         return this._newObject(KINDS[responseTree.kind] || 'RedditContent', this._populate(responseTree.data), true);
