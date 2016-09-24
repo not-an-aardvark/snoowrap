@@ -1,4 +1,4 @@
-import {clone, defaults, defaultsDeep, isEmpty, isNumber, isObject, omitBy, pick} from 'lodash';
+import {clone, defaults, defaultsDeep, isEmpty, isObject, omitBy, pick} from 'lodash';
 import Promise from '../Promise.js';
 import {inspect} from 'util';
 import {parse as urlParse} from 'url';
@@ -121,7 +121,7 @@ const Listing = class Listing extends Array {
       // Accept either `skip_replies` or `skipReplies` for backwards compatibility.
       {append: true, skipReplies: options.skip_replies}
     );
-    if (!isNumber(parsedOptions.amount) || Number.isNaN(parsedOptions.amount)) {
+    if (typeof parsedOptions.amount !== 'number' || Number.isNaN(parsedOptions.amount)) {
       throw new InvalidMethodCallError('Failed to fetch Listing. (`amount` parameter was missing or invalid)');
     }
     if (parsedOptions.amount <= 0 || this.isFinished) {
