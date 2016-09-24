@@ -87,6 +87,7 @@ rules:
   space-infix-ops: warn
   space-unary-ops: warn
   spaced-comment: warn
+  strict: [error, global]
   template-curly-spacing: warn
   valid-typeof: [error, {requireStringLiterals: true}]
   wrap-iife: error

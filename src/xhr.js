@@ -1,5 +1,4 @@
 /* eslint-env browser */
-'use strict';
 import {merge} from 'lodash';
 import Promise from './Promise.js';
 import url from 'url';

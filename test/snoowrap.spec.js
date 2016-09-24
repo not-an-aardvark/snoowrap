@@ -1,5 +1,6 @@
 /* eslint-env mocha */
-'use strict';
+// eslint-disable-next-line strict
+'use strict'; // (this is not a module, so 'use strict' is required)
 const expect = require('chai').use(require('dirty-chai')).expect;
 const Promise = require('bluebird');
 const _ = require('lodash');
