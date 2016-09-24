@@ -1,4 +1,4 @@
-import {clone, defaults, defaultsDeep, isEmpty, isNumber, isObject, keys, last, omitBy, pick} from 'lodash';
+import {clone, defaults, defaultsDeep, isEmpty, isNumber, isObject, last, omitBy, pick} from 'lodash';
 import Promise from '../Promise.js';
 import {inspect} from 'util';
 import {parse as urlParse} from 'url';
@@ -49,7 +49,7 @@ const Listing = class Listing extends Array {
     this.push(...options.children || []);
     this._r = _r;
     this._cachedLookahead = options._cachedLookahead;
-    defaultsDeep(this, pick(options, keys(INTERNAL_DEFAULTS)), INTERNAL_DEFAULTS);
+    defaultsDeep(this, pick(options, Object.keys(INTERNAL_DEFAULTS)), INTERNAL_DEFAULTS);
     Object.assign(this._query, pick(options, ['before', 'after']));
     if (last(options.children) instanceof More) {
       this._setMore(this.pop());
@@ -217,7 +217,7 @@ const Listing = class Listing extends Array {
     return `Listing ${inspect(Array.from(this))}`;
   }
   _clone ({deep = false} = {}) {
-    const properties = pick(this, keys(INTERNAL_DEFAULTS));
+    const properties = pick(this, Object.keys(INTERNAL_DEFAULTS));
     properties._query = clone(properties._query);
     properties._cachedLookahead = clone(properties._cachedLookahead);
     properties._more = this._more && this._more._clone();

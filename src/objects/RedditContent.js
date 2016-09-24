@@ -1,4 +1,4 @@
-import {cloneDeep, forEach, keys, mapValues, pick} from 'lodash';
+import {cloneDeep, forEach, mapValues, pick} from 'lodash';
 import Promise from '../Promise.js';
 import {inspect} from 'util';
 import {HTTP_VERBS, USER_KEYS, SUBREDDIT_KEYS} from '../constants.js';
@@ -101,7 +101,7 @@ const RedditContent = class RedditContent {
     return `${this.constructor._name} ${inspect(this._stripPrivateProps())}`;
   }
   _stripPrivateProps () {
-    return pick(this, keys(this).filter(key => !key.startsWith('_')));
+    return pick(this, Object.keys(this).filter(key => !key.startsWith('_')));
   }
   _transformApiResponse (response) {
     return response;
