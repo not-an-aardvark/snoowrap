@@ -1,4 +1,4 @@
-import {defaults, forEach, forOwn, identity, includes, isEmpty, isFunction, isObject, isUndefined, map, mapValues,
+import {defaults, forEach, forOwn, identity, includes, isEmpty, isObject, isUndefined, map, mapValues,
   omit, omitBy, snakeCase, values} from 'lodash';
 import Promise from './Promise.js';
 import promiseWrap from 'promise-chains';
@@ -1304,7 +1304,7 @@ forOwn(KINDS, value => {
 // Alias all functions on snoowrap's prototype and snoowrap's object prototypes in snake_case.
 values(snoowrap.objects).concat(snoowrap).map(func => func.prototype).forEach(funcProto => {
   Object.getOwnPropertyNames(funcProto)
-    .filter(name => !name.startsWith('_') && name !== snakeCase(name) && isFunction(funcProto[name]))
+    .filter(name => !name.startsWith('_') && name !== snakeCase(name) && typeof funcProto[name] === 'function')
     .forEach(name => Object.defineProperty(funcProto, snakeCase(name), {value: funcProto[name], ...classFuncDescriptors}));
 });
 

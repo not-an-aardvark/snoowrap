@@ -1,4 +1,4 @@
-import {clone, defaults, defaultsDeep, identity, isEmpty, isFunction, isNil, isNull, isNumber, isObject, keys, last, omitBy,
+import {clone, defaults, defaultsDeep, identity, isEmpty, isNil, isNull, isNumber, isObject, keys, last, omitBy,
   pick} from 'lodash';
 import Promise from '../Promise.js';
 import {inspect} from 'util';
@@ -224,7 +224,7 @@ const Listing = class Listing extends Array {
     properties._more = this._more && this._more._clone();
     const shallowChildren = Array.from(this);
     properties.children = deep
-      ? shallowChildren.map(item => '_clone' in item && isFunction(item._clone) ? item._clone({deep}) : item)
+      ? shallowChildren.map(item => '_clone' in item && typeof item._clone === 'function' ? item._clone({deep}) : item)
       : shallowChildren;
     return new Listing(properties, this._r);
   }
