@@ -2,7 +2,7 @@ import {clone, defaults, defaultsDeep, isEmpty, omitBy, pick} from 'lodash';
 import Promise from '../Promise.js';
 import util from 'util';
 import {parse as urlParse} from 'url';
-import {isBrowser} from '../helpers.js';
+import {defineInspectFunc} from '../helpers.js';
 import {InvalidMethodCallError} from '../errors.js';
 import {default as More, emptyChildren} from './More.js';
 
@@ -237,10 +237,8 @@ const Listing = class Listing extends Array {
   }
 };
 
-if (!isBrowser) {
-  Object.defineProperty(Listing.prototype, 'inspect', {writable: true, enumerable: false, configurable: true, value () {
-    return `Listing ${util.inspect(Array.from(this))}`;
-  }});
-}
+defineInspectFunc(Listing.prototype, function () {
+  return `Listing ${util.inspect(Array.from(this))}`;
+});
 
 export default Listing;

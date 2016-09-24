@@ -5,7 +5,7 @@ import util from 'util';
 import * as requestHandler from './request_handler.js';
 import {HTTP_VERBS, KINDS, MAX_LISTING_ITEMS, MODULE_NAME, USER_KEYS, SUBREDDIT_KEYS, VERSION} from './constants.js';
 import * as errors from './errors.js';
-import {addFullnamePrefix, addSnakeCaseShadowProps, handleJsonErrors, isBrowser} from './helpers.js';
+import {addFullnamePrefix, addSnakeCaseShadowProps, defineInspectFunc, handleJsonErrors, isBrowser} from './helpers.js';
 import createConfig from './create_config.js';
 import * as objects from './objects/index.js';
 const api_type = 'json';
@@ -1272,16 +1272,14 @@ function identity (value) {
   return value;
 }
 
-if (!isBrowser) {
-  Object.defineProperty(snoowrap.prototype, 'inspect', {writable: true, enumerable: false, configurable: true, value () {
-    // Hide confidential information (tokens, client IDs, etc.), as well as private properties, from the console.log output.
-    const keysForHiddenValues = ['clientSecret', 'refreshToken', 'accessToken', 'password'];
-    const formatted = mapValues(omitBy(this, (value, key) => key.startsWith('_')), (value, key) => {
-      return includes(keysForHiddenValues, key) ? value && '(redacted)' : value;
-    });
-    return `${MODULE_NAME} ${util.inspect(formatted)}`;
-  }});
-}
+defineInspectFunc(snoowrap.prototype, function () {
+  // Hide confidential information (tokens, client IDs, etc.), as well as private properties, from the console.log output.
+  const keysForHiddenValues = ['clientSecret', 'refreshToken', 'accessToken', 'password'];
+  const formatted = mapValues(omitBy(this, (value, key) => typeof key === 'string' && key.startsWith('_')), (value, key) => {
+    return includes(keysForHiddenValues, key) ? value && '(redacted)' : value;
+  });
+  return `${MODULE_NAME} ${util.inspect(formatted)}`;
+});
 
 const classFuncDescriptors = {configurable: true, writable: true};
 

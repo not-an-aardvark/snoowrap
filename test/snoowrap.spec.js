@@ -5,6 +5,7 @@ const expect = require('chai').use(require('dirty-chai')).expect;
 const Promise = require('bluebird');
 const _ = require('lodash');
 const moment = require('moment');
+const util = require('util');
 const snoowrap = require('..');
 const isBrowser = typeof self !== 'undefined';
 describe('snoowrap', function () {
@@ -113,11 +114,14 @@ describe('snoowrap', function () {
       expect(jsonified.subreddit).to.be.a('string');
       expect(jsonified.subreddit).to.equal(some_submission.subreddit.display_name);
     });
-    it('does not de-populate a RedditContent object when inspecting it', async () => {
+    it('does not de-populate a RedditContent object when inspecting it', async function () {
+      if (isBrowser) {
+        return this.skip();
+      }
       const some_submission = await r.get_submission('4abn1k').fetch();
       expect(some_submission.author).to.be.an('object');
       expect(some_submission.subreddit).to.be.an('object');
-      const inspected = some_submission.inspect();
+      const inspected = util.inspect(some_submission);
       expect(inspected).to.be.a('string');
       expect(_.includes(inspected, "author: RedditUser { name: 'not_an_aardvark' }")).to.be.true();
     });
@@ -268,8 +272,11 @@ describe('snoowrap', function () {
       expect(typeof r.refresh_token === 'string').to.be.true();
       expect(typeof r.access_token === 'string').to.be.true();
     });
-    it('redacts the client secret, the refresh token, and the access token from the console.log view', () => {
-      const inspected = require('util').inspect(r);
+    it('redacts the client secret, the refresh token, and the access token from the console.log view', function () {
+      if (isBrowser) {
+        return this.skip();
+      }
+      const inspected = util.inspect(r);
       expect(_.includes(inspected, r.client_secret)).to.be.false();
       expect(_.includes(inspected, r.refresh_token)).to.be.false();
       expect(_.includes(inspected, r.access_token)).to.be.false();
