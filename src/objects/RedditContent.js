@@ -1,4 +1,4 @@
-import {assign, cloneDeep, forEach, keys, mapValues, pick} from 'lodash';
+import {cloneDeep, forEach, keys, mapValues, pick} from 'lodash';
 import Promise from '../Promise.js';
 import {inspect} from 'util';
 import {HTTP_VERBS, USER_KEYS, SUBREDDIT_KEYS} from '../constants.js';
@@ -16,7 +16,7 @@ const RedditContent = class RedditContent {
     this._r = _r;
     this._fetch = null;
     this._hasFetched = !!_hasFetched;
-    assign(this, options);
+    Object.assign(this, options);
     if (typeof Proxy !== 'undefined' && !this._hasFetched && _r._config.proxies) {
       return new Proxy(this, {get (target, key) {
         return key in target || key === 'length' || key in Promise.prototype ? target[key] : target.fetch()[key];

@@ -1,4 +1,4 @@
-import {assign, concat, flatten, forEach, pick, remove} from 'lodash';
+import {concat, flatten, forEach, pick, remove} from 'lodash';
 import Promise from '../Promise.js';
 import {addEmptyRepliesListing, buildRepliesTree, handleJsonErrors} from '../helpers.js';
 import {MAX_API_INFO_AMOUNT, MAX_API_MORECHILDREN_AMOUNT} from '../constants.js';
@@ -22,7 +22,7 @@ behavior.
 
 const More = class More {
   constructor (options, _r) {
-    assign(this, options);
+    Object.assign(this, options);
     this._r = _r;
   }
   /* Requests to /api/morechildren are capped at 20 comments at a time, but requests to /api/info are capped at 100, so

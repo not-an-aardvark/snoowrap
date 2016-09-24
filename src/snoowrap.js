@@ -1,5 +1,5 @@
-import {assign, defaults, forEach, forOwn, identity, includes, isEmpty, isFunction, isObject, isString, isUndefined,
-  map, mapValues, omit, omitBy, snakeCase, values} from 'lodash';
+import {defaults, forEach, forOwn, identity, includes, isEmpty, isFunction, isObject, isString, isUndefined, map, mapValues,
+  omit, omitBy, snakeCase, values} from 'lodash';
 import Promise from './Promise.js';
 import promiseWrap from 'promise-chains';
 import util from 'util';
@@ -131,7 +131,7 @@ const snoowrap = class snoowrap {
     if (invalidKey) {
       throw new TypeError(`Invalid config option '${invalidKey}'`);
     }
-    return assign(this._config, options);
+    return Object.assign(this._config, options);
   }
   inspect () {
     // Hide confidential information (tokens, client IDs, etc.), as well as private properties, from the console.log output.
