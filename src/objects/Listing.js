@@ -1,4 +1,4 @@
-import {clone, defaults, defaultsDeep, isEmpty, isNil, isNull, isNumber, isObject, keys, last, omitBy, pick} from 'lodash';
+import {clone, defaults, defaultsDeep, isEmpty, isNumber, isObject, keys, last, omitBy, pick} from 'lodash';
 import Promise from '../Promise.js';
 import {inspect} from 'util';
 import {parse as urlParse} from 'url';
@@ -82,7 +82,7 @@ const Listing = class Listing extends Array {
 
       It is important to check for `null` here rather than any falsey value, because when an empty Listing is initialized, its
       `after` and `before` properties are both `undefined`, but calling these empty Listings `finished` would be incorrect. */
-      : !this._uri || (isNull(this._query.after) && isNull(this._query.before));
+      : !this._uri || (this._query.after === null && this._query.before === null);
   }
   get is_finished () {
     // camel-case alias for backwards-compatibility.
@@ -119,7 +119,7 @@ const Listing = class Listing extends Array {
     const parsedOptions = defaults(
       isObject(options) ? clone(options) : {amount: options},
       // Accept either `skip_replies` or `skipReplies` for backwards compatibility.
-      {append: true, skipReplies: isNil(options.skip_replies) ? false : options.skip_replies}
+      {append: true, skipReplies: options.skip_replies}
     );
     if (!isNumber(parsedOptions.amount) || Number.isNaN(parsedOptions.amount)) {
       throw new InvalidMethodCallError('Failed to fetch Listing. (`amount` parameter was missing or invalid)');
@@ -137,7 +137,7 @@ const Listing = class Listing extends Array {
     );
   }
   _fetchMoreRegular (options) {
-    const query = omitBy(clone(this._query), isNil);
+    const query = omitBy(clone(this._query), value => value === null || value === undefined);
     if (!this._isCommentList) {
       /* Reddit returns a different number of items per request depending on the `limit` querystring property specified in the
       request. If no `limit` property is specified, reddit returns some number of items depending on the user's preferences
