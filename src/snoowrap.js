@@ -1,5 +1,4 @@
-import {defaults, forEach, forOwn, identity, includes, isEmpty, isObject, isUndefined, map, mapValues,
-  omit, omitBy, snakeCase, values} from 'lodash';
+import {defaults, forEach, forOwn, includes, isEmpty, isObject, map, mapValues, omit, omitBy, snakeCase, values} from 'lodash';
 import Promise from './Promise.js';
 import promiseWrap from 'promise-chains';
 import util from 'util';
@@ -65,8 +64,8 @@ const snoowrap = class snoowrap {
       throw new errors.MissingUserAgentError();
     }
     if (!accessToken &&
-        (isUndefined(clientId) || isUndefined(clientSecret) || isUndefined(refreshToken)) &&
-        (isUndefined(clientId) || isUndefined(clientSecret) || isUndefined(username) || isUndefined(password))
+        (clientId === undefined || clientSecret === undefined || refreshToken === undefined) &&
+        (clientId === undefined || clientSecret === undefined || username === undefined || password === undefined)
     ) {
       throw new errors.NoCredentialsError();
     }
@@ -467,7 +466,7 @@ const snoowrap = class snoowrap {
     // Handle things properly if only a time parameter is provided but not the subreddit name
     let opts = options;
     let subName = subredditName;
-    if (typeof subredditName === 'object' && isEmpty(omitBy(opts, isUndefined))) {
+    if (typeof subredditName === 'object' && isEmpty(omitBy(opts, option => option === undefined))) {
       /* In this case, "subredditName" ends up referring to the second argument, which is not actually a name since the user
       decided to omit that parameter. */
       opts = subredditName;
@@ -1276,6 +1275,10 @@ const snoowrap = class snoowrap {
     return this;
   }
 };
+
+function identity (value) {
+  return value;
+}
 
 const classFuncDescriptors = {configurable: true, writable: true};
 

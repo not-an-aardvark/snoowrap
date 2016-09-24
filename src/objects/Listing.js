@@ -1,5 +1,4 @@
-import {clone, defaults, defaultsDeep, identity, isEmpty, isNil, isNull, isNumber, isObject, keys, last, omitBy,
-  pick} from 'lodash';
+import {clone, defaults, defaultsDeep, isEmpty, isNil, isNull, isNumber, isObject, keys, last, omitBy, pick} from 'lodash';
 import Promise from '../Promise.js';
 import {inspect} from 'util';
 import {parse as urlParse} from 'url';
@@ -8,7 +7,7 @@ import {default as More, emptyChildren} from './More.js';
 
 const INTERNAL_DEFAULTS = {
   _query: {},
-  _transform: identity,
+  _transform: value => value,
   _method: 'get',
   _isCommentList: false,
   _link_id: null,

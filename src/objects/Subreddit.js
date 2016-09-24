@@ -1,4 +1,4 @@
-import {chunk, flatten, identity, map, omit} from 'lodash';
+import {chunk, flatten, map, omit} from 'lodash';
 import Promise from '../Promise.js';
 import {Readable} from 'stream';
 import {createReadStream} from 'fs';
@@ -652,7 +652,7 @@ const Subreddit = class Subreddit extends RedditContent {
   * // => '.md blockquote,.md del,body{color:#121212}.usertext-body ... '
   */
   getStylesheet () {
-    return this._get({uri: `r/${this.display_name}/stylesheet`, json: false, transform: identity});
+    return this._get({uri: `r/${this.display_name}/stylesheet`, json: false, transform: response => response});
   }
   /**
   * @summary Conducts a search of reddit submissions, restricted to this subreddit.
