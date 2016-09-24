@@ -60,7 +60,7 @@ const snoowrap = class snoowrap {
       username,
       password
   } = {}) {
-    if (!userAgent) {
+    if (!userAgent && typeof window === 'undefined') {
       throw new errors.MissingUserAgentError();
     }
     if (!accessToken &&

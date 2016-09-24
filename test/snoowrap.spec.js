@@ -47,8 +47,11 @@ describe('snoowrap', function () {
   });
 
   describe('.constructor', () => {
-    it('throws an error if no user-agent is provided', () => {
+    (isBrowser ? it.skip : it)('throws an error if no user-agent is provided in node', () => {
       expect(() => new snoowrap({})).to.throw(snoowrap.errors.MissingUserAgentError);
+    });
+    (isBrowser ? it : it.skip)('does not throw an error if no user-agent is provided in a browser', () => {
+      expect(() => new snoowrap({clientId: 'a', clientSecret: 'b', refreshToken: 'c'})).to.not.throw();
     });
     it('throws an error if insufficient credentials are provided', () => {
       expect(() => new snoowrap({
