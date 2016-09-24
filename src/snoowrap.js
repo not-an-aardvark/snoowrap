@@ -1,4 +1,4 @@
-import {defaults, forEach, forOwn, identity, includes, isEmpty, isFunction, isObject, isString, isUndefined, map, mapValues,
+import {defaults, forEach, forOwn, identity, includes, isEmpty, isFunction, isObject, isUndefined, map, mapValues,
   omit, omitBy, snakeCase, values} from 'lodash';
 import Promise from './Promise.js';
 import promiseWrap from 'promise-chains';
@@ -1167,7 +1167,7 @@ const snoowrap = class snoowrap {
       description_md: description,
       icon_name,
       key_color,
-      subreddits: subreddits.map(sub => ({name: isString(sub) ? sub : sub.display_name})),
+      subreddits: subreddits.map(sub => ({name: typeof sub === 'string' ? sub : sub.display_name})),
       visibility,
       weighting_scheme
     })}});

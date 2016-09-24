@@ -1,4 +1,3 @@
-import {isString} from 'lodash';
 import RedditContent from './RedditContent.js';
 
 /**
@@ -88,7 +87,7 @@ const MultiReddit = class MultiReddit extends RedditContent {
   * @example r.getUser('not_an_aardvark').getMultireddit('cookie_languages').addSubreddit('cookies')
   */
   addSubreddit (sub) {
-    sub = isString(sub) ? sub : sub.display_name;
+    sub = typeof sub === 'string' ? sub : sub.display_name;
     return this._put({uri: `api/multi${this._path}/r/${sub}`, form: {model: JSON.stringify({name: sub})}}).return(this);
   }
   /**
@@ -98,7 +97,7 @@ const MultiReddit = class MultiReddit extends RedditContent {
   * @example r.getUser('not_an_aardvark').getMultireddit('cookie_languages').removeSubreddit('cookies')
   */
   removeSubreddit (sub) {
-    return this._delete({uri: `api/multi${this._path}/r/${isString(sub) ? sub : sub.display_name}`}).return(this);
+    return this._delete({uri: `api/multi${this._path}/r/${typeof sub === 'string' ? sub : sub.display_name}`}).return(this);
   }
   /* Note: The endpoints GET/PUT /api/multi/multipath/description and GET /api/multi/multipath/r/srname are intentionally not
   included, because they're redundant and the same thing can be achieved by simply using fetch() and edit(). */

@@ -1,5 +1,4 @@
 /* eslint-disable max-len */
-import {isString} from 'lodash';
 import {API_RULES_LINK, DOCS_LINK, MODULE_NAME} from './constants.js';
 
 function subError (name, defaultMessage) {
@@ -8,7 +7,7 @@ function subError (name, defaultMessage) {
       return new SubclassedError(message);
     }
     const propertyOptions = {configurable: true, writable: true, enumerable: false};
-    Object.defineProperty(this, 'message', {...propertyOptions, value: isString(message) ? message : defaultMessage});
+    Object.defineProperty(this, 'message', {...propertyOptions, value: typeof message === 'string' ? message : defaultMessage});
     Object.defineProperty(this, 'name', {...propertyOptions, value: name});
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, this.constructor);
