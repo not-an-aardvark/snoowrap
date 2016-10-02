@@ -44,7 +44,8 @@ const snoowrap = class snoowrap {
   not recommended for long-term use.
   * @param {object} options An object containing authentication options. This should always have the property `userAgent`. It
   must also contain some combination of credentials (see above)
-  * @param {string} options.userAgent A unique description of what your app does
+  * @param {string} options.userAgent A unique description of what your app does. This argument is not necessary when snoowrap
+  is running in a browser.
   * @param {string} [options.clientId] The client ID of your app (assigned by reddit)
   * @param {string} [options.clientSecret] The client secret of your app (assigned by reddit). If you are using a refresh token
   with an installed app (which does not have a client secret), pass an empty string as your `clientSecret`.
@@ -75,6 +76,9 @@ const snoowrap = class snoowrap {
         (clientId === undefined || clientSecret === undefined || username === undefined || password === undefined)
     ) {
       throw new errors.NoCredentialsError();
+    }
+    if (isBrowser) {
+      this.userAgent = global.navigator.userAgent;
     }
     defaults(this, {userAgent, clientId, clientSecret, refreshToken, accessToken, username, password}, {
       clientId: null,

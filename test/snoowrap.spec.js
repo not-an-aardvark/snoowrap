@@ -52,6 +52,9 @@ describe('snoowrap', function () {
     (isBrowser ? it.skip : it)('throws an error if no user-agent is provided in node', () => {
       expect(() => new snoowrap({})).to.throw(snoowrap.errors.MissingUserAgentError);
     });
+    (isBrowser ? it : it.skip)('always uses navigator.userAgent in browsers', () => {
+      expect(new snoowrap({userAgent: 'foo', accessToken: 'bar'}).userAgent).to.equal(global.navigator.userAgent);
+    });
     (isBrowser ? it : it.skip)('does not throw an error if no user-agent is provided in a browser', () => {
       expect(() => new snoowrap({clientId: 'a', clientSecret: 'b', refreshToken: 'c'})).to.not.throw();
     });

@@ -27,7 +27,6 @@ export const RateLimitError = subError('RateLimitError', `${MODULE_NAME} refused
 export const InvalidUserError = subError('InvalidUserError', 'Cannot fetch information on the given user. Please be sure you have the right username.');
 export const InvalidMethodCallError = subError('InvalidMethodCallError', '');
 export const NoCredentialsError = subError('NoCredentialsError', `Missing credentials passed to ${MODULE_NAME} constructor. You must pass an object containing either (a) userAgent, clientId, clientSecret, and refreshToken properties, (b) userAgent and accessToken properties, or (c) userAgent, clientId, clientSecret, username, and password properties. For information, please read the docs at ${DOCS_LINK}.`);
-export const MissingUserAgentError = subError('MissingUserAgentError', `You must supply an object with the userAgent property to the snoowrap constructor. For more details on userAgent strings, please see: ${API_RULES_LINK}`);
 export const RequestError = subError('RequestError', '');
 export const StatusCodeError = subError('StatusCodeError', '');
 export const RateLimitWarning = millisecondsUntilReset => `Warning: ${MODULE_NAME} temporarily stopped sending requests because reddit's ratelimit was exceeded. The request you attempted to send was queued, and will be sent to reddit when the current ratelimit period expires in ${millisecondsUntilReset / 1000} seconds.`;
