@@ -101,3 +101,4 @@ parserOptions:
 env:
   node: true
   es6: true
+root: true
