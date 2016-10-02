@@ -78,6 +78,58 @@ describe('snoowrap', function () {
     });
   });
 
+  describe('.getAuthUrl()', () => {
+    it('returns an authentication URL as a string', () => {
+      expect(snoowrap.getAuthUrl({
+        clientId: 'foo',
+        scope: ['bar', 'baz'],
+        redirectUri: 'http://example.com/callback'
+      })).to.equal(
+        'https://www.reddit.com/api/v1/authorize?client_id=foo&response_type=code&state=_&redirect_uri=' +
+        'http%3A%2F%2Fexample.com%2Fcallback&duration=permanent&scope=bar%20baz'
+      );
+    });
+    it('throws an error if the scope list is empty', () => {
+      expect(() => {
+        snoowrap.getAuthUrl({clientId: 'foo', scope: [], redirectUri: 'http://example.com/callback'});
+      }).to.throw(TypeError);
+    });
+    it('throws an error if the scope list is missing', () => {
+      expect(() => {
+        snoowrap.getAuthUrl({clientId: 'foo', redirectUri: 'http://example.com/callback'});
+      }).to.throw(TypeError);
+    });
+    it('throws an error if the scope list contains non-strings', () => {
+      expect(() => {
+        snoowrap.getAuthUrl({clientId: 'foo', scope: [5], redirectUri: 'http://example.com/callback'});
+      }).to.throw(TypeError);
+    });
+    it('throws an error if the scope param is not an array', () => {
+      expect(() => {
+        snoowrap.getAuthUrl({clientId: 'foo', scope: 'read', redirectUri: 'http://example.com/callback'});
+      }).to.throw(TypeError);
+    });
+    it('throws an error if the clientId is missing', () => {
+      expect(() => {
+        snoowrap.getAuthUrl({scope: ['read'], redirectUri: 'http://example.com/callback'});
+      }).to.throw(TypeError);
+    });
+    it('throws an error if the redirectUri is missing', () => {
+      expect(() => {
+        snoowrap.getAuthUrl({clientId: 'foo', scope: ['read']});
+      }).to.throw(TypeError);
+    });
+    it('allows a state param to be provided', () => {
+      const state = require('crypto').randomBytes(16).toString('hex');
+      expect(snoowrap.getAuthUrl({clientId: 'a', scope: ['read'], redirectUri: 'http://example.com', state})).to.include(state);
+    });
+    it('url-encodes the state parameter', () => {
+      const state = 'ding\x07';
+      expect(snoowrap.getAuthUrl({clientId: 'a', scope: ['read'], redirectUri: 'http://example.co', state}))
+        .to.include('ding%07');
+    });
+  });
+
   describe('internal helpers', () => {
     it('can deeply clone a RedditContent instance', async () => {
       const some_user = r.get_user('someone');

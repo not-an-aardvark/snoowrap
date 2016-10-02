@@ -5,7 +5,9 @@ import util from 'util';
 import * as requestHandler from './request_handler.js';
 import {HTTP_VERBS, KINDS, MAX_LISTING_ITEMS, MODULE_NAME, USER_KEYS, SUBREDDIT_KEYS, VERSION} from './constants.js';
 import * as errors from './errors.js';
-import {addFullnamePrefix, addSnakeCaseShadowProps, defineInspectFunc, handleJsonErrors, isBrowser} from './helpers.js';
+import {
+  addFullnamePrefix, addSnakeCaseShadowProps, defineInspectFunc, handleJsonErrors, isBrowser, requiredArg
+} from './helpers.js';
 import createConfig from './create_config.js';
 import * as objects from './objects/index.js';
 const api_type = 'json';
@@ -23,8 +25,13 @@ exposed since they are useful externally as well.
 */
 const snoowrap = class snoowrap {
   /**
-  * @summary Constructs a new requester. This will be necessary if you want to do anything.
-  * @desc snoowrap supports several different options for authentication.
+  * @summary Constructs a new requester.
+  * @desc You should use the snoowrap constructor if you are able to authorize a reddit account in advance (e.g. for a Node.js
+  script that always uses the same account). If you aren't able to authorize in advance (e.g. acting through an arbitrary user's
+  account while running snoowrap in a browser), then you should use {@link snoowrap.getAuthUrl} and
+  {@link snoowrap.fromAuthCode} instead.
+  *
+  * snoowrap supports several different options for pre-existing authentication:
   * 1. *Refresh token*: To authenticate with a refresh token, pass an object with the properties `userAgent`, `clientId`,
   `clientSecret`, and `refreshToken` to the snoowrap constructor. You will need to get the refresh token from reddit
   beforehand. A script to automatically generate refresh tokens for you can be found
@@ -61,7 +68,7 @@ const snoowrap = class snoowrap {
       password
   } = {}) {
     if (!userAgent && !isBrowser) {
-      throw new errors.MissingUserAgentError();
+      return requiredArg('userAgent');
     }
     if (!accessToken &&
         (clientId === undefined || clientSecret === undefined || refreshToken === undefined) &&
@@ -84,6 +91,125 @@ const snoowrap = class snoowrap {
       _nextRequestTimestamp: -Infinity
     });
     addSnakeCaseShadowProps(this);
+  }
+  /**
+  * @summary Gets an authorization URL, which allows a user to authorize access to their account
+  * @desc This create a URL where a user can authorize an app to act through their account. If the user visits the returned URL
+  in a web browser, they will see a page that looks like [this](https://i.gyazo.com/0325534f38b78c1dbd4c84d690dda6c2.png). If
+  the user clicks "Allow", they will be redirected to your `redirectUri`, with a `code` querystring parameter containing an
+  * *authorization code*. If this code is passed to {@link snoowrap.fromAuthCode}, you can create a requester to make
+  requests on behalf of the user.
+  *
+  * The main use-case here is for running snoowrap in a browser. You can generate a URL, send the user there, and then continue
+  after the user authenticates on reddit and is redirected back.
+  *
+  * @param {object} options
+  * @param {string} options.clientId The client ID of your app (assigned by reddit). If your code is running clientside in a
+  browser, using an "Installed" app type is recommended.
+  * @param {string[]} options.scope An array of scopes (permissions on the user's account) to request on the authentication
+  page. A list of possible scopes can be found [here](https://www.reddit.com/api/v1/scopes). You can also get them on-the-fly
+  with snoowrap#getOauthScopeList.
+  * @param {string} options.redirectUri The URL where the user should be redirected after authenticating. This **must** be the
+  same as the redirect URI that is configured for the reddit app. (If there is a mismatch, the returned URL will display an
+  error page instead of an authentication form.)
+  * @param {boolean} options.permanent=true If `true`, the app will have indefinite access to the user's account. If `false`,
+  access to the user's account will expire after 1 hour.
+  * @param {string} [options.state] A string that can be used to verify a user after they are redirected back to the site. When
+  the user is redirected from reddit, to the redirect URI after authenticating, the resulting URI will have this same `state`
+  value in the querystring. (See [here](http://www.twobotechnologies.com/blog/2014/02/importance-of-state-in-oauth2.html) for
+  more information on how to use the `state` value.)
+  * @param {string} [options.endpointDomain='reddit.com'] The endpoint domain for the URL. If the user is authenticating on
+  reddit.com (as opposed to some other site with a reddit-like API), you can omit this value.
+  * @returns {string} A URL where the user can authenticate with the given options
+  * @example
+  *
+  * var authenticationUrl = snoowrap.getAuthUrl({
+  *   clientId: 'foobarbazquuux',
+  *   scope: ['identity', 'wikiread', 'wikiedit'],
+  *   redirectUri: 'https://example.com/reddit_callback',
+  *   permanent: false,
+  *   state: 'fe211bebc52eb3da9bef8db6e63104d3' // a random string, this could be validated when the user is redirected back
+  * });
+  * // --> 'https://www.reddit.com/api/v1/authorize?client_id=foobarbaz&response_type=code&state= ...'
+  *
+  * window.location = authenticationUrl; // send the user to the authentication url
+  */
+  static getAuthUrl ({
+    clientId = requiredArg('clientId'),
+    scope = requiredArg('scope'),
+    redirectUri = requiredArg('redirectUri'),
+    permanent = true,
+    state = '_',
+    endpointDomain = 'reddit.com'
+  }) {
+    if (!(Array.isArray(scope) && scope.length && scope.every(scopeValue => scopeValue && typeof scopeValue === 'string'))) {
+      throw new TypeError('Missing `scope` argument; a non-empty list of OAuth scopes must be provided');
+    }
+    return `
+      https://www.${endpointDomain}/api/v1/authorize?
+      client_id=${encodeURIComponent(clientId)}
+      &response_type=code
+      &state=${encodeURIComponent(state)}
+      &redirect_uri=${encodeURIComponent(redirectUri)}
+      &duration=${permanent ? 'permanent' : 'temporary'}
+      &scope=${encodeURIComponent(scope.join(' '))}
+    `.replace(/\s/g, '');
+  }
+  /**
+  * @summary Creates a snoowrap requester from an authorization code.
+  * @desc An authorization code is the `code` value that appears in the querystring after a user authenticates with reddit and
+  is redirected. For more information, see {@link snoowrap.getAuthUrl}.
+  *
+  * The main use-case for this function is for running snoowrap in a browser. You can generate a URL with
+  {@link snoowrap.getAuthUrl} and send the user to that URL, and then use this function to create a requester when
+  the user is redirected back with an authorization code.
+  * @param {object} options
+  * @param {string} options.code The authorization code
+  * @param {string} options.userAgent A unique description of what your app does. This argument is not necessary when snoowrap
+  is running in a browser.
+  * @param {string} options.clientId The client ID of your app (assigned by reddit). If your code is running clientside in a
+  browser, using an "Installed" app type is recommended.
+  * @param {string} [options.clientSecret] The client secret of your app. If your app has the "Installed" app type, omit
+  this parameter.
+  * @param {string} options.redirectUri The redirect URI that is configured for the reddit app.
+  * @param {string} [options.endpointDomain='reddit.com'] The endpoint domain that the returned requester should be configured
+  to use. If the user is authenticating on reddit.com (as opposed to some other site with a reddit-like API), you can omit this
+  value.
+  * @returns {Promise} A Promise that fulfills with a `snoowrap` instance
+  * @example
+  *
+  * // Get the `code` querystring param (assuming the user was redirected from reddit)
+  * var code = new URL(window.location.href).searchParams.get('code');
+  *
+  * snoowrap.fromAuthCode({
+  *   code: code,
+  *   userAgent: 'My app',
+  *   clientId: 'foobarbazquuux',
+  *   redirectUri: 'eample.com'
+  * }).then(r => {
+  *   // Now we have a requester that can access reddit through the user's account
+  *   return r.getHot().then(posts => {
+  *     // do something with posts from the front page
+  *   });
+  * })
+  */
+  static fromAuthCode ({
+    code = requiredArg('code'),
+    userAgent = isBrowser ? global.navigator.userAgent : requiredArg('userAgent'),
+    clientId = requiredArg('clientId'),
+    clientSecret,
+    redirectUri = requiredArg('redirectUri'),
+    endpointDomain = 'reddit.com'
+  }) {
+    return this.prototype.credentialedClientRequest.call({userAgent, clientId, clientSecret}, {
+      method: 'post',
+      url: `https://www.${endpointDomain}/api/v1/access_token`,
+      form: {grant_type: 'authorization_code', code, redirect_uri: redirectUri}
+    }).then(response => {
+      const requester = new snoowrap({userAgent, clientId, clientSecret, ...response});
+      requester.config({endpointDomain});
+      return requester;
+    });
   }
   _newObject (objectType, content, _hasFetched = false) {
     return Array.isArray(content) ? content : new snoowrap.objects[objectType](content, this, _hasFetched);

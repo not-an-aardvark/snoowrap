@@ -163,3 +163,7 @@ export function defineInspectFunc (obj, inspectFunc) {
   const inspectKey = util.inspect && typeof util.inspect.custom === 'symbol' ? util.inspect.custom : 'inspect';
   Object.defineProperty(obj, inspectKey, {writable: true, enumerable: false, value: inspectFunc});
 }
+
+export function requiredArg (argName) {
+  throw new TypeError(`Missing required argument ${argName}`);
+}
