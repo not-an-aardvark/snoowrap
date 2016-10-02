@@ -5,6 +5,7 @@ const expect = require('chai').use(require('dirty-chai')).expect;
 const Promise = require('bluebird');
 const _ = require('lodash');
 const moment = require('moment');
+const request = require('request-promise');
 const util = require('util');
 const snoowrap = require('..');
 
@@ -12,41 +13,52 @@ const isBrowser = typeof self !== 'undefined';
 describe('snoowrap', function () {
   this.timeout(60000);
   this.slow(Infinity);
-  let r, r2;
-  before(() => {
+  let oauthInfo, r, r2, cookieAgent;
+  before(async () => {
+    oauthInfo = process.env.CI ? {
+      user_agent: process.env.SNOOWRAP_USER_AGENT,
+      client_id: process.env.SNOOWRAP_CLIENT_ID,
+      client_secret: process.env.SNOOWRAP_CLIENT_SECRET,
+      refresh_token: process.env.SNOOWRAP_REFRESH_TOKEN,
+      username: process.env.SNOOWRAP_USERNAME,
+      password: process.env.SNOOWRAP_PASSWORD,
+      redirect_uri: process.env.SNOOWRAP_REDIRECT_URI
+    } : require('../oauth_info.json');
+
+    r = new snoowrap({
+      user_agent: oauthInfo.user_agent,
+      client_id: oauthInfo.client_id,
+      client_secret: oauthInfo.client_secret,
+      refresh_token: oauthInfo.refresh_token
+    });
+    r2 = new snoowrap({
+      user_agent: oauthInfo.user_agent,
+      client_id: oauthInfo.client_id,
+      client_secret: oauthInfo.client_secret,
+      username: oauthInfo.username,
+      password: oauthInfo.password
+    });
     if (process.env.CI) {
-      r = new snoowrap({
-        user_agent: process.env.SNOOWRAP_USER_AGENT,
-        client_id: process.env.SNOOWRAP_CLIENT_ID,
-        client_secret: process.env.SNOOWRAP_CLIENT_SECRET,
-        refresh_token: process.env.SNOOWRAP_REFRESH_TOKEN
-      });
-      r2 = new snoowrap({
-        user_agent: process.env.SNOOWRAP_USER_AGENT,
-        client_id: process.env.SNOOWRAP_CLIENT_ID,
-        client_secret: process.env.SNOOWRAP_CLIENT_SECRET,
-        username: process.env.SNOOWRAP_USERNAME,
-        password: process.env.SNOOWRAP_PASSWORD
-      });
       this.retries(3);
-    } else {
-      // oauth_info.json has properties `user_agent`, `client_id`, `client_secret`, `username`, `password`, and `refresh_token`.
-      const oauth_info = require('../oauth_info.json');
-      r = new snoowrap({
-        user_agent: oauth_info.user_agent,
-        client_id: oauth_info.client_id,
-        client_secret: oauth_info.client_secret,
-        refresh_token: oauth_info.refresh_token
-      });
-      r2 = new snoowrap({
-        user_agent: oauth_info.user_agent,
-        client_id: oauth_info.client_id,
-        client_secret: oauth_info.client_secret,
-        username: oauth_info.username,
-        password: oauth_info.password
-      });
     }
     r.config({request_delay: 1000});
+
+    if (!isBrowser) {
+      cookieAgent = request.defaults({
+        headers: {'user-agent': oauthInfo.user_agent},
+        json: true,
+        jar: request.jar(),
+        baseUrl: 'https://www.reddit.com/'
+      });
+
+      const loginResponse = await cookieAgent.post({
+        uri: 'api/login',
+        form: {user: oauthInfo.username, passwd: oauthInfo.password, api_type: 'json'}
+      });
+
+      expect(loginResponse.json.errors.length).to.equal(0);
+      cookieAgent = cookieAgent.defaults({headers: {'X-Modhash': loginResponse.json.data.modhash}});
+    }
   });
 
   describe('.constructor', () => {
@@ -131,6 +143,68 @@ describe('snoowrap', function () {
       const state = 'ding\x07';
       expect(snoowrap.getAuthUrl({clientId: 'a', scope: ['read'], redirectUri: 'http://example.co', state}))
         .to.include('ding%07');
+    });
+    it('allows the duration to be either temporary or permanent', () => {
+      expect(
+        snoowrap.getAuthUrl({clientId: 'a', scope: ['read'], redirectUri: 'http://example.com'})
+      ).to.include('&duration=permanent');
+
+      expect(
+        snoowrap.getAuthUrl({clientId: 'a', scope: ['read'], redirectUri: 'http://example.com', permanent: false})
+      ).to.include('&duration=temporary');
+    });
+  });
+
+  describe('.fromAuthCode', () => {
+    it('throws a TypeError if no code is provided', () => {
+      expect(() => {
+        snoowrap.fromAuthCode({userAgent: 'foo', clientId: 'bar', clientSecret: 'baz', redirectUri: 'qux'});
+      }).to.throw(TypeError);
+    });
+    it('throws a TypeError if no userAgent is provided in node', function () {
+      if (isBrowser) {
+        return this.skip();
+      }
+      expect(() => {
+        snoowrap.fromAuthCode({code: 'foo', clientId: 'bar', clientSecret: 'baz', redirectUri: 'qux'});
+      }).to.throw(TypeError);
+    });
+    it('throws a TypeError if no redirectUri is provided', () => {
+      expect(() => {
+        snoowrap.fromAuthCode({code: 'foo', userAgent: 'bar', clientId: 'baz', clientSecret: 'qux'});
+      }).to.throw(TypeError);
+    });
+    it('throws a TypeError if no clientId is provided', () => {
+      expect(() => {
+        snoowrap.fromAuthCode({code: 'foo', userAgent: 'bar', clientSecret: 'qux', redirectUri: 'qux2'});
+      }).to.throw(TypeError);
+    });
+    (isBrowser ? it.skip : it)('returns a Promise for a valid requester', async () => {
+      const authResponse = await cookieAgent.post({
+        uri: 'api/v1/authorize',
+        simple: false,
+        resolveWithFullResponse: true,
+        form: {
+          client_id: oauthInfo.client_id,
+          redirect_uri: oauthInfo.redirect_uri,
+          scope: 'identity',
+          state: '_',
+          response_type: 'code',
+          duration: 'temporary',
+          authorize: 'Allow'
+        }
+      });
+      expect(authResponse.statusCode).to.equal(302);
+
+      const newRequester = await snoowrap.fromAuthCode({
+        code: require('url').parse(authResponse.headers.location, true).query.code,
+        userAgent: oauthInfo.user_agent,
+        clientId: oauthInfo.client_id,
+        clientSecret: oauthInfo.client_secret,
+        redirectUri: oauthInfo.redirect_uri
+      });
+
+      expect(await newRequester.getMe().name).to.equal(oauthInfo.username);
     });
   });
 
