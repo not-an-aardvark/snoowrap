@@ -102,7 +102,11 @@ exposed since they are useful externally as well.</p></div>
 
     
     <div class="description">
-        <p>snoowrap supports several different options for authentication.</p>
+        <p>You should use the snoowrap constructor if you are able to authorize a reddit account in advance (e.g. for a Node.js
+  script that always uses the same account). If you aren't able to authorize in advance (e.g. acting through an arbitrary user's
+  account while running snoowrap in a browser), then you should use <a href="snoowrap.html#.getAuthUrl"><code>snoowrap.getAuthUrl</code></a> and
+  <a href="snoowrap.html#.fromAuthCode"><code>snoowrap.fromAuthCode</code></a> instead.</p>
+<p>snoowrap supports several different options for pre-existing authentication:</p>
 <ol>
 <li><em>Refresh token</em>: To authenticate with a refresh token, pass an object with the properties <code>userAgent</code>, <code>clientId</code>,
 <code>clientSecret</code>, and <code>refreshToken</code> to the snoowrap constructor. You will need to get the refresh token from reddit
@@ -220,7 +224,8 @@ not recommended for long-term use.</li>
 
             
 
-            <td class="description last"><p>A unique description of what your app does</p></td>
+            <td class="description last"><p>A unique description of what your app does. This argument is not necessary when snoowrap
+  is running in a browser.</p></td>
         </tr>
 
     
@@ -515,6 +520,879 @@ not recommended for long-term use.</li>
         <h3 class="subsection-title">Methods</h3>
 
         <dl>
+            
+<hr>
+<dt>
+    <h4 class="name" id=".getAuthUrl"><span class="type-signature">&lt;static> </span>getAuthUrl(options)</h4>
+    
+    
+    <p class="summary">Gets an authorization URL, which allows a user to authorize access to their account</p>
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>This create a URL where a user can authorize an app to act through their account. If the user visits the returned URL
+  in a web browser, they will see a page that looks like <a href="https://i.gyazo.com/0325534f38b78c1dbd4c84d690dda6c2.png">this</a>. If
+  the user clicks &quot;Allow&quot;, they will be redirected to your <code>redirectUri</code>, with a <code>code</code> querystring parameter containing an
+<em>authorization code</em>. If this code is passed to <a href="snoowrap.html#.fromAuthCode"><code>snoowrap.fromAuthCode</code></a>, you can create a requester to make
+  requests on behalf of the user.</p>
+<p>The main use-case here is for running snoowrap in a browser. You can generate a URL, send the user there, and then continue
+  after the user authenticates on reddit and is redirected back.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <h6 class="method-params-label method-subparams-label">Properties</h6>
+                
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>clientId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>The client ID of your app (assigned by reddit). If your code is running clientside in a
+  browser, using an &quot;Installed&quot; app type is recommended.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>scope</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;string></span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>An array of scopes (permissions on the user's account) to request on the authentication
+  page. A list of possible scopes can be found <a href="https://www.reddit.com/api/v1/scopes">here</a>. You can also get them on-the-fly
+  with snoowrap#getOauthScopeList.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>redirectUri</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>The URL where the user should be redirected after authenticating. This <strong>must</strong> be the
+  same as the redirect URI that is configured for the reddit app. (If there is a mismatch, the returned URL will display an
+  error page instead of an authentication form.)</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>permanent</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"><p>If <code>true</code>, the app will have indefinite access to the user's account. If <code>false</code>,
+  access to the user's account will expire after 1 hour.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>state</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>A string that can be used to verify a user after they are redirected back to the site. When
+  the user is redirected from reddit, to the redirect URI after authenticating, the resulting URI will have this same <code>state</code>
+  value in the querystring. (See <a href="http://www.twobotechnologies.com/blog/2014/02/importance-of-state-in-oauth2.html">here</a> for
+  more information on how to use the <code>state</code> value.)</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>endpointDomain</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    'reddit.com'
+                
+                </td>
+            
+
+            <td class="description last"><p>The endpoint domain for the URL. If the user is authenticating on
+  reddit.com (as opposed to some other site with a reddit-like API), you can omit this value.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A URL where the user can authenticate with the given options</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">var authenticationUrl = snoowrap.getAuthUrl({
+  clientId: &#x27;foobarbazquuux&#x27;,
+  scope: [&#x27;identity&#x27;, &#x27;wikiread&#x27;, &#x27;wikiedit&#x27;],
+  redirectUri: &#x27;https://example.com/reddit_callback&#x27;,
+  permanent: false,
+  state: &#x27;fe211bebc52eb3da9bef8db6e63104d3&#x27; // a random string, this could be validated when the user is redirected back
+});
+// --&gt; &#x27;https://www.reddit.com/api/v1/authorize?client_id=foobarbaz&amp;response_type=code&amp;state= ...&#x27;
+
+window.location = authenticationUrl; // send the user to the authentication url</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".fromAuthCode"><span class="type-signature">&lt;static> </span>fromAuthCode(options)</h4>
+    
+    
+    <p class="summary">Creates a snoowrap requester from an authorization code.</p>
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>An authorization code is the <code>code</code> value that appears in the querystring after a user authenticates with reddit and
+  is redirected. For more information, see <a href="snoowrap.html#.getAuthUrl"><code>snoowrap.getAuthUrl</code></a>.</p>
+<p>The main use-case for this function is for running snoowrap in a browser. You can generate a URL with
+  <a href="snoowrap.html#.getAuthUrl"><code>snoowrap.getAuthUrl</code></a> and send the user to that URL, and then use this function to create a requester when
+  the user is redirected back with an authorization code.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <h6 class="method-params-label method-subparams-label">Properties</h6>
+                
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>code</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>The authorization code</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>userAgent</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>A unique description of what your app does. This argument is not necessary when snoowrap
+  is running in a browser.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>clientId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>The client ID of your app (assigned by reddit). If your code is running clientside in a
+  browser, using an &quot;Installed&quot; app type is recommended.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>clientSecret</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>The client secret of your app. If your app has the &quot;Installed&quot; app type, omit
+  this parameter.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>redirectUri</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>The redirect URI that is configured for the reddit app.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>endpointDomain</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    'reddit.com'
+                
+                </td>
+            
+
+            <td class="description last"><p>The endpoint domain that the returned requester should be configured
+  to use. If the user is authenticating on reddit.com (as opposed to some other site with a reddit-like API), you can omit this
+  value.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Promise that fulfills with a <code>snoowrap</code> instance</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">// Get the &#x60;code&#x60; querystring param (assuming the user was redirected from reddit)
+var code = new URL(window.location.href).searchParams.get(&#x27;code&#x27;);
+
+snoowrap.fromAuthCode({
+  code: code,
+  userAgent: &#x27;My app&#x27;,
+  clientId: &#x27;foobarbazquuux&#x27;,
+  redirectUri: &#x27;eample.com&#x27;
+}).then(r =&gt; {
+  // Now we have a requester that can access reddit through the user&#x27;s account
+  return r.getHot().then(posts =&gt; {
+    // do something with posts from the front page
+  });
+})</pre>
+
+
+    
+</dd>
+
+        
             
 <hr>
 <dt>
