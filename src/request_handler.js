@@ -1,7 +1,7 @@
 import {includes} from 'lodash';
 import Promise from './Promise.js';
 import {IDEMPOTENT_HTTP_VERBS, MAX_TOKEN_LATENCY} from './constants.js';
-import {RateLimitWarning, RateLimitError} from './errors.js';
+import {rateLimitWarning, RateLimitError} from './errors.js';
 const request = (
   // Use XHR if available, to avoid inflating the bundle size with all of the request-promise library.
   typeof XMLHttpRequest !== 'undefined' ? require('./xhr') : require('request-promise')
@@ -108,7 +108,7 @@ export function _awaitRatelimit () {
     if (this._config.continueAfterRatelimitError) {
       /* If the `continue_after_ratelimit_error` setting is enabled, queue the request, wait until the next ratelimit
       period, and then send it. */
-      this._warn(RateLimitWarning(timeUntilExpiry));
+      this._warn(rateLimitWarning(timeUntilExpiry));
       return Promise.delay(timeUntilExpiry);
     }
     // Otherwise, throw an error.
