@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.10.0 (2016-10-02)
+
+* Added `snoowrap.getAuthUrl` and `snoowrap.fromAuthCode` functions, to allow for easier authorization of arbitrary accounts in browsers.
+
 ## v1.9.0 (2016-09-24)
 
 * Added `PrivateMessage#deleteFromInbox`, which deletes a private message from the user's inbox.

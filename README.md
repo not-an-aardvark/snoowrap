@@ -181,7 +181,7 @@ snoowrap is usable with module bundlers such as [browserify](http://browserify.o
 Alternatively, prebuilt versions are available:
 
 * [snoowrap.js](https://not-an-aardvark.github.io/snoowrap/snoowrap-v1.js)
-* [snoowrap.min.js](https://not-an-aardvark.github.io/snoowrap/snoowrap-v1.min.js) (79kB gzipped)
+* [snoowrap.min.js](https://not-an-aardvark.github.io/snoowrap/snoowrap-v1.min.js) (77kB gzipped)
 
 When run in a browser, snoowrap will be assigned to the global variable `window.snoowrap`. If you want to avoid global state (or you're using two versions of snoowrap on the same page for some reason), use `snoowrap.noConflict()` to restore `window.snoowrap` to its previous value.
 
