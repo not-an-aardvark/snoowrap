@@ -10,6 +10,7 @@ import {
 } from './helpers.js';
 import createConfig from './create_config.js';
 import * as objects from './objects/index.js';
+
 const api_type = 'json';
 
 /** The class for a snoowrap requester.

@@ -7,6 +7,7 @@ const _ = require('lodash');
 const moment = require('moment');
 const util = require('util');
 const snoowrap = require('..');
+
 const isBrowser = typeof self !== 'undefined';
 describe('snoowrap', function () {
   this.timeout(60000);

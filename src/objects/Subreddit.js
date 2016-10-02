@@ -5,6 +5,7 @@ import {createReadStream} from 'fs';
 import {formatModPermissions, handleJsonErrors, renameKey} from '../helpers.js';
 import {InvalidMethodCallError} from '../errors.js';
 import RedditContent from './RedditContent.js';
+
 const api_type = 'json';
 
 /**

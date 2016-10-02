@@ -2,6 +2,7 @@ import {includes} from 'lodash';
 import Promise from './Promise.js';
 import {IDEMPOTENT_HTTP_VERBS, MAX_TOKEN_LATENCY} from './constants.js';
 import {rateLimitWarning, RateLimitError} from './errors.js';
+
 const request = (
   // Use XHR if available, to avoid inflating the bundle size with all of the request-promise library.
   typeof XMLHttpRequest !== 'undefined' ? require('./xhr') : require('request-promise')

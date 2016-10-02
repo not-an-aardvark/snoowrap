@@ -1,5 +1,6 @@
 import {getEmptyRepliesListing} from '../helpers.js';
 import VoteableContent from './VoteableContent.js';
+
 const api_type = 'json';
 
 /**

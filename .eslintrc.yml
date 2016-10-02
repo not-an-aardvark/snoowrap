@@ -92,13 +92,24 @@ rules:
   valid-typeof: [error, {requireStringLiterals: true}]
   wrap-iife: error
   yoda: error
-extends: eslint:recommended
+  import/prefer-default-export: error
+  import/newline-after-import: [error, always]
+  import/no-unassigned-import: error
+
+extends:
+  - eslint:recommended
+  - plugin:import/errors
+  - plugin:import/warnings
+
+plugins: [import]
+root: true
+
 parserOptions:
   ecmaVersion: 8
   sourceType: module
   ecmaFeatures:
     experimentalObjectRestSpread: true
+
 env:
   node: true
   es6: true
-root: true

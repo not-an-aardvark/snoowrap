@@ -1,4 +1,5 @@
 import {addSnakeCaseShadowProps} from './helpers.js';
+
 export default function () {
   const config = Object.create(null);
   config.endpointDomain = 'reddit.com';

@@ -1,6 +1,7 @@
 import Promise from '../Promise.js';
 import {handleJsonErrors} from '../helpers.js';
 import ReplyableContent from './ReplyableContent.js';
+
 const api_type = 'json';
 
 /**
