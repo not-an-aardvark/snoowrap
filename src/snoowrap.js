@@ -113,7 +113,7 @@ const snoowrap = class snoowrap {
   browser, using an "Installed" app type is recommended.
   * @param {string[]} options.scope An array of scopes (permissions on the user's account) to request on the authentication
   page. A list of possible scopes can be found [here](https://www.reddit.com/api/v1/scopes). You can also get them on-the-fly
-  with snoowrap#getOauthScopeList.
+  with {@link snoowrap#getOauthScopeList}.
   * @param {string} options.redirectUri The URL where the user should be redirected after authenticating. This **must** be the
   same as the redirect URI that is configured for the reddit app. (If there is a mismatch, the returned URL will display an
   error page instead of an authentication form.)
@@ -190,7 +190,7 @@ const snoowrap = class snoowrap {
   *   code: code,
   *   userAgent: 'My app',
   *   clientId: 'foobarbazquuux',
-  *   redirectUri: 'eample.com'
+  *   redirectUri: 'example.com'
   * }).then(r => {
   *   // Now we have a requester that can access reddit through the user's account
   *   return r.getHot().then(posts => {

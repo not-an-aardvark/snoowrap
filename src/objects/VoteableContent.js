@@ -74,6 +74,7 @@ const VoteableContent = class VoteableContent extends ReplyableContent {
   /**
   * @summary Distinguishes this Comment or Submission with a sigil.
   * @desc **Note:** This function will only work if the requester is the author of this Comment/Submission.
+  * @param {object} options
   * @param {boolean|string} [options.status=true] Determines how the item should be distinguished.
   `true` (default) signifies that the item should be moderator-distinguished, and
   `false` signifies that the item should not be distinguished. Passing a string (e.g.
