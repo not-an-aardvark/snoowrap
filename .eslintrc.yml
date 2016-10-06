@@ -89,6 +89,7 @@ rules:
   spaced-comment: error
   strict: [error, global]
   template-curly-spacing: error
+  unicode-bom: error
   valid-typeof: [error, {requireStringLiterals: true}]
   wrap-iife: error
   yoda: error
