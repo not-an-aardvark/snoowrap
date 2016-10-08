@@ -42,28 +42,34 @@ someLivethread.stream.on('update', data => {
 * @extends RedditContent
 */
 const LiveThread = class LiveThread extends RedditContent {
+  constructor (options, _r, _hasFetched) {
+    super(options, _r, _hasFetched);
+    this._rawStream = null;
+    this._populatedStream = null;
+    if (_hasFetched) {
+      Object.defineProperty(this, 'stream', {get: () => {
+        if (!this._populatedStream) {
+          this._setupWebSocket();
+        }
+        return this._populatedStream;
+      }});
+    }
+  }
   get _uri () {
     return `live/${this.id}/about`;
   }
-  _transformApiResponse (response) {
-    response._rawStream = null;
-    response._populatedStream = new EventEmitter();
-    Object.defineProperty(response, 'stream', {get: () => {
-      if (!response._rawStream) {
-        response._rawStream = new WebSocket(response.websocket_url);
-        const handler = data => {
-          const parsed = this._r._populate(JSON.parse(data));
-          response._populatedStream.emit(parsed.type, parsed.payload);
-        };
-        if (typeof response._rawStream.on === 'function') {
-          response._rawStream.on('message', handler);
-        } else {
-          response._rawStream.onmessage = messageEvent => handler(messageEvent.data);
-        }
-      }
-      return response._populatedStream;
-    }});
-    return response;
+  _setupWebSocket () {
+    this._rawStream = new WebSocket(this.websocket_url);
+    this._populatedStream = new EventEmitter();
+    const handler = data => {
+      const parsed = this._r._populate(JSON.parse(data));
+      this._populatedStream.emit(parsed.type, parsed.payload);
+    };
+    if (typeof this._rawStream.on === 'function') {
+      this._rawStream.on('message', handler);
+    } else {
+      this._rawStream.onmessage = messageEvent => handler(messageEvent.data);
+    }
   }
   /**
   * @summary Adds a new update to this thread.
@@ -272,7 +278,9 @@ const LiveThread = class LiveThread extends RedditContent {
   *
   */
   closeStream () {
-    this._rawStream.close();
+    if (this._rawStream) {
+      this._rawStream.close();
+    }
   }
 };
 
