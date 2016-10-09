@@ -1,4 +1,4 @@
-import {defaults, forEach, forOwn, includes, isEmpty, map, mapValues, omit, omitBy, snakeCase, values} from 'lodash';
+import {defaults, forOwn, includes, isEmpty, map, mapValues, omit, omitBy, snakeCase, values} from 'lodash';
 import Promise from './Promise.js';
 import promiseWrap from 'promise-chains';
 import util from 'util';
@@ -1086,9 +1086,7 @@ const snoowrap = class snoowrap {
   * // ]
   */
   searchSubredditTopics ({query}) {
-    return this._get({uri: 'api/subreddits_by_topic', qs: {query}}).then(results =>
-      map(results, 'name').map(result => this.getSubreddit(result))
-    );
+    return this._get({uri: 'api/subreddits_by_topic', qs: {query}}).map(result => this.getSubreddit(result.name));
   }
   /**
   * @summary Gets a list of subreddits that the currently-authenticated user is subscribed to.
@@ -1418,7 +1416,7 @@ const classFuncDescriptors = {configurable: true, writable: true};
 Object.defineProperties to ensure that the properties are non-enumerable. */
 Object.defineProperties(snoowrap.prototype, mapValues(requestHandler, func => ({value: func, ...classFuncDescriptors})));
 
-forEach(HTTP_VERBS, method => {
+HTTP_VERBS.forEach(method => {
   /* Define method shortcuts for each of the HTTP verbs. i.e. `snoowrap.prototype._post` is the same as `oauth_request` except
   that the HTTP method defaults to `post`, and the result is promise-wrapped. Use Object.defineProperty to ensure that the
   properties are non-enumerable. */

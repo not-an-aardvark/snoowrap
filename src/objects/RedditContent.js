@@ -1,4 +1,4 @@
-import {cloneDeep, forEach, mapValues, pick} from 'lodash';
+import {cloneDeep, mapValues, pick} from 'lodash';
 import Promise from '../Promise.js';
 import util from 'util';
 import {defineInspectFunc} from '../helpers.js';
@@ -122,7 +122,7 @@ defineInspectFunc(RedditContent.prototype, function () {
   return `${this.constructor._name} ${util.inspect(this._stripPrivateProps())}`;
 });
 
-forEach(HTTP_VERBS, method => {
+HTTP_VERBS.forEach(method => {
   Object.defineProperty(RedditContent.prototype, `_${method}`, {value (...args) {
     return this._r[`_${method}`](...args);
   }, configurable: true, writable: true});

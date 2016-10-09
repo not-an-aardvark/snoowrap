@@ -1,5 +1,5 @@
 import util from 'util';
-import {filter, find, forEach, includes, isEmpty, keyBy, omit, partial, property, remove, snakeCase} from 'lodash';
+import {find, includes, isEmpty, keyBy, omit, partial, property, remove, snakeCase} from 'lodash';
 import {MODERATOR_PERMISSIONS, LIVETHREAD_PERMISSIONS} from './constants.js';
 import {emptyChildren as emptyMoreObject} from './objects/More.js';
 
@@ -97,10 +97,8 @@ tree so that replies are threaded properly.
 */
 export function buildRepliesTree (childList) {
   const childMap = keyBy(childList, 'name');
-  forEach(childList, addEmptyRepliesListing);
-  forEach(filter(childList, child => child.constructor._name === 'Comment'), child => {
-    child.replies._more = emptyMoreObject;
-  });
+  childList.forEach(addEmptyRepliesListing);
+  childList.filter(child => child.constructor._name === 'Comment').forEach(child => child.replies._more = emptyMoreObject);
   remove(childList, child => childMap[child.parent_id]).forEach(child => {
     if (child.constructor._name === 'More') {
       childMap[child.parent_id].replies._setMore(child);
