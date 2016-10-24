@@ -1597,6 +1597,7 @@ describe('snoowrap', function () {
       });
     });
     it('can delete an update', done => {
+      // eslint-disable-next-line promise/catch-or-return
       thread.get_recent_updates()[0].then(most_recent_update => {
         thread.delete_update(most_recent_update);
       });
@@ -1613,6 +1614,7 @@ describe('snoowrap', function () {
       await thread.invite_contributor({name: 'actually_an_aardvark'}).then(expect.fail, _.noop);
     });
     it('can strike an update', done => {
+      // eslint-disable-next-line promise/catch-or-return
       thread.get_recent_updates()[0].then(most_recent_update => {
         thread.strike_update(most_recent_update);
       });

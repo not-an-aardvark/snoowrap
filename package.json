@@ -59,6 +59,7 @@
     "dirty-chai": "^1.2.2",
     "eslint": "^3.6.0",
     "eslint-plugin-import": "^2.0.0",
+    "eslint-plugin-promise": "^3.3.0",
     "ink-docstrap": "^1.2.1",
     "istanbul": "^1.0.0-alpha.2",
     "jsdoc": "^3.4.0",

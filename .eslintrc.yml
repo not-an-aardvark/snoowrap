@@ -96,13 +96,19 @@ rules:
   import/prefer-default-export: error
   import/newline-after-import: [error, always]
   import/no-unassigned-import: error
+  promise/catch-or-return: error
+  promise/no-return-wrap: error
+  promise/param-names: error
+  promise/no-native: error
 
 extends:
   - eslint:recommended
   - plugin:import/errors
   - plugin:import/warnings
+plugins:
+  - import
+  - promise
 
-plugins: [import]
 root: true
 
 parserOptions:
