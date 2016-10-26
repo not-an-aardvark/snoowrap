@@ -349,6 +349,28 @@ describe('snoowrap', function () {
     it('exposes a noConflict function to restore the previous version of window.snoowrap', () => {
       expect(snoowrap.noConflict()).to.equal(snoowrap);
     });
+    describe('subclassing', () => {
+      it('allows snoowrap to be subclassed, and makes requests based on shadowed functions', async () => {
+        const requestLog = [];
+        class SnoowrapSubclass extends snoowrap {
+          rawRequest (options) {
+            requestLog.push(options);
+            return super.rawRequest(options);
+          }
+        }
+        const subclassedRequester = new SnoowrapSubclass({
+          user_agent: oauthInfo.user_agent,
+          client_id: oauthInfo.client_id,
+          client_secret: oauthInfo.client_secret,
+          refresh_token: oauthInfo.refresh_token
+        });
+        const response = await subclassedRequester.getMe();
+        expect(response.name).to.equal(oauthInfo.username);
+        expect(requestLog.length).to.equal(2);
+        expect(requestLog[0].uri).to.equal('api/v1/access_token');
+        expect(requestLog[1].uri).to.equal('api/v1/me');
+      });
+    });
     afterEach(() => {
       r.config({request_delay: previous_request_delay, request_timeout: previous_request_timeout});
     });

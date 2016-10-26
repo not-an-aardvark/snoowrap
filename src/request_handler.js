@@ -1,12 +1,7 @@
-import {includes} from 'lodash';
+import {includes, merge} from 'lodash';
 import Promise from './Promise.js';
 import {IDEMPOTENT_HTTP_VERBS, MAX_TOKEN_LATENCY} from './constants.js';
 import {rateLimitWarning, RateLimitError} from './errors.js';
-
-const request = (
-  // Use XHR if available, to avoid inflating the bundle size with all of the request-promise library.
-  typeof XMLHttpRequest !== 'undefined' ? require('./xhr') : require('request-promise')
-).defaults({json: true, gzip: true});
 
 /**
 * @summary Sends an oauth-authenticated request to the reddit server, and returns the server's response.
@@ -52,7 +47,8 @@ export function oauthRequest (options, attempts = 1) {
     .then(() => this._awaitRequestDelay())
     .then(() => this.updateAccessToken())
     .then(token => {
-      return request.defaults({
+      return this.rawRequest(merge({
+        json: true,
         headers: {'user-agent': this.userAgent},
         baseUrl: `https://oauth.${this._config.endpointDomain}`,
         qs: {raw_json: 1},
@@ -70,7 +66,7 @@ export function oauthRequest (options, attempts = 1) {
           );
           return response;
         }
-      })(options);
+      }, options));
     }).then(response => {
       const populated = this._populate(response.body);
       if (populated && populated.constructor._name === 'Listing') {
@@ -155,11 +151,13 @@ snoowrap.prototype.credentialedClientRequest.call({
 * @instance
 */
 export function credentialedClientRequest (options) {
-  return request.defaults({
+  const requestFunc = this.rawRequest || rawRequest;
+  return Promise.resolve(requestFunc.call(this, merge({
+    json: true,
     auth: {user: this.clientId || this.client_id || '', pass: this.clientSecret || this.client_secret || ''},
     headers: {'user-agent': this.userAgent},
     baseUrl: this._config ? `https://www.${this._config.endpointDomain}` : undefined
-  })(options);
+  }, options)));
 }
 
 /**
@@ -171,10 +169,11 @@ export function credentialedClientRequest (options) {
 * @instance
 */
 export function unauthenticatedRequest (options) {
-  return request.defaults({
+  return Promise.resolve(this.rawRequest(merge({
+    json: true,
     headers: {'user-agent': this.userAgent},
     baseUrl: `https://www.${this._config.endpointDomain}`
-  })(options);
+  }, options)));
 }
 
 /**
@@ -205,3 +204,73 @@ export function updateAccessToken () {
   // Otherwise, just return the existing token.
   return Promise.resolve(this.accessToken);
 }
+
+/**
+* @function
+* @name rawRequest
+* @summary Sends an HTTP request
+* @desc **Note**: This function is called internally whenever snoowrap makes a request. You generally should not call this
+* function directly; use {@link snoowrap#oauthRequest} or another snoowrap function instead.
+*
+* This method allows snoowrap's request behavior to be customized via subclassing. If you create a snoowrap subclass and shadow
+* this method, all requests from snoowrap will pass through it.
+*
+* To ensure that all other snoowrap methods work correctly, the API for a shadowed version of this method must match the API for
+* the original `makeRequest` method. This method is based on the API of the
+* [request-promise](https://www.npmjs.com/package/request-promise) library, so if you do create a subclass, it might be helpful
+* to use `request-promise` internally. This will ensure that the API works correctly, so that you don't have to reimplement this
+* function's API from scratch.
+*
+* @param {object} options Options for the request
+* @param {boolean} options.json If `true`, the `Content-Type: application/json` header is added, and the response body will be
+* parsed as JSON automatically.
+* @param {string} options.baseUrl The base URL that a request should be sent to
+* @param {string} options.uri The uri that a request should be sent to, using the provided `baseUrl`.
+* @param {string} options.method='GET' Method for the request
+* @param {object} options.headers Headers for the request
+* @param {object} [options.qs] Querystring parameters for the request
+* @param {object} [options.form] Form data for the request. If provided, the `Content-Type: application/x-www-form-urlencoded`
+* header is set, and the provided object is serialized into URL-encoded form data in the request body.
+* @param {object} [options.formData] Multipart form data for the request. If provided, the `Content-Type: multipart/form-data`
+* header is set, and the provided object is serialized as multipart form data.
+* @param {object} [options.body] The body of the request. Should be converted to a string with JSON.stringify(). This is ignored
+* for GET requests, or of `options.form` or `options.formData` are provided.
+* @param {Function} [options.transform] A function that is called before the response Promise fulfills. Accepts two parameters:
+* `response.body` and `response`. This function should be called regardless of the status code of the response, and the returned
+* Promise from `makeRequest` should fulfill with its return value.
+* @param {boolean} [options.resolveWithFullResponse=false] If `true`, a Promise for the entire response is returned. If `false`,
+* a Promise for only the response body is returned. This is ignored if an `options.transform` function is provided.
+* @returns {Promise} A Promise for a response object. Depending on `options.transform` and `options.resolveWithFullResponse`,
+* the Promise should settle with either the response object itself, the body of the response, or the value returned by
+* `options.transform`. The Promise should be fulfilled if the status code is between 200 and 299, inclusive, and reject
+* otherwise. (If a redirect is returned from the server, the function should follow the redirect if possible, otherwise reject
+* with an error.) A response object has 4 properties: `statusCode` (number) the status code of the response, `body` (object)
+* the body of the response, `headers` (object) the parsed response headers, and `request` (object) an object of the form
+* `{method: 'GET', uri: {href: 'https://oauth.reddit.com/full/url'}}` representing information about the original request.
+* @memberof snoowrap
+* @instance
+* @example
+*
+* const snoowrap = require('snoowrap');
+*
+* class SnoowrapSubclass extends snoowrap {
+*   rawRequest(options) {
+*     // do custom behavior with `options` if you want, then call the regular rawRequest function
+*     console.log(`made a request with options:`);
+*     console.log(options);
+*     return super.rawRequest(options)
+*   }
+* }
+*
+* const request = require('request-promise');
+*
+* class AnotherSnoowrapSubclass extends snoowrap {
+*   rawRequest(options) {
+*     // send all requests through a proxy
+*     return request(Object.assign(options, {proxy: 'https://example.com'}))
+*   }
+* }
+*/
+export const rawRequest = typeof XMLHttpRequest !== 'undefined'
+  ? require('./xhr')
+  : require('request-promise').defaults({gzip: true});

@@ -1,5 +1,4 @@
 /* eslint-env browser */
-import {merge} from 'lodash';
 import Promise from './Promise.js';
 import url from 'url';
 import {stringify as createQueryString} from 'querystring';
@@ -9,12 +8,6 @@ import {RequestError, StatusCodeError} from './errors.js';
 // Previously, snoowrap depended on browserify to package `request-promise` for the browser bundle, and while this worked
 // properly, it caused the snoowrap bundle to be very large since `request-promise` contains many dependencies that snoowrap
 // doesn't actually need.
-
-function createRequester (defaultOptions = Object.create(null)) {
-  const requester = options => makeRequest(merge({}, defaultOptions, options));
-  requester.defaults = options => createRequester(merge({}, defaultOptions, options));
-  return requester;
-}
 
 function noop () {}
 
@@ -34,9 +27,9 @@ function parseHeaders (headerString) {
   }, {});
 }
 
-function makeRequest (options) {
+module.exports = function rawRequest (options) {
   // It would be nice to be able to use the `URL` API in browsers, but Safari 9 doesn't support `URLSearchParams`.
-  const parsedUrl = url.parse(options.url || url.resolve(options.baseUrl, options.uri), true);
+  const parsedUrl = url.parse(url.resolve(options.baseUrl, options.uri), true);
   parsedUrl.search = createQueryString(Object.assign({}, parsedUrl.query, options.qs));
   // create a new url object with the new qs params, to ensure that the `href` value changes (to use later for parsing response)
   const finalUrl = url.parse(parsedUrl.format());
@@ -97,6 +90,4 @@ function makeRequest (options) {
       xhr.abort();
       throw err;
     });
-}
-
-module.exports = createRequester();
+};

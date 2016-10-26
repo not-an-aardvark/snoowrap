@@ -206,12 +206,20 @@ const snoowrap = class snoowrap {
     redirectUri = requiredArg('redirectUri'),
     endpointDomain = 'reddit.com'
   }) {
-    return this.prototype.credentialedClientRequest.call({userAgent, clientId, clientSecret}, {
+    return this.prototype.credentialedClientRequest.call({
+      userAgent,
+      clientId,
+      clientSecret,
+      // Use `this.prototype.rawRequest` function to allow for custom `rawRequest` method usage in subclasses.
+      rawRequest: this.prototype.rawRequest
+    }, {
       method: 'post',
-      url: `https://www.${endpointDomain}/api/v1/access_token`,
+      baseUrl: `https://www.${endpointDomain}/`,
+      uri: 'api/v1/access_token',
       form: {grant_type: 'authorization_code', code, redirect_uri: redirectUri}
     }).then(response => {
-      const requester = new snoowrap({userAgent, clientId, clientSecret, ...response});
+      // Use `new this` instead of `new snoowrap` to ensure that subclass instances can be returned
+      const requester = new this({userAgent, clientId, clientSecret, ...response});
       requester.config({endpointDomain});
       return requester;
     });
