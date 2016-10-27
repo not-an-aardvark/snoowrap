@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.11.1 (2016-10-27)
+
+* Fixed a regression where `snoowrap#oauthRequest` only accepted a `uri` option and did not accept a `url` option.
+
 ## v1.11.0 (2016-10-27)
 
 * Added `snoowrap#getStickiedLivethread`, which gets the globally-stickied live-thread if one exists.
