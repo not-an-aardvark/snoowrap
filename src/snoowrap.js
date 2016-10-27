@@ -1255,6 +1255,16 @@ const snoowrap = class snoowrap {
     }).tap(handleJsonErrors(this)).then(result => this.getLivethread(result.json.data.id));
   }
   /**
+  * @summary Gets the "happening now" LiveThread, if it exists
+  * @desc This is the LiveThread that is occasionally linked at the top of reddit.com, relating to current events.
+  * @returns {Promise} A Promise that fulfills with the "happening now" LiveThread if it exists, or rejects with a 404 error
+  otherwise.
+  * @example r.getCurrentEventsLivethread().then(thread => thread.stream.on('update', console.log))
+  */
+  getStickiedLivethread () {
+    return this._get({uri: 'api/live/happening_now'});
+  }
+  /**
   * @summary Gets the user's own multireddits.
   * @returns {Promise} A Promise for an Array containing the requester's MultiReddits.
   * @example

@@ -1654,6 +1654,10 @@ describe('snoowrap', function () {
       await thread.set_contributor_permissions({name: 'not_an_aardvark'});
       expect(_.find(await thread.get_contributors(), {name: 'not_an_aardvark'}).permissions).to.eql(['all']);
     });
+    it('can get the "happening now" livethread, if it exists', async () => {
+      // Sometimes there won't be a thread, in which case a 404 error will be returned.
+      await r.getStickiedLivethread().catch({statusCode: 404}, _.noop);
+    });
     after(() => {
       thread.close_stream();
     });
