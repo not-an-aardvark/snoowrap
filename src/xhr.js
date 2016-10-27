@@ -29,7 +29,7 @@ function parseHeaders (headerString) {
 
 module.exports = function rawRequest (options) {
   // It would be nice to be able to use the `URL` API in browsers, but Safari 9 doesn't support `URLSearchParams`.
-  const parsedUrl = url.parse(url.resolve(options.baseUrl, options.uri), true);
+  const parsedUrl = url.parse(options.url || url.resolve(options.baseUrl, options.uri), true);
   parsedUrl.search = createQueryString(Object.assign({}, parsedUrl.query, options.qs));
   // create a new url object with the new qs params, to ensure that the `href` value changes (to use later for parsing response)
   const finalUrl = url.parse(parsedUrl.format());
