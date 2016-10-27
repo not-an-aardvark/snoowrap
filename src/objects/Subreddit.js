@@ -60,7 +60,7 @@ const Subreddit = class Subreddit extends RedditContent {
     }).return(this);
   }
   _createFlairTemplate ({
-      text, css_class, cssClass = css_class, flair_type, text_editable = false, textEditable = text_editable
+    text, css_class, cssClass = css_class, flair_type, text_editable = false, textEditable = text_editable
   }) {
     return this._post({
       uri: `r/${this.display_name}/api/flairtemplate`,
@@ -286,11 +286,11 @@ const Subreddit = class Subreddit extends RedditContent {
   * })
   */
   configureFlair ({
-      user_flair_enabled, userFlairEnabled = user_flair_enabled,
-      user_flair_position, userFlairPosition = user_flair_position,
-      user_flair_self_assign_enabled, userFlairSelfAssignEnabled = user_flair_self_assign_enabled,
-      link_flair_position, linkFlairPosition = link_flair_position,
-      link_flair_self_assign_enabled, linkFlairSelfAssignEnabled = link_flair_self_assign_enabled
+    user_flair_enabled, userFlairEnabled = user_flair_enabled,
+    user_flair_position, userFlairPosition = user_flair_position,
+    user_flair_self_assign_enabled, userFlairSelfAssignEnabled = user_flair_self_assign_enabled,
+    link_flair_position, linkFlairPosition = link_flair_position,
+    link_flair_self_assign_enabled, linkFlairSelfAssignEnabled = link_flair_self_assign_enabled
   }) {
     return this._post({uri: `r/${this.display_name}/api/flairconfig`, form: {
       api_type,
@@ -1129,11 +1129,11 @@ const Subreddit = class Subreddit extends RedditContent {
   * @example r.getSubreddit('snoowrap').banUser({name: 'actually_an_aardvark', banMessage: 'You are now banned LOL'})
   */
   banUser ({
-      name,
-      ban_message, banMessage = ban_message,
-      ban_reason, banReason = ban_reason,
-      duration,
-      ban_note, banNote = ban_note
+    name,
+    ban_message, banMessage = ban_message,
+    ban_reason, banReason = ban_reason,
+    duration,
+    ban_note, banNote = ban_note
   }) {
     return this._friend({
       name, ban_message: banMessage,

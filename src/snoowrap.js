@@ -56,18 +56,18 @@ const snoowrap = class snoowrap {
   * @param {string} [options.accessToken] An access token for your app
   */
   constructor ({
-      // The function signature for the constructor is a bit large due to the snake_case aliases. Essentially, it accepts an
-      // object with properties {userAgent, clientId, clientSecret, refreshToken, accessToken, username, password}.
-      // Additionally, if snake_case properties are provided and camelCase properties are not (e.g. `user_agent` is provided but
-      // `userAgent` is not), then the `userAgent` identifier gets set to the provided `user_agent` property. This is needed for
-      // backwards compatibility; snoowrap previously only accepted snake_case props, but now it also accepts camelCase props.
-      user_agent, userAgent = user_agent,
-      client_id, clientId = client_id,
-      client_secret, clientSecret = client_secret,
-      refresh_token, refreshToken = refresh_token,
-      access_token, accessToken = access_token,
-      username,
-      password
+    // The function signature for the constructor is a bit large due to the snake_case aliases. Essentially, it accepts an
+    // object with properties {userAgent, clientId, clientSecret, refreshToken, accessToken, username, password}.
+    // Additionally, if snake_case properties are provided and camelCase properties are not (e.g. `user_agent` is provided but
+    // `userAgent` is not), then the `userAgent` identifier gets set to the provided `user_agent` property. This is needed for
+    // backwards compatibility; snoowrap previously only accepted snake_case props, but now it also accepts camelCase props.
+    user_agent, userAgent = user_agent,
+    client_id, clientId = client_id,
+    client_secret, clientSecret = client_secret,
+    refresh_token, refreshToken = refresh_token,
+    access_token, accessToken = access_token,
+    username,
+    password
   } = {}) {
     if (!userAgent && !isBrowser) {
       return requiredArg('userAgent');
@@ -528,15 +528,15 @@ const snoowrap = class snoowrap {
     return this._post({uri: 'api/store_visits', links: map(links, 'name').join(',')});
   }
   _submit ({
-      captcha_response, captchaResponse = captcha_response,
-      captcha_iden, captchaIden = captcha_iden,
-      kind,
-      resubmit = true,
-      send_replies = true, sendReplies = send_replies,
-      text,
-      title,
-      url,
-      subreddit_name, subredditName = subreddit_name
+    captcha_response, captchaResponse = captcha_response,
+    captcha_iden, captchaIden = captcha_iden,
+    kind,
+    resubmit = true,
+    send_replies = true, sendReplies = send_replies,
+    text,
+    title,
+    url,
+    subreddit_name, subredditName = subreddit_name
   }) {
     return this._post({uri: 'api/submit', form: {
       api_type, captcha: captchaResponse, iden: captchaIden, sendreplies: sendReplies, sr: subredditName, kind, resubmit,
@@ -876,12 +876,12 @@ const snoowrap = class snoowrap {
   * // (message created on reddit)
   */
   composeMessage ({
-      captcha,
-      from_subreddit, fromSubreddit = from_subreddit,
-      captcha_iden, captchaIden = captcha_iden,
-      subject,
-      text,
-      to
+    captcha,
+    from_subreddit, fromSubreddit = from_subreddit,
+    captcha_iden, captchaIden = captcha_iden,
+    subject,
+    text,
+    to
   }) {
     let parsedTo = to;
     let parsedFromSr = fromSubreddit;
@@ -1299,7 +1299,7 @@ const snoowrap = class snoowrap {
   * => MultiReddit { display_name: 'myMulti', ... }
   */
   createMultireddit ({name, description, subreddits, visibility = 'private', icon_name = '', key_color = '#000000',
-      weighting_scheme = 'classic'}) {
+    weighting_scheme = 'classic'}) {
     return this._post({uri: 'api/multi', form: {model: JSON.stringify({
       display_name: name,
       description_md: description,
