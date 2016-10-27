@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.11.0 (2016-10-27)
+
+* Added `snoowrap#getStickiedLivethread`, which gets the globally-stickied live-thread if one exists.
+* Added `snoowrap#rawRequest`, which exposes raw request functionality. This is useful for snoowrap subclasses that want to use custom request logic.
+
 ## v1.10.0 (2016-10-02)
 
 * Added `snoowrap.getAuthUrl` and `snoowrap.fromAuthCode` functions, to allow for easier authorization of arbitrary accounts in browsers.
