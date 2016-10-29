@@ -11,6 +11,7 @@ const snoowrap = require('..');
 
 const isBrowser = typeof self !== 'undefined';
 describe('snoowrap', function () {
+  // TODO: split this test into multiple files
   this.timeout(60000);
   this.slow(Infinity);
   let oauthInfo, r, r2, cookieAgent;
