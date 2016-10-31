@@ -1044,7 +1044,7 @@ describe('snoowrap', function () {
     it('checks whether the current account needs to fill out a captcha to post', async () => {
       expect(await r.check_captcha_requirement()).to.be.a('boolean');
     });
-    it('can fetch a new captcha on request', async () => {
+    it.skip('can fetch a new captcha on request', async () => {
       const iden = await r.get_new_captcha_identifier();
       expect(iden).to.be.a('string');
       const image = await r.get_captcha_image(iden);
