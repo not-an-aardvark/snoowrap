@@ -1417,6 +1417,11 @@ describe('snoowrap', function () {
       expect(await message2.refresh().new).to.be.false();
       expect(_.map(await r.get_unread_messages(), 'name')).to.not.include('t1_d403ctb');
     });
+    it("doesn't throw an error when fetching messages without replies", async () => {
+      const message = await r.getMessage('6vp176').fetch();
+      expect(message.body).to.equal('foo bar');
+      expect(message.replies.length).to.equal(0);
+    });
   });
 
   describe('inbox operations', () => {

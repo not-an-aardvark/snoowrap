@@ -15,7 +15,7 @@ const PrivateMessage = class PrivateMessage extends ReplyableContent {
     return `message/messages/${this.name.slice(3)}`;
   }
   _transformApiResponse (response) {
-    response[0].replies = buildRepliesTree(response[0].replies);
+    response[0].replies = buildRepliesTree(response[0].replies || []);
     return findMessageInTree(this.name, response[0]);
   }
   // TODO: Get rid of the repeated code here, most of these methods are exactly the same with the exception of the URIs
