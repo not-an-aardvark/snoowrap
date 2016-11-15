@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.11.2 (2016-11-15)
+
+* Fixed an issue where snoowrap threw an error when fetching PrivateMessages with no replies.
+* Fixed an issue where ratelimit errors caused a confusing error message.
+* Fixed an issue where Promises returned by `snoowrap#checkCaptchaRequirement` sometimes fulfilled with something other than a boolean.
+
 ## v1.11.1 (2016-10-27)
 
 * Fixed a regression where `snoowrap#oauthRequest` only accepted a `uri` option and did not accept a `url` option.
