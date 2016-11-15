@@ -653,7 +653,7 @@ const Subreddit = class Subreddit extends RedditContent {
   * // => '.md blockquote,.md del,body{color:#121212}.usertext-body ... '
   */
   getStylesheet () {
-    return this._get({uri: `r/${this.display_name}/stylesheet`, json: false, transform: response => response});
+    return this._get({uri: `r/${this.display_name}/stylesheet`, json: false});
   }
   /**
   * @summary Conducts a search of reddit submissions, restricted to this subreddit.

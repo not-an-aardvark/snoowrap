@@ -72,7 +72,7 @@ export function oauthRequest (options, attempts = 1) {
       if (populated && populated.constructor._name === 'Listing') {
         populated._setUri(response.request.uri.href);
       }
-      return populated || response;
+      return populated;
     }).catch(...this._config.retryErrorCodes.map(retryCode => ({statusCode: retryCode})), e => {
       if (!includes(IDEMPOTENT_HTTP_VERBS, e.response.request.method) || attempts >= this._config.maxRetryAttempts) {
         throw e;
