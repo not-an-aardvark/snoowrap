@@ -2,8 +2,8 @@
 import {API_RULES_LINK, DOCS_LINK, MODULE_NAME} from './constants.js';
 
 export class RateLimitError extends Error {
-  constructor (message = `${MODULE_NAME} refused to continue because reddit's ratelimit was exceeded. For more information about reddit's ratelimit, please consult reddit's API rules at ${API_RULES_LINK}.`) {
-    super(message);
+  constructor () {
+    super(`${MODULE_NAME} refused to continue because reddit's ratelimit was exceeded. For more information about reddit's ratelimit, please consult reddit's API rules at ${API_RULES_LINK}.`);
   }
 }
 
