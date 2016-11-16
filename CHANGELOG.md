@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.11.3 (2016-11-16)
+
+* Fixed an issue where `Listing#fetchMore` returned incorrect results when fetching very large Listings with the `append` option
+
 ## v1.11.2 (2016-11-15)
 
 * Fixed an issue where snoowrap threw an error when fetching PrivateMessages with no replies.
