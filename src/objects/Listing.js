@@ -126,7 +126,7 @@ const Listing = class Listing extends Array {
       throw new InvalidMethodCallError('Failed to fetch Listing. (`amount` parameter was missing or invalid)');
     }
     if (parsedOptions.amount <= 0 || this.isFinished) {
-      return this._r._promiseWrap(Promise.resolve(this._clone()));
+      return this._r._promiseWrap(Promise.resolve(parsedOptions.append ? this._clone() : this._clone()._empty()));
     }
     if (this._cachedLookahead) {
       const cloned = this._clone();
@@ -180,7 +180,7 @@ const Listing = class Listing extends Array {
           cloned._cachedLookahead = Array.from(cloned.splice(options.amount));
         }
       }
-      return cloned.fetchMore({...options, amount: options.amount - response.length});
+      return cloned.fetchMore({...options, append: true, amount: options.amount - response.length});
     });
   }
   /* Pagination for comments works differently than it does for most other things; rather than sending a link to the next page
@@ -212,7 +212,7 @@ const Listing = class Listing extends Array {
   }
   fetchUntil (options) {
     this._r._warn('Listing#fetchUntil is deprecated -- use Listing#fetchMore instead.');
-    return this.fetchMore({...options, amount: options.length - this.length});
+    return this.fetchMore({...options, append: true, amount: options.length - this.length});
   }
   _clone ({deep = false} = {}) {
     const properties = pick(this, Object.keys(INTERNAL_DEFAULTS));
@@ -231,6 +231,7 @@ const Listing = class Listing extends Array {
   }
   _empty () {
     this.splice(0, this.length);
+    return this;
   }
   toJSON () {
     return Array.from(this).map(item => item && item.toJSON ? item.toJSON() : item);

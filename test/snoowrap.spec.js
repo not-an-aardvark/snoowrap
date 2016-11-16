@@ -768,6 +768,12 @@ describe('snoowrap', function () {
       expect(_.map(expanded_list, 'id').slice(0, 20)).to.eql(_.map(initial_list, 'id'));
       expect(_.map(expanded_list, 'id').slice(20)).to.eql(_.map(next_list_part, 'id'));
     });
+    it('returns an empty list if `append` is provided and there are no remaining items', async () => {
+      const initialList = await r.getTop({t: 'all', limit: 5});
+      expect(initialList).to.have.lengthOf(5);
+      const additionalItems = await initialList.fetchMore({amount: 0, append: false});
+      expect(additionalItems).to.have.lengthOf(0);
+    });
     it('allows an `append` parameter indicating whether new elements should be passed to comment Listings', async () => {
       const initial_comment_length = comments.length;
       const expanded_comments = await comments.fetch_more({amount: 10});
