@@ -365,7 +365,7 @@ const Subreddit = class Subreddit extends RedditContent {
   * @example
   *
   * r.getSubreddit('snoowrap').submitSelfpost({title: 'this is a selfpost', text: "hi, how's it going?"}).then(console.log)
-  * // => Submission { title: 'this is a selfpost', ... }
+  * // => Submission { name: 't3_4abmsz' }
   */
   submitSelfpost (options) {
     return this._r.submitSelfpost({...options, subredditName: this.display_name});
@@ -385,7 +385,7 @@ const Subreddit = class Subreddit extends RedditContent {
   * @example
   *
   * r.getSubreddit('snoowrap').submitLink({title: 'I found a cool website', url: 'https://google.com'}).then(console.log)
-  * // => Submission { title: 'I found a cool website', ... }
+  * // => Submission { name: 't3_4abmsz' }
   */
   submitLink (options) {
     return this._r.submitLink({...options, subredditName: this.display_name});
