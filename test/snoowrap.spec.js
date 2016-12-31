@@ -1010,6 +1010,17 @@ describe('snoowrap', function () {
       expect(additional_comments.is_finished).to.be.false();
       expect(additional_comments._cachedLookahead).to.have.lengthOf(comments._cachedLookahead.length - 1);
     });
+    it('can get rising posts', async () => {
+      const list = await r.getRising('gifs', {limit: 2});
+      expect(list).to.have.lengthOf(2);
+      expect(list.every(post => post instanceof snoowrap.objects.Submission)).to.be.true();
+      const list2 = await r.getSubreddit('gifs').getRising({limit: 2});
+      expect(list2).to.have.lengthOf(2);
+      expect(list2.every(post => post instanceof snoowrap.objects.Submission)).to.be.true();
+      const list3 = await r.getRising({limit: 2});
+      expect(list3).to.have.lengthOf(2);
+      expect(list3.every(post => post instanceof snoowrap.objects.Submission)).to.be.true();
+    });
   });
 
   describe('self-property fetching', () => {

@@ -489,6 +489,22 @@ const Subreddit = class Subreddit extends RedditContent {
     return this._r.getControversial(this.display_name, options);
   }
   /**
+  * @summary Gets a Listing of top posts on this subreddit.
+  * @param {object} [options] Options for the resulting Listing
+  * @returns {Promise} A Listing containing the retrieved submissions
+  * @example
+  *
+  * r.getSubreddit('snoowrap').getRising().then(console.log)
+  * // => Listing [
+  * //  Submission { ... },
+  * //  Submission { ... },
+  * //  ...
+  * // ]
+  */
+  getRising (options) {
+    return this._r.getRising(this.display_name, options);
+  }
+  /**
   * @summary Gets the moderator mail for this subreddit.
   * @param {object} [options] Options for the resulting Listing
   * @returns {Promise} A Listing containing PrivateMessage objects

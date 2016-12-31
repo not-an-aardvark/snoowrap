@@ -734,6 +734,23 @@ const snoowrap = class snoowrap {
     return this._getSortedFrontpage('controversial', subredditName, options);
   }
   /**
+  * @summary Gets a Listing of controversial posts.
+  * @param {string} [subredditName] The subreddit to get posts from. If not provided, posts are fetched from
+  the front page of reddit.
+  * @param {object} [options] Options for the resulting Listing
+  * @returns {Promise} A Listing containing the retrieved submissions
+  * @example
+  *
+  * r.getRising('technology').then(console.log)
+  * // => Listing [
+  * //  Submission { domain: 'thenextweb.com', banned_by: null, subreddit: Subreddit { display_name: 'technology' }, ... },
+  * //  Submission { domain: 'pcmag.com', banned_by: null, subreddit: Subreddit { display_name: 'technology' }, ... }
+  * // ]
+  */
+  getRising (subredditName, options) {
+    return this._getSortedFrontpage('rising', subredditName, options);
+  }
+  /**
   * @summary Gets the authenticated user's unread messages.
   * @param {object} [options={}] Options for the resulting Listing
   * @returns {Promise} A Listing containing unread items in the user's inbox
