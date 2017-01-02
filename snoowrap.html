@@ -6680,6 +6680,213 @@ r.getTop(&#x27;AskReddit&#x27;).then(console.log)
             
 <hr>
 <dt>
+    <h4 class="name" id="getRising"><span class="type-signature"></span>getRising( [subredditName] [, options])</h4>
+    
+    
+    <p class="summary">Gets a Listing of controversial posts.</p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>subredditName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The subreddit to get posts from. If not provided, posts are fetched from
+  the front page of reddit.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Options for the resulting Listing</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Listing containing the retrieved submissions</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.getRising(&#x27;technology&#x27;).then(console.log)
+// =&gt; Listing [
+//  Submission { domain: &#x27;thenextweb.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;technology&#x27; }, ... },
+//  Submission { domain: &#x27;pcmag.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;technology&#x27; }, ... }
+// ]</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
     <h4 class="name" id="getUnreadMessages"><span class="type-signature"></span>getUnreadMessages( [options])</h4>
     
     

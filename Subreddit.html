@@ -3568,7 +3568,7 @@ r.getSubreddit(&#x27;snoowrap&#x27;).setMultipleUserFlairs([
         <h5>Example</h5>
         
     <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).submitSelfpost({title: &#x27;this is a selfpost&#x27;, text: &quot;hi, how&#x27;s it going?&quot;}).then(console.log)
-// =&gt; Submission { title: &#x27;this is a selfpost&#x27;, ... }</pre>
+// =&gt; Submission { name: &#x27;t3_4abmsz&#x27; }</pre>
 
 
     
@@ -3985,7 +3985,7 @@ r.getSubreddit(&#x27;snoowrap&#x27;).setMultipleUserFlairs([
         <h5>Example</h5>
         
     <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).submitLink({title: &#x27;I found a cool website&#x27;, url: &#x27;https://google.com&#x27;}).then(console.log)
-// =&gt; Submission { title: &#x27;I found a cool website&#x27;, ... }</pre>
+// =&gt; Submission { name: &#x27;t3_4abmsz&#x27; }</pre>
 
 
     
@@ -5127,6 +5127,179 @@ r.getSubreddit(&#x27;snoowrap&#x27;).setMultipleUserFlairs([
 // =&gt; Listing [
 //  Comment { ... },
 //  Comment { ... },
+//  ...
+// ]</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getRising"><span class="type-signature"></span>getRising( [options])</h4>
+    
+    
+    <p class="summary">Gets a Listing of top posts on this subreddit.</p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Options for the resulting Listing</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Listing containing the retrieved submissions</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getRising().then(console.log)
+// =&gt; Listing [
+//  Submission { ... },
+//  Submission { ... },
 //  ...
 // ]</pre>
 
