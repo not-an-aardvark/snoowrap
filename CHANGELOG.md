@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.12.0 (2017-01-01)
+
+* Added `snoowrap#getRising` and `subreddit#getRising` to get a list of "rising" posts on reddit
+* Fixed an issue where Webpack would throw "missing dependency" errors when including snoowrap
+
 ## v1.11.3 (2016-11-16)
 
 * Fixed an issue where `Listing#fetchMore` returned incorrect results when fetching very large Listings with the `append` option
