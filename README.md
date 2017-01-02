@@ -180,8 +180,10 @@ snoowrap is usable with module bundlers such as [browserify](http://browserify.o
 
 Alternatively, prebuilt versions are available:
 
-* [snoowrap.js](https://not-an-aardvark.github.io/snoowrap/snoowrap-v1.js)
-* [snoowrap.min.js](https://not-an-aardvark.github.io/snoowrap/snoowrap-v1.min.js) (79kB gzipped)
+* [snoowrap-v1.js](https://not-an-aardvark.github.io/snoowrap/snoowrap-v1.js)
+* [snoowrap-v1.min.js](https://not-an-aardvark.github.io/snoowrap/snoowrap-v1.min.js) (79kB gzipped)
+
+These files will occasionally be updated as new versions of snoowrap 1 are released. Since snoowrap follows semantic versioning, the changes should not break your code. However, if you would prefer to pin the version, you can specify a version number in the URL (e.g. [snoowrap-v1.11.3.min.js](https://not-an-aardvark.github.io/snoowrap/snoowrap-v1.11.3.min.js)). For a list of all available prebuilt versions, see the [gh-pages branch](https://github.com/not-an-aardvark/snoowrap/tree/gh-pages) of this repository.
 
 When run in a browser, snoowrap will be assigned to the global variable `window.snoowrap`. If you want to avoid global state (or you're using two versions of snoowrap on the same page for some reason), use `snoowrap.noConflict()` to restore `window.snoowrap` to its previous value.
 
