@@ -71,6 +71,7 @@
     "node": ">=4.0.0"
   },
   "browser": {
+    "fs": false,
     "request-promise": false,
     "util": false,
     "ws": false
