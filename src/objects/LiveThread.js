@@ -48,7 +48,7 @@ const LiveThread = class LiveThread extends RedditContent {
     this._populatedStream = null;
     if (_hasFetched) {
       Object.defineProperty(this, 'stream', {get: () => {
-        if (!this._populatedStream) {
+        if (!this._populatedStream && this.websocket_url) {
           this._setupWebSocket();
         }
         return this._populatedStream;

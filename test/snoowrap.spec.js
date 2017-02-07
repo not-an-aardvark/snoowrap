@@ -726,19 +726,19 @@ describe('snoowrap', function () {
     it('can fetch more comment items and get a new Listing without modifying the original Listing', async () => {
       const initial_comments_length = comments.length;
       const initial_comments_morechildren_length = comments._more.children.length;
-      const more_comments = await comments.fetch_more(10);
+      const more_comments = await comments.fetch_more(5);
       expect(comments).to.have.lengthOf(initial_comments_length);
       expect(comments._more.children).to.have.lengthOf(initial_comments_morechildren_length);
-      expect(more_comments).to.have.lengthOf(comments.length + 10);
-      expect(more_comments._more.children).to.have.lengthOf(initial_comments_morechildren_length - 10);
+      expect(more_comments).to.have.lengthOf(comments.length + 5);
+      expect(more_comments._more.children).to.have.lengthOf(initial_comments_morechildren_length - 5);
       expect(comments[0].name).to.equal(more_comments[0].name);
-      expect(_.map(more_comments.slice(-10), 'id').sort()).to.eql(comments._more.children.slice(0, 10).sort());
-      const more_comments_duplicate = await comments.fetch_more(10);
+      expect(_.map(more_comments.slice(-5), 'id').sort()).to.eql(comments._more.children.slice(0, 5).sort());
+      const more_comments_duplicate = await comments.fetch_more(5);
       expect(_.map(more_comments, 'name').sort()).to.eql(_.map(more_comments_duplicate, 'name').sort());
-      const even_more_comments = await more_comments.fetch_more(10);
-      expect(even_more_comments).to.have.lengthOf(comments.length + 20);
-      expect(_.map(even_more_comments.slice(0, -10), 'name').sort()).to.eql(_.map(more_comments, 'name').sort());
-      expect(_.map(even_more_comments.slice(-10), 'name').sort()).to.not.eql(_.map(more_comments.slice(-10), 'name').sort());
+      const even_more_comments = await more_comments.fetch_more(5);
+      expect(even_more_comments).to.have.lengthOf(comments.length + 10);
+      expect(_.map(even_more_comments.slice(0, -5), 'name').sort()).to.eql(_.map(more_comments, 'name').sort());
+      expect(_.map(even_more_comments.slice(-5), 'name').sort()).to.not.eql(_.map(more_comments.slice(-5), 'name').sort());
     });
     it('can fetch more regular items and get a new Listing without modifying the original Listing', async () => {
       const initial_list = await r.get_top({t: 'all'});
@@ -831,10 +831,10 @@ describe('snoowrap', function () {
     it('allows replies to be expanded by default for comment listings', async () => {
       const comments = await submission.comments;
       const initial_length = comments.length;
-      const expanded_comments = await comments.fetch_more(15);
-      expect(expanded_comments).to.have.lengthOf(initial_length + 15);
+      const expanded_comments = await comments.fetch_more(10);
+      expect(expanded_comments).to.have.lengthOf(initial_length + 10);
       expect(_.last(expanded_comments).replies).to.be.an.instanceof(snoowrap.objects.Listing);
-      const nested_replies = _.compact(_.flatMap(expanded_comments.slice(-15), 'replies'));
+      const nested_replies = _.compact(_.flatMap(expanded_comments, 'replies'));
       expect(nested_replies).to.not.be.empty();
       expect(nested_replies[0].replies).to.be.an.instanceof(snoowrap.objects.Listing);
     });
@@ -1631,7 +1631,7 @@ describe('snoowrap', function () {
   describe('livethreads', () => {
     let thread;
     before(async () => {
-      thread = r.get_livethread('whrdxo8dg9n0');
+      thread = r.get_livethread('yebyckcrf2ln');
       await thread.fetch();
     });
     it('can add and listen for content on a livethread using websockets', done => {

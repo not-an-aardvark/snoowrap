@@ -1,5 +1,5 @@
 import {includes, merge} from 'lodash';
-import Promise from './Promise.js';
+import Promise from './Promise.js' ;
 import {IDEMPOTENT_HTTP_VERBS, MAX_TOKEN_LATENCY} from './constants.js';
 import {rateLimitWarning, RateLimitError} from './errors.js';
 
