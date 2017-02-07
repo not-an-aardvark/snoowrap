@@ -12,7 +12,7 @@ import {emptyChildren as emptyMoreObject} from './objects/More.js';
 export function getEmptyRepliesListing (item) {
   if (item.constructor._name === 'Comment') {
     return item._r._newObject('Listing', {
-      _uri: `comments/${item.link_id.slice(3)}`,
+      _uri: `comments/${(item.link_id || item.parent_id).slice(3)}`,
       _query: {comment: item.name.slice(3)},
       _transform: property('comments[0].replies'),
       _link_id: item.link_id,

@@ -6,7 +6,13 @@ import * as requestHandler from './request_handler.js';
 import {HTTP_VERBS, KINDS, MAX_LISTING_ITEMS, MODULE_NAME, USER_KEYS, SUBREDDIT_KEYS, VERSION} from './constants.js';
 import * as errors from './errors.js';
 import {
-  addFullnamePrefix, addSnakeCaseShadowProps, defineInspectFunc, handleJsonErrors, isBrowser, requiredArg
+  addEmptyRepliesListing,
+  addFullnamePrefix,
+  addSnakeCaseShadowProps,
+  defineInspectFunc,
+  handleJsonErrors,
+  isBrowser,
+  requiredArg
 } from './helpers.js';
 import createConfig from './create_config.js';
 import * as objects from './objects/index.js';
@@ -1416,7 +1422,12 @@ const snoowrap = class snoowrap {
       other meta-properties,  the function will still end up throwing an error, but there's not really any good way to handle it
       (predicting upstream changes can only go so far). More importantly, in the limited cases where it's used, the fallback
       should have no effect on the returned results */
-      : this._get({uri, qs: mergedQuery});
+      : this._get({uri, qs: mergedQuery}).then(listing => {
+        if (Array.isArray(listing)) {
+          listing.filter(item => item.constructor._name === 'Comment').forEach(addEmptyRepliesListing);
+        }
+        return listing;
+      });
   }
   /**
   * @summary In browsers, restores the `window.snoowrap` property to whatever it was before this instance of snoowrap was

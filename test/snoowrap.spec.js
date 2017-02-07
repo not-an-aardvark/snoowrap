@@ -1327,6 +1327,12 @@ describe('snoowrap', function () {
     it('can get edited items', async () => {
       expect(await sub.get_edited()).to.be.an.instanceof(snoowrap.objects.Listing);
     });
+    it('can get replies to edited items', async () => {
+      const editedItems = await sub.getEdited();
+      const editedCommentWithReply = editedItems.find(comment => comment.body === 'foo bar (edited)');
+      expect(editedCommentWithReply.replies.isFinished).to.be.false();
+      expect(await editedCommentWithReply.replies.fetchAll().get('length')).to.be.above(0);
+    });
   });
 
   describe('comment/post actions', () => {
