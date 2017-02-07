@@ -71,6 +71,25 @@ const Submission = class Submission extends VoteableContent {
     return this._post({uri: 'api/unmarknsfw', form: {id: this.name}}).return(this);
   }
   /**
+  * @summary Mark a submission as a spoiler
+  * @desc **Note:** This will silently fail if the subreddit has disabled spoilers.
+  * @returns {Promise} A Promise that fulfills with this Submission when the request is complete
+  * @example r.getSubmission('2np694').markSpoiler()
+  */
+  markSpoiler () {
+    return this._post({uri: 'api/spoiler', form: {id: this.name}}).return(this);
+  }
+
+  /**
+  * @summary Unmark a submission as a spoiler
+  * @returns {Promise} A Promise that fulfills with this Submission when the request is complete
+  * @example r.getSubmission('2np694').unmarkSpoiler()
+  */
+  unmarkSpoiler () {
+    return this._post({uri: 'api/unspoiler', form: {id: this.name}}).return(this);
+  }
+
+  /**
   * @summary Sets the contest mode status of this submission.
   * @private
   * @param {boolean} state The desired contest mode status

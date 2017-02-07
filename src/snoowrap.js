@@ -1021,6 +1021,7 @@ const snoowrap = class snoowrap {
     spam_comments = 'high',
     spam_links = 'high',
     spam_selfposts = 'high',
+    spoilers_enabled = false,
     sr,
     submit_link_label = '',
     submit_text_label = '',
@@ -1036,8 +1037,9 @@ const snoowrap = class snoowrap {
     return this._post({uri: 'api/site_admin', form: {
       allow_top, api_type, captcha, collapse_deleted_comments, comment_score_hide_mins, description, exclude_banned_modqueue,
       'header-title': header_title, hide_ads, iden: captcha_iden, lang, link_type, name, over_18, public_description,
-      public_traffic, show_media, spam_comments, spam_links, spam_selfposts, sr, submit_link_label, submit_text,
-      submit_text_label, suggested_comment_sort, title, type: subreddit_type || type, wiki_edit_age, wiki_edit_karma, wikimode
+      public_traffic, show_media, spam_comments, spam_links, spam_selfposts, spoilers_enabled, sr, submit_link_label,
+      submit_text, submit_text_label, suggested_comment_sort, title, type: subreddit_type || type, wiki_edit_age,
+      wiki_edit_karma, wikimode
     }}).then(handleJsonErrors(this.getSubreddit(name || sr)));
   }
   /**
@@ -1085,6 +1087,7 @@ const snoowrap = class snoowrap {
   * @param {string} [options.suggested_comment_sort=undefined] The suggested comment sort for the subreddit. This should be
   one of `confidence, top, new, controversial, old, random, qa`.If left blank, there will be no suggested sort,
   which means that users will see the sort method that is set in their own preferences (usually `confidence`.)
+  * @param {boolean} [options.spoilers_enabled=false] Determines whether users can mark their posts as spoilers
   * @returns {Promise} A Promise for the newly-created subreddit object.
   * @example
   *

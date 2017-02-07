@@ -684,6 +684,12 @@ describe('snoowrap', function () {
       await submission.unmark_nsfw();
       expect(await submission.refresh().over_18).to.be.false();
     });
+    it('can mark/unmark a submission as a spoiler', async () => {
+      await submission.markSpoiler();
+      expect(await submission.refresh().get('spoiler')).to.be.true();
+      await submission.unmarkSpoiler();
+      expect(await submission.refresh().get('spoiler')).to.be.false();
+    });
     it('can enable/disable contest mode on a submission', async () => {
       /* There's no way to check whether a submission is in contest mode using the OAuth API, so just make sure the functions
       don't throw errors. */

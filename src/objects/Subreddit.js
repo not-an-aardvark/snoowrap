@@ -522,7 +522,7 @@ const Subreddit = class Subreddit extends RedditContent {
   acceptmoderatorinvite, removemoderator, addcontributor, removecontributor, editsettings, editflair, distinguish, marknsfw,
   wikibanned, wikicontributor, wikiunbanned, wikipagelisted, removewikicontributor, wikirevise, wikipermlevel,
   ignorereports, unignorereports, setpermissions, setsuggestedsort, sticky, unsticky, setcontestmode, unsetcontestmode,
-  lock, unlock, muteuser, unmuteuser, createrule, editrule, deleterule`
+  lock, unlock, muteuser, unmuteuser, createrule, editrule, deleterule, spoiler, unspoiler`
   * @returns {Promise} A Listing containing moderation actions
   * @example
   *
@@ -883,6 +883,7 @@ const Subreddit = class Subreddit extends RedditContent {
   * @param {string} [options.suggested_comment_sort=undefined] The suggested comment sort for the subreddit. This should be
   one of `confidence, top, new, controversial, old, random, qa`.If left blank, there will be no suggested sort,
   which means that users will see the sort method that is set in their own preferences (usually `confidence`.)
+  * @param {boolean} [options.spoilers_enabled=false] Determines whether users can mark their posts as spoilers
   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
   * @example r.getSubreddit('snoowrap').editSettings({submit_text: 'Welcome! Please be sure to read the rules.'})
   */
