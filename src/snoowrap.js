@@ -675,8 +675,8 @@ const snoowrap = class snoowrap {
   * // => Submission { domain: 'self.AskReddit', banned_by: null, subreddit: Subreddit { display_name: 'AskReddit' }, ... }
   * // => ...
   */
-  getNewStream (subredditName, options) {
-    return new snoowrap.objects.EventStream(1, 'submission', this.getNew, subredditName, options);
+  getNewStream (subredditName, options = {}) {
+    return new snoowrap.objects.EventStream(options.rate || 1000, 'submission', this.getNew, subredditName, options);
   }
   /**
   * @summary Gets a Listing of new comments.
@@ -708,8 +708,8 @@ const snoowrap = class snoowrap {
   * // => Comment { link_title: 'How far back in time could you go and still understand English?', ... }
   * // => ...
   */
-  getNewCommentStream (subredditName, options) {
-    return new snoowrap.objects.EventStream(1, 'comment', this.getNewComments, subredditName, options);
+  getNewCommentStream (subredditName, options = {}) {
+    return new snoowrap.objects.EventStream(options.rate || 1000, 'comment', this.getNewComments, subredditName, options);
   }
   /**
   * @summary Gets a single random Submission.
