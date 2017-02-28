@@ -429,7 +429,7 @@ const Subreddit = class Subreddit extends RedditContent {
   * @returns {Promise} A Listing containing the retrieved comments
   * @example
   *
-  * r.getSubreddit('snoowrap').getHot().then(console.log)
+  * r.getSubreddit('snoowrap').getNewComments().then(console.log)
   * // => Listing [
   * //  Comment { ... },
   * //  Comment { ... },
