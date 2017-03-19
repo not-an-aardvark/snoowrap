@@ -197,6 +197,9 @@ export function updateAccessToken () {
     }).then(tokenInfo => {
       this.accessToken = tokenInfo.access_token;
       this.tokenExpiration = Date.now() + (tokenInfo.expires_in * 1000);
+      if (tokenInfo.error === 'invalid_grant') {
+        throw new Error('"Invalid grant" error returned from reddit. (You might have incorrect credentials.)');
+      }
       this.scope = tokenInfo.scope.split(' ');
       return this.accessToken;
     });
