@@ -1649,7 +1649,7 @@ describe('snoowrap', function () {
   describe('livethreads', () => {
     let thread;
     before(async () => {
-      thread = r.get_livethread('yebyckcrf2ln');
+      thread = r.get_livethread('yogc2rqi1dmc');
       await thread.fetch();
     });
     it('can add and listen for content on a livethread using websockets', done => {
