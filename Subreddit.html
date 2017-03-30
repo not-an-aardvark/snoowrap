@@ -4523,7 +4523,7 @@ r.getSubreddit(&#x27;snoowrap&#x27;).setMultipleUserFlairs([
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getHot().then(console.log)
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getNewComments().then(console.log)
 // =&gt; Listing [
 //  Comment { ... },
 //  Comment { ... },
@@ -5651,7 +5651,7 @@ r.getSubreddit(&#x27;snoowrap&#x27;).setMultipleUserFlairs([
   acceptmoderatorinvite, removemoderator, addcontributor, removecontributor, editsettings, editflair, distinguish, marknsfw,
   wikibanned, wikicontributor, wikiunbanned, wikipagelisted, removewikicontributor, wikirevise, wikipermlevel,
   ignorereports, unignorereports, setpermissions, setsuggestedsort, sticky, unsticky, setcontestmode, unsetcontestmode,
-  lock, unlock, muteuser, unmuteuser, createrule, editrule, deleterule</code></p></td>
+  lock, unlock, muteuser, unmuteuser, createrule, editrule, deleterule, spoiler, unspoiler</code></p></td>
         </tr>
 
     
@@ -10661,6 +10661,46 @@ r.getSubreddit(&#x27;snoowrap&#x27;).setMultipleUserFlairs([
             <td class="description last"><p>The suggested comment sort for the subreddit. This should be
   one of <code>confidence, top, new, controversial, old, random, qa</code>.If left blank, there will be no suggested sort,
   which means that users will see the sort method that is set in their own preferences (usually <code>confidence</code>.)</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>spoilers_enabled</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last"><p>Determines whether users can mark their posts as spoilers</p></td>
         </tr>
 
     
