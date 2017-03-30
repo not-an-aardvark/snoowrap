@@ -1149,7 +1149,7 @@ describe('snoowrap', function () {
     });
   });
 
-  describe('Subreddit#set_multiple_user_flairs', () => {
+  describe.skip('Subreddit#set_multiple_user_flairs', () => {
     let sub;
     beforeEach(async () => {
       sub = r.get_subreddit('snoowrap_testing');
@@ -1499,7 +1499,7 @@ describe('snoowrap', function () {
   });
 
   describe('search', () => {
-    it('can search for posts based on various parameters', async () => {
+    it.skip('can search for posts based on various parameters', async () => {
       const results = await r.search({
         subreddit: 'AskReddit',
         query: 'What tasty food would be distusting if eaten over rice?', // (sic)
@@ -1512,7 +1512,7 @@ describe('snoowrap', function () {
       expect(results[0].author.name).to.equal('DO_U_EVN_SPAGHETTI');
       expect(await results.fetch_more(2)).to.have.lengthOf(4);
     });
-    it('can search a given subreddit for posts', async () => {
+    it.skip('can search a given subreddit for posts', async () => {
       const results = await r.get_subreddit('askreddit').search({query: 'e', limit: 5});
       expect(results).to.have.lengthOf(5);
       for (let i = 0; i < results.length; i++) {
