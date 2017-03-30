@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.13.0 (2017-03-30)
+
+* Added support for marking and unmarking posts as spoilers
+* Fixed an issue where comments on some listings did not have a `replies` property
+* Fixed an issue where using invalid credentials could result in a confusing error message from snoowrap
+
 ## v1.12.0 (2017-01-01)
 
 * Added `snoowrap#getRising` and `subreddit#getRising` to get a list of "rising" posts on reddit
