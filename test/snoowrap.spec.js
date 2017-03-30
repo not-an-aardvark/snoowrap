@@ -1547,20 +1547,26 @@ describe('snoowrap', function () {
     });
     it('can add/remove an approved submitter from a subreddit', async () => {
       await sub.add_contributor(victim);
+      await Promise.delay(3000);
       expect(await sub.get_contributors({name: victim.name})).to.have.lengthOf(1);
       await sub.remove_contributor(victim);
+      await Promise.delay(3000);
       expect(await sub.get_contributors({name: victim.name})).to.have.lengthOf(0);
     });
     it('can wikiban/unwikiban a user from a subreddit', async () => {
       await sub.wikiban_user(victim);
+      await Promise.delay(3000);
       expect(await sub.get_wikibanned_users({name: victim.name})).to.have.lengthOf(1);
       await sub.unwikiban_user(victim);
+      await Promise.delay(3000);
       expect(await sub.get_wikibanned_users({name: victim.name})).to.have.lengthOf(0);
     });
     it('can add/remove a user from approved wiki editor status on a subreddit', async () => {
       await sub.add_wiki_contributor(victim);
+      await Promise.delay(3000);
       expect(await sub.get_wiki_contributors({name: victim.name})).to.have.lengthOf(1);
       await sub.remove_wiki_contributor(victim);
+      await Promise.delay(3000);
       expect(await sub.get_wiki_contributors({name: victim.name})).to.have.lengthOf(0);
     });
     it("can change a moderator's permissions on a subreddit", async () => {
