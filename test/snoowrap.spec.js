@@ -1155,6 +1155,7 @@ describe('snoowrap', function () {
       sub = r.get_subreddit('snoowrap_testing');
       await r.get_user('not_an_aardvark').assign_flair({subreddit_name: sub.display_name, text: 'foo', css_class: 'bar'});
       await r.get_user('actually_an_aardvark').assign_flair({subreddit_name: sub.display_name, text: 'baz', css_class: 'quux'});
+      await Promise.delay(3000);
       const naa_previous_flair = await sub.get_user_flair('not_an_aardvark');
       const aaa_previous_flair = await sub.get_user_flair('actually_an_aardvark');
       expect(naa_previous_flair.flair_text).to.equal('foo');
@@ -1167,6 +1168,7 @@ describe('snoowrap', function () {
         {name: 'not_an_aardvark', text: "not_an_aardvark's flair", css_class: 'naa-css-class'},
         {name: 'actually_an_aardvark', text: "actually_an_aardvark's flair", css_class: 'aaa-css-class'}
       ]);
+      await Promise.delay(3000);
       const naa_afterwards_flair = await sub.get_user_flair('not_an_aardvark');
       const aaa_afterwards_flair = await sub.get_user_flair('actually_an_aardvark');
       expect(naa_afterwards_flair.flair_text).to.equal("not_an_aardvark's flair");
@@ -1186,6 +1188,7 @@ describe('snoowrap', function () {
           warnings: {}
         }]);
       });
+      await Promise.delay(3000);
       const naa_afterwards_flair = await sub.get_user_flair('not_an_aardvark');
       const aaa_afterwards_flair = await sub.get_user_flair('actually_an_aardvark');
       expect(naa_afterwards_flair.flair_text).to.equal("not_an_aardvark's flair");
@@ -1199,6 +1202,7 @@ describe('snoowrap', function () {
         {name: 'not_an_aardvark', text: special_chars_string, css_class: 'naa-css-class'},
         {name: 'actually_an_aardvark', text: "actually_an_aardvark's flair", css_class: 'aaa-css-class'}
       ]);
+      await Promise.delay(3000);
       const naa_afterwards_flair = await sub.get_user_flair('not_an_aardvark');
       const aaa_afterwards_flair = await sub.get_user_flair('actually_an_aardvark');
       expect(naa_afterwards_flair.flair_text).to.equal(special_chars_string);
