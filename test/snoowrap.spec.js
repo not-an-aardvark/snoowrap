@@ -1541,8 +1541,10 @@ describe('snoowrap', function () {
     });
     it('can ban/unban a user from a subreddit', async () => {
       await sub.ban_user({name: victim.name, ban_message: 'banned for stuff', ban_note: 'test note'});
+      await Promise.delay(3000);
       expect(await sub.get_banned_users({name: victim.name})).to.have.lengthOf(1);
       await sub.unban_user(victim);
+      await Promise.delay(3000);
       expect(await sub.get_banned_users({name: victim.name})).to.have.lengthOf(0);
     });
     it('can add/remove an approved submitter from a subreddit', async () => {
@@ -1571,14 +1573,18 @@ describe('snoowrap', function () {
     });
     it("can change a moderator's permissions on a subreddit", async () => {
       await sub.set_moderator_permissions({name: 'not_an_aardvark', permissions: ['flair', 'wiki']});
+      await Promise.delay(3000);
       expect(await sub.get_moderators({name: 'not_an_aardvark'})[0].mod_permissions.sort()).to.eql(['flair', 'wiki']);
       await sub.set_moderator_permissions({name: 'not_an_aardvark'});
+      await Promise.delay(3000);
       expect(await sub.get_moderators({name: 'not_an_aardvark'})[0].mod_permissions).to.eql(['all']);
     });
     it('can add/remove a user as a friend', async () => {
       await victim.friend();
+      await Promise.delay(3000);
       expect(await victim.get_friend_information().name).to.equal(victim.name);
       await victim.unfriend();
+      await Promise.delay(3000);
       await victim.get_friend_information().then(expect.fail, res => expect(res.statusCode).to.equal(400));
     });
   });
@@ -1716,7 +1722,7 @@ describe('snoowrap', function () {
       const subs = await multi.subreddits;
       expect(subs).to.be.an.instanceof(Array);
       expect(subs[0]).to.be.an.instanceof(snoowrap.objects.Subreddit);
-      expect(subs[0].display_name).to.equal('linguistics');
+      expect(subs.map(sub => sub.display_name)).to.include('linguistics');
     });
     it('can copy and delete a multireddit', async () => {
       const copied = await multi.copy({new_name: 'copied_multi'});
