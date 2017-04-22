@@ -1002,6 +1002,7 @@ const snoowrap = class snoowrap {
     return this._post({uri: 'api/search_reddit_names', qs: {exact, include_over_18: includeNsfw, query}}).get('names');
   }
   _createOrEditSubreddit ({
+    allow_images = true,
     allow_top = true,
     captcha,
     captcha_iden,
@@ -1018,6 +1019,7 @@ const snoowrap = class snoowrap {
     public_description,
     public_traffic = false,
     show_media = false,
+    show_media_preview = true,
     spam_comments = 'high',
     spam_links = 'high',
     spam_selfposts = 'high',
@@ -1035,11 +1037,11 @@ const snoowrap = class snoowrap {
     wikimode = 'modonly'
   }) {
     return this._post({uri: 'api/site_admin', form: {
-      allow_top, api_type, captcha, collapse_deleted_comments, comment_score_hide_mins, description, exclude_banned_modqueue,
-      'header-title': header_title, hide_ads, iden: captcha_iden, lang, link_type, name, over_18, public_description,
-      public_traffic, show_media, spam_comments, spam_links, spam_selfposts, spoilers_enabled, sr, submit_link_label,
-      submit_text, submit_text_label, suggested_comment_sort, title, type: subreddit_type || type, wiki_edit_age,
-      wiki_edit_karma, wikimode
+      allow_images, allow_top, api_type, captcha, collapse_deleted_comments, comment_score_hide_mins, description,
+      exclude_banned_modqueue, 'header-title': header_title, hide_ads, iden: captcha_iden, lang, link_type, name,
+      over_18, public_description, public_traffic, show_media, show_media_preview, spam_comments, spam_links,
+      spam_selfposts, spoilers_enabled, sr, submit_link_label, submit_text, submit_text_label, suggested_comment_sort,
+      title, type: subreddit_type || type, wiki_edit_age, wiki_edit_karma, wikimode
     }}).then(handleJsonErrors(this.getSubreddit(name || sr)));
   }
   /**
@@ -1078,6 +1080,8 @@ const snoowrap = class snoowrap {
   * @param {boolean} [options.allow_top=true] Determines whether the new subreddit should be able to appear in /r/all and
   trending subreddits
   * @param {boolean} [options.show_media=false] Determines whether image thumbnails should be enabled on this subreddit
+  * @param {boolean} [options.show_media_preview=true] Determines whether media previews should be expanded by default on this subreddit
+  * @param {boolean} [options.allow_images=true] Determines whether image uploads and links to image hosting sites should be enabled on this subreddit
   * @param {boolean} [options.exclude_banned_modqueue=false] Determines whether posts by site-wide banned users should be
   excluded from the modqueue.
   * @param {boolean} [options.public_traffic=false] Determines whether the /about/traffic page for this subreddit should be
