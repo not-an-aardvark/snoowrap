@@ -874,6 +874,10 @@ const Subreddit = class Subreddit extends RedditContent {
   * @param {boolean} [options.allow_top=true] Determines whether the new subreddit should be able to appear in /r/all and
   trending subreddits
   * @param {boolean} [options.show_media=false] Determines whether image thumbnails should be enabled on this subreddit
+  * @param {boolean} [options.show_media_preview=true] Determines whether media previews should be expanded by default on this
+  subreddit
+  * @param {boolean} [options.allow_images=true] Determines whether image uploads and links to image hosting sites should be
+  enabled on this subreddit
   * @param {boolean} [options.exclude_banned_modqueue=false] Determines whether posts by site-wide banned users should be
   excluded from the modqueue.
   * @param {boolean} [options.public_traffic=false] Determines whether the /about/traffic page for this subreddit should be
