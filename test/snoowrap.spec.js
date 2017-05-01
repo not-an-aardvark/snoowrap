@@ -1656,9 +1656,14 @@ describe('snoowrap', function () {
     });
   });
 
-  describe('livethreads', () => {
+  describe.skip('livethreads', () => {
     let thread;
     before(async () => {
+      // Since these tests were added, reddit introduced a change where livethreads are automatically closed after a week
+      // of inactivity. As a result, the tests usually fail unless they're run more than once per week, because the
+      // hardcoded livethread ID is closed. Eventually it would be good to have a better solution to this, but for now
+      // the tests can be run by creating a livethread and replacing the id in the line below with the id of the livethread.
+      // The authenticated account must be a contributor on the livethread.
       thread = r.get_livethread('yogc2rqi1dmc');
       await thread.fetch();
     });
