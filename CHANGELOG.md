@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.14.0 (2017-04-22)
+
+* Added support for `allow_images` and `show_media_preview` subreddit settings
+
 ## v1.13.0 (2017-03-30)
 
 * Added support for marking and unmarking posts as spoilers
