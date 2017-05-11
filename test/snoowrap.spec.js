@@ -664,7 +664,7 @@ describe('snoowrap', function () {
   describe('acting on a submission', () => {
     let submission;
     beforeEach(() => {
-      submission = r.get_submission('5979j6');
+      submission = r.get_submission('6ahrs4');
     });
     it('can hide/unhide a submission', async () => {
       await submission.hide();
