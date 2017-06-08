@@ -424,6 +424,21 @@ const Subreddit = class Subreddit extends RedditContent {
     return this._r.getNew(this.display_name, options);
   }
   /**
+  * @summary Gets a Listing of new posts.
+  * @param {object} [options={}] Options for the resulting Listing
+  * @returns {EventEmitter} An event emitter for new submissions
+  * @example
+  *
+  * let submissionStream = r.getSubreddit('snoowrap').getNewStream()
+  * submissionStream.on('submission', (submission) => console.log);
+  * // => Submission { domain: 'self.Jokes', banned_by: null, subreddit: Subreddit { display_name: 'Jokes' }, ... }
+  * // => Submission { domain: 'self.AskReddit', banned_by: null, subreddit: Subreddit { display_name: 'AskReddit' }, ... }
+  * // => ...
+  */
+  getNewStream (options) {
+    return this._r.getNewStream(this.display_name, options);
+  }
+  /**
   * @summary Gets a Listing of new comments on this subreddit.
   * @param {object} [options={}] Options for the resulting Listing
   * @returns {Promise} A Listing containing the retrieved comments
@@ -438,6 +453,20 @@ const Subreddit = class Subreddit extends RedditContent {
   */
   getNewComments (options) {
     return this._r.getNewComments(this.display_name, options);
+  }
+  /**
+  * @summary Gets an event stream for new comments.
+  * @param {object} [options={}] Options for the resulting Listing
+  * @returns {EventEmitter} An event emitter for new comments.
+  *
+  * let commentStream = r.getSubreddit('snoowrap').getNewCommentStream()
+  * commentStream.on('comment', (comment) => console.log);
+  * // => Comment { link_title: 'What amazing book should be made into a movie, but hasn\'t been yet?', ... }
+  * // => Comment { link_title: 'How far back in time could you go and still understand English?', ... }
+  * // => ...
+  */
+  getNewCommentStream (options) {
+    return this._r.getNewCommentStream(this.display_name, options);
   }
   /**
   * @summary Gets a single random Submission from this subreddit.

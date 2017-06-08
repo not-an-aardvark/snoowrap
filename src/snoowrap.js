@@ -662,6 +662,23 @@ const snoowrap = class snoowrap {
     return this._getSortedFrontpage('new', subredditName, options);
   }
   /**
+  * @summary Gets a Listing of new posts.
+  * @param {string} [subredditName] The subreddit to get posts from. If not provided, posts are fetched from
+  the front page of reddit.
+  * @param {object} [options={}] Options for the resulting Listing
+  * @returns {EventEmitter} An event emitter for new submissions
+  * @example
+  *
+  * let submissionStream = r.getNewStream()
+  * submissionStream.on('submission', (submission) => console.log);
+  * // => Submission { domain: 'self.Jokes', banned_by: null, subreddit: Subreddit { display_name: 'Jokes' }, ... }
+  * // => Submission { domain: 'self.AskReddit', banned_by: null, subreddit: Subreddit { display_name: 'AskReddit' }, ... }
+  * // => ...
+  */
+  getNewStream (subredditName, options = {}) {
+    return new snoowrap.objects.EventStream(options.rate || 1000, 'submission', this.getNew, subredditName, options);
+  }
+  /**
   * @summary Gets a Listing of new comments.
   * @param {string} [subredditName] The subreddit to get comments from. If not provided, posts are fetched from
   the front page of reddit.
@@ -677,6 +694,22 @@ const snoowrap = class snoowrap {
   */
   getNewComments (subredditName, options) {
     return this._getSortedFrontpage('comments', subredditName, options);
+  }
+  /**
+  * @summary Gets an event stream for new comments.
+  * @param {string} [subredditName] The subreddit to get comments from. If not provided, posts are fetched from
+  the front page of reddit.
+  * @param {object} [options={}] Options for the resulting Listing
+  * @returns {EventEmitter} An event emitter for new comments.
+  *
+  * let commentStream = r.getNewCommentStream()
+  * commentStream.on('comment', (comment) => console.log);
+  * // => Comment { link_title: 'What amazing book should be made into a movie, but hasn\'t been yet?', ... }
+  * // => Comment { link_title: 'How far back in time could you go and still understand English?', ... }
+  * // => ...
+  */
+  getNewCommentStream (subredditName, options = {}) {
+    return new snoowrap.objects.EventStream(options.rate || 1000, 'comment', this.getNewComments, subredditName, options);
   }
   /**
   * @summary Gets a single random Submission.
