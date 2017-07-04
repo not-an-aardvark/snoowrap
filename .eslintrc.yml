@@ -95,7 +95,7 @@ rules:
   wrap-iife: error
   yoda: error
   import/prefer-default-export: error
-  import/newline-after-import: [error, always]
+  import/newline-after-import: error
   import/no-unassigned-import: error
   promise/catch-or-return: error
   promise/no-return-wrap: error
