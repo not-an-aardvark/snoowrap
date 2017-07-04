@@ -571,10 +571,7 @@ describe('snoowrap', function () {
       }
       expect(await subreddit.get_stylesheet()).to.match(/^\.stylesheet-[0-9a-f]{8}/);
     });
-    it("can get and modify a subreddit's settings (test skipped depending on captcha requirement)", async function () {
-      if (await r.check_captcha_requirement()) {
-        return this.skip();
-      }
+    it.skip("can get and modify a subreddit's settings (test skipped depending on captcha requirement)", async () => {
       await subreddit.edit_settings({public_traffic: false});
       expect(await subreddit.get_settings().public_traffic).to.be.false();
       await subreddit.edit_settings({public_traffic: true});
@@ -1064,7 +1061,7 @@ describe('snoowrap', function () {
     it('gets a list of blocked users', async () => {
       expect(await r.get_blocked_users()).to.be.an.instanceof(Array);
     });
-    it('checks whether the current account needs to fill out a captcha to post', async () => {
+    it.skip('checks whether the current account needs to fill out a captcha to post', async () => {
       expect(await r.check_captcha_requirement()).to.be.a('boolean');
     });
     it.skip('can fetch a new captcha on request', async () => {
