@@ -224,6 +224,9 @@ const snoowrap = class snoowrap {
       uri: 'api/v1/access_token',
       form: {grant_type: 'authorization_code', code, redirect_uri: redirectUri}
     }).then(response => {
+      if (response.error) {
+        throw new Error(`API Error: ${response.error}`);
+      }
       // Use `new this` instead of `new snoowrap` to ensure that subclass instances can be returned
       const requester = new this({userAgent, clientId, clientSecret, ...response});
       requester.config({endpointDomain});
