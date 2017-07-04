@@ -162,7 +162,7 @@ const Submission = class Submission extends VoteableContent {
   * @example r.getSubmission('2np694').getDuplicates()
   */
   getDuplicates (options = {}) {
-    return this._getListing({uri: `duplicates/${this.name}`, qs: options});
+    return this._getListing({uri: `duplicates/${this.name.slice(3)}`, qs: options});
   }
   /**
   * @summary Gets a Listing of Submissions that are related to this one.
