@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.14.1 (2017-07-07)
+
+* Fixed an issue where `Submission#getDuplicates` would return a 404 error
+* Fixed an issue where using an invalid auth code in `snoowrap.fromAuthCode` would result in a confusing error message
+
 ## v1.14.0 (2017-05-11)
 
 * Added support for `allow_images` and `show_media_preview` subreddit settings
