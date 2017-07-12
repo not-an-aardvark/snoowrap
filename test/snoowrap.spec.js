@@ -256,6 +256,22 @@ describe('snoowrap', function () {
       expect(inspected).to.be.a('string');
       expect(_.includes(inspected, "author: RedditUser { name: 'not_an_aardvark' }")).to.be.true();
     });
+    it('does exponential backoff', async function() {
+      let start = Date.now();
+      await r._awaitExponentialBackoff(1);
+      let end = Date.now();
+      expect(end - start).to.be.lessThan(10); // let's be generous
+
+      start = Date.now();
+      await r._awaitExponentialBackoff(2);
+      end = Date.now();
+      expect(end - start).to.be.within(1.6, 2.8);
+
+      start = Date.now();
+      await r._awaitExponentialBackoff(3);
+      end = Date.now();
+      expect(end - start).to.be.within(3.6, 4.8);
+    })
   });
 
   describe('general snoowrap behavior', () => {
