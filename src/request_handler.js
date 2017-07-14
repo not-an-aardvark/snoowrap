@@ -103,7 +103,7 @@ export function _awaitExponentialBackoff (attempts) {
   if (attempts === 1) {
     return Promise.resolve();
   }
-  
+
   return Promise.delay((Math.pow(2, attempts - 1) + (Math.random() - 0.3)) * 1000);
 }
 

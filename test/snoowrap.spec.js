@@ -271,7 +271,7 @@ describe('snoowrap', function () {
       await r._awaitExponentialBackoff(3);
       end = Date.now();
       expect(end - start).to.be.within(3600, 4800);
-    })
+    });
   });
 
   describe('general snoowrap behavior', () => {
