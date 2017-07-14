@@ -256,21 +256,21 @@ describe('snoowrap', function () {
       expect(inspected).to.be.a('string');
       expect(_.includes(inspected, "author: RedditUser { name: 'not_an_aardvark' }")).to.be.true();
     });
-    it('does exponential backoff', async function() {
+    it('does exponential backoff', async () => {
       let start = Date.now();
       await r._awaitExponentialBackoff(1);
       let end = Date.now();
-      expect(end - start).to.be.lessThan(10); // let's be generous
+      expect(end - start).to.be.lessThan(500);
 
       start = Date.now();
       await r._awaitExponentialBackoff(2);
       end = Date.now();
-      expect(end - start).to.be.within(1.6, 2.8);
+      expect(end - start).to.be.within(1600, 2800);
 
       start = Date.now();
       await r._awaitExponentialBackoff(3);
       end = Date.now();
-      expect(end - start).to.be.within(3.6, 4.8);
+      expect(end - start).to.be.within(3600, 4800);
     })
   });
 
