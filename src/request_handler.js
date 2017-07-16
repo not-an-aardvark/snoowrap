@@ -45,6 +45,7 @@ export function oauthRequest (options, attempts = 1) {
   return Promise.resolve()
     .then(() => this._awaitRatelimit())
     .then(() => this._awaitRequestDelay())
+    .then(() => _awaitExponentialBackoff(attempts))
     .then(() => this.updateAccessToken())
     .then(token => {
       return this.rawRequest(merge({
@@ -96,6 +97,14 @@ export function oauthRequest (options, attempts = 1) {
       }
       throw e;
     });
+}
+
+export function _awaitExponentialBackoff (attempts) {
+  if (attempts === 1) {
+    return Promise.resolve();
+  }
+
+  return Promise.delay((Math.pow(2, attempts - 1) + (Math.random() - 0.3)) * 1000);
 }
 
 export function _awaitRatelimit () {
