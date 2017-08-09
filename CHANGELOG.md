@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.14.2 (2017-08-09)
+
+* Added an exponential backoff for failed requests
+
 ## v1.14.1 (2017-07-07)
 
 * Fixed an issue where `Submission#getDuplicates` would return a 404 error
