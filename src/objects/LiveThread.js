@@ -199,7 +199,7 @@ const LiveThread = class LiveThread extends RedditContent {
   * @param {object} options
   * @param {string} options.title The title of the thread
   * @param {string} [options.description] A descriptions of the thread. 120 characters max
-  * @param {string} [options.resources] Information and useful links related to the thread. 120 characters max
+  * @param {string} [options.resources] Information and useful links related to the thread.
   * @param {boolean} options.nsfw Determines whether the thread is Not Safe For Work
   * @returns {Promise} A Promise that fulfills with this LiveThread when the request is complete
   * @example r.getLivethread('whrdxo8dg9n0').editSettings({title: 'My livethread', description: 'an updated description'})
