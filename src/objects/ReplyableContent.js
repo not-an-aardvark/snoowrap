@@ -78,7 +78,8 @@ const ReplyableContent = class ReplyableContent extends RedditContent {
   * @returns {Promise} A Promise that fulfills with this message after the request is complete
   * @example
   *
-  * r.getInbox({limit: 1}).then(messages =>
+  * r.getInbox({limit: 1})
+  * .then(messages =>
   *   messages[0].blockAuthor();
   * );
   */
