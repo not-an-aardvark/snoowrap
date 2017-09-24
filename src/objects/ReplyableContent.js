@@ -23,7 +23,7 @@ const ReplyableContent = class ReplyableContent extends RedditContent {
   /**
   * @summary Approves this Comment, Submission, or PrivateMessage, re-adding it to public listings if it had been removed
   * @returns {Promise} A Promise that fulfills with this content when the request is complete
-  * @example r.getComment('c08pp5z').remove()
+  * @example r.getComment('c08pp5z').approve()
   */
   approve () {
     return this._post({uri: 'api/approve', form: {id: this.name}}).return(this);
