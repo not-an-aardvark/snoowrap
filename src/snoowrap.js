@@ -568,7 +568,7 @@ const snoowrap = class snoowrap {
   * r.submitSelfpost({
   *   subredditName: 'snoowrap_testing',
   *   title: 'This is a selfpost',
-  *   body: 'This is the body of the selfpost'
+  *   text: 'This is the text body of the selfpost'
   * }).then(console.log)
   * // => Submission { name: 't3_4abmsz' }
   * // (new selfpost created on reddit)
