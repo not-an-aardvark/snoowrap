@@ -685,7 +685,7 @@ describe('snoowrap', function () {
       await submission.unhide();
       expect(await submission.refresh().hidden).to.be.false();
     });
-    it('can lock/unlock a submission', async () => {
+    it.skip('can lock/unlock a submission', async () => {
       await submission.lock();
       expect(await submission.refresh().locked).to.be.true();
       await submission.unlock();
