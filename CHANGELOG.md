@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.15.0 (2017-11-27)
+
+* Added `snoowrap#submitCrosspost`, `Submission#submitCrosspost`, and `Subreddit#submitCrosspost`
+
 ## v1.14.2 (2017-08-09)
 
 * Added an exponential backoff for failed requests
