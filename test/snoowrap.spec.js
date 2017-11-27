@@ -1809,6 +1809,32 @@ describe('snoowrap', function () {
       await new_selfpost.delete();
       expect(await new_selfpost.refresh().author.name).to.equal('[deleted]');
     });
+    describe.skip('crossposts', () => {
+      before(async () => {
+        await r.getSubreddit('snoowrap_testing').subscribe();
+      });
+      after(async () => {
+        await r.getSubreddit('snoowrap_testing').unsubscribe();
+      });
+      it('can create a crosspost', async () => {
+        const title = 'foo';
+        const newPost = await r.submitCrosspost({title, subredditName: 'snoowrap_testing', originalPost: '6vths0'});
+        expect(newPost).to.be.an.instanceof(snoowrap.objects.Submission);
+        expect(await newPost.title).to.equal(title);
+      });
+      it('can create a crosspost from a subreddit instance', async () => {
+        const title = 'foo';
+        const newPost = await r.getSubreddit('snoowrap_testing').submitCrosspost({title, originalPost: '6vths0'});
+        expect(newPost).to.be.an.instanceof(snoowrap.objects.Submission);
+        expect(await newPost.title).to.equal(title);
+      });
+      it('can create a crosspost from a submission instance', async () => {
+        const title = 'foo';
+        const newPost = await r.getSubmission('6vths0').submitCrosspost({title, subredditName: 'snoowrap_testing'});
+        expect(newPost).to.be.an.instanceof(snoowrap.objects.Submission);
+        expect(await newPost.title).to.equal(title);
+      });
+    });
     it.skip('can create a subreddit', async () => {
       const sub_name = moment().format().slice(0, 19).replace(/[-:]/g, '_');
       const new_sub = await r.create_subreddit({

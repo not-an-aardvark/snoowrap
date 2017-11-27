@@ -542,6 +542,7 @@ const snoowrap = class snoowrap {
     kind,
     resubmit = true,
     send_replies = true, sendReplies = send_replies,
+    crosspost_fullname,
     text,
     title,
     url,
@@ -549,7 +550,7 @@ const snoowrap = class snoowrap {
   }) {
     return this._post({uri: 'api/submit', form: {
       api_type, captcha: captchaResponse, iden: captchaIden, sendreplies: sendReplies, sr: subredditName, kind, resubmit,
-      text, title, url
+      crosspost_fullname, text, title, url
     }}).tap(handleJsonErrors(this)).then(result => this.getSubmission(result.json.data.id));
   }
   /**
@@ -602,6 +603,34 @@ const snoowrap = class snoowrap {
   submitLink (options) {
     return this._submit({...options, kind: 'link'});
   }
+
+  /**
+   * @summary Creates a new crosspost submission on the given subreddit
+   * @desc **NOTE**: To create a crosspost, the authenticated account must be subscribed to the subreddit where
+   * the crosspost is being submitted, and that subreddit be configured to allow crossposts.
+   * @param {object} options An object containing details about the submission
+   * @param {string} options.subredditName The name of the subreddit that the crosspost should be submitted to
+   * @param {string} options.title The title of the crosspost
+   * @param {(string|Submission)} options.originalPost A Submission object or a post ID for the original post which
+   is being crossposted
+   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission
+   * @param {boolean} [options.resubmit=true] If this is false and same link has already been submitted to this subreddit in
+   the past, reddit will return an error. This could be used to avoid accidental reposts.
+   * @returns {Promise} The newly-created Submission object
+   * @example
+   *
+   * await r.submitCrosspost({ title: 'I found an interesting post', originalPost: '6vths0', subredditName: 'snoowrap' })
+   */
+  submitCrosspost (options) {
+    return this._submit({
+      ...options,
+      kind: 'crosspost',
+      crosspost_fullname: options.originalPost instanceof snoowrap.objects.Submission
+        ? options.originalPost.name
+        : addFullnamePrefix(options.originalPost, 't3_')
+    });
+  }
+
   _getSortedFrontpage (sortType, subredditName, options = {}) {
     // Handle things properly if only a time parameter is provided but not the subreddit name
     let opts = options;

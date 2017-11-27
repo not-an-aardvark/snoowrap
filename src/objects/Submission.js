@@ -221,6 +221,25 @@ const Submission = class Submission extends VoteableContent {
   selectFlair (options) {
     return this._r._selectFlair({...options, link: this.name, subredditName: this.subreddit.display_name}).return(this);
   }
+
+  /**
+   * @summary Crossposts this submission to a different subreddit
+   * @desc **NOTE**: To create a crosspost, the authenticated account must be subscribed to the subreddit where
+   * the crosspost is being submitted, and that subreddit be configured to allow crossposts.
+   * @param {object} options An object containing details about the submission
+   * @param {string} options.subredditName The name of the subreddit that the crosspost should be submitted to
+   * @param {string} options.title The title of the crosspost
+   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission
+   * @param {boolean} [options.resubmit=true] If this is false and same link has already been submitted to this subreddit in
+   the past, reddit will return an error. This could be used to avoid accidental reposts.
+   * @returns {Promise} The newly-created Submission object
+   * @example
+   *
+   * await r.getSubmission('6vths0').submitCrosspost({ title: 'I found an interesting post', subredditName: 'snoowrap' })
+   */
+  submitCrosspost (options) {
+    return this._r.submitCrosspost({...options, originalPost: this});
+  }
 };
 
 export default Submission;

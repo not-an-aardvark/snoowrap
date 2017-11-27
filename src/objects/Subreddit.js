@@ -390,6 +390,28 @@ const Subreddit = class Subreddit extends RedditContent {
   submitLink (options) {
     return this._r.submitLink({...options, subredditName: this.display_name});
   }
+
+  /**
+   * @summary Creates a new crosspost submission on this subreddit
+   * @desc **NOTE**: To create a crosspost, the authenticated account must be subscribed to the subreddit where
+   * the crosspost is being submitted, and that subreddit be configured to allow crossposts.
+   * @param {object} options An object containing details about the submission
+   * @param {string} options.title The title of the crosspost
+   * @param {string|Submission} options.originalPost A Submission object or a post ID for the original post which
+   is being crossposted
+   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission
+   * @param {boolean} [options.resubmit=true] If this is false and same link has already been submitted to this subreddit in
+   the past, reddit will return an error. This could be used to avoid accidental reposts.
+   * @returns {Promise} The newly-created Submission object
+   * @example
+   *
+   * await r.getSubreddit('snoowrap').submitCrosspost({ title: 'I found an interesting post', originalPost: '6vths0' })
+   * // => Submission { name: 't3_4abmsz' }
+   */
+  submitCrosspost (options) {
+    return this._r.submitCrosspost({...options, subredditName: this.display_name});
+  }
+
   /**
   * @summary Gets a Listing of hot posts on this subreddit.
   * @param {object} [options={}] Options for the resulting Listing
