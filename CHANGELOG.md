@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.15.1 (2017-11-27)
+
+* Re-release after accidentally publishing a broken package to npm
+
 ## v1.15.0 (2017-11-27)
 
 * Added `snoowrap#submitCrosspost`, `Submission#submitCrosspost`, and `Subreddit#submitCrosspost`
