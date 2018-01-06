@@ -915,7 +915,11 @@ const Subreddit = class Subreddit extends RedditContent {
   */
   editSettings (options) {
     return Promise.join(this.getSettings(), this.fetch().get('name'), (currentValues, name) => {
-      return this._r._createOrEditSubreddit({...currentValues, ...options, sr: name});
+      return this._r._createOrEditSubreddit({
+        ...renameKey(currentValues, 'subreddit_type', 'type'),
+        ...options,
+        sr: name
+      });
     }).return(this);
   }
   /**

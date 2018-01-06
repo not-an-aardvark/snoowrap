@@ -1063,7 +1063,6 @@ const snoowrap = class snoowrap {
     suggested_comment_sort = 'confidence',
     title,
     type = 'public',
-    subreddit_type, // This is the same as `type`, but for some reason the name is changed when fetching current settings
     wiki_edit_age,
     wiki_edit_karma,
     wikimode = 'modonly'
@@ -1073,7 +1072,7 @@ const snoowrap = class snoowrap {
       exclude_banned_modqueue, 'header-title': header_title, hide_ads, iden: captcha_iden, lang, link_type, name,
       over_18, public_description, public_traffic, show_media, show_media_preview, spam_comments, spam_links,
       spam_selfposts, spoilers_enabled, sr, submit_link_label, submit_text, submit_text_label, suggested_comment_sort,
-      title, type: subreddit_type || type, wiki_edit_age, wiki_edit_karma, wikimode
+      title, type, wiki_edit_age, wiki_edit_karma, wikimode
     }}).then(handleJsonErrors(this.getSubreddit(name || sr)));
   }
   /**
