@@ -616,6 +616,13 @@ describe('snoowrap', function () {
       }
       await subreddit.upload_header_image({file: 'test/test_image.png'});
     });
+    it('can upload/delete images to a subreddit from the filesystem', async function () {
+      if (isBrowser) {
+        return this.skip();
+      }
+      await subreddit.upload_stylesheet_image({name: 'foo', file: 'test/test_image.png', imageType: 'png'});
+      await subreddit.deleteImage({imageName: 'foo'});
+    });
     it("can get a subreddit's rules", async () => {
       const rules_obj = await subreddit.get_rules();
       expect(rules_obj.rules[0].short_name).to.equal('Rule 1: No breaking the rules');

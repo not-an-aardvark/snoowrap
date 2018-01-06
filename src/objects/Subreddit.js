@@ -845,7 +845,7 @@ const Subreddit = class Subreddit extends RedditContent {
   */
   deleteImage ({image_name, imageName = image_name}) {
     return this._post({
-      uri: `r/${this.display_name}/api/delete_sr_image`,
+      uri: `r/${this.display_name}/api/delete_sr_img`,
       form: {api_type, img_name: imageName}
     }).then(handleJsonErrors(this));
   }
