@@ -22,9 +22,11 @@ deploy:
     branch: master
     tags: true
     repo: not-an-aardvark/snoowrap
+  skip_cleanup: true
 - provider: script
   script: scripts/deploy/deploy_docs.sh
   on:
     branch: master
     tags: true
     repo: not-an-aardvark/snoowrap
+  skip_cleanup: true
