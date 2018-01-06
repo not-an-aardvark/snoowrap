@@ -109,12 +109,14 @@ const Listing = class Listing extends Array {
   query parameter), then the newly-fetched elements will appear at the beginning. In any case, continuity is maintained, i.e.
   the order of items in the Listing will be the same as the order in which they appear on reddit.
   * @example
-  * r.getHot({limit: 25}).then(myListing => {
+  * r.getHot({limit: 25})
+  * .then(myListing => {
   *   console.log(myListing.length); // => 25
-  *   myListing.fetchMore({amount: 10}).then(extendedListing => {
-  *     console.log(extendedListing.length); // => 35
-  *   })
+  *   return myListing.fetchMore({amount: 10})
   * });
+  * .then(extendedListing => {
+  *   console.log(extendedListing.length); // => 35
+  * })
   */
   fetchMore (options) {
     const parsedOptions = defaults(

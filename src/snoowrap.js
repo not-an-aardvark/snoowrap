@@ -199,10 +199,11 @@ const snoowrap = class snoowrap {
   *   redirectUri: 'example.com'
   * }).then(r => {
   *   // Now we have a requester that can access reddit through the user's account
-  *   return r.getHot().then(posts => {
-  *     // do something with posts from the front page
-  *   });
+  *   return r.getHot()
   * })
+  * .then(posts => {
+  *   // do something with posts from the front page
+  * });
   */
   static fromAuthCode ({
     code = requiredArg('code'),
@@ -900,7 +901,8 @@ const snoowrap = class snoowrap {
   * @returns {Promise} A Promise that resolves when the request is complete
   * @example
   *
-  * r.readAllMessages().then(function () {
+  * r.readAllMessages()
+  * .then(function () {
   *   r.getUnreadMessages().then(console.log)
   * })
   * // => Listing []

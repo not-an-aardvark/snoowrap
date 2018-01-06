@@ -37,7 +37,8 @@ const RedditContent = class RedditContent {
   function is called again. To refresh an object, use refresh().
   * @example
   *
-  * r.getUser('not_an_aardvark').fetch().then(userInfo => {
+  * r.getUser('not_an_aardvark').fetch()
+  * .then(userInfo => {
   *   console.log(userInfo.name); // 'not_an_aardvark'
   *   console.log(userInfo.created_utc); // 1419104352
   * });
