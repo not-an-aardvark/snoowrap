@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.15.2 (2018-01-05)
+
+* Fixed an error when deleting images from subreddit stylesheets
+* Fixed an issue where snoowrap would fail to change the visibility of a subreddit
+
 ## v1.15.1 (2017-11-27)
 
 * Re-release after accidentally publishing a broken package to npm
