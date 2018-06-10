@@ -209,6 +209,9 @@ export function updateAccessToken () {
       if (tokenInfo.error === 'invalid_grant') {
         throw new Error('"Invalid grant" error returned from reddit. (You might have incorrect credentials.)');
       }
+      if (tokenInfo.error_description === "Only script apps may use password auth") {
+        throw new Error('"Unauthorized client" error returned from reddit. Double check your credentials and if you are passing username and password for authentication you will need to ensure your reddit application is set to "script".');
+      }
       this.scope = tokenInfo.scope.split(' ');
       return this.accessToken;
     });
