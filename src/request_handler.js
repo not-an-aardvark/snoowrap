@@ -209,9 +209,9 @@ export function updateAccessToken () {
       if (tokenInfo.error === 'invalid_grant') {
         throw new Error('"Invalid grant" error returned from reddit. (You might have incorrect credentials.)');
       } else if (tokenInfo.error_description !== undefined) {
-        throw new Error(`Reddit return an error. ${tokenInfo.error}: ${tokenInfo.error_description}`);
+        throw new Error(`Reddit returned an error: ${tokenInfo.error}: ${tokenInfo.error_description}`);
       } else if (tokenInfo.error !== undefined) {
-        throw new Error(`Reddit return an error: ${tokenInfo.error}`);
+        throw new Error(`Reddit returned an error: ${tokenInfo.error}`);
       }
       this.scope = tokenInfo.scope.split(' ');
       return this.accessToken;
