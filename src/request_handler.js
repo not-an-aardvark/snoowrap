@@ -208,6 +208,10 @@ export function updateAccessToken () {
       this.tokenExpiration = Date.now() + (tokenInfo.expires_in * 1000);
       if (tokenInfo.error === 'invalid_grant') {
         throw new Error('"Invalid grant" error returned from reddit. (You might have incorrect credentials.)');
+      } else if (tokenInfo.error_description !== undefined) {
+        throw new Error(`Reddit returned an error: ${tokenInfo.error}: ${tokenInfo.error_description}`);
+      } else if (tokenInfo.error !== undefined) {
+        throw new Error(`Reddit returned an error: ${tokenInfo.error}`);
       }
       this.scope = tokenInfo.scope.split(' ');
       return this.accessToken;
