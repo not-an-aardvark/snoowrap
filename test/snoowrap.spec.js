@@ -19,6 +19,7 @@ describe('snoowrap', function () {
     oauthInfo = process.env.CI ? {
       user_agent: process.env.SNOOWRAP_USER_AGENT,
       client_id: process.env.SNOOWRAP_CLIENT_ID,
+      client_id_installed: process.env.SNOOWRAP_CLIENT_ID_INSTALLED,
       client_secret: process.env.SNOOWRAP_CLIENT_SECRET,
       refresh_token: process.env.SNOOWRAP_REFRESH_TOKEN,
       username: process.env.SNOOWRAP_USERNAME,
@@ -206,6 +207,35 @@ describe('snoowrap', function () {
       });
 
       expect(await newRequester.getMe().name).to.equal(oauthInfo.username);
+    });
+  });
+
+  describe('.fromInstalledAppAuth', () => {
+    it('throws a TypeError if no userAgent is provided in node', function () {
+      if (isBrowser) {
+        return this.skip();
+      }
+      expect(() => {
+        snoowrap.fromInstalledClientAuth({clientId: 'bar', deviceId: 'baz', redirectUri: 'qux'});
+      }).to.throw(TypeError);
+    });
+    it('throws a TypeError if no clientId is provided', () => {
+      expect(() => {
+        snoowrap.fromInstalledClientAuth({userAgent: 'bar', deviceId: 'dev', redirectUri: 'qux2'});
+      }).to.throw(TypeError);
+    });
+    it('throws a TypeError if no deviceId is provided', () => {
+      expect(() => {
+        snoowrap.fromInstalledClientAuth({userAgent: 'bar', clientId: 'baz', redirectUri: 'qux2'});
+      }).to.throw(TypeError);
+    });
+    (isBrowser ? it.skip : it)('returns a Promise for a valid requester', async () => {
+      const newRequester = await snoowrap.fromInstalledClientAuth({
+        userAgent: oauthInfo.user_agent,
+        clientId: oauthInfo.client_id_installed,
+        deviceId: oauthInfo.device_id
+      });
+      expect(await newRequester.getHot('redditdev', {limit: 1})).to.have.lengthOf(1);
     });
   });
 

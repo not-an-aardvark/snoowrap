@@ -233,6 +233,32 @@ const snoowrap = class snoowrap {
       return requester;
     });
   }
+  static fromInstalledClientAuth ({
+    userAgent = isBrowser ? global.navigator.userAgent : requiredArg('userAgent'),
+    clientId = requiredArg('clientId'),
+    deviceId = requiredArg('deviceId'),
+    endpointDomain = 'reddit.com'
+  }) {
+    return this.prototype.credentialedClientRequest.call({
+      clientId,
+      deviceId,
+      // Use `this.prototype.rawRequest` function to allow for custom `rawRequest` method usage in subclasses.
+      rawRequest: this.prototype.rawRequest
+    }, {
+      method: 'post',
+      baseUrl: `https://www.${endpointDomain}/`,
+      uri: 'api/v1/access_token',
+      form: {grant_type: 'https://oauth.reddit.com/grants/installed_client', device_id: deviceId}
+    }).then(response => {
+      if (response.error) {
+        throw new Error(`API Error: ${response.error}`);
+      }
+      // Use `new this` instead of `new snoowrap` to ensure that subclass instances can be returned
+      const requester = new this({userAgent, clientId, clientSecret: '', ...response});
+      requester.config({endpointDomain});
+      return requester;
+    });
+  }
   _newObject (objectType, content, _hasFetched = false) {
     return Array.isArray(content) ? content : new snoowrap.objects[objectType](content, this, _hasFetched);
   }
