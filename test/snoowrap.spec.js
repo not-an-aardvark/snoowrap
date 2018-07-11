@@ -210,30 +210,40 @@ describe('snoowrap', function () {
     });
   });
 
-  describe('.fromInstalledAppAuth', () => {
+  describe('.fromApplicationOnlyAuth', () => {
     it('throws a TypeError if no userAgent is provided in node', function () {
       if (isBrowser) {
         return this.skip();
       }
       expect(() => {
-        snoowrap.fromInstalledClientAuth({clientId: 'bar', deviceId: 'baz', redirectUri: 'qux'});
+        snoowrap.fromApplicationOnlyAuth({clientId: 'bar', deviceId: 'baz'});
       }).to.throw(TypeError);
     });
     it('throws a TypeError if no clientId is provided', () => {
       expect(() => {
-        snoowrap.fromInstalledClientAuth({userAgent: 'bar', deviceId: 'dev', redirectUri: 'qux2'});
+        snoowrap.fromApplicationOnlyAuth({userAgent: 'bar'});
       }).to.throw(TypeError);
     });
-    it('throws a TypeError if no deviceId is provided', () => {
+    it('throws a TypeError if no grantType is provided', () => {
       expect(() => {
-        snoowrap.fromInstalledClientAuth({userAgent: 'bar', clientId: 'baz', redirectUri: 'qux2'});
+        snoowrap.fromApplicationOnlyAuth({userAgent: 'bar'});
       }).to.throw(TypeError);
     });
-    (isBrowser ? it.skip : it)('returns a Promise for a valid requester', async () => {
-      const newRequester = await snoowrap.fromInstalledClientAuth({
+    (isBrowser ? it.skip : it)('returns a Promise for a valid installed requester', async () => {
+      const newRequester = await snoowrap.fromApplicationOnlyAuth({
         userAgent: oauthInfo.user_agent,
-        clientId: oauthInfo.client_id_installed,
-        deviceId: oauthInfo.device_id
+        grantType: snoowrap.grantType.INSTALLED_CLIENT,
+        clientId: oauthInfo.application_only_auth.installed_app.client_id,
+        deviceId: oauthInfo.application_only_auth.installed_app.device_id
+      });
+      expect(await newRequester.getHot('redditdev', {limit: 1})).to.have.lengthOf(1);
+    });
+    (isBrowser ? it.skip : it)('returns a Promise for a valid client requester', async () => {
+      const newRequester = await snoowrap.fromApplicationOnlyAuth({
+        userAgent: oauthInfo.user_agent,
+        grantType: snoowrap.grantType.CLIENT_CREDENTIALS,
+        clientId: oauthInfo.application_only_auth.client_credentials.client_id,
+        clientSecret: oauthInfo.application_only_auth.client_credentials.client_secret
       });
       expect(await newRequester.getHot('redditdev', {limit: 1})).to.have.lengthOf(1);
     });
