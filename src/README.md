@@ -27,16 +27,7 @@ Put these credentials in a file called `oauth_info.json` in the project root dir
   "username": "put a username here",
   "password": "put a password here",
   "redirect_uri": "put the redirect URI here"
-  "application_only_auth": {
-    "client_credentials": {
-      "client_id": "put client web app id here",
-      "client_secret": "put client web app secret here"
-    },
-    "installed_app": {
-      "client_id": "put client installed app id here",
-      "device_id": "put unique installed app id here"
-    }
-  }
+  "installed_app_client_id" "put_your_installed_app_client_id_here"
 }
 ```
 

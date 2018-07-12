@@ -19,12 +19,12 @@ describe('snoowrap', function () {
     oauthInfo = process.env.CI ? {
       user_agent: process.env.SNOOWRAP_USER_AGENT,
       client_id: process.env.SNOOWRAP_CLIENT_ID,
-      client_id_installed: process.env.SNOOWRAP_CLIENT_ID_INSTALLED,
       client_secret: process.env.SNOOWRAP_CLIENT_SECRET,
       refresh_token: process.env.SNOOWRAP_REFRESH_TOKEN,
       username: process.env.SNOOWRAP_USERNAME,
       password: process.env.SNOOWRAP_PASSWORD,
-      redirect_uri: process.env.SNOOWRAP_REDIRECT_URI
+      redirect_uri: process.env.SNOOWRAP_REDIRECT_URI,
+      installed_app_client_id: process.env.SNOOWRAP_INSTALLED_APP_CLIENT_ID
     } : require('../oauth_info.json');
 
     r = new snoowrap({
@@ -233,8 +233,8 @@ describe('snoowrap', function () {
       const newRequester = await snoowrap.fromApplicationOnlyAuth({
         userAgent: oauthInfo.user_agent,
         grantType: snoowrap.grantType.INSTALLED_CLIENT,
-        clientId: oauthInfo.application_only_auth.installed_app.client_id,
-        deviceId: oauthInfo.application_only_auth.installed_app.device_id
+        clientId: oauthInfo.installed_app_client_id,
+        deviceId: oauthInfo.device_id
       });
       expect(await newRequester.getHot('redditdev', {limit: 1})).to.have.lengthOf(1);
     });
@@ -242,8 +242,8 @@ describe('snoowrap', function () {
       const newRequester = await snoowrap.fromApplicationOnlyAuth({
         userAgent: oauthInfo.user_agent,
         grantType: snoowrap.grantType.CLIENT_CREDENTIALS,
-        clientId: oauthInfo.application_only_auth.client_credentials.client_id,
-        clientSecret: oauthInfo.application_only_auth.client_credentials.client_secret
+        clientId: oauthInfo.client_id,
+        clientSecret: oauthInfo.client_secret
       });
       expect(await newRequester.getHot('redditdev', {limit: 1})).to.have.lengthOf(1);
     });
