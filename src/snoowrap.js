@@ -1033,48 +1033,23 @@ const snoowrap = class snoowrap {
   searchSubredditNames ({exact = false, include_nsfw = true, includeNsfw = include_nsfw, query}) {
     return this._post({uri: 'api/search_reddit_names', qs: {exact, include_over_18: includeNsfw, query}}).get('names');
   }
-  _createOrEditSubreddit ({
-    allow_images = true,
-    allow_top = true,
-    captcha,
-    captcha_iden,
-    collapse_deleted_comments = false,
-    comment_score_hide_mins = 0,
-    description,
-    exclude_banned_modqueue = false,
-    'header-title': header_title,
-    hide_ads = false,
-    lang = 'en',
-    link_type = 'any',
-    name,
-    over_18 = false,
-    public_description,
-    public_traffic = false,
-    show_media = false,
-    show_media_preview = true,
-    spam_comments = 'high',
-    spam_links = 'high',
-    spam_selfposts = 'high',
-    spoilers_enabled = false,
-    sr,
-    submit_link_label = '',
-    submit_text_label = '',
-    submit_text = '',
-    suggested_comment_sort = 'confidence',
-    title,
-    type = 'public',
-    wiki_edit_age,
-    wiki_edit_karma,
-    wikimode = 'modonly'
-  }) {
-    return this._post({uri: 'api/site_admin', form: {
-      allow_images, allow_top, api_type, captcha, collapse_deleted_comments, comment_score_hide_mins, description,
-      exclude_banned_modqueue, 'header-title': header_title, hide_ads, iden: captcha_iden, lang, link_type, name,
-      over_18, public_description, public_traffic, show_media, show_media_preview, spam_comments, spam_links,
-      spam_selfposts, spoilers_enabled, sr, submit_link_label, submit_text, submit_text_label, suggested_comment_sort,
-      title, type, wiki_edit_age, wiki_edit_karma, wikimode
-    }}).then(handleJsonErrors(this.getSubreddit(name || sr)));
+
+  _createOrEditSubreddit(form={}) {
+    let safe = ['all_original_content', 'allow_discovery', 'allow_images', 'allow_post_crossposts', 'allow_top', 'allow_videos', 'api_type',
+                'collapse_deleted_comments', 'comment_score_hide_mins', 'description', 'exclude_banned_modqueue', 'free_form_reports', 'g-recaptcha-response ',
+                'header-title', 'hide_ads', 'key_color', 'lang', 'link_type', 'name', 'original_content_tag_enabled', 'over_18', 'public_description',
+                'show_media', 'show_media_preview', 'spam_comments', 'spam_links', 'spam_selfposts', 'spoilers_enabled', 'sr', 'submit_link_label', 'submit_text',
+                'submit_text_label', 'suggested_comment_sort', 'theme_sr', 'theme_sr_update', 'title', 'type', 'uh / X-Modhash header', 'wiki_edit_age',
+                'wiki_edit_karma', 'wikimode'];
+
+    let setForm = {};
+    safe.forEach(key => setForm[key] = form[key]);
+
+    return this._post({ uri: 'api/site_admin', form: setForm })
+      .then(handleJsonErrors(this.getSubreddit(form.name || form.sr)))
+      .catch(console.error);
   }
+
   /**
   * @summary Creates a new subreddit.
   * @param {object} options
