@@ -40,8 +40,6 @@ var _RedditContent2 = _interopRequireDefault(_RedditContent);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
 var api_type = 'json';
 
 /**
@@ -1009,17 +1007,12 @@ var Subreddit = class Subreddit extends _RedditContent2.default {
   * @example r.getSubreddit('snoowrap').editSettings({submit_text: 'Welcome! Please be sure to read the rules.'})
   */
   editSettings(options) {
-    return _Promise2.default.join(this.getSettings(), this.fetch().get('name'), function (currentValues, name) {
-      var _console, _console2;
+    var _this6 = this;
 
-      (_console = console).log.apply(_console, _toConsumableArray((0, _helpers.renameKey)(currentValues, 'subreddit_type', 'type')));
-      console.log('===-=-=-=-=-=-==-=-==-====asdfasdfasdfa-==-=-=-==-=--==-=-=-=--=-==-=');
-      (_console2 = console).log.apply(_console2, _toConsumableArray(options));
-      // return this._r._createOrEditSubreddit({
-      //   ...renameKey(currentValues, 'subreddit_type', 'type'),
-      //   ...options,
-      //   sr: name
-      // });
+    return _Promise2.default.join(this.getSettings(), this.fetch().get('name'), function (currentValues, name) {
+      return _this6._r._createOrEditSubreddit(_extends({}, (0, _helpers.renameKey)(currentValues, 'subreddit_type', 'type'), options, {
+        sr: name
+      }));
     }).return(this);
   }
   /**
@@ -1087,7 +1080,7 @@ var Subreddit = class Subreddit extends _RedditContent2.default {
   * @example r.getSubreddit('snoowrap').unsubscribe()
   */
   unsubscribe() {
-    var _this6 = this;
+    var _this7 = this;
 
     /* Reddit returns a 404 error if the user attempts to unsubscribe to a subreddit that they weren't subscribed to in the
     first place. It also (as one would expect) returns a 404 error if the subreddit in question does not exist. snoowrap
@@ -1096,11 +1089,11 @@ var Subreddit = class Subreddit extends _RedditContent2.default {
     does exist, then the 404 error was of the first type, so swallow it and return the current Subreddit object as usual. If
     the subreddit doesn't exist, then the original error was of the second type, so throw it. */
     return this._setSubscribed(false).catch({ statusCode: 404 }, function (err) {
-      return _this6.fetch().return(_this6).catchThrow(err);
+      return _this7.fetch().return(_this7).catchThrow(err);
     });
   }
   _uploadSrImg(_ref9) {
-    var _this7 = this;
+    var _this8 = this;
 
     var name = _ref9.name,
         file = _ref9.file,
@@ -1118,7 +1111,7 @@ var Subreddit = class Subreddit extends _RedditContent2.default {
       if (result.errors.length) {
         throw result.errors[0];
       }
-      return _this7;
+      return _this8;
     });
   }
   /**
@@ -1481,10 +1474,10 @@ var Subreddit = class Subreddit extends _RedditContent2.default {
   * // ]
   */
   getWikiPages() {
-    var _this8 = this;
+    var _this9 = this;
 
     return this._get({ uri: 'r/' + this.display_name + '/wiki/pages' }).map(function (title) {
-      return _this8.getWikiPage(title);
+      return _this9.getWikiPage(title);
     });
   }
   /**
