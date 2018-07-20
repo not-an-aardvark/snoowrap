@@ -1046,7 +1046,12 @@ const snoowrap = class snoowrap {
     safe.forEach(key => setForm[key] = form[key]);
 
     return this._post({ uri: 'api/site_admin', form: setForm })
-      .then(handleJsonErrors(this.getSubreddit(form.name || form.sr)))
+      .then(response => {
+        try {
+          handleJsonErrors(this.getSubreddit(form.name || form.sr))(response);
+        }
+        catch(e) {}
+      })
       .catch(console.error);
   }
 
