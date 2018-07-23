@@ -38,7 +38,8 @@
     "bluebird": "^3.4.1",
     "lodash": "^4.5.1",
     "promise-chains": "^0.3.11",
-    "request-promise": "^3.0.0",
+    "request": "^2.87.0",
+    "request-promise": "^4.2.2",
     "ws": "^1.1.1"
   },
   "devDependencies": {
