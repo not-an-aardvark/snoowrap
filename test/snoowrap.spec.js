@@ -335,11 +335,11 @@ describe('snoowrap', function () {
     });
     it('exposes camelCase aliases for all prototype functions', () => {
       // noinspection JSUnresolvedVariable
-      expect(r.getUser).to.equal(r.getUser);
+      expect(r.get_user).to.equal(r.getUser);
       // noinspection all
-      expect(r.getSubreddit('AskReddit').getTop).to.equal(r.getSubreddit('AskReddit').getTop);
+      expect(r.get_subreddit('AskReddit').getTop).to.equal(r.getSubreddit('AskReddit').getTop);
       // noinspection JSUnresolvedVariable
-      expect(snoowrap.objects.Listing.prototype.fetchMore).to.equal(snoowrap.objects.Listing.prototype.fetchMore);
+      expect(snoowrap.objects.Listing.prototype.fetch_more).to.equal(snoowrap.objects.Listing.prototype.fetchMore);
     });
     describe('`proxies` config option', async () => {
       it('allows method chaining when set to true', async () => {
