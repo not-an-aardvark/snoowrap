@@ -334,11 +334,8 @@ describe('snoowrap', function () {
       expect(snoowrap.objects.Comment).to.exist();
     });
     it('exposes camelCase aliases for all prototype functions', () => {
-      // noinspection JSUnresolvedVariable
       expect(r.get_user).to.equal(r.getUser);
-      // noinspection all
       expect(r.get_subreddit('AskReddit').getTop).to.equal(r.getSubreddit('AskReddit').getTop);
-      // noinspection JSUnresolvedVariable
       expect(snoowrap.objects.Listing.prototype.fetch_more).to.equal(snoowrap.objects.Listing.prototype.fetchMore);
     });
     describe('`proxies` config option', async () => {
