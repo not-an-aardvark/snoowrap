@@ -1543,11 +1543,6 @@ describe('snoowrap', function () {
       const results = await r.search_subreddit_names({query: 'AskReddit'});
       expect(Array.isArray(results)).to.be.true();
     });
-    it('can search for a list of subreddits by topic', async () => {
-      const results = await r.search_subreddit_topics({query: 'snoowrap'});
-      expect(Array.isArray(results)).to.be.true();
-      expect(results[0]).to.be.an.instanceof(snoowrap.objects.Subreddit);
-    });
     // honestly I have no idea why there are three separate subreddit search functions
     it('can search for a list of subreddits by name and description', async () => {
       const results = await r.search_subreddits({query: 'AskReddit', limit: 5});

@@ -1146,6 +1146,7 @@ const snoowrap = class snoowrap {
   * @param {object} options
   * @param {string} options.query The search query. (50 characters max)
   * @returns {Promise} An Array of subreddit objects corresponding to the search results
+  * @deprecated Reddit no longer provides the corresponding API endpoint.
   * @example
   *
   * r.searchSubredditTopics({query: 'movies'}).then(console.log)
