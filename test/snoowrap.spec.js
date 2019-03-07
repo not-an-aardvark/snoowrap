@@ -42,7 +42,7 @@ describe('snoowrap', function () {
     if (process.env.CI) {
       this.retries(3);
     }
-    r.config({request_delay: 1000});
+    r.config({request_delay: 1000, debug: true});
 
     if (!isBrowser) {
       cookieAgent = request.defaults({
@@ -1918,6 +1918,15 @@ describe('snoowrap', function () {
       const initial_gilding_amount = await submission.gilded;
       await submission.gild();
       expect(await submission.refresh().gilded).to.be.above(initial_gilding_amount);
+    });
+  });
+  describe('new modmail', () => {
+    it('can view a list of conversations', async () => {
+      const conversations = await r.getNewModmailConversations({limit: 2});
+      expect(conversations).to.have.lengthOf(1);
+      expect(conversations).to.be.an.instanceof(snoowrap.objects.Listing);
+      expect(conversations[0]).to.be.an.instanceof(snoowrap.objects.ModmailConversation);
+      console.log(await conversations[0].fetch());
     });
   });
 });

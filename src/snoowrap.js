@@ -1,4 +1,4 @@
-import {defaults, forOwn, includes, isEmpty, map, mapValues, omit, omitBy, snakeCase, values} from 'lodash';
+import {defaults, forOwn, includes, isEmpty, map, mapValues, omit, omitBy, property, snakeCase, values} from 'lodash';
 import Promise from './Promise.js';
 import promiseWrap from 'promise-chains';
 import util from 'util';
@@ -858,6 +858,35 @@ const snoowrap = class snoowrap {
     return this._getListing({uri: 'message/moderator', qs: options});
   }
   /**
+   * @todo Not implemented
+   */
+  getNewModmailConversations (options = {}) {
+    return this._getListing({uri: 'api/mod/conversations', qs: options, _name: 'ModmailConversation', _transform: response => {
+      console.log(JSON.stringify(response));
+      response.after = null;
+      response.before = null;
+      response.children = response.conversationIds.map(id => {
+        return this._newObject('ModmailConversation', {id});
+      });
+      return this._newObject('Listing', response);
+    }});
+  }
+  getNewModmailConversation (id) {
+    return this._newObject('ModmailConversation', {id});
+  }
+  getNewModmailSubreddits () {
+    return this._getListing({uri: 'api/mod/conversations/subreddits'});
+  }
+  getUnreadNewModmailConversations () {
+    return this._getListing({uri: 'api/mod/conversations/unread'});
+  }
+  getUnreadNewModmailConversationsCount () {
+    return this._getListing({uri: 'api/mod/conversations/unread/count'});
+  }
+  bulkReadNewModmail () {
+    return this._post({uri: 'api/mod/conversations/bulk/read'});
+  }
+  /**
   * @summary Gets the user's sent messages.
   * @param {object} [options={}] options for the resulting Listing
   * @returns {Promise} A Listing of the user's sent messages
@@ -1360,6 +1389,7 @@ const snoowrap = class snoowrap {
   getMyMultireddits () {
     return this._get({uri: 'api/multi/mine', qs: {expand_srs: true}});
   }
+
   /**
   * @summary Creates a new multireddit.
   * @param {object} options
