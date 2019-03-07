@@ -675,6 +675,27 @@ const snoowrap = class snoowrap {
     return this._getSortedFrontpage('hot', subredditName, options);
   }
   /**
+   * @summary Gets a Listing of best posts.
+   * @param {object} [options={}] Options for the resulting Listing
+   * @returns {Promise<Listing>} A Listing containing the retrieved submissions
+   * @example
+   *
+   * r.getBest().then(console.log)
+   * // => Listing [
+   * //  Submission { domain: 'imgur.com', banned_by: null, subreddit: Subreddit { display_name: 'pics' }, ... },
+   * //  Submission { domain: 'i.imgur.com', banned_by: null, subreddit: Subreddit { display_name: 'funny' }, ... },
+   * //  ...
+   * // ]
+   *
+   * r.getBest({limit: 1}).then(console.log)
+   * // => Listing [
+   //   Submission { domain: 'self.redditdev', banned_by: null, subreddit: Subreddit { display_name: 'redditdev' }, ...}
+   * // ]
+   */
+  getBest (options) {
+    return this._getSortedFrontpage('best', undefined, options);
+  }
+  /**
   * @summary Gets a Listing of new posts.
   * @param {string} [subredditName] The subreddit to get posts from. If not provided, posts are fetched from
   the front page of reddit.

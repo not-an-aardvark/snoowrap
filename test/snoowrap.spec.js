@@ -997,6 +997,15 @@ describe('snoowrap', function () {
       expect(posts).to.have.length.above(0).and.at.most(100);
       expect(await posts.fetch_more(101)).to.have.length.above(100);
     });
+    it('can get best posts from the front page', async () => {
+      const posts = await r.getBest();
+      expect(posts).to.be.an.instanceof(snoowrap.objects.Listing);
+      expect(posts).to.have.length.above(0).and.at.most(100);
+      expect(await posts.fetchMore(101)).to.have.length.above(100);
+    });
+    it('can get best posts when specifying limit', async () => {
+      expect(await r.getBest({limit: 2})).to.have.lengthOf(2);
+    });
     it('can get new posts from the front page', async () => {
       const posts = await r.get_new();
       expect(moment.unix(posts[0].created_utc).add(60, 'minutes').isAfter()).to.be.true();
