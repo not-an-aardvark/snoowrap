@@ -82,8 +82,18 @@ describe('snoowrap', function () {
     it('does not throw an error if only an access token is provided', () => {
       expect(() => new snoowrap({user_agent: 'a', access_token: 'blah'})).not.to.throw();
     });
+    it('throws an error if the access token is not a string', () => {
+      expect(() => new snoowrap({user_agent: 'a', access_token: {}})).to.throw();
+      expect(() => new snoowrap({user_agent: 'a', access_token: []})).to.throw();
+      expect(() => new snoowrap({user_agent: 'a', access_token: 123})).to.throw();
+    });
     it('does not throw an error if a user_agent, client_id, client_secret, and refresh_token are provided', () => {
       expect(() => new snoowrap({user_agent: 'a', client_id: 'b', client_secret: 'c', refresh_token: 'd'})).not.to.throw();
+    });
+    it('throws an error if refresh_token is not a string', () => {
+      expect(() => new snoowrap({user_agent: 'a', client_id: 'b', client_secret: 'c', refresh_token: {}})).to.throw();
+      expect(() => new snoowrap({user_agent: 'a', client_id: 'b', client_secret: 'c', refresh_token: []})).to.throw();
+      expect(() => new snoowrap({user_agent: 'a', client_id: 'b', client_secret: 'c', refresh_token: 123})).to.throw();
     });
     it('does not throw an error if a user_agent, client_id, client_secret, username, and password are provided', () => {
       expect(() => {

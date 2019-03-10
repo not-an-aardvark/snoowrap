@@ -78,8 +78,8 @@ const snoowrap = class snoowrap {
     if (!userAgent && !isBrowser) {
       return requiredArg('userAgent');
     }
-    if (!accessToken &&
-        (clientId === undefined || clientSecret === undefined || refreshToken === undefined) &&
+    if ((!accessToken || typeof accessToken !== 'string') &&
+        (clientId === undefined || clientSecret === undefined || typeof refreshToken !== 'string') &&
         (clientId === undefined || clientSecret === undefined || username === undefined || password === undefined)
     ) {
       throw new errors.NoCredentialsError();
