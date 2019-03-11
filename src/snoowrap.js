@@ -865,16 +865,28 @@ const snoowrap = class snoowrap {
       response.after = null;
       response.before = null;
       response.children = [];
+
+
       /** @member {Array} response.conversationIds */
       for (const conversation of response.conversationIds) {
         const messages = [];
+        const otherObjects = [];
+        response.conversations[conversation].participant = this._newObject('ModmailConversationAuthor', {
+          ...response.conversations[conversation].participant
+        });
         for (const objId of response.conversations[conversation].objIds) {
           if (objId.key === 'messages') {
-            messages.push(response.messages[objId.id]);
+            messages.push(response[objId.key][objId.id]);
+          } else {
+            if (!otherObjects[objId.key]) {
+              otherObjects[objId.key] = [];
+            }
+            otherObjects[objId.key].push(response[objId.key][objId.id]);
           }
         }
         const data = {
           messages,
+          ...otherObjects,
           ...response.conversations[conversation]
         };
         response.children.push(this._newObject('ModmailConversation', data));

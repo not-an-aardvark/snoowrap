@@ -10,18 +10,36 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
       id: response.conversation.owner.id,
       display_name: response.conversation.owner.displayName
     });
+    response.conversation.participant = this._r._newObject('ModmailConversationAuthor', {
+      modmailConversation: this,
+      ...response.user
+    });
+
+    for (let author of response.conversation.authors) {
+      author = this._r._newObject('ModmailConversationAuthor', {
+        ...author
+      });
+    }
+
     const messages = [];
     const modActions = [];
+    const otherObjects = {};
     for (const objId of response.conversation.objIds) {
       if (objId.key === 'messages') {
-        messages.push(response.messages[objId.id]);
+        messages.push(response[objId.key][objId.id]);
       } else if (objId.key === 'modActions') {
-        messages.push(response.modActions[objId.id]);
+        modActions.push(response[objId.key][objId.id]);
+      } else {
+        if (!otherObjects[objId.key]) {
+          otherObjects[objId.key] = [];
+        }
+        otherObjects[objId.key].push(response[objId.key][objId.id]);
       }
     }
-    return this._r._newObject('ModmailConversation',{
+    return this._r._newObject('ModmailConversation', {
       messages,
       modActions,
+      ...otherObjects,
       ...response.conversation
     });
   }
@@ -60,6 +78,10 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
 
   getParticipant () {
     return this.participant;
+  }
+
+  isHighlighted () {
+    return this.isHighlighted;
   }
 };
 

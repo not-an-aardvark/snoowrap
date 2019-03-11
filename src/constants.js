@@ -29,7 +29,8 @@ export const KINDS = {
   LiveUpdateEvent: 'LiveThread',
   LiveUpdate: 'LiveUpdate',
   LabeledMulti: 'MultiReddit',
-  ModmailConversation: 'ModmailConversation'
+  ModmailConversation: 'ModmailConversation',
+  ModmailConversationAuthor: 'ModmailConversationAuthor'
 };
 export const USERNAME_REGEX = /^[\w-]{1,20}$/;
 export const MODERATOR_PERMISSIONS = ['wiki', 'posts', 'access', 'mail', 'config', 'flair'];
