@@ -4,6 +4,28 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
   get _uri () {
     return `api/mod/conversations/${this.id}?markRead=false`;
   }
+
+  _transformApiResponse (response) {
+    response.conversation.owner = this._r._newObject('Subreddit', {
+      id: response.conversation.owner.id,
+      display_name: response.conversation.owner.displayName
+    });
+    const messages = [];
+    const modActions = [];
+    for (const objId of response.conversation.objIds) {
+      if (objId.key === 'messages') {
+        messages.push(response.messages[objId.id]);
+      } else if (objId.key === 'modActions') {
+        messages.push(response.modActions[objId.id]);
+      }
+    }
+    return this._r._newObject('ModmailConversation',{
+      messages,
+      modActions,
+      ...response.conversation
+    });
+  }
+
   archive () {
     return this._post({uri: `api/mod/conversations/${this.id}/archive`});
   }
@@ -30,6 +52,14 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
   }
   getModmailsByAuthor () {
     return this._get({uri: `api/mod/conversations/${this.id}/user`});
+  }
+
+  getSubject () {
+    return this.subject;
+  }
+
+  getParticipant () {
+    return this.participant;
   }
 };
 

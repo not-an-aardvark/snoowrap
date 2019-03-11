@@ -858,16 +858,27 @@ const snoowrap = class snoowrap {
     return this._getListing({uri: 'message/moderator', qs: options});
   }
   /**
-   * @todo Not implemented
+   * @TODO Modmail; Not implemented
    */
   getNewModmailConversations (options = {}) {
     return this._getListing({uri: 'api/mod/conversations', qs: options, _name: 'ModmailConversation', _transform: response => {
-      console.log(JSON.stringify(response));
       response.after = null;
       response.before = null;
-      response.children = response.conversationIds.map(id => {
-        return this._newObject('ModmailConversation', {id});
-      });
+      response.children = [];
+      /** @member {Array} response.conversationIds */
+      for (const conversation of response.conversationIds) {
+        const messages = [];
+        for (const objId of response.conversations[conversation].objIds) {
+          if (objId.key === 'messages') {
+            messages.push(response.messages[objId.id]);
+          }
+        }
+        const data = {
+          messages,
+          ...response.conversations[conversation]
+        };
+        response.children.push(this._newObject('ModmailConversation', data));
+      }
       return this._newObject('Listing', response);
     }});
   }

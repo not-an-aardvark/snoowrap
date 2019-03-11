@@ -1923,10 +1923,17 @@ describe('snoowrap', function () {
   describe('new modmail', () => {
     it('can view a list of conversations', async () => {
       const conversations = await r.getNewModmailConversations({limit: 2});
-      expect(conversations).to.have.lengthOf(1);
+      expect(conversations).to.have.lengthOf(2);
       expect(conversations).to.be.an.instanceof(snoowrap.objects.Listing);
       expect(conversations[0]).to.be.an.instanceof(snoowrap.objects.ModmailConversation);
-      console.log(await conversations[0].fetch());
+      //console.log(conversations[0].authors[0]);
+      //console.log(conversations[0].owner);
+      console.log("getParticipant", conversations[0].getParticipant());
+      console.log("getSubject", conversations[0].getSubject());
+      let second = await conversations[0].fetch();
+      console.log("second", JSON.stringify(second));
+      console.log("getParticipant", second.getParticipant());
+      console.log("getSubject", second.getSubject());
     });
   });
 });
