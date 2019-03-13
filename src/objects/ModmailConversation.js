@@ -1,23 +1,27 @@
 import RedditContent from './RedditContent.js';
 
+export const conversationStates = Object.freeze({
+  New: 0,
+  InProgress: 1,
+  Archived: 2
+});
+export const modActionStates = Object.freeze({
+  Highlight: 0,
+  UnHighlight: 1,
+  Archive: 2,
+  UnArchive: 3,
+  ReportedToAdmins: 4,
+  Mute: 5,
+  Unmute: 6
+});
 const ModmailConversation = class ModmailConversation extends RedditContent {
 
-  constructor (options, r, hasFetched) {
-    super(options, r, hasFetched);
-    this.conversationStates = Object.freeze({
-      New: 0,
-      InProgress: 1,
-      Archived: 2
-    });
-    this.modActionStates = Object.freeze({
-      Highlight: 0,
-      UnHighlight: 1,
-      Archive: 2,
-      UnArchive: 3,
-      ReportedToAdmins: 4,
-      Mute: 5,
-      Unmute: 6
-    });
+  static get conversationStates () {
+    return conversationStates;
+  }
+
+  static get modActionStates () {
+    return modActionStates;
   }
 
   get _uri () {
@@ -36,7 +40,6 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
       display_name: response.conversation.owner.displayName
     });
     response.conversation.participant = this._r._newObject('ModmailConversationAuthor', {
-      modmailConversation: this,
       ...response.user
     });
     for (let author of response.conversation.authors) {
@@ -101,10 +104,6 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
 
   getCurrentState () {
     return this.state;
-  }
-
-  isHighlighted () {
-    return this.isHighlighted;
   }
 };
 

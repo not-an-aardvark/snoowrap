@@ -881,6 +881,22 @@ const snoowrap = class snoowrap {
       return this._newObject('Listing', response);
     }});
   }
+  /**
+   * @summary Creates a new moderator discussion
+   * @param {object} options
+   * @param {string} options.body Body of the discussion
+   * @param {string} options.subject Title or subject
+   * @param {string} options.srName Subreddit name without fullname
+   */
+  createModeratorDiscussion ({body,
+                              subject,
+                              srName}) {
+    const parsedFromSr = srName.replace(/^\/?r\//, ''); // Convert '/r/subreddit_name' to 'subreddit_name'
+    // _newObject ignores most of the response, no practical way to parse the returned content yet
+    return this._post({uri: 'api/mod/conversations', form: {
+      body, subject, srName: parsedFromSr
+    }}).then(res => this._newObject('ModmailConversation', {id: res.conversation.id}));
+  }
   getNewModmailConversation (id) {
     return this._newObject('ModmailConversation', {id});
   }

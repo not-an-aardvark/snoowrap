@@ -1926,7 +1926,64 @@ describe('snoowrap', function () {
       expect(conversations).to.have.lengthOf(2);
       expect(conversations).to.be.an.instanceof(snoowrap.objects.Listing);
       expect(conversations[0]).to.be.an.instanceof(snoowrap.objects.ModmailConversation);
-      expect(conversations[0].getParticipant()).to.be.an.instanceof(snoowrap.objects.ModmailConversationAuthor);
+      expect(await conversations[0].getParticipant()).to.be.an.instanceof(snoowrap.objects.ModmailConversationAuthor);
+    });
+
+    it('can view a specific conversation', async () => {
+      const conversation = await r.getNewModmailConversation('75hxt').fetch();
+      expect(conversation).to.be.an.instanceof(snoowrap.objects.ModmailConversation);
+      expect(conversation.getParticipant()).to.be.an.instanceof(snoowrap.objects.ModmailConversationAuthor);
+    });
+
+    it('can archive a conversation', async () => {
+      let conversation = await r.getNewModmailConversation('75hxt').fetch();
+      expect(conversation.getCurrentState()).to.not.equal(snoowrap.objects.ModmailConversation.conversationStates.Archived);
+
+      await conversation.archive();
+      conversation = await conversation.refresh();
+      expect(conversation.getCurrentState()).to.equal(snoowrap.objects.ModmailConversation.conversationStates.Archived);
+
+      await conversation.unarchive();
+      conversation = await conversation.refresh();
+      expect(conversation.getCurrentState()).to.not.equal(snoowrap.objects.ModmailConversation.conversationStates.Archived);
+    });
+
+    it('can highlight a conversation', async () => {
+      let conversation = await r.getNewModmailConversation('75hxt').fetch();
+      expect(conversation.isHighlighted).to.be.false();
+
+      await conversation.highlight();
+      conversation = await conversation.refresh();
+      expect(conversation.isHighlighted).to.be.true();
+
+      await conversation.unhighlight();
+      conversation = await conversation.refresh();
+      expect(conversation.isHighlighted).to.be.false();
+    });
+
+    it('can mark a conversation as read', async () => {
+      let conversation = await r.getNewModmailConversation('75hxt').fetch();
+      expect(conversation.isHighlighted).to.be.false();
+
+      await conversation.read();
+      conversation = await conversation.refresh();
+      expect(conversation.isHighlighted).to.be.true();
+
+      await conversation.read();
+      conversation = await conversation.refresh();
+      expect(conversation.isHighlighted).to.be.false();
+    });
+
+    it('create a mod discussion', async () => {
+      const conversation = await r.createModeratorDiscussion({
+        body: 'testBody',
+        subject: 'testSubject',
+        srName: 'SpyTecSnoowrapTesting'
+      }).fetch();
+      expect(conversation).to.be.an.instanceof(snoowrap.objects.ModmailConversation);
+      expect(conversation.subject).to.equal('testSubject');
+      expect(conversation.messages[0].bodyMarkdown).to.equal('testBody');
+      expect(conversation.owner.display_name).to.equal('SpyTecSnoowrapTesting');
     });
   });
 });
