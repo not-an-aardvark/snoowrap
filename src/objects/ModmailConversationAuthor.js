@@ -1,6 +1,21 @@
 import RedditContent from './RedditContent';
 
 const ModmailConversationAuthor = class ModmailParticipant extends RedditContent {
+
+  constructor (options, r, hasFetched) {
+    super(options, r, hasFetched);
+
+    options.recentComments = Object.keys(options.recentComments).map(commentId => this._r._newObject('Comment', {
+      name: commentId,
+      ...options.recentComments[commentId]
+    }));
+
+    options.recentPosts = Object.keys(options.recentPosts).map(postId => this._r._newObject('Submission', {
+      name: postId,
+      ...options.recentPosts[postId]
+    }));
+  }
+
   /**
    * @summary Gets information on a Reddit user for the given modmail.
    * @returns {RedditUser} An unfetched RedditUser object for the requested user
@@ -14,6 +29,7 @@ const ModmailConversationAuthor = class ModmailParticipant extends RedditContent
   getUser () {
     return this._r.getUser(this.name);
   }
+
 };
 
 export default ModmailConversationAuthor;

@@ -1,10 +1,35 @@
 import RedditContent from './RedditContent.js';
 
 const ModmailConversation = class ModmailConversation extends RedditContent {
+
+  constructor (options, r, hasFetched) {
+    super(options, r, hasFetched);
+    this.conversationStates = Object.freeze({
+      New: 0,
+      InProgress: 1,
+      Archived: 2
+    });
+    this.modActionStates = Object.freeze({
+      Highlight: 0,
+      UnHighlight: 1,
+      Archive: 2,
+      UnArchive: 3,
+      ReportedToAdmins: 4,
+      Mute: 5,
+      Unmute: 6
+    });
+  }
+
   get _uri () {
     return `api/mod/conversations/${this.id}?markRead=false`;
   }
 
+  /**
+   * @summary Converts relevant fields in the ModmailConversation to snoowrap models.
+   * @param response API Response
+   * @return {ModmailConversation}
+   * @private
+   */
   _transformApiResponse (response) {
     response.conversation.owner = this._r._newObject('Subreddit', {
       id: response.conversation.owner.id,
@@ -14,34 +39,28 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
       modmailConversation: this,
       ...response.user
     });
-
     for (let author of response.conversation.authors) {
       author = this._r._newObject('ModmailConversationAuthor', {
         ...author
       });
     }
 
-    const messages = [];
-    const modActions = [];
-    const otherObjects = {};
-    for (const objId of response.conversation.objIds) {
-      if (objId.key === 'messages') {
-        messages.push(response[objId.key][objId.id]);
-      } else if (objId.key === 'modActions') {
-        modActions.push(response[objId.key][objId.id]);
-      } else {
-        if (!otherObjects[objId.key]) {
-          otherObjects[objId.key] = [];
-        }
-        otherObjects[objId.key].push(response[objId.key][objId.id]);
-      }
-    }
+    const conversationObjects = ModmailConversation._getConversationObjects(response.conversation, response);
     return this._r._newObject('ModmailConversation', {
-      messages,
-      modActions,
-      ...otherObjects,
+      ...conversationObjects,
       ...response.conversation
     });
+  }
+
+  static _getConversationObjects (conversation, response) {
+    const objects = {};
+    for (const objId of conversation.objIds) {
+      if (!objects[objId.key]) {
+        objects[objId.key] = [];
+      }
+      objects[objId.key].push(response[objId.key][objId.id]);
+    }
+    return objects;
   }
 
   archive () {
@@ -78,6 +97,10 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
 
   getParticipant () {
     return this.participant;
+  }
+
+  getCurrentState () {
+    return this.state;
   }
 
   isHighlighted () {

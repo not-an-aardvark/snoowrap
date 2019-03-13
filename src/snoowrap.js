@@ -16,6 +16,7 @@ import {
 } from './helpers.js';
 import createConfig from './create_config.js';
 import * as objects from './objects/index.js';
+import ModmailConversation from './objects/ModmailConversation';
 
 const api_type = 'json';
 
@@ -866,27 +867,13 @@ const snoowrap = class snoowrap {
       response.before = null;
       response.children = [];
 
-
-      /** @member {Array} response.conversationIds */
       for (const conversation of response.conversationIds) {
-        const messages = [];
-        const otherObjects = [];
         response.conversations[conversation].participant = this._newObject('ModmailConversationAuthor', {
           ...response.conversations[conversation].participant
         });
-        for (const objId of response.conversations[conversation].objIds) {
-          if (objId.key === 'messages') {
-            messages.push(response[objId.key][objId.id]);
-          } else {
-            if (!otherObjects[objId.key]) {
-              otherObjects[objId.key] = [];
-            }
-            otherObjects[objId.key].push(response[objId.key][objId.id]);
-          }
-        }
+        const conversationObjects = ModmailConversation._getConversationObjects(response.conversations[conversation], response);
         const data = {
-          messages,
-          ...otherObjects,
+          ...conversationObjects,
           ...response.conversations[conversation]
         };
         response.children.push(this._newObject('ModmailConversation', data));
