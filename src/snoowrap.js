@@ -1,4 +1,4 @@
-import {defaults, forOwn, includes, isEmpty, map, mapValues, omit, omitBy, property, snakeCase, values} from 'lodash';
+import {defaults, forOwn, includes, isEmpty, map, mapValues, omit, omitBy, snakeCase, values} from 'lodash';
 import Promise from './Promise.js';
 import promiseWrap from 'promise-chains';
 import util from 'util';
@@ -16,7 +16,6 @@ import {
 } from './helpers.js';
 import createConfig from './create_config.js';
 import * as objects from './objects/index.js';
-import ModmailConversation from './objects/ModmailConversation';
 
 const api_type = 'json';
 
@@ -871,7 +870,10 @@ const snoowrap = class snoowrap {
         response.conversations[conversation].participant = this._newObject('ModmailConversationAuthor', {
           ...response.conversations[conversation].participant
         });
-        const conversationObjects = ModmailConversation._getConversationObjects(response.conversations[conversation], response);
+        const conversationObjects = objects.ModmailConversation._getConversationObjects(
+          response.conversations[conversation],
+          response
+        );
         const data = {
           ...conversationObjects,
           ...response.conversations[conversation]
@@ -1415,7 +1417,6 @@ const snoowrap = class snoowrap {
   getMyMultireddits () {
     return this._get({uri: 'api/multi/mine', qs: {expand_srs: true}});
   }
-
   /**
   * @summary Creates a new multireddit.
   * @param {object} options
