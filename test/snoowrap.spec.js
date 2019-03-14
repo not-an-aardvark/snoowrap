@@ -1961,7 +1961,16 @@ describe('snoowrap', function () {
       expect(conversation.isHighlighted).to.be.false();
     });
 
-    it('can mark a conversation as read');
+    it('can mark a conversation as read', async () => {
+      let conversation = r.getNewModmailConversation('75hxt');
+      await conversation.read();
+      conversation = await conversation.refresh();
+      expect(conversation.lastUnread).to.be.null();
+
+      await conversation.unread();
+      conversation = await conversation.refresh();
+      expect(conversation.lastUnread).to.be.a('string');
+    });
 
     it('create a mod discussion', async () => {
       const conversation = await r.createModeratorDiscussion({
@@ -1988,7 +1997,8 @@ describe('snoowrap', function () {
     });
 
     it('can get the user from modmail', async () => {
-      const author = await r.getNewModmailConversation('75hxt').getAuthor();
+      const conversation = r.getNewModmailConversation('75hxt');
+      const author = conversation.getAuthor();
       expect(author).to.be.an.instanceof(snoowrap.objects.ModmailConversationAuthor);
     });
   });
