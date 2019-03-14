@@ -5,6 +5,7 @@ export const conversationStates = Object.freeze({
   InProgress: 1,
   Archived: 2
 });
+
 export const modActionStates = Object.freeze({
   Highlight: 0,
   UnHighlight: 1,
@@ -14,6 +15,7 @@ export const modActionStates = Object.freeze({
   Mute: 5,
   Unmute: 6
 });
+
 const ModmailConversation = class ModmailConversation extends RedditContent {
 
   static get conversationStates () {
@@ -39,20 +41,16 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
       id: response.conversation.owner.id,
       display_name: response.conversation.owner.displayName
     });
-    response.conversation.participant = this._r._newObject('ModmailConversationAuthor', {
-      ...response.user
-    });
+    response.conversation.participant = this._r._newObject('ModmailConversationAuthor', response.user.name, true);
     for (let author of response.conversation.authors) {
-      author = this._r._newObject('ModmailConversationAuthor', {
-        ...author
-      });
+      author = this._r._newObject('ModmailConversationAuthor', author, true);
     }
 
     const conversationObjects = ModmailConversation._getConversationObjects(response.conversation, response);
     return this._r._newObject('ModmailConversation', {
       ...conversationObjects,
       ...response.conversation
-    });
+    }, true);
   }
 
   static _getConversationObjects (conversation, response) {
@@ -69,29 +67,40 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
   archive () {
     return this._post({uri: `api/mod/conversations/${this.id}/archive`});
   }
+
   unarchive () {
     return this._post({uri: `api/mod/conversations/${this.id}/unarchive`});
   }
+
   highlight () {
     return this._post({uri: `api/mod/conversations/${this.id}/highlight`});
   }
+
   unhighlight () {
     return this._delete({uri: `api/mod/conversations/${this.id}/highlight`});
   }
+
   mute () {
     return this._post({uri: `api/mod/conversations/${this.id}/mute`});
   }
+
   unmute () {
     return this._post({uri: `api/mod/conversations/${this.id}/unmute`});
   }
+
   read () {
     return this._post({uri: `api/mod/conversations/${this.id}/read`});
   }
+
   unread () {
     return this._post({uri: `api/mod/conversations/${this.id}/unread`});
   }
-  getModmailsByAuthor () {
-    return this._get({uri: `api/mod/conversations/${this.id}/user`});
+
+  getAuthor () {
+    return this._get({uri: `api/mod/conversations/${this.id}/user`})
+      .then(res => {
+        return this._r._newObject('ModmailConversationAuthor', res, true);
+      });
   }
 
   getSubject () {

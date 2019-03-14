@@ -1961,18 +1961,7 @@ describe('snoowrap', function () {
       expect(conversation.isHighlighted).to.be.false();
     });
 
-    it('can mark a conversation as read', async () => {
-      let conversation = await r.getNewModmailConversation('75hxt').fetch();
-      expect(conversation.isHighlighted).to.be.false();
-
-      await conversation.read();
-      conversation = await conversation.refresh();
-      expect(conversation.isHighlighted).to.be.true();
-
-      await conversation.read();
-      conversation = await conversation.refresh();
-      expect(conversation.isHighlighted).to.be.false();
-    });
+    it('can mark a conversation as read');
 
     it('create a mod discussion', async () => {
       const conversation = await r.createModeratorDiscussion({
@@ -1984,6 +1973,23 @@ describe('snoowrap', function () {
       expect(conversation.subject).to.equal('testSubject');
       expect(conversation.messages[0].bodyMarkdown).to.equal('testBody');
       expect(conversation.owner.display_name).to.equal('SpyTecSnoowrapTesting');
+    });
+
+    it('can mute a user', async () => {
+      let conversation = await r.getNewModmailConversation('75hxt').fetch();
+
+      await conversation.mute();
+      conversation = await conversation.refresh();
+      expect(conversation.getParticipant().muteStatus.isMuted).to.be.true();
+
+      await conversation.unmute();
+      conversation = await conversation.refresh();
+      expect(conversation.getParticipant().muteStatus.isMuted).to.be.false();
+    });
+
+    it('can get the user from modmail', async () => {
+      const author = await r.getNewModmailConversation('75hxt').getAuthor();
+      expect(author).to.be.an.instanceof(snoowrap.objects.ModmailConversationAuthor);
     });
   });
 });
