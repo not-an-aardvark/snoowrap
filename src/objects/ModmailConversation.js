@@ -89,11 +89,11 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
   }
 
   read () {
-    return this._post({uri: 'api/mod/conversations/read', form: {conversationIds: this.id}});
+    return this._r.markNewModmailConversationsAsRead([this.id]);
   }
 
   unread () {
-    return this._post({uri: 'api/mod/conversations/unread', form: {conversationIds: this.id}});
+    return this._r.markNewModmailConversationsAsUnread([this.id]);
   }
 
   getAuthor () {
@@ -103,16 +103,12 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
       });
   }
 
-  getSubject () {
-    return this.subject;
+  isRead () {
+    return this.lastUnread === null;
   }
 
-  getParticipant () {
-    return this.participant;
-  }
-
-  getCurrentState () {
-    return this.state;
+  get name () {
+    return this.id;
   }
 };
 

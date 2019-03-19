@@ -1926,26 +1926,26 @@ describe('snoowrap', function () {
       expect(conversations).to.have.lengthOf(2);
       expect(conversations).to.be.an.instanceof(snoowrap.objects.Listing);
       expect(conversations[0]).to.be.an.instanceof(snoowrap.objects.ModmailConversation);
-      expect(await conversations[0].getParticipant()).to.be.an.instanceof(snoowrap.objects.ModmailConversationAuthor);
+      expect(await conversations[0].participant).to.be.an.instanceof(snoowrap.objects.ModmailConversationAuthor);
     });
 
     it('can view a specific conversation', async () => {
       const conversation = await r.getNewModmailConversation('75hxt').fetch();
       expect(conversation).to.be.an.instanceof(snoowrap.objects.ModmailConversation);
-      expect(conversation.getParticipant()).to.be.an.instanceof(snoowrap.objects.ModmailConversationAuthor);
+      expect(conversation.participant).to.be.an.instanceof(snoowrap.objects.ModmailConversationAuthor);
     });
 
     it('can archive a conversation', async () => {
       let conversation = await r.getNewModmailConversation('75hxt').fetch();
-      expect(conversation.getCurrentState()).to.not.equal(snoowrap.objects.ModmailConversation.conversationStates.Archived);
+      expect(conversation.state).to.not.equal(snoowrap.objects.ModmailConversation.conversationStates.Archived);
 
       await conversation.archive();
       conversation = await conversation.refresh();
-      expect(conversation.getCurrentState()).to.equal(snoowrap.objects.ModmailConversation.conversationStates.Archived);
+      expect(conversation.state).to.equal(snoowrap.objects.ModmailConversation.conversationStates.Archived);
 
       await conversation.unarchive();
       conversation = await conversation.refresh();
-      expect(conversation.getCurrentState()).to.not.equal(snoowrap.objects.ModmailConversation.conversationStates.Archived);
+      expect(conversation.state).to.not.equal(snoowrap.objects.ModmailConversation.conversationStates.Archived);
     });
 
     it('can highlight a conversation', async () => {
@@ -1989,17 +1989,68 @@ describe('snoowrap', function () {
 
       await conversation.mute();
       conversation = await conversation.refresh();
-      expect(conversation.getParticipant().muteStatus.isMuted).to.be.true();
+      expect(conversation.participant.muteStatus.isMuted).to.be.true();
 
       await conversation.unmute();
       conversation = await conversation.refresh();
-      expect(conversation.getParticipant().muteStatus.isMuted).to.be.false();
+      expect(conversation.participant.muteStatus.isMuted).to.be.false();
     });
 
     it('can get the user from modmail', async () => {
       const conversation = r.getNewModmailConversation('75hxt');
       const author = conversation.getAuthor();
       expect(author).to.be.an.instanceof(snoowrap.objects.ModmailConversationAuthor);
+    });
+
+    it('can mark a conversation as read', async () => {
+      let conversation = r.getNewModmailConversation('75hxt');
+      await conversation.unread();
+      conversation = await conversation.refresh();
+      expect(conversation.isRead()).to.be.false();
+
+      await conversation.read();
+      conversation = await conversation.refresh();
+      expect(conversation.isRead()).to.be.true();
+    });
+
+    it('can mark a list of conversations objects as read', async () => {
+      const conversations = [
+        r.getNewModmailConversation('75hxt'),
+        r.getNewModmailConversation('7b8oj')
+      ];
+      await r.markNewModmailConversationsAsUnread(conversations);
+      for (let conversation of conversations) {
+        conversation = await conversation.fetch();
+        expect(conversation.isRead()).to.be.false();
+      }
+
+      await r.markNewModmailConversationsAsRead(conversations);
+      for (let conversation of conversations) {
+        conversation = await conversation.refresh();
+        expect(conversation.isRead()).to.be.true();
+      }
+    });
+
+    it('can mark a list of conversations strings as read', async () => {
+      const conversationIds = [
+        '75hxt',
+        '7b8oj'
+      ];
+      await r.markNewModmailConversationsAsUnread(conversationIds);
+      for (const id of conversationIds) {
+        const conversation = await r.getNewModmailConversation(id).fetch();
+        expect(conversation.isRead()).to.be.false();
+      }
+
+      await r.markNewModmailConversationsAsRead(conversationIds);
+      for (const id of conversationIds) {
+        const conversation = await r.getNewModmailConversation(id).fetch();
+        expect(conversation.isRead()).to.be.true();
+      }
+    });
+
+    it('can get a list of subreddits', async () => {
+      console.log(await r.getNewModmailSubreddits());
     });
   });
 });
