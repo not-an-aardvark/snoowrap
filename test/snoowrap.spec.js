@@ -1998,7 +1998,7 @@ describe('snoowrap', function () {
 
     it('can get the user from modmail', async () => {
       const conversation = r.getNewModmailConversation('75hxt');
-      const author = await conversation.getAuthor();
+      const author = await conversation.getParticipant();
       expect(author).to.be.an.instanceof(snoowrap.objects.ModmailConversationAuthor);
     });
 

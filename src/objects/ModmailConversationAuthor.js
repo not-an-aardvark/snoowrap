@@ -1,5 +1,14 @@
 import RedditContent from './RedditContent';
 
+/**
+ * A class representing an author from a modmail conversation
+ * <style> #ModmailConversationAuthor {display: none} </style>
+ * @example
+ *
+ * // Get a Modmail Conversation author with a given ID
+ * r.getNewModmailConversation('75hxt').getParticipant()
+ * @extends RedditContent
+ */
 const ModmailConversationAuthor = class ModmailParticipant extends RedditContent {
 
   constructor (options, r, hasFetched) {
