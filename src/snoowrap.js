@@ -978,16 +978,36 @@ const snoowrap = class snoowrap {
     });
   }
 
-  getUnreadNewModmailConversations () {
-    return this._getListing({uri: 'api/mod/conversations/unread'});
-  }
+  /**
+   * @typedef {Object} UnreadCount
+   * @property {number} highlighted
+   * @property {number} notifications
+   * @property {number} archived
+   * @property {number} new
+   * @property {number} inprogress
+   * @property {number} mod
+   */
 
+  /**
+   * @summary Retrieves an object of unread Modmail conversations for each state
+   * @return {UnreadCount} unreadCount
+   */
   getUnreadNewModmailConversationsCount () {
-    return this._getListing({uri: 'api/mod/conversations/unread/count'});
+    return this._get({uri: 'api/mod/conversations/unread/count'});
   }
 
-  bulkReadNewModmail () {
-    return this._post({uri: 'api/mod/conversations/bulk/read'});
+  /**
+   * @summary Mark Modmail conversations as read given the subreddit(s) and state.
+   * @param {Subreddit[]|String[]} subreddits
+   * @param {('new'|'inprogress'|'mod'|'notifications'|'archived'|'highlighted'|'all')} state selected state to mark as read
+   * @return {Promise}
+   */
+  bulkReadNewModmail (subreddits, state) {
+    const subredditNames = subreddits.map(s => typeof s === 'string' ? s.replace(/^\/?r\//, '') : s.display_name);
+    return this._post({uri: 'api/mod/conversations/bulk/read', form: {
+      entity: subredditNames.join(','),
+      state
+    }});
   }
 
   /**

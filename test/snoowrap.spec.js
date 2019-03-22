@@ -1998,7 +1998,7 @@ describe('snoowrap', function () {
 
     it('can get the user from modmail', async () => {
       const conversation = r.getNewModmailConversation('75hxt');
-      const author = conversation.getAuthor();
+      const author = await conversation.getAuthor();
       expect(author).to.be.an.instanceof(snoowrap.objects.ModmailConversationAuthor);
     });
 
@@ -2050,7 +2050,37 @@ describe('snoowrap', function () {
     });
 
     it('can get a list of subreddits', async () => {
-      console.log(await r.getNewModmailSubreddits());
+      const subreddits = await r.getNewModmailSubreddits();
+      expect(subreddits).to.be.instanceof(snoowrap.objects.Listing);
+      expect(subreddits[0]).to.be.instanceof(snoowrap.objects.Subreddit);
+    });
+
+    it('can retrieve amount of of unread Modmail conversations', async () => {
+      const count = await r.getUnreadNewModmailConversationsCount();
+      expect(Object.keys(count)).to.have.members([
+        'highlighted',
+        'notifications',
+        'archived',
+        'new',
+        'inprogress',
+        'mod'
+      ]);
+    });
+
+    it('can bulk read defined states', async () => {
+      const conversation = r.getNewModmailConversation('75hxt'); // '75hxt' is an inprogress discussion
+      await conversation.unread();
+      let count = await r.getUnreadNewModmailConversationsCount();
+      expect(count.inprogress).to.be.greaterThan(0);
+
+      const checkCount = count.inprogress;
+      await r.bulkReadNewModmail(['SpyTecSnoowrapTesting'], 'new');
+      count = await r.getUnreadNewModmailConversationsCount();
+      expect(count.inprogress).to.equal(checkCount);
+
+      await r.bulkReadNewModmail(['SpyTecSnoowrapTesting'], 'inprogress');
+      count = await r.getUnreadNewModmailConversationsCount();
+      expect(count.inprogress).to.equal(checkCount - 1);
     });
   });
 });
