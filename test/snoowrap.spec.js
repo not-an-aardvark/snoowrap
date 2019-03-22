@@ -42,7 +42,7 @@ describe('snoowrap', function () {
     if (process.env.CI) {
       this.retries(3);
     }
-    r.config({request_delay: 1000, debug: true});
+    r.config({request_delay: 1000});
 
     if (!isBrowser) {
       cookieAgent = request.defaults({
