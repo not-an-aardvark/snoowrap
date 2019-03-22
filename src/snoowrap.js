@@ -901,7 +901,16 @@ const snoowrap = class snoowrap {
   }
 
   /**
-   * @TODO Modmail; Not implemented
+   * @summary Gets a list of ModmailConversations from the authenticated user's subreddits.
+   * @param {object} [options] Options for the resulting Listing
+   * @returns {Promise<Listing<ModmailConversation>>} A Listing containing Subreddits
+   * @example
+   *
+   * r.getNewModmailConversations({limit: 2}).then(console.log)
+   * // => Listing [
+   * //  ModmailConversation { messages: [...], objIds: [...], subject: 'test subject', ... },
+   * //  ModmailConversation { messages: [...], objIds: [...], subject: 'test subject', ... }
+   * // ]
    */
   getNewModmailConversations (options = {}) {
     return this._getListing({
@@ -930,11 +939,20 @@ const snoowrap = class snoowrap {
   }
 
   /**
-   * @summary Creates a new moderator discussion
+   * @summary Create a new moderator discussion
    * @param {object} options
    * @param {string} options.body Body of the discussion
    * @param {string} options.subject Title or subject
    * @param {string} options.srName Subreddit name without fullname
+   * @returns {Promise<ModmailConversation>} the created ModmailConversation
+   * @example
+   *
+   * r.createModeratorDiscussion({
+   *   body: 'test body',
+   *   subject: 'test subject',
+   *   srName: 'AskReddit'
+   * }).then(console.log)
+   * // ModmailConversation { messages: [...], objIds: [...], subject: 'test subject', ... }
    */
   createModeratorDiscussion ({
                                body,
@@ -950,20 +968,54 @@ const snoowrap = class snoowrap {
     }).then(res => this._newObject('ModmailConversation', {id: res.conversation.id}));
   }
 
+  /**
+   * @summary Get a ModmailConversation by its id
+   * @param {string} id of the ModmailConversation
+   * @returns {Promise<ModmailConversation>} the requested ModmailConversation
+   * @example
+   *
+   * r.getNewModmailConversation('75hxt').then(console.log)
+   * // ModmailConversation { messages: [...], objIds: [...], ... }
+   */
   getNewModmailConversation (id) {
     return this._newObject('ModmailConversation', {id});
   }
 
+  /**
+   * @summary Marks all conversations in array as read.
+   * @param {ModmailConversation[]} conversations to mark as read
+   * @example
+   *
+   * r.markNewModmailConversationsAsRead(['pics', 'sweden'])
+   */
   markNewModmailConversationsAsRead (conversations) {
     const conversationIds = conversations.map(message => addFullnamePrefix(message, ''));
     return this._post({uri: 'api/mod/conversations/read', form: {conversationIds: conversationIds.join(',')}});
   }
 
+  /**
+   * @summary Marks all conversations in array as unread.
+   * @param {ModmailConversation[]} conversations to mark as unread
+   * @example
+   *
+   * r.markNewModmailConversationsAsUnread(['pics', 'sweden'])
+   */
   markNewModmailConversationsAsUnread (conversations) {
     const conversationIds = conversations.map(message => addFullnamePrefix(message, ''));
     return this._post({uri: 'api/mod/conversations/unread', form: {conversationIds: conversationIds.join(',')}});
   }
 
+  /**
+   * @summary Gets all moderated subreddits that have new Modmail activated
+   * @returns {Promise<Listing<Subreddit>>} a Listing of ModmailConversations marked as read
+   * @example
+   *
+   * r.getNewModmailSubreddits().then(console.log)
+   * // => Listing [
+   * //  Subreddit { display_name: 'tipofmytongue', ... },
+   * //  Subreddit { display_name: 'EarthPorn', ... },
+   * // ]
+   */
   getNewModmailSubreddits () {
     return this._getListing({
       uri: 'api/mod/conversations/subreddits', _transform: response => {
@@ -989,8 +1041,19 @@ const snoowrap = class snoowrap {
    */
 
   /**
-   * @summary Retrieves an object of unread Modmail conversations for each state
-   * @return {UnreadCount} unreadCount
+   * @summary Retrieves an object of unread Modmail conversations for each state.
+   * @returns {UnreadCount} unreadCount
+   * @example
+   *
+   * r.getUnreadNewModmailConversationsCount().then(console.log)
+   * // => {
+   * //  highlighted: 1,
+   * //  notifications: 0,
+   * //  archived: 0,
+   * //  new: 2,
+   * //  inprogress: 5,
+   * //  mod: 1,
+   * // }
    */
   getUnreadNewModmailConversationsCount () {
     return this._get({uri: 'api/mod/conversations/unread/count'});
@@ -1000,14 +1063,35 @@ const snoowrap = class snoowrap {
    * @summary Mark Modmail conversations as read given the subreddit(s) and state.
    * @param {Subreddit[]|String[]} subreddits
    * @param {('new'|'inprogress'|'mod'|'notifications'|'archived'|'highlighted'|'all')} state selected state to mark as read
-   * @return {Promise}
+   * @returns {Promise<Listing<ModmailConversation>>} a Listing of ModmailConversations marked as read
+   * @example
+   *
+   * r.bulkReadNewModmail(['AskReddit'], 'all').then(console.log)
+   * // => Listing [
+   * //  ModmailConversation { id: '75hxt' },
+   * //  ModmailConversation { id: '75hxg' }
+   * // ]
+   *
+   * r.bulkReadNewModmail([r.getSubreddit('AskReddit')], 'all').then(console.log)
+   * // => Listing [
+   * //  ModmailConversation { id: '75hxt' },
+   * //  ModmailConversation { id: '75hxg' }
+   * // ]
    */
   bulkReadNewModmail (subreddits, state) {
     const subredditNames = subreddits.map(s => typeof s === 'string' ? s.replace(/^\/?r\//, '') : s.display_name);
     return this._post({uri: 'api/mod/conversations/bulk/read', form: {
       entity: subredditNames.join(','),
       state
-    }});
+    }}).then(res => {
+      return this._newObject('Listing', {
+        after: null,
+        before: null,
+        children: res.conversation_ids.map(id => {
+          return this._newObject('ModmailConversation', {id});
+        })
+      });
+    });
   }
 
   /**

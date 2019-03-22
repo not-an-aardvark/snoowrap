@@ -6,6 +6,7 @@ export const conversationStates = Object.freeze({
   Archived: 2
 });
 
+
 export const modActionStates = Object.freeze({
   Highlight: 0,
   UnHighlight: 1,
@@ -92,7 +93,7 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
     return this._r.markNewModmailConversationsAsRead([this.id]);
   }
 
-  unread () {
+  markAsUnread () {
     return this._r.markNewModmailConversationsAsUnread([this.id]);
   }
 

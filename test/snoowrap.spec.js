@@ -2078,7 +2078,7 @@ describe('snoowrap', function () {
       count = await r.getUnreadNewModmailConversationsCount();
       expect(count.inprogress).to.equal(checkCount);
 
-      await r.bulkReadNewModmail(['SpyTecSnoowrapTesting'], 'inprogress');
+      await r.bulkReadNewModmail([r.getSubreddit('SpyTecSnoowrapTesting')], 'inprogress');
       count = await r.getUnreadNewModmailConversationsCount();
       expect(count.inprogress).to.equal(checkCount - 1);
     });
