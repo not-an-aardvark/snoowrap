@@ -939,7 +939,7 @@ const snoowrap = class snoowrap {
   }
 
   /**
-   * @summary Create a new moderator discussion
+   * @summary Create a new modmail discussion between moderators
    * @param {object} options
    * @param {string} options.body Body of the discussion
    * @param {string} options.subject Title or subject
@@ -954,7 +954,7 @@ const snoowrap = class snoowrap {
    * }).then(console.log)
    * // ModmailConversation { messages: [...], objIds: [...], subject: 'test subject', ... }
    */
-  createModeratorDiscussion ({
+  createModmailDiscussion ({
                                body,
                                subject,
                                srName
