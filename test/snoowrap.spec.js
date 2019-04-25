@@ -1973,7 +1973,7 @@ describe('snoowrap', function () {
     });
 
     it('create a mod discussion', async () => {
-      const conversation = await r.createModeratorDiscussion({
+      const conversation = await r.createModmailDiscussion({
         body: 'testBody',
         subject: 'testSubject',
         srName: 'SpyTecSnoowrapTesting'
@@ -2051,8 +2051,11 @@ describe('snoowrap', function () {
 
     it('can get a list of subreddits', async () => {
       const subreddits = await r.getNewModmailSubreddits();
-      expect(subreddits).to.be.instanceof(snoowrap.objects.Listing);
-      expect(subreddits[0]).to.be.instanceof(snoowrap.objects.Subreddit);
+      expect(subreddits).to.be.an('array');
+      expect(subreddits.length).to.be.greaterThan(1);
+      for (let i = 0; i < subreddits.length; i++) {
+        expect(subreddits[i]).to.be.instanceof(snoowrap.objects.Subreddit);
+      }
     });
 
     it('can retrieve amount of of unread Modmail conversations', async () => {

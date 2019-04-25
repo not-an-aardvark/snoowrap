@@ -1017,16 +1017,10 @@ const snoowrap = class snoowrap {
    * // ]
    */
   getNewModmailSubreddits () {
-    return this._getListing({
-      uri: 'api/mod/conversations/subreddits', _transform: response => {
-        return this._newObject('Listing', {
-          after: null,
-          before: null,
-          children: Object.values(response.subreddits).map(s => {
-            return this._newObject('Subreddit', s);
-          })
-        });
-      }
+    return this._get({uri: 'api/mod/conversations/subreddits'}).then(response => {
+      return Object.values(response.subreddits).map(s => {
+        return this._newObject('Subreddit', s);
+      });
     });
   }
 
