@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.16.0 (2019-06-04)
+
+* Added support for new modmail
+* Added `/best` endpoint
+
 ## v1.15.2 (2018-01-05)
 
 * Fixed an error when deleting images from subreddit stylesheets
