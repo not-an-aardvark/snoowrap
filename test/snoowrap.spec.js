@@ -1920,4 +1920,170 @@ describe('snoowrap', function () {
       expect(await submission.refresh().gilded).to.be.above(initial_gilding_amount);
     });
   });
+  describe('new modmail', () => {
+    it('can view a list of conversations', async () => {
+      const conversations = await r.getNewModmailConversations({limit: 2});
+      expect(conversations).to.have.lengthOf(2);
+      expect(conversations).to.be.an.instanceof(snoowrap.objects.Listing);
+      expect(conversations[0]).to.be.an.instanceof(snoowrap.objects.ModmailConversation);
+      expect(await conversations[0].participant).to.be.an.instanceof(snoowrap.objects.ModmailConversationAuthor);
+    });
+
+    it('can view a specific conversation', async () => {
+      const conversation = await r.getNewModmailConversation('75hxt').fetch();
+      expect(conversation).to.be.an.instanceof(snoowrap.objects.ModmailConversation);
+      expect(conversation.participant).to.be.an.instanceof(snoowrap.objects.ModmailConversationAuthor);
+    });
+
+    it('can archive a conversation', async () => {
+      let conversation = await r.getNewModmailConversation('75hxt').fetch();
+      expect(conversation.state).to.not.equal(snoowrap.objects.ModmailConversation.conversationStates.Archived);
+
+      await conversation.archive();
+      conversation = await conversation.refresh();
+      expect(conversation.state).to.equal(snoowrap.objects.ModmailConversation.conversationStates.Archived);
+
+      await conversation.unarchive();
+      conversation = await conversation.refresh();
+      expect(conversation.state).to.not.equal(snoowrap.objects.ModmailConversation.conversationStates.Archived);
+    });
+
+    it('can highlight a conversation', async () => {
+      let conversation = await r.getNewModmailConversation('75hxt').fetch();
+      expect(conversation.isHighlighted).to.be.false();
+
+      await conversation.highlight();
+      conversation = await conversation.refresh();
+      expect(conversation.isHighlighted).to.be.true();
+
+      await conversation.unhighlight();
+      conversation = await conversation.refresh();
+      expect(conversation.isHighlighted).to.be.false();
+    });
+
+    it('can mark a conversation as read', async () => {
+      let conversation = r.getNewModmailConversation('75hxt');
+      await conversation.read();
+      conversation = await conversation.refresh();
+      expect(conversation.lastUnread).to.be.null();
+
+      await conversation.unread();
+      conversation = await conversation.refresh();
+      expect(conversation.lastUnread).to.be.a('string');
+    });
+
+    it('create a mod discussion', async () => {
+      const conversation = await r.createModmailDiscussion({
+        body: 'testBody',
+        subject: 'testSubject',
+        srName: 'SpyTecSnoowrapTesting'
+      }).fetch();
+      expect(conversation).to.be.an.instanceof(snoowrap.objects.ModmailConversation);
+      expect(conversation.subject).to.equal('testSubject');
+      expect(conversation.messages[0].bodyMarkdown).to.equal('testBody');
+      expect(conversation.owner.display_name).to.equal('SpyTecSnoowrapTesting');
+    });
+
+    it('can mute a user', async () => {
+      let conversation = await r.getNewModmailConversation('75hxt').fetch();
+
+      await conversation.mute();
+      conversation = await conversation.refresh();
+      expect(conversation.participant.muteStatus.isMuted).to.be.true();
+
+      await conversation.unmute();
+      conversation = await conversation.refresh();
+      expect(conversation.participant.muteStatus.isMuted).to.be.false();
+    });
+
+    it('can get the user from modmail', async () => {
+      const conversation = r.getNewModmailConversation('75hxt');
+      const author = await conversation.getParticipant();
+      expect(author).to.be.an.instanceof(snoowrap.objects.ModmailConversationAuthor);
+    });
+
+    it('can mark a conversation as read', async () => {
+      let conversation = r.getNewModmailConversation('75hxt');
+      await conversation.unread();
+      conversation = await conversation.refresh();
+      expect(conversation.isRead()).to.be.false();
+
+      await conversation.read();
+      conversation = await conversation.refresh();
+      expect(conversation.isRead()).to.be.true();
+    });
+
+    it('can mark a list of conversations objects as read', async () => {
+      const conversations = [
+        r.getNewModmailConversation('75hxt'),
+        r.getNewModmailConversation('7b8oj')
+      ];
+      await r.markNewModmailConversationsAsUnread(conversations);
+      for (let conversation of conversations) {
+        conversation = await conversation.fetch();
+        expect(conversation.isRead()).to.be.false();
+      }
+
+      await r.markNewModmailConversationsAsRead(conversations);
+      for (let conversation of conversations) {
+        conversation = await conversation.refresh();
+        expect(conversation.isRead()).to.be.true();
+      }
+    });
+
+    it('can mark a list of conversations strings as read', async () => {
+      const conversationIds = [
+        '75hxt',
+        '7b8oj'
+      ];
+      await r.markNewModmailConversationsAsUnread(conversationIds);
+      for (const id of conversationIds) {
+        const conversation = await r.getNewModmailConversation(id).fetch();
+        expect(conversation.isRead()).to.be.false();
+      }
+
+      await r.markNewModmailConversationsAsRead(conversationIds);
+      for (const id of conversationIds) {
+        const conversation = await r.getNewModmailConversation(id).fetch();
+        expect(conversation.isRead()).to.be.true();
+      }
+    });
+
+    it('can get a list of subreddits', async () => {
+      const subreddits = await r.getNewModmailSubreddits();
+      expect(subreddits).to.be.an('array');
+      expect(subreddits.length).to.be.greaterThan(1);
+      for (let i = 0; i < subreddits.length; i++) {
+        expect(subreddits[i]).to.be.instanceof(snoowrap.objects.Subreddit);
+      }
+    });
+
+    it('can retrieve amount of of unread Modmail conversations', async () => {
+      const count = await r.getUnreadNewModmailConversationsCount();
+      expect(Object.keys(count)).to.have.members([
+        'highlighted',
+        'notifications',
+        'archived',
+        'new',
+        'inprogress',
+        'mod'
+      ]);
+    });
+
+    it('can bulk read defined states', async () => {
+      const conversation = r.getNewModmailConversation('75hxt'); // '75hxt' is an inprogress discussion
+      await conversation.unread();
+      let count = await r.getUnreadNewModmailConversationsCount();
+      expect(count.inprogress).to.be.greaterThan(0);
+
+      const checkCount = count.inprogress;
+      await r.bulkReadNewModmail(['SpyTecSnoowrapTesting'], 'new');
+      count = await r.getUnreadNewModmailConversationsCount();
+      expect(count.inprogress).to.equal(checkCount);
+
+      await r.bulkReadNewModmail([r.getSubreddit('SpyTecSnoowrapTesting')], 'inprogress');
+      count = await r.getUnreadNewModmailConversationsCount();
+      expect(count.inprogress).to.equal(checkCount - 1);
+    });
+  });
 });

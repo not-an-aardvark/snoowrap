@@ -28,7 +28,9 @@ export const KINDS = {
   wikipagelisting: 'WikiPageListing',
   LiveUpdateEvent: 'LiveThread',
   LiveUpdate: 'LiveUpdate',
-  LabeledMulti: 'MultiReddit'
+  LabeledMulti: 'MultiReddit',
+  ModmailConversation: 'ModmailConversation',
+  ModmailConversationAuthor: 'ModmailConversationAuthor'
 };
 export const USERNAME_REGEX = /^[\w-]{1,20}$/;
 export const MODERATOR_PERMISSIONS = ['wiki', 'posts', 'access', 'mail', 'config', 'flair'];
