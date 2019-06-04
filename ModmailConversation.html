@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>snoowrap Class: RedditContent</title>
+	<title>snoowrap Class: ModmailConversation</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -72,19 +72,17 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: RedditContent</h1>
+	<h1 class="page-title">Class: ModmailConversation</h1>
 <section>
 
 <header>
     
         <h2>
-        RedditContent
+        ModmailConversation
         </h2>
         
-            <div class="class-description"><p>A base class for content from reddit. With the expection of Listings, all content types extend this class.
-This class should be considered 'abstract', to the extend that JavaScript classes can be -- it should not be necessary to
-instantiate it directly.</p>
-<style> #RedditContent {display: none} </style></div>
+            <div class="class-description"><p>A class representing a conversation from new modmail</p>
+<style> #ModmailConversation {display: none} </style></div>
         
     
 </header>
@@ -96,7 +94,7 @@ instantiate it directly.</p>
         
 <hr>
 <dt>
-    <h4 class="name" id="RedditContent"><span class="type-signature"></span>new RedditContent()</h4>
+    <h4 class="name" id="ModmailConversation"><span class="type-signature"></span>new ModmailConversation()</h4>
     
     
 </dt>
@@ -164,10 +162,28 @@ instantiate it directly.</p>
     
 
     
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">// Get a Modmail Conversation with a given ID
+r.getNewModmailConversation(&#x27;75hxt&#x27;)</pre>
+
+
+    
 </dd>
 
     
     </div>
+
+    
+        <h3 class="subsection-title">Extends</h3>
+
+        
+
+
+    <ul>
+        <li><a href="RedditContent.html">RedditContent</a></li>
+    </ul>
+
 
     
 
@@ -185,6 +201,1025 @@ instantiate it directly.</p>
         <h3 class="subsection-title">Methods</h3>
 
         <dl>
+            
+<hr>
+<dt>
+    <h4 class="name" id="archive"><span class="type-signature"></span>archive()</h4>
+    
+    
+    <p class="summary"><p>Archives the ModmailConversation</p></p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.getNewModmailConversation(&#x27;75hxt&#x27;).archive()</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="unarchive"><span class="type-signature"></span>unarchive()</h4>
+    
+    
+    <p class="summary"><p>Unarchives the ModmailConversation</p></p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.getNewModmailConversation(&#x27;75hxt&#x27;).unarchive()</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="highlight"><span class="type-signature"></span>highlight()</h4>
+    
+    
+    <p class="summary"><p>Marks a ModmailConversation as highlighted</p></p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.getNewModmailConversation(&#x27;75hxt&#x27;).highlight()</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="unhighlight"><span class="type-signature"></span>unhighlight()</h4>
+    
+    
+    <p class="summary"><p>Removed highligted from a ModmailConversation</p></p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.getNewModmailConversation(&#x27;75hxt&#x27;).unhighlight()</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="mute"><span class="type-signature"></span>mute()</h4>
+    
+    
+    <p class="summary"><p>Mute the participant of the ModmailConversation</p></p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.getNewModmailConversation(&#x27;75hxt&#x27;).mute()</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="unmute"><span class="type-signature"></span>unmute()</h4>
+    
+    
+    <p class="summary"><p>Unmute the participant of the ModmailConversation</p></p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.getNewModmailConversation(&#x27;75hxt&#x27;).unmute()</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="read"><span class="type-signature"></span>read()</h4>
+    
+    
+    <p class="summary"><p>Marks the ModmailConversation as read</p></p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.getNewModmailConversation(&#x27;75hxt&#x27;).read()</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="unread"><span class="type-signature"></span>unread()</h4>
+    
+    
+    <p class="summary"><p>Marks the ModmailConversation as unread</p></p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.getNewModmailConversation(&#x27;75hxt&#x27;).unread()</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getParticipant"><span class="type-signature"></span>getParticipant()</h4>
+    
+    
+    <p class="summary"><p>Fetches the participant of the conversation</p></p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;<a href="ModmailConversationAuthor.html">ModmailConversationAuthor</a>></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.getNewModmailConversation(&#x27;75hxt&#x27;).getParticipant().then(console.log)
+// ModmailConversationAuthor { muteStatus: {...}, name: &quot;SpyTec13&quot;, created: &#x27;2015-11-22T14:30:38.821292+00:00&#x27;, ...}</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="isRead"><span class="type-signature"></span>isRead()</h4>
+    
+    
+    <p class="summary"><p>Returns whether the ModmailConversation is read.</p></p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>true, if read. false otherwise</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
             
 <hr>
 <dt>
@@ -221,6 +1256,15 @@ automatically called when an unknown property is accessed on an unfetched conten
 
 	
 
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="RedditContent.html#fetch">RedditContent#fetch</a>
+			</li>
+		</ul>
+	</dd>
 	
 
     
@@ -339,6 +1383,15 @@ r.getComment(&#x27;d1xchqn&#x27;).body.then(console.log);
 
 	
 
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="RedditContent.html#refresh">RedditContent#refresh</a>
+			</li>
+		</ul>
+	</dd>
 	
 
     
@@ -459,6 +1512,15 @@ private properties anyway.</p>
 
 	
 
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="RedditContent.html#toJSON">RedditContent#toJSON</a>
+			</li>
+		</ul>
+	</dd>
 	
 
     

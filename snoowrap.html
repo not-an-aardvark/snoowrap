@@ -33,7 +33,14 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="snoowrap.html">snoowrap</a></li><li><a href="RedditContent.html">RedditContent</a></li><li><a href="ReplyableContent.html">ReplyableContent</a></li><li><a href="VoteableContent.html">VoteableContent</a></li><li><a href="Comment.html">Comment</a></li><li><a href="RedditUser.html">RedditUser</a></li><li><a href="Submission.html">Submission</a></li><li><a href="LiveThread.html">LiveThread</a></li><li><a href="PrivateMessage.html">PrivateMessage</a></li><li><a href="Subreddit.html">Subreddit</a></li><li><a href="MultiReddit.html">MultiReddit</a></li><li><a href="WikiPage.html">WikiPage</a></li><li><a href="Listing.html">Listing</a></li>
+					<li><a href="snoowrap.html">snoowrap</a></li><li><a href="RedditContent.html">RedditContent</a></li><li><a href="ReplyableContent.html">ReplyableContent</a></li><li><a href="VoteableContent.html">VoteableContent</a></li><li><a href="Comment.html">Comment</a></li><li><a href="RedditUser.html">RedditUser</a></li><li><a href="Submission.html">Submission</a></li><li><a href="LiveThread.html">LiveThread</a></li><li><a href="PrivateMessage.html">PrivateMessage</a></li><li><a href="Subreddit.html">Subreddit</a></li><li><a href="MultiReddit.html">MultiReddit</a></li><li><a href="ModmailConversation.html">ModmailConversation</a></li><li><a href="ModmailConversationAuthor.html">ModmailConversationAuthor</a></li><li><a href="WikiPage.html">WikiPage</a></li><li><a href="Listing.html">Listing</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="global.html">Global</a></li>
 				</ul>
 			</li>
 			
@@ -97,15 +104,17 @@ exposed since they are useful externally as well.</p></div>
     <h4 class="name" id="snoowrap"><span class="type-signature"></span>new snoowrap(options)</h4>
     
     
+    <p class="summary"><p>Constructs a new requester.</p></p>
+    
 </dt>
 <dd>
 
     
     <div class="description">
         <p>You should use the snoowrap constructor if you are able to authorize a reddit account in advance (e.g. for a Node.js
-  script that always uses the same account). If you aren't able to authorize in advance (e.g. acting through an arbitrary user's
-  account while running snoowrap in a browser), then you should use <a href="snoowrap.html#.getAuthUrl"><code>snoowrap.getAuthUrl</code></a> and
-  <a href="snoowrap.html#.fromAuthCode"><code>snoowrap.fromAuthCode</code></a> instead.</p>
+script that always uses the same account). If you aren't able to authorize in advance (e.g. acting through an arbitrary user's
+account while running snoowrap in a browser), then you should use <a href="snoowrap.html#.getAuthUrl"><code>snoowrap.getAuthUrl</code></a> and
+<a href="snoowrap.html#.fromAuthCode"><code>snoowrap.fromAuthCode</code></a> instead.</p>
 <p>snoowrap supports several different options for pre-existing authentication:</p>
 <ol>
 <li><em>Refresh token</em>: To authenticate with a refresh token, pass an object with the properties <code>userAgent</code>, <code>clientId</code>,
@@ -171,7 +180,7 @@ not recommended for long-term use.</li>
             
 
             <td class="description last"><p>An object containing authentication options. This should always have the property <code>userAgent</code>. It
-  must also contain some combination of credentials (see above)</p>
+must also contain some combination of credentials (see above)</p>
                 <h6 class="method-params-label method-subparams-label">Properties</h6>
                 
 
@@ -225,7 +234,7 @@ not recommended for long-term use.</li>
             
 
             <td class="description last"><p>A unique description of what your app does. This argument is not necessary when snoowrap
-  is running in a browser.</p></td>
+is running in a browser.</p></td>
         </tr>
 
     
@@ -294,7 +303,7 @@ not recommended for long-term use.</li>
             
 
             <td class="description last"><p>The client secret of your app (assigned by reddit). If you are using a refresh token
-  with an installed app (which does not have a client secret), pass an empty string as your <code>clientSecret</code>.</p></td>
+with an installed app (which does not have a client secret), pass an empty string as your <code>clientSecret</code>.</p></td>
         </tr>
 
     
@@ -534,12 +543,12 @@ not recommended for long-term use.</li>
     
     <div class="description">
         <p>This create a URL where a user can authorize an app to act through their account. If the user visits the returned URL
-  in a web browser, they will see a page that looks like <a href="https://i.gyazo.com/0325534f38b78c1dbd4c84d690dda6c2.png">this</a>. If
-  the user clicks &quot;Allow&quot;, they will be redirected to your <code>redirectUri</code>, with a <code>code</code> querystring parameter containing an
+in a web browser, they will see a page that looks like <a href="https://i.gyazo.com/0325534f38b78c1dbd4c84d690dda6c2.png">this</a>. If
+the user clicks &quot;Allow&quot;, they will be redirected to your <code>redirectUri</code>, with a <code>code</code> querystring parameter containing an
 <em>authorization code</em>. If this code is passed to <a href="snoowrap.html#.fromAuthCode"><code>snoowrap.fromAuthCode</code></a>, you can create a requester to make
-  requests on behalf of the user.</p>
+requests on behalf of the user.</p>
 <p>The main use-case here is for running snoowrap in a browser. You can generate a URL, send the user there, and then continue
-  after the user authenticates on reddit and is redirected back.</p>
+after the user authenticates on reddit and is redirected back.</p>
     </div>
     
 
@@ -651,7 +660,7 @@ not recommended for long-term use.</li>
             
 
             <td class="description last"><p>The client ID of your app (assigned by reddit). If your code is running clientside in a
-  browser, using an &quot;Installed&quot; app type is recommended.</p></td>
+browser, using an &quot;Installed&quot; app type is recommended.</p></td>
         </tr>
 
     
@@ -688,8 +697,8 @@ not recommended for long-term use.</li>
             
 
             <td class="description last"><p>An array of scopes (permissions on the user's account) to request on the authentication
-  page. A list of possible scopes can be found <a href="https://www.reddit.com/api/v1/scopes">here</a>. You can also get them on-the-fly
-  with <a href="snoowrap.html#getOauthScopeList"><code>snoowrap#getOauthScopeList</code></a>.</p></td>
+page. A list of possible scopes can be found <a href="https://www.reddit.com/api/v1/scopes">here</a>. You can also get them on-the-fly
+with <a href="snoowrap.html#getOauthScopeList"><code>snoowrap#getOauthScopeList</code></a>.</p></td>
         </tr>
 
     
@@ -726,8 +735,8 @@ not recommended for long-term use.</li>
             
 
             <td class="description last"><p>The URL where the user should be redirected after authenticating. This <strong>must</strong> be the
-  same as the redirect URI that is configured for the reddit app. (If there is a mismatch, the returned URL will display an
-  error page instead of an authentication form.)</p></td>
+same as the redirect URI that is configured for the reddit app. (If there is a mismatch, the returned URL will display an
+error page instead of an authentication form.)</p></td>
         </tr>
 
     
@@ -766,7 +775,7 @@ not recommended for long-term use.</li>
             
 
             <td class="description last"><p>If <code>true</code>, the app will have indefinite access to the user's account. If <code>false</code>,
-  access to the user's account will expire after 1 hour.</p></td>
+access to the user's account will expire after 1 hour.</p></td>
         </tr>
 
     
@@ -805,9 +814,9 @@ not recommended for long-term use.</li>
             
 
             <td class="description last"><p>A string that can be used to verify a user after they are redirected back to the site. When
-  the user is redirected from reddit, to the redirect URI after authenticating, the resulting URI will have this same <code>state</code>
-  value in the querystring. (See <a href="http://www.twobotechnologies.com/blog/2014/02/importance-of-state-in-oauth2.html">here</a> for
-  more information on how to use the <code>state</code> value.)</p></td>
+the user is redirected from reddit, to the redirect URI after authenticating, the resulting URI will have this same <code>state</code>
+value in the querystring. (See <a href="http://www.twobotechnologies.com/blog/2014/02/importance-of-state-in-oauth2.html">here</a> for
+more information on how to use the <code>state</code> value.)</p></td>
         </tr>
 
     
@@ -848,7 +857,7 @@ not recommended for long-term use.</li>
             
 
             <td class="description last"><p>The endpoint domain for the URL. If the user is authenticating on
-  reddit.com (as opposed to some other site with a reddit-like API), you can omit this value.</p></td>
+reddit.com (as opposed to some other site with a reddit-like API), you can omit this value.</p></td>
         </tr>
 
     
@@ -973,10 +982,10 @@ window.location = authenticationUrl; // send the user to the authentication url<
     
     <div class="description">
         <p>An authorization code is the <code>code</code> value that appears in the querystring after a user authenticates with reddit and
-  is redirected. For more information, see <a href="snoowrap.html#.getAuthUrl"><code>snoowrap.getAuthUrl</code></a>.</p>
+is redirected. For more information, see <a href="snoowrap.html#.getAuthUrl"><code>snoowrap.getAuthUrl</code></a>.</p>
 <p>The main use-case for this function is for running snoowrap in a browser. You can generate a URL with
-  <a href="snoowrap.html#.getAuthUrl"><code>snoowrap.getAuthUrl</code></a> and send the user to that URL, and then use this function to create a requester when
-  the user is redirected back with an authorization code.</p>
+<a href="snoowrap.html#.getAuthUrl"><code>snoowrap.getAuthUrl</code></a> and send the user to that URL, and then use this function to create a requester when
+the user is redirected back with an authorization code.</p>
     </div>
     
 
@@ -1124,7 +1133,7 @@ window.location = authenticationUrl; // send the user to the authentication url<
             
 
             <td class="description last"><p>A unique description of what your app does. This argument is not necessary when snoowrap
-  is running in a browser.</p></td>
+is running in a browser.</p></td>
         </tr>
 
     
@@ -1161,7 +1170,7 @@ window.location = authenticationUrl; // send the user to the authentication url<
             
 
             <td class="description last"><p>The client ID of your app (assigned by reddit). If your code is running clientside in a
-  browser, using an &quot;Installed&quot; app type is recommended.</p></td>
+browser, using an &quot;Installed&quot; app type is recommended.</p></td>
         </tr>
 
     
@@ -1200,7 +1209,7 @@ window.location = authenticationUrl; // send the user to the authentication url<
             
 
             <td class="description last"><p>The client secret of your app. If your app has the &quot;Installed&quot; app type, omit
-  this parameter.</p></td>
+this parameter.</p></td>
         </tr>
 
     
@@ -1277,8 +1286,8 @@ window.location = authenticationUrl; // send the user to the authentication url<
             
 
             <td class="description last"><p>The endpoint domain that the returned requester should be configured
-  to use. If the user is authenticating on reddit.com (as opposed to some other site with a reddit-like API), you can omit this
-  value.</p></td>
+to use. If the user is authenticating on reddit.com (as opposed to some other site with a reddit-like API), you can omit this
+value.</p></td>
         </tr>
 
     
@@ -1467,9 +1476,9 @@ snoowrap.fromAuthCode({
             
 
             <td class="description last"><p>A map of <code>{[config property name]: value}</code>. Note that any omitted config properties will simply
-  retain whatever value they had previously. (In other words, if you only want to change one property, you only need to put
-  that one property in this parameter. To get the current configuration without modifying anything, simply omit this
-  parameter.)</p>
+retain whatever value they had previously. (In other words, if you only want to change one property, you only need to put
+that one property in this parameter. To get the current configuration without modifying anything, simply omit this
+parameter.)</p>
                 <h6 class="method-params-label method-subparams-label">Properties</h6>
                 
 
@@ -1573,10 +1582,10 @@ snoowrap.fromAuthCode({
             
 
             <td class="description last"><p>A minimum delay, in milliseconds, to enforce between API calls. If multiple
-  api calls are requested during this timespan, they will be queued and sent one at a time. Setting this to more than 1000 will
-  ensure that reddit's ratelimit is never reached, but it will make things run slower than necessary if only a few requests
-  are being sent. If this is set to zero, snoowrap will not enforce any delay between individual requests. However, it will
-  still refuse to continue if reddit's enforced ratelimit (600 requests per 10 minutes) is exceeded.</p></td>
+api calls are requested during this timespan, they will be queued and sent one at a time. Setting this to more than 1000 will
+ensure that reddit's ratelimit is never reached, but it will make things run slower than necessary if only a few requests
+are being sent. If this is set to zero, snoowrap will not enforce any delay between individual requests. However, it will
+still refuse to continue if reddit's enforced ratelimit (600 requests per 10 minutes) is exceeded.</p></td>
         </tr>
 
     
@@ -1617,7 +1626,7 @@ snoowrap.fromAuthCode({
             
 
             <td class="description last"><p>A timeout for all OAuth requests, in milliseconds. If the reddit server
-  fails to return a response within this amount of time, the Promise will be rejected with a timeout error.</p></td>
+fails to return a response within this amount of time, the Promise will be rejected with a timeout error.</p></td>
         </tr>
 
     
@@ -1658,9 +1667,9 @@ snoowrap.fromAuthCode({
             
 
             <td class="description last"><p>Determines whether snoowrap should queue API calls if
-  reddit's ratelimit is exceeded. If set to <code>true</code> when the ratelimit is exceeded, snoowrap will queue all further requests,
-  and will attempt to send them again after the current ratelimit period expires (which happens every 10 minutes). If set
-  to <code>false</code>, snoowrap will simply throw an error when reddit's ratelimit is exceeded.</p></td>
+reddit's ratelimit is exceeded. If set to <code>true</code> when the ratelimit is exceeded, snoowrap will queue all further requests,
+and will attempt to send them again after the current ratelimit period expires (which happens every 10 minutes). If set
+to <code>false</code>, snoowrap will simply throw an error when reddit's ratelimit is exceeded.</p></td>
         </tr>
 
     
@@ -1701,9 +1710,9 @@ snoowrap.fromAuthCode({
             
 
             <td class="description last"><p>If reddit responds to an idempotent request with one of
-  these error codes, snoowrap will retry the request, up to a maximum of <code>max_retry_attempts</code> requests in total. (These
-   errors usually indicate that there was an temporary issue on reddit's end, and retrying the request has a decent chance of
-  success.) This behavior can be disabled by simply setting this property to an empty array.</p></td>
+these error codes, snoowrap will retry the request, up to a maximum of <code>max_retry_attempts</code> requests in total. (These
+errors usually indicate that there was an temporary issue on reddit's end, and retrying the request has a decent chance of
+success.) This behavior can be disabled by simply setting this property to an empty array.</p></td>
         </tr>
 
     
@@ -1784,7 +1793,7 @@ snoowrap.fromAuthCode({
             
 
             <td class="description last"><p>snoowrap may occasionally log warnings, such as deprecation notices, to the
-  console. These can be disabled by setting this to <code>false</code>.</p></td>
+console. These can be disabled by setting this to <code>false</code>.</p></td>
         </tr>
 
     
@@ -1825,7 +1834,7 @@ snoowrap.fromAuthCode({
             
 
             <td class="description last"><p>If set to true, snoowrap will print out potentially-useful information for debugging
-  purposes as it runs.</p></td>
+purposes as it runs.</p></td>
         </tr>
 
     
@@ -1866,9 +1875,9 @@ snoowrap.fromAuthCode({
             
 
             <td class="description last"><p>Setting this to <code>false</code> disables snoowrap's method-chaining feature. This causes
-  the syntax for using snoowrap to become a bit heavier, but allows for consistency between environments that support the ES6
-  <code>Proxy</code> object and environments that don't. This option is a no-op in environments that don't support the <code>Proxy</code> object,
-  since method chaining is always disabled in those environments.</p></td>
+the syntax for using snoowrap to become a bit heavier, but allows for consistency between environments that support the ES6
+<code>Proxy</code> object and environments that don't. This option is a no-op in environments that don't support the <code>Proxy</code> object,
+since method chaining is always disabled in those environments.</p></td>
         </tr>
 
     
@@ -4106,7 +4115,7 @@ not included in this object will simply retain its current value.</p></td>
         <h5>Example</h5>
         
     <pre class="sunlight-highlight-javascript">r.getCaptchaImage(&#x27;o5M18uy4mk0IW4hs0fu2GNPdXb1Dxe9d&#x27;).then(console.log)
-  // =&gt; (A long, incoherent string representing the image in PNG format)</pre>
+   // =&gt; (A long, incoherent string representing the image in PNG format)</pre>
 
 
     
@@ -4655,7 +4664,7 @@ r.markAsVisited(submissions)
             
 
             <td class="description last"><p>A captcha identifier. This is only necessary if the authenticated account
-  requires a captcha to submit posts and comments.</p></td>
+requires a captcha to submit posts and comments.</p></td>
         </tr>
 
     
@@ -5074,7 +5083,7 @@ r.markAsVisited(submissions)
             
 
             <td class="description last"><p>If this is false and same link has already been submitted to this subreddit in
-  the past, reddit will return an error. This could be used to avoid accidental reposts.</p></td>
+the past, reddit will return an error. This could be used to avoid accidental reposts.</p></td>
         </tr>
 
     
@@ -5113,7 +5122,7 @@ r.markAsVisited(submissions)
             
 
             <td class="description last"><p>A captcha identifier. This is only necessary if the authenticated account
-  requires a captcha to submit posts and comments.</p></td>
+requires a captcha to submit posts and comments.</p></td>
         </tr>
 
     
@@ -5460,7 +5469,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>A Submission object or a post ID for the original post which
-   is being crossposted</p></td>
+is being crossposted</p></td>
         </tr>
 
     
@@ -5541,7 +5550,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>If this is false and same link has already been submitted to this subreddit in
-   the past, reddit will return an error. This could be used to avoid accidental reposts.</p></td>
+the past, reddit will return an error. This could be used to avoid accidental reposts.</p></td>
         </tr>
 
     
@@ -5723,7 +5732,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>The subreddit to get posts from. If not provided, posts are fetched from
-  the front page of reddit.</p></td>
+the front page of reddit.</p></td>
         </tr>
 
     
@@ -5867,7 +5876,193 @@ r.getHot(&#x27;gifs&#x27;).then(console.log)
 
 r.getHot(&#x27;redditdev&#x27;, {limit: 1}).then(console.log)
 // =&gt; Listing [
-    //   Submission { domain: &#x27;self.redditdev&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;redditdev&#x27; }, ...}
+   //   Submission { domain: &#x27;self.redditdev&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;redditdev&#x27; }, ...}
+// ]</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getBest"><span class="type-signature"></span>getBest( [options])</h4>
+    
+    
+    <p class="summary"><p>Gets a Listing of best posts.</p></p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    {}
+                
+                </td>
+            
+
+            <td class="description last"><p>Options for the resulting Listing</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Listing containing the retrieved submissions</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;<a href="Listing.html">Listing</a>></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.getBest().then(console.log)
+// =&gt; Listing [
+//  Submission { domain: &#x27;imgur.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;pics&#x27; }, ... },
+//  Submission { domain: &#x27;i.imgur.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;funny&#x27; }, ... },
+//  ...
+// ]
+
+r.getBest({limit: 1}).then(console.log)
+// =&gt; Listing [
+   //   Submission { domain: &#x27;self.redditdev&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;redditdev&#x27; }, ...}
 // ]</pre>
 
 
@@ -5955,7 +6150,7 @@ r.getHot(&#x27;redditdev&#x27;, {limit: 1}).then(console.log)
             
 
             <td class="description last"><p>The subreddit to get posts from. If not provided, posts are fetched from
-  the front page of reddit.</p></td>
+the front page of reddit.</p></td>
         </tr>
 
     
@@ -6175,7 +6370,7 @@ r.getHot(&#x27;redditdev&#x27;, {limit: 1}).then(console.log)
             
 
             <td class="description last"><p>The subreddit to get comments from. If not provided, posts are fetched from
-  the front page of reddit.</p></td>
+the front page of reddit.</p></td>
         </tr>
 
     
@@ -6328,7 +6523,7 @@ r.getHot(&#x27;redditdev&#x27;, {limit: 1}).then(console.log)
     
     <div class="description">
         <p><strong>Note</strong>: This function will not work when snoowrap is running in a browser, because the reddit server sends a
-  redirect which cannot be followed by a CORS request.</p>
+redirect which cannot be followed by a CORS request.</p>
     </div>
     
 
@@ -6393,7 +6588,7 @@ r.getHot(&#x27;redditdev&#x27;, {limit: 1}).then(console.log)
             
 
             <td class="description last"><p>The subreddit to get the random submission. If not provided, the post is fetched from
-  the front page of reddit.</p></td>
+the front page of reddit.</p></td>
         </tr>
 
     
@@ -6569,7 +6764,7 @@ r.getHot(&#x27;redditdev&#x27;, {limit: 1}).then(console.log)
             
 
             <td class="description last"><p>The subreddit to get posts from. If not provided, posts are fetched from
-  the front page of reddit.</p></td>
+the front page of reddit.</p></td>
         </tr>
 
     
@@ -6665,7 +6860,7 @@ r.getHot(&#x27;redditdev&#x27;, {limit: 1}).then(console.log)
             
 
             <td class="description last"><p>Describes the timespan that posts should be retrieved from. Should be one of
-  <code>hour, day, week, month, year, all</code></p></td>
+<code>hour, day, week, month, year, all</code></p></td>
         </tr>
 
     
@@ -6859,7 +7054,7 @@ r.getTop(&#x27;AskReddit&#x27;).then(console.log)
             
 
             <td class="description last"><p>The subreddit to get posts from. If not provided, posts are fetched from
-  the front page of reddit.</p></td>
+the front page of reddit.</p></td>
         </tr>
 
     
@@ -6955,7 +7150,7 @@ r.getTop(&#x27;AskReddit&#x27;).then(console.log)
             
 
             <td class="description last"><p>Describes the timespan that posts should be retrieved from. Should be one of
-  <code>hour, day, week, month, year, all</code></p></td>
+<code>hour, day, week, month, year, all</code></p></td>
         </tr>
 
     
@@ -7135,7 +7330,7 @@ r.getTop(&#x27;AskReddit&#x27;).then(console.log)
             
 
             <td class="description last"><p>The subreddit to get posts from. If not provided, posts are fetched from
-  the front page of reddit.</p></td>
+the front page of reddit.</p></td>
         </tr>
 
     
@@ -7585,8 +7780,8 @@ r.getTop(&#x27;AskReddit&#x27;).then(console.log)
             
 
             <td class="description last"><p>A filter for the inbox items. If provided, it should be one of <code>unread</code>, (unread
-  items), <code>messages</code> (i.e. PMs), <code>comments</code> (comment replies), <code>selfreply</code> (selfpost replies), or <code>mentions</code> (username
-  mentions).</p></td>
+items), <code>messages</code> (i.e. PMs), <code>comments</code> (comment replies), <code>selfreply</code> (selfpost replies), or <code>mentions</code> (username
+mentions).</p></td>
         </tr>
 
     
@@ -7875,6 +8070,1293 @@ r.getTop(&#x27;AskReddit&#x27;).then(console.log)
             
 <hr>
 <dt>
+    <h4 class="name" id="getNewModmailConversations"><span class="type-signature"></span>getNewModmailConversations( [options])</h4>
+    
+    
+    <p class="summary"><p>Gets a list of ModmailConversations from the authenticated user's subreddits.</p></p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Options for the resulting Listing</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Listing containing Subreddits</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;<a href="Listing.html">Listing</a>.&lt;<a href="ModmailConversation.html">ModmailConversation</a>>></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.getNewModmailConversations({limit: 2}).then(console.log)
+// =&gt; Listing [
+//  ModmailConversation { messages: [...], objIds: [...], subject: &#x27;test subject&#x27;, ... },
+//  ModmailConversation { messages: [...], objIds: [...], subject: &#x27;test subject&#x27;, ... }
+// ]</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="createModmailDiscussion"><span class="type-signature"></span>createModmailDiscussion(options)</h4>
+    
+    
+    <p class="summary"><p>Create a new modmail discussion between moderators</p></p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <h6 class="method-params-label method-subparams-label">Properties</h6>
+                
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>body</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Body of the discussion</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>subject</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Title or subject</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>srName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Subreddit name without fullname</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>the created ModmailConversation</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;<a href="ModmailConversation.html">ModmailConversation</a>></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.createModeratorDiscussion({
+  body: &#x27;test body&#x27;,
+  subject: &#x27;test subject&#x27;,
+  srName: &#x27;AskReddit&#x27;
+}).then(console.log)
+// ModmailConversation { messages: [...], objIds: [...], subject: &#x27;test subject&#x27;, ... }</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getNewModmailConversation"><span class="type-signature"></span>getNewModmailConversation(id)</h4>
+    
+    
+    <p class="summary"><p>Get a ModmailConversation by its id</p></p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>of the ModmailConversation</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>the requested ModmailConversation</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;<a href="ModmailConversation.html">ModmailConversation</a>></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.getNewModmailConversation(&#x27;75hxt&#x27;).then(console.log)
+// ModmailConversation { messages: [...], objIds: [...], ... }</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="markNewModmailConversationsAsRead"><span class="type-signature"></span>markNewModmailConversationsAsRead(conversations)</h4>
+    
+    
+    <p class="summary"><p>Marks all conversations in array as read.</p></p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>conversations</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;<a href="ModmailConversation.html">ModmailConversation</a>></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>to mark as read</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.markNewModmailConversationsAsRead([&#x27;pics&#x27;, &#x27;sweden&#x27;])</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="markNewModmailConversationsAsUnread"><span class="type-signature"></span>markNewModmailConversationsAsUnread(conversations)</h4>
+    
+    
+    <p class="summary"><p>Marks all conversations in array as unread.</p></p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>conversations</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;<a href="ModmailConversation.html">ModmailConversation</a>></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>to mark as unread</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.markNewModmailConversationsAsUnread([&#x27;pics&#x27;, &#x27;sweden&#x27;])</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getNewModmailSubreddits"><span class="type-signature"></span>getNewModmailSubreddits()</h4>
+    
+    
+    <p class="summary"><p>Gets all moderated subreddits that have new Modmail activated</p></p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>a Listing of ModmailConversations marked as read</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;<a href="Listing.html">Listing</a>.&lt;<a href="Subreddit.html">Subreddit</a>>></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.getNewModmailSubreddits().then(console.log)
+// =&gt; Listing [
+//  Subreddit { display_name: &#x27;tipofmytongue&#x27;, ... },
+//  Subreddit { display_name: &#x27;EarthPorn&#x27;, ... },
+// ]</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getUnreadNewModmailConversationsCount"><span class="type-signature"></span>getUnreadNewModmailConversationsCount()</h4>
+    
+    
+    <p class="summary"><p>Retrieves an object of unread Modmail conversations for each state.</p></p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>unreadCount</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#UnreadCount">UnreadCount</a></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.getUnreadNewModmailConversationsCount().then(console.log)
+// =&gt; {
+//  highlighted: 1,
+//  notifications: 0,
+//  archived: 0,
+//  new: 2,
+//  inprogress: 5,
+//  mod: 1,
+// }</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="bulkReadNewModmail"><span class="type-signature"></span>bulkReadNewModmail(subreddits, state)</h4>
+    
+    
+    <p class="summary"><p>Mark Modmail conversations as read given the subreddit(s) and state.</p></p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>subreddits</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;<a href="Subreddit.html">Subreddit</a>></span>
+|
+
+<span class="param-type">Array.&lt;String></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>state</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">'new'</span>
+|
+
+<span class="param-type">'inprogress'</span>
+|
+
+<span class="param-type">'mod'</span>
+|
+
+<span class="param-type">'notifications'</span>
+|
+
+<span class="param-type">'archived'</span>
+|
+
+<span class="param-type">'highlighted'</span>
+|
+
+<span class="param-type">'all'</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>selected state to mark as read</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>a Listing of ModmailConversations marked as read</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;<a href="Listing.html">Listing</a>.&lt;<a href="ModmailConversation.html">ModmailConversation</a>>></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.bulkReadNewModmail([&#x27;AskReddit&#x27;], &#x27;all&#x27;).then(console.log)
+// =&gt; Listing [
+//  ModmailConversation { id: &#x27;75hxt&#x27; },
+//  ModmailConversation { id: &#x27;75hxg&#x27; }
+// ]
+
+r.bulkReadNewModmail([r.getSubreddit(&#x27;AskReddit&#x27;)], &#x27;all&#x27;).then(console.log)
+// =&gt; Listing [
+//  ModmailConversation { id: &#x27;75hxt&#x27; },
+//  ModmailConversation { id: &#x27;75hxg&#x27; }
+// ]</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
     <h4 class="name" id="getSentMessages"><span class="type-signature"></span>getSentMessages( [options])</h4>
     
     
@@ -8117,8 +9599,8 @@ r.getTop(&#x27;AskReddit&#x27;).then(console.log)
             
 
             <td class="description last"><p>An Array of PrivateMessage or Comment objects. Can also contain strings
-  representing message or comment IDs. If strings are provided, they are assumed to represent PrivateMessages unless a fullname
-  prefix such as <code>t1_</code> is specified.</p></td>
+representing message or comment IDs. If strings are provided, they are assumed to represent PrivateMessages unless a fullname
+prefix such as <code>t1_</code> is specified.</p></td>
         </tr>
 
     
@@ -8285,8 +9767,8 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
             
 
             <td class="description last"><p>An Array of PrivateMessage or Comment objects. Can also contain strings
-  representing message IDs. If strings are provided, they are assumed to represent PrivateMessages unless a fullname prefix such
-  as <code>t1_</code> is included.</p></td>
+representing message IDs. If strings are provided, they are assumed to represent PrivateMessages unless a fullname prefix such
+as <code>t1_</code> is included.</p></td>
         </tr>
 
     
@@ -8402,7 +9884,7 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
     
     <div class="description">
         <p><strong>Note:</strong> The reddit.com site imposes a ratelimit of approximately 1 request every 10 minutes on this endpoint.
-  Further requests will cause the API to return a 429 error.</p>
+Further requests will cause the API to return a 429 error.</p>
     </div>
     
 
@@ -8725,7 +10207,7 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
             
 
             <td class="description last"><p>If provided, the message is sent as a modmail from the specified
-  subreddit.</p></td>
+subreddit.</p></td>
         </tr>
 
     
@@ -8760,7 +10242,7 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
             
 
             <td class="description last"><p>A captcha identifier. This is only necessary if the authenticated account
-  requires a captcha to submit posts and comments.</p></td>
+requires a captcha to submit posts and comments.</p></td>
         </tr>
 
     
@@ -9183,7 +10665,7 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
             
 
             <td class="description last"><p>Describes the timespan that posts should be retrieved from. One of
-  <code>hour, day, week, month, year, all</code></p></td>
+<code>hour, day, week, month, year, all</code></p></td>
         </tr>
 
     
@@ -9954,7 +11436,7 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
             
 
             <td class="description last"><p>The text that appears with this subreddit on the search page, or on the
-  blocked-access page if this subreddit is private. (500 characters max)</p></td>
+blocked-access page if this subreddit is private. (500 characters max)</p></td>
         </tr>
 
     
@@ -10071,7 +11553,7 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
             
 
             <td class="description last"><p>Determines whether ads should be hidden on this subreddit. (This is only
-  allowed for gold-only subreddits.)</p></td>
+allowed for gold-only subreddits.)</p></td>
         </tr>
 
     
@@ -10152,7 +11634,7 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
             
 
             <td class="description last"><p>Determines who should be able to access the subreddit. This should be one of
-  <code>public, private, restricted, gold_restricted, gold_only, archived, employees_only</code>.</p></td>
+<code>public, private, restricted, gold_restricted, gold_only, archived, employees_only</code>.</p></td>
         </tr>
 
     
@@ -10193,7 +11675,7 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
             
 
             <td class="description last"><p>Determines what types of submissions are allowed on the subreddit. This should
-  be one of <code>any, link, self</code>.</p></td>
+be one of <code>any, link, self</code>.</p></td>
         </tr>
 
     
@@ -10232,7 +11714,7 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
             
 
             <td class="description last"><p>Custom text to display on the button that submits a link. If
-  this is omitted, the default text will be displayed.</p></td>
+this is omitted, the default text will be displayed.</p></td>
         </tr>
 
     
@@ -10271,7 +11753,7 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
             
 
             <td class="description last"><p>Custom text to display on the button that submits a selfpost. If
-  this is omitted, the default text will be displayed.</p></td>
+this is omitted, the default text will be displayed.</p></td>
         </tr>
 
     
@@ -10312,7 +11794,7 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
             
 
             <td class="description last"><p>Determines who can edit wiki pages on the subreddit. This should be one of
-  <code>modonly, anyone, disabled</code>.</p></td>
+<code>modonly, anyone, disabled</code>.</p></td>
         </tr>
 
     
@@ -10353,7 +11835,7 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
             
 
             <td class="description last"><p>The minimum amount of subreddit karma needed for someone to edit this
-  subreddit's wiki. (This is only relevant if <code>options.wikimode</code> is set to <code>anyone</code>.)</p></td>
+subreddit's wiki. (This is only relevant if <code>options.wikimode</code> is set to <code>anyone</code>.)</p></td>
         </tr>
 
     
@@ -10394,7 +11876,7 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
             
 
             <td class="description last"><p>The minimum account age (in days) needed for someone to edit this subreddit's
-  wiki. (This is only relevant if <code>options.wikimode</code> is set to <code>anyone</code>.)</p></td>
+wiki. (This is only relevant if <code>options.wikimode</code> is set to <code>anyone</code>.)</p></td>
         </tr>
 
     
@@ -10435,7 +11917,7 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
             
 
             <td class="description last"><p>The spam filter strength for links on this subreddit. This should be one of
-  <code>low, high, all</code>.</p></td>
+<code>low, high, all</code>.</p></td>
         </tr>
 
     
@@ -10476,7 +11958,7 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
             
 
             <td class="description last"><p>The spam filter strength for selfposts on this subreddit. This should be
-  one of <code>low, high, all</code>.</p></td>
+one of <code>low, high, all</code>.</p></td>
         </tr>
 
     
@@ -10517,7 +11999,7 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
             
 
             <td class="description last"><p>The spam filter strength for comments on this subreddit. This should be one
-  of <code>low, high, all</code>.</p></td>
+of <code>low, high, all</code>.</p></td>
         </tr>
 
     
@@ -10598,7 +12080,7 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
             
 
             <td class="description last"><p>Determines whether the new subreddit should be able to appear in /r/all and
-  trending subreddits</p></td>
+trending subreddits</p></td>
         </tr>
 
     
@@ -10679,7 +12161,7 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
             
 
             <td class="description last"><p>Determines whether media previews should be expanded by default on this
-  subreddit</p></td>
+subreddit</p></td>
         </tr>
 
     
@@ -10720,7 +12202,7 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
             
 
             <td class="description last"><p>Determines whether image uploads and links to image hosting sites should be
-  enabled on this subreddit</p></td>
+enabled on this subreddit</p></td>
         </tr>
 
     
@@ -10761,7 +12243,7 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
             
 
             <td class="description last"><p>Determines whether posts by site-wide banned users should be
-  excluded from the modqueue.</p></td>
+excluded from the modqueue.</p></td>
         </tr>
 
     
@@ -10802,7 +12284,7 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
             
 
             <td class="description last"><p>Determines whether the /about/traffic page for this subreddit should be
-  viewable by anyone.</p></td>
+viewable by anyone.</p></td>
         </tr>
 
     
@@ -10843,7 +12325,7 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
             
 
             <td class="description last"><p>Determines whether deleted and removed comments should be
-  collapsed by default</p></td>
+collapsed by default</p></td>
         </tr>
 
     
@@ -10882,8 +12364,8 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
             
 
             <td class="description last"><p>The suggested comment sort for the subreddit. This should be
-  one of <code>confidence, top, new, controversial, old, random, qa</code>.If left blank, there will be no suggested sort,
-  which means that users will see the sort method that is set in their own preferences (usually <code>confidence</code>.)</p></td>
+one of <code>confidence, top, new, controversial, old, random, qa</code>.If left blank, there will be no suggested sort,
+which means that users will see the sort method that is set in their own preferences (usually <code>confidence</code>.)</p></td>
         </tr>
 
     
@@ -11172,6 +12654,15 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
     
 
 	
+	<dt class="important tag-deprecated method-doc-label method-doc-details-label">Deprecated:</dt>
+	
+    <dd>
+        <ul class="dummy">
+            <li>Reddit no longer provides the corresponding API endpoint.</li>
+        </ul>
+    </dd>
+    
+    
 
 	
 
@@ -12672,7 +14163,7 @@ r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb
     
     <div class="description">
         <p><strong>Note:</strong> This function will not work when snoowrap is running in a browser, due to an issue with reddit's CORS
-  settings.</p>
+settings.</p>
     </div>
     
 
@@ -13241,7 +14732,7 @@ r.checkUsernameAvailability(&#x27;eqwZAr9qunx7IHqzWVeF&#x27;).then(console.log)
             
 <div class="param-desc">
     <p>A Promise that fulfills with the &quot;happening now&quot; LiveThread if it exists, or rejects with a 404 error
-  otherwise.</p>
+otherwise.</p>
 </div>
 
 
@@ -13652,9 +15143,9 @@ r.checkUsernameAvailability(&#x27;eqwZAr9qunx7IHqzWVeF&#x27;).then(console.log)
             
 
             <td class="description last"><p>One of <code>art and design</code>, <code>ask</code>, <code>books</code>, <code>business</code>, <code>cars</code>, <code>comics</code>,
-  <code>cute animals</code>, <code>diy</code>, <code>entertainment</code>, <code>food and drink</code>, <code>funny</code>, <code>games</code>, <code>grooming</code>, <code>health</code>, <code>life advice</code>, <code>military</code>,
-  <code>models pinup</code>, <code>music</code>, <code>news</code>, <code>philosophy</code>, <code>pictures and gifs</code>, <code>science</code>, <code>shopping</code>, <code>sports</code>, <code>style</code>, <code>tech</code>,
-  <code>travel</code>, <code>unusual stories</code>, <code>video</code>, <code>None</code></p></td>
+<code>cute animals</code>, <code>diy</code>, <code>entertainment</code>, <code>food and drink</code>, <code>funny</code>, <code>games</code>, <code>grooming</code>, <code>health</code>, <code>life advice</code>, <code>military</code>,
+<code>models pinup</code>, <code>music</code>, <code>news</code>, <code>philosophy</code>, <code>pictures and gifs</code>, <code>science</code>, <code>shopping</code>, <code>sports</code>, <code>style</code>, <code>tech</code>,
+<code>travel</code>, <code>unusual stories</code>, <code>video</code>, <code>None</code></p></td>
         </tr>
 
     
@@ -13855,8 +15346,8 @@ r.checkUsernameAvailability(&#x27;eqwZAr9qunx7IHqzWVeF&#x27;).then(console.log)
     
     <div class="description">
         <p><strong>Note</strong>: This can only be used if the current requester was supplied with a <code>client_id</code> and <code>client_secret</code>. If the
-  current requester was supplied with a refresh token, it will automatically create a new access token if any more requests
-  are made after this one.</p>
+current requester was supplied with a refresh token, it will automatically create a new access token if any more requests
+are made after this one.</p>
     </div>
     
 
@@ -13967,9 +15458,9 @@ r.checkUsernameAvailability(&#x27;eqwZAr9qunx7IHqzWVeF&#x27;).then(console.log)
     
     <div class="description">
         <p><strong>Note</strong>: This can only be used if the current requester was supplied with a <code>client_id</code> and <code>client_secret</code>. All
-  access tokens generated by this refresh token will also be invalidated. This effectively de-authenticates the requester and
-  prevents it from making any more valid requests. This should only be used in a few cases, e.g. if this token has
-  been accidentally leaked to a third party.</p>
+access tokens generated by this refresh token will also be invalidated. This effectively de-authenticates the requester and
+prevents it from making any more valid requests. This should only be used in a few cases, e.g. if this token has
+been accidentally leaked to a third party.</p>
     </div>
     
 
@@ -14073,7 +15564,7 @@ r.checkUsernameAvailability(&#x27;eqwZAr9qunx7IHqzWVeF&#x27;).then(console.log)
     
     
     <p class="summary"><p>In browsers, restores the <code>window.snoowrap</code> property to whatever it was before this instance of snoowrap was
-  loaded. This is a no-op in Node.</p></p>
+loaded. This is a no-op in Node.</p></p>
     
 </dt>
 <dd>
@@ -15495,7 +16986,7 @@ console.log('Thanks for reading the snoowrap docs! Try using the `snoowrap` glob
 
 
 <span class="jsdoc-message">
-	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.2</a>
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

@@ -33,7 +33,14 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="snoowrap.html">snoowrap</a></li><li><a href="RedditContent.html">RedditContent</a></li><li><a href="ReplyableContent.html">ReplyableContent</a></li><li><a href="VoteableContent.html">VoteableContent</a></li><li><a href="Comment.html">Comment</a></li><li><a href="RedditUser.html">RedditUser</a></li><li><a href="Submission.html">Submission</a></li><li><a href="LiveThread.html">LiveThread</a></li><li><a href="PrivateMessage.html">PrivateMessage</a></li><li><a href="Subreddit.html">Subreddit</a></li><li><a href="MultiReddit.html">MultiReddit</a></li><li><a href="WikiPage.html">WikiPage</a></li><li><a href="Listing.html">Listing</a></li>
+					<li><a href="snoowrap.html">snoowrap</a></li><li><a href="RedditContent.html">RedditContent</a></li><li><a href="ReplyableContent.html">ReplyableContent</a></li><li><a href="VoteableContent.html">VoteableContent</a></li><li><a href="Comment.html">Comment</a></li><li><a href="RedditUser.html">RedditUser</a></li><li><a href="Submission.html">Submission</a></li><li><a href="LiveThread.html">LiveThread</a></li><li><a href="PrivateMessage.html">PrivateMessage</a></li><li><a href="Subreddit.html">Subreddit</a></li><li><a href="MultiReddit.html">MultiReddit</a></li><li><a href="ModmailConversation.html">ModmailConversation</a></li><li><a href="ModmailConversationAuthor.html">ModmailConversationAuthor</a></li><li><a href="WikiPage.html">WikiPage</a></li><li><a href="Listing.html">Listing</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="global.html">Global</a></li>
 				</ul>
 			</li>
 			
@@ -668,7 +675,7 @@ r.getUser(&#x27;spez&#x27;)</pre>
     
     <div class="description">
         <p><strong>Note:</strong> reddit.com only permits &quot;notes&quot; to be added on friends if the authenticated account has a subscription to
-  reddit gold.</p>
+reddit gold.</p>
     </div>
     
 
@@ -1737,7 +1744,7 @@ r.getUser(&#x27;spez&#x27;)</pre>
     
     <div class="description">
         <p><strong>Note</strong>: This can only be used to view one's own upvoted content, unless the user in question has chosen to
-  make this information public in their preferences.</p>
+make this information public in their preferences.</p>
     </div>
     
 
@@ -1916,7 +1923,7 @@ r.getUser(&#x27;spez&#x27;)</pre>
     
     <div class="description">
         <p><strong>Note</strong>: This can only be used to view one's own downvoted content, unless the user in question has chosen to
-  make this information public in their preferences.</p>
+make this information public in their preferences.</p>
     </div>
     
 
@@ -2095,7 +2102,7 @@ r.getUser(&#x27;spez&#x27;)</pre>
     
     <div class="description">
         <p><strong>Note</strong>: This can only be used to view one's own set of hidden posts, as reddit will return a 403 error when
-  attempting to view another users' hidden posts.</p>
+attempting to view another users' hidden posts.</p>
     </div>
     
 
@@ -2274,7 +2281,7 @@ r.getUser(&#x27;spez&#x27;)</pre>
     
     <div class="description">
         <p><strong>Note</strong>: This can only be used to view one's own set of saved content, as reddit will return a 403 error when
-  attempting to view other users' saved content.</p>
+attempting to view other users' saved content.</p>
     </div>
     
 
@@ -3248,7 +3255,7 @@ r.getUser(&#x27;spez&#x27;)</pre>
     
     
     <p class="summary"><p>Reports this content anonymously to subreddit moderators (for Comments and Submissions)
-  or to the reddit admins (for PrivateMessages)</p></p>
+or to the reddit admins (for PrivateMessages)</p></p>
     
 </dt>
 <dd>
@@ -3718,7 +3725,7 @@ r.getUser(&#x27;spez&#x27;)</pre>
     
     
     <p class="summary"><p>Submits a new reply to this object. (This takes the form of a new Comment if this object is a Submission/Comment,
-  or a new PrivateMessage if this object is a PrivateMessage.)</p></p>
+or a new PrivateMessage if this object is a PrivateMessage.)</p></p>
     
 </dt>
 <dd>
@@ -3891,8 +3898,8 @@ r.getUser(&#x27;spez&#x27;)</pre>
     
     <div class="description">
         <p><strong>Note:</strong> In order for this function to have an effect, this item <strong>must</strong> be in the authenticated account's inbox or
-  modmail somewhere. The reddit API gives no outward indication of whether this condition is satisfied, so the returned Promise
-  will fulfill even if this is not the case.</p>
+modmail somewhere. The reddit API gives no outward indication of whether this condition is satisfied, so the returned Promise
+will fulfill even if this is not the case.</p>
     </div>
     
 
@@ -4093,8 +4100,8 @@ automatically called when an unknown property is accessed on an unfetched conten
             
 <div class="param-desc">
     <p>A version of this object with all of its fetched properties from reddit. This will not mutate the
-  object. Once an object has been fetched once, its properties will be cached, so they might end up out-of-date if this
-  function is called again. To refresh an object, use refresh().</p>
+object. Once an object has been fetched once, its properties will be cached, so they might end up out-of-date if this
+function is called again. To refresh an object, use refresh().</p>
 </div>
 
 
@@ -4273,7 +4280,7 @@ setTimeout(() =&gt; {
     
     <div class="description">
         <p>It is usually not necessary to call this method directly; simply running JSON.stringify(some_object) will strip the
-  private properties anyway.</p>
+private properties anyway.</p>
     </div>
     
 
@@ -4444,7 +4451,7 @@ console.log('Thanks for reading the snoowrap docs! Try using the `snoowrap` glob
 
 
 <span class="jsdoc-message">
-	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.2</a>
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

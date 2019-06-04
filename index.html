@@ -33,7 +33,14 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="snoowrap.html">snoowrap</a></li><li><a href="RedditContent.html">RedditContent</a></li><li><a href="ReplyableContent.html">ReplyableContent</a></li><li><a href="VoteableContent.html">VoteableContent</a></li><li><a href="Comment.html">Comment</a></li><li><a href="RedditUser.html">RedditUser</a></li><li><a href="Submission.html">Submission</a></li><li><a href="LiveThread.html">LiveThread</a></li><li><a href="PrivateMessage.html">PrivateMessage</a></li><li><a href="Subreddit.html">Subreddit</a></li><li><a href="MultiReddit.html">MultiReddit</a></li><li><a href="WikiPage.html">WikiPage</a></li><li><a href="Listing.html">Listing</a></li>
+					<li><a href="snoowrap.html">snoowrap</a></li><li><a href="RedditContent.html">RedditContent</a></li><li><a href="ReplyableContent.html">ReplyableContent</a></li><li><a href="VoteableContent.html">VoteableContent</a></li><li><a href="Comment.html">Comment</a></li><li><a href="RedditUser.html">RedditUser</a></li><li><a href="Submission.html">Submission</a></li><li><a href="LiveThread.html">LiveThread</a></li><li><a href="PrivateMessage.html">PrivateMessage</a></li><li><a href="Subreddit.html">Subreddit</a></li><li><a href="MultiReddit.html">MultiReddit</a></li><li><a href="ModmailConversation.html">ModmailConversation</a></li><li><a href="ModmailConversationAuthor.html">ModmailConversationAuthor</a></li><li><a href="WikiPage.html">WikiPage</a></li><li><a href="Listing.html">Listing</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="global.html">Global</a></li>
 				</ul>
 			</li>
 			
@@ -86,8 +93,10 @@
 
 
     <section class="readme-section">
-        <article><h1>snoowrap <a href="https://travis-ci.org/not-an-aardvark/snoowrap"><img src="https://travis-ci.org/not-an-aardvark/snoowrap.svg?branch=master" alt="Build Status"></a></h1><p>A fully-featured JavaScript wrapper for the reddit API. (<a href="https://not-an-aardvark.github.io/snoowrap">Documentation</a>)</p>
-<h3>Features</h3><ul>
+        <article><h1>snoowrap <a href="https://travis-ci.org/not-an-aardvark/snoowrap"><img src="https://travis-ci.org/not-an-aardvark/snoowrap.svg?branch=master" alt="Build Status"></a></h1>
+<p>A fully-featured JavaScript wrapper for the reddit API. (<a href="https://not-an-aardvark.github.io/snoowrap">Documentation</a>)</p>
+<h3>Features</h3>
+<ul>
 <li>snoowrap provides a simple interface to access every reddit API endpoint. For example, the method to get a user profile is just <code>getUser()</code>, and the method to upvote something is just <code>upvote()</code>.</li>
 <li>snoowrap is non-blocking; all of its API calls are asynchronous and return bluebird Promises. This means that you can handle concurrent requests however you want to, and you can use snoowrap as part of a larger process without it holding everything back.</li>
 <li>Each snoowrap object is completely independent. This means that you can have scripts from separate accounts making requests at the same time.</li>
@@ -99,21 +108,30 @@
 <p>These features ensure that you can write less boilerplate code and focus more on actually doing what you want to do.</p>
 <hr>
 <p>snoowrap's methods are designed to be as simple and consistent as possible. So the following expression:</p>
-<pre class="prettyprint source lang-js"><code>r.getSubmission('2np694').body</code></pre><p>...will return a Promise. So will this one:</p>
+<pre class="prettyprint source lang-js"><code>r.getSubmission('2np694').body
+</code></pre>
+<p>...will return a Promise. So will this one:</p>
 <pre class="prettyprint source lang-js"><code> r.getSubmission('2np694').author.name
  // --> returns a Promise for the string 'DO_U_EVN_SPAGHETTI'
- // (this submission's author's name)</code></pre><p>The above will return a Promise for the author's name, without having to deal with callback hell or <code>.then</code> statements. You can chain multiple API calls together:</p>
+ // (this submission's author's name)
+</code></pre>
+<p>The above will return a Promise for the author's name, without having to deal with callback hell or <code>.then</code> statements. You can chain multiple API calls together:</p>
 <pre class="prettyprint source lang-js"><code>r.getSubmission('2np694').subreddit.getModerators()[0].name
 // --> returns a Promise for the string 'krispykrackers'
-// (this submission's subreddit's first mod's name)</code></pre><p>...or chain actions together with fluent syntax:</p>
+// (this submission's subreddit's first mod's name)
+</code></pre>
+<p>...or chain actions together with fluent syntax:</p>
 <pre class="prettyprint source lang-js"><code>r.getSubreddit('snoowrap')
   .submitSelfpost({title: 'Discussion Thread', text: 'Hello! This is a thread'})
   .sticky()
   .distinguish()
   .ignoreReports()
-  .assignFlair({text: 'Exciting Flair Text', css_class: 'modpost'})</code></pre><p>snoowrap works on Node.js 4+, as well as most common browsers.</p>
+  .assignFlair({text: 'Exciting Flair Text', css_class: 'modpost'})
+</code></pre>
+<p>snoowrap works on Node.js 4+, as well as most common browsers.</p>
 <hr>
-<h3>Examples</h3><pre class="prettyprint source lang-js"><code>'use strict';
+<h3>Examples</h3>
+<pre class="prettyprint source lang-js"><code>'use strict';
 const snoowrap = require('snoowrap');
 
 // NOTE: The following examples illustrate how to use snoowrap. However, hardcoding
@@ -170,14 +188,22 @@ r.getSubreddit('some_subreddit_name')
   // etc. etc.
 
 // Printing the content of a wiki page
-r.getSubreddit('AskReddit').getWikiPage('bestof').content_md.then(console.log);</code></pre><p>For more examples of what can be done with snoowrap, take a look at the <a href="https://not-an-aardvark.github.io/snoowrap">documentation</a>.</p>
+r.getSubreddit('AskReddit').getWikiPage('bestof').content_md.then(console.log);
+
+</code></pre>
+<p>For more examples of what can be done with snoowrap, take a look at the <a href="https://not-an-aardvark.github.io/snoowrap">documentation</a>.</p>
 <hr>
-<h3>Live threads</h3><p>Reddit's <a href="https://www.reddit.com/r/live/wiki/index">live threads</a> are different from most other content, in that messages are distributed through websockets instead of a RESTful API. snoowrap supports this protocol under the hood by representing the content stream as an <a href="https://nodejs.org/api/events.html#events_class_eventemitter">EventEmitter</a>. For example, the following script will stream all livethread updates to the console as they appear:</p>
-<pre class="prettyprint source lang-js"><code>r.getLivethread('whrdxo8dg9n0').stream.on('update', console.log);</code></pre><p>For more information, see the <a href="https://not-an-aardvark.github.io/snoowrap/LiveThread.html">LiveThread documentation page</a>.</p>
+<h3>Live threads</h3>
+<p>Reddit's <a href="https://www.reddit.com/r/live/wiki/index">live threads</a> are different from most other content, in that messages are distributed through websockets instead of a RESTful API. snoowrap supports this protocol under the hood by representing the content stream as an <a href="https://nodejs.org/api/events.html#events_class_eventemitter">EventEmitter</a>. For example, the following script will stream all livethread updates to the console as they appear:</p>
+<pre class="prettyprint source lang-js"><code>r.getLivethread('whrdxo8dg9n0').stream.on('update', console.log);
+</code></pre>
+<p>For more information, see the <a href="https://not-an-aardvark.github.io/snoowrap/LiveThread.html">LiveThread documentation page</a>.</p>
 <hr>
-<h3>Important note on ES6</h3><p>snoowrap uses the <code>Proxy</code> object introduced in ES6.</p>
+<h3>Important note on ES6</h3>
+<p>snoowrap uses the <code>Proxy</code> object introduced in ES6.</p>
 <p>If your target environment does not support Proxies, snoowrap will still function. However, method chaining as described above won't work, so your syntax will need to be a bit heavier.</p>
-<h4>Environments that support the ES6 Proxy object</h4><ul>
+<h4>Environments that support the ES6 Proxy object</h4>
+<ul>
 <li>Node 6+</li>
 <li>Chrome 49+</li>
 <li>Firefox 18+</li>
@@ -194,10 +220,18 @@ r.getSubmission('47v7tm').comments[0].upvote();
 // This is equivalent and works on all platforms, but the syntax isn't as nice.
 r.getSubmission('47v7tm').fetch().then(submission => {
   return submission.comments[0].upvote();
-});</code></pre><p>You can explicitly disable method chaining with <code>r.config({proxies: false})</code>.</p>
+});
+
+</code></pre>
+<p>You can explicitly disable method chaining with <code>r.config({proxies: false})</code>.</p>
 <hr>
-<h3>To include in a project</h3><p><strong>Node:</strong></p>
-<pre class="prettyprint source lang-bash"><code>npm install snoowrap --save</code></pre><pre class="prettyprint source lang-js"><code>var snoowrap = require('snoowrap');</code></pre><p><strong>Browsers:</strong></p>
+<h3>To include in a project</h3>
+<p><strong>Node:</strong></p>
+<pre class="prettyprint source lang-bash"><code>npm install snoowrap --save
+</code></pre>
+<pre class="prettyprint source lang-js"><code>var snoowrap = require('snoowrap');
+</code></pre>
+<p><strong>Browsers:</strong></p>
 <p>snoowrap is usable with module bundlers such as <a href="http://browserify.org/">browserify</a>.</p>
 <p>Alternatively, prebuilt versions are available:</p>
 <ul>
@@ -206,9 +240,11 @@ r.getSubmission('47v7tm').fetch().then(submission => {
 </ul>
 <p>These files will occasionally be updated as new versions of snoowrap 1 are released. Since snoowrap follows semantic versioning, the changes should not break your code. However, if you would prefer to pin the version, you can specify a version number in the URL (e.g. <a href="https://not-an-aardvark.github.io/snoowrap/snoowrap-v1.11.3.min.js">snoowrap-v1.11.3.min.js</a>). For a list of all available prebuilt versions, see the <a href="https://github.com/not-an-aardvark/snoowrap/tree/gh-pages">gh-pages branch</a> of this repository.</p>
 <p>When run in a browser, snoowrap will be assigned to the global variable <code>window.snoowrap</code>. If you want to avoid global state (or you're using two versions of snoowrap on the same page for some reason), use <code>snoowrap.noConflict()</code> to restore <code>window.snoowrap</code> to its previous value.</p>
-<h3>To build/run the tests independently</h3><p>See the <a href="https://github.com/not-an-aardvark/snoowrap/blob/master/CONTRIBUTING.md">contributing guide</a> and the <a href="https://github.com/not-an-aardvark/snoowrap/blob/master/src/README.md">getting started</a> page.</p>
+<h3>To build/run the tests independently</h3>
+<p>See the <a href="https://github.com/not-an-aardvark/snoowrap/blob/master/CONTRIBUTING.md">contributing guide</a> and the <a href="https://github.com/not-an-aardvark/snoowrap/blob/master/src/README.md">getting started</a> page.</p>
 <hr>
-<h3>License</h3><p>This software is freely distributable under the <a href="https://github.com/not-an-aardvark/snoowrap/blob/master/LICENSE.md">MIT License</a>.</p></article>
+<h3>License</h3>
+<p>This software is freely distributable under the <a href="https://github.com/not-an-aardvark/snoowrap/blob/master/LICENSE.md">MIT License</a>.</p></article>
     </section>
 
 
@@ -269,7 +305,7 @@ console.log('Thanks for reading the snoowrap docs! Try using the `snoowrap` glob
 
 
 <span class="jsdoc-message">
-	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.2</a>
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

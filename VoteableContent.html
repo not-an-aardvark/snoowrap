@@ -33,7 +33,14 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="snoowrap.html">snoowrap</a></li><li><a href="RedditContent.html">RedditContent</a></li><li><a href="ReplyableContent.html">ReplyableContent</a></li><li><a href="VoteableContent.html">VoteableContent</a></li><li><a href="Comment.html">Comment</a></li><li><a href="RedditUser.html">RedditUser</a></li><li><a href="Submission.html">Submission</a></li><li><a href="LiveThread.html">LiveThread</a></li><li><a href="PrivateMessage.html">PrivateMessage</a></li><li><a href="Subreddit.html">Subreddit</a></li><li><a href="MultiReddit.html">MultiReddit</a></li><li><a href="WikiPage.html">WikiPage</a></li><li><a href="Listing.html">Listing</a></li>
+					<li><a href="snoowrap.html">snoowrap</a></li><li><a href="RedditContent.html">RedditContent</a></li><li><a href="ReplyableContent.html">ReplyableContent</a></li><li><a href="VoteableContent.html">VoteableContent</a></li><li><a href="Comment.html">Comment</a></li><li><a href="RedditUser.html">RedditUser</a></li><li><a href="Submission.html">Submission</a></li><li><a href="LiveThread.html">LiveThread</a></li><li><a href="PrivateMessage.html">PrivateMessage</a></li><li><a href="Subreddit.html">Subreddit</a></li><li><a href="MultiReddit.html">MultiReddit</a></li><li><a href="ModmailConversation.html">ModmailConversation</a></li><li><a href="ModmailConversationAuthor.html">ModmailConversationAuthor</a></li><li><a href="WikiPage.html">WikiPage</a></li><li><a href="Listing.html">Listing</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="global.html">Global</a></li>
 				</ul>
 			</li>
 			
@@ -201,9 +208,9 @@
     
     <div class="description">
         <p><strong>Note: votes must be cast by humans.</strong> That is, API clients proxying a human's action one-for-one are OK,
-  but bots deciding how to vote on content or amplifying a human's vote are not. See the
-  <a href="https://reddit.com/rules">reddit rules</a> for more details on what constitutes vote cheating. (This guideline is quoted from
-  <a href="https://www.reddit.com/dev/api#POST_api_vote">the official reddit API documentation page</a>.)</p>
+but bots deciding how to vote on content or amplifying a human's vote are not. See the
+<a href="https://reddit.com/rules">reddit rules</a> for more details on what constitutes vote cheating. (This guideline is quoted from
+<a href="https://www.reddit.com/dev/api#POST_api_vote">the official reddit API documentation page</a>.)</p>
     </div>
     
 
@@ -314,9 +321,9 @@
     
     <div class="description">
         <p><strong>Note: votes must be cast by humans.</strong> That is, API clients proxying a human's action one-for-one are OK, but
-  bots deciding how to vote on content or amplifying a human's vote are not. See the <a href="https://reddit.com/rules">reddit rules</a>
-  for more details on what constitutes vote cheating. (This guideline is quoted from
-  <a href="https://www.reddit.com/dev/api#POST_api_vote">the official reddit API documentation page</a>.)</p>
+bots deciding how to vote on content or amplifying a human's vote are not. See the <a href="https://reddit.com/rules">reddit rules</a>
+for more details on what constitutes vote cheating. (This guideline is quoted from
+<a href="https://www.reddit.com/dev/api#POST_api_vote">the official reddit API documentation page</a>.)</p>
     </div>
     
 
@@ -427,9 +434,9 @@
     
     <div class="description">
         <p><strong>Note: votes must be cast by humans.</strong> That is, API clients proxying a human's action one-for-one are OK, but
-  bots deciding how to vote on content or amplifying a human's vote are not. See the <a href="https://reddit.com/rules">reddit rules</a>
-  for more details on what constitutes vote cheating. (This guideline is quoted from
-  <a href="https://www.reddit.com/dev/api#POST_api_vote">the official reddit API documentation page</a>.)</p>
+bots deciding how to vote on content or amplifying a human's vote are not. See the <a href="https://reddit.com/rules">reddit rules</a>
+for more details on what constitutes vote cheating. (This guideline is quoted from
+<a href="https://www.reddit.com/dev/api#POST_api_vote">the official reddit API documentation page</a>.)</p>
     </div>
     
 
@@ -870,9 +877,9 @@
             
 
             <td class="description last"><p>Determines how the item should be distinguished.
-  <code>true</code> (default) signifies that the item should be moderator-distinguished, and
-  <code>false</code> signifies that the item should not be distinguished. Passing a string (e.g.
-  <code>admin</code>) will cause the item to get distinguished with that string, if possible.</p></td>
+<code>true</code> (default) signifies that the item should be moderator-distinguished, and
+<code>false</code> signifies that the item should not be distinguished. Passing a string (e.g.
+<code>admin</code>) will cause the item to get distinguished with that string, if possible.</p></td>
         </tr>
 
     
@@ -913,7 +920,7 @@
             
 
             <td class="description last"><p>Determines whether this item should be stickied in addition to being
-  distinguished. (This only applies to comments; to sticky a submission, use <a href="Submission.html#sticky"><code>Submission#sticky</code></a> instead.)</p></td>
+distinguished. (This only applies to comments; to sticky a submission, use <a href="Submission.html#sticky"><code>Submission#sticky</code></a> instead.)</p></td>
         </tr>
 
     
@@ -1609,20 +1616,20 @@
     
     <div class="description">
         <p>This is useful in cases where one wants to enumerate all comments on a
-  thread, even the ones that are initially hidden when viewing it (e.g. long comment chains).</p>
+thread, even the ones that are initially hidden when viewing it (e.g. long comment chains).</p>
 <p>This function accepts two optional parameters <code>options.limit</code> and <code>options.depth</code>. <code>options.limit</code> sets an upper bound
-  for the branching factor of the resulting replies tree, i.e. the number of comments that are fetched in reply to any given
-  item. <code>options.depth</code> sets an upper bound for the depth of the resulting replies tree (where a depth of 0 signifies that no
-  replies should be fetched at all).</p>
+for the branching factor of the resulting replies tree, i.e. the number of comments that are fetched in reply to any given
+item. <code>options.depth</code> sets an upper bound for the depth of the resulting replies tree (where a depth of 0 signifies that no
+replies should be fetched at all).</p>
 <p>Note that regardless of the <code>limit</code> and <code>depth</code> parameters used, any reply that appeared in the original reply tree will
-  appear in the expanded reply tree. In certain cases, the depth of the resulting tree may also be larger than <code>options.depth</code>,
-  if the reddit API returns more of a comment tree than needed.</p>
+appear in the expanded reply tree. In certain cases, the depth of the resulting tree may also be larger than <code>options.depth</code>,
+if the reddit API returns more of a comment tree than needed.</p>
 <p>These parameters should primarily be used to keep the request count low; if a precise limit and depth are needed, it is
-  recommended to manually verify the comments in the tree afterwards.</p>
+recommended to manually verify the comments in the tree afterwards.</p>
 <p>Both parameters default to <code>Infinity</code> if omitted, i.e. the resulting tree contains every single comment available. It should
-  be noted that depending on the size and depth of the thread, fetching every single comment can use up a significant number
-  of ratelimited requests. (To give an intuitive estimate, consider how many clicks would be needed to view all the
-  comments on the thread using the HTML site.)</p>
+be noted that depending on the size and depth of the thread, fetching every single comment can use up a significant number
+of ratelimited requests. (To give an intuitive estimate, consider how many clicks would be needed to view all the
+comments on the thread using the HTML site.)</p>
     </div>
     
 
@@ -1869,7 +1876,7 @@
             
 <div class="param-desc">
     <p>A Promise that fulfills with a new version of this object that has an expanded reply tree. The original
-  object is not modified</p>
+object is not modified</p>
 </div>
 
 
@@ -2368,7 +2375,7 @@
     
     
     <p class="summary"><p>Reports this content anonymously to subreddit moderators (for Comments and Submissions)
-  or to the reddit admins (for PrivateMessages)</p></p>
+or to the reddit admins (for PrivateMessages)</p></p>
     
 </dt>
 <dd>
@@ -2838,7 +2845,7 @@
     
     
     <p class="summary"><p>Submits a new reply to this object. (This takes the form of a new Comment if this object is a Submission/Comment,
-  or a new PrivateMessage if this object is a PrivateMessage.)</p></p>
+or a new PrivateMessage if this object is a PrivateMessage.)</p></p>
     
 </dt>
 <dd>
@@ -3011,8 +3018,8 @@
     
     <div class="description">
         <p><strong>Note:</strong> In order for this function to have an effect, this item <strong>must</strong> be in the authenticated account's inbox or
-  modmail somewhere. The reddit API gives no outward indication of whether this condition is satisfied, so the returned Promise
-  will fulfill even if this is not the case.</p>
+modmail somewhere. The reddit API gives no outward indication of whether this condition is satisfied, so the returned Promise
+will fulfill even if this is not the case.</p>
     </div>
     
 
@@ -3213,8 +3220,8 @@ automatically called when an unknown property is accessed on an unfetched conten
             
 <div class="param-desc">
     <p>A version of this object with all of its fetched properties from reddit. This will not mutate the
-  object. Once an object has been fetched once, its properties will be cached, so they might end up out-of-date if this
-  function is called again. To refresh an object, use refresh().</p>
+object. Once an object has been fetched once, its properties will be cached, so they might end up out-of-date if this
+function is called again. To refresh an object, use refresh().</p>
 </div>
 
 
@@ -3393,7 +3400,7 @@ setTimeout(() =&gt; {
     
     <div class="description">
         <p>It is usually not necessary to call this method directly; simply running JSON.stringify(some_object) will strip the
-  private properties anyway.</p>
+private properties anyway.</p>
     </div>
     
 
@@ -3564,7 +3571,7 @@ console.log('Thanks for reading the snoowrap docs! Try using the `snoowrap` glob
 
 
 <span class="jsdoc-message">
-	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.2</a>
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

@@ -33,7 +33,14 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="snoowrap.html">snoowrap</a></li><li><a href="RedditContent.html">RedditContent</a></li><li><a href="ReplyableContent.html">ReplyableContent</a></li><li><a href="VoteableContent.html">VoteableContent</a></li><li><a href="Comment.html">Comment</a></li><li><a href="RedditUser.html">RedditUser</a></li><li><a href="Submission.html">Submission</a></li><li><a href="LiveThread.html">LiveThread</a></li><li><a href="PrivateMessage.html">PrivateMessage</a></li><li><a href="Subreddit.html">Subreddit</a></li><li><a href="MultiReddit.html">MultiReddit</a></li><li><a href="WikiPage.html">WikiPage</a></li><li><a href="Listing.html">Listing</a></li>
+					<li><a href="snoowrap.html">snoowrap</a></li><li><a href="RedditContent.html">RedditContent</a></li><li><a href="ReplyableContent.html">ReplyableContent</a></li><li><a href="VoteableContent.html">VoteableContent</a></li><li><a href="Comment.html">Comment</a></li><li><a href="RedditUser.html">RedditUser</a></li><li><a href="Submission.html">Submission</a></li><li><a href="LiveThread.html">LiveThread</a></li><li><a href="PrivateMessage.html">PrivateMessage</a></li><li><a href="Subreddit.html">Subreddit</a></li><li><a href="MultiReddit.html">MultiReddit</a></li><li><a href="ModmailConversation.html">ModmailConversation</a></li><li><a href="ModmailConversationAuthor.html">ModmailConversationAuthor</a></li><li><a href="WikiPage.html">WikiPage</a></li><li><a href="Listing.html">Listing</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="global.html">Global</a></li>
 				</ul>
 			</li>
 			
@@ -813,7 +820,7 @@ r.getSubreddit(&#x27;AskReddit&#x27;)</pre>
             
 
             <td class="description last"><p>Determines whether users should be able to edit their flair text
-  when it has this template</p></td>
+when it has this template</p></td>
         </tr>
 
     
@@ -1116,7 +1123,7 @@ r.getSubreddit(&#x27;AskReddit&#x27;)</pre>
             
 
             <td class="description last"><p>Determines whether users should be able to edit the flair text of their
-  links when it has this template</p></td>
+links when it has this template</p></td>
         </tr>
 
     
@@ -1835,9 +1842,9 @@ r.getSubreddit(&#x27;AskReddit&#x27;)</pre>
     
     <div class="description">
         <p>Due to the behavior of the reddit API endpoint that this function uses, if any of the provided user flairs are
-  invalid, reddit will make note of this in its response, but it will still attempt to set the remaining user flairs. If this
-  occurs, the Promise returned by snoowrap will be rejected, and the rejection reason will be an array containing the 'error'
-  responses from reddit.</p>
+invalid, reddit will make note of this in its response, but it will still attempt to set the remaining user flairs. If this
+occurs, the Promise returned by snoowrap will be rejected, and the rejection reason will be an array containing the 'error'
+responses from reddit.</p>
     </div>
     
 
@@ -2440,7 +2447,7 @@ r.getSubreddit(&#x27;snoowrap&#x27;).setMultipleUserFlairs([
             
 
             <td class="description last"><p>Determines the orientation of user flair relative to a given username. This
-  should be either the string 'left' or the string 'right'.</p></td>
+should be either the string 'left' or the string 'right'.</p></td>
         </tr>
 
     
@@ -2489,7 +2496,7 @@ r.getSubreddit(&#x27;snoowrap&#x27;).setMultipleUserFlairs([
             
 
             <td class="description last"><p>Determines the orientation of link flair relative to a link title. This should
-  be either 'left' or 'right'.</p></td>
+be either 'left' or 'right'.</p></td>
         </tr>
 
     
@@ -2514,7 +2521,7 @@ r.getSubreddit(&#x27;snoowrap&#x27;).setMultipleUserFlairs([
             
 
             <td class="description last"><p>Determines whether users should be able to edit the flair of their
-  submissions.</p></td>
+submissions.</p></td>
         </tr>
 
     
@@ -2848,7 +2855,7 @@ r.getSubreddit(&#x27;snoowrap&#x27;).setMultipleUserFlairs([
             
 
             <td class="description last"><p>A flair template ID to use. (This should be obtained beforehand using
-  <code>getUserFlairTemplates</code>.)</p></td>
+<code>getUserFlairTemplates</code>.)</p></td>
         </tr>
 
     
@@ -2883,7 +2890,7 @@ r.getSubreddit(&#x27;snoowrap&#x27;).setMultipleUserFlairs([
             
 
             <td class="description last"><p>The flair text to use. (This is only necessary/useful if the given flair
-  template has the <code>text_editable</code> property set to <code>true</code>.)</p></td>
+template has the <code>text_editable</code> property set to <code>true</code>.)</p></td>
         </tr>
 
     
@@ -3434,7 +3441,7 @@ r.getSubreddit(&#x27;snoowrap&#x27;).setMultipleUserFlairs([
             
 
             <td class="description last"><p>A captcha identifier. This is only necessary if the authenticated account
-  requires a captcha to submit posts and comments.</p></td>
+requires a captcha to submit posts and comments.</p></td>
         </tr>
 
     
@@ -3812,7 +3819,7 @@ r.getSubreddit(&#x27;snoowrap&#x27;).setMultipleUserFlairs([
             
 
             <td class="description last"><p>If this is false and same link has already been submitted to this subreddit in
-  the past, reddit will return an error. This could be used to avoid accidental reposts.</p></td>
+the past, reddit will return an error. This could be used to avoid accidental reposts.</p></td>
         </tr>
 
     
@@ -3851,7 +3858,7 @@ r.getSubreddit(&#x27;snoowrap&#x27;).setMultipleUserFlairs([
             
 
             <td class="description last"><p>A captcha identifier. This is only necessary if the authenticated account
-  requires a captcha to submit posts and comments.</p></td>
+requires a captcha to submit posts and comments.</p></td>
         </tr>
 
     
@@ -4157,7 +4164,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>A Submission object or a post ID for the original post which
-   is being crossposted</p></td>
+is being crossposted</p></td>
         </tr>
 
     
@@ -4238,7 +4245,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>If this is false and same link has already been submitted to this subreddit in
-   the past, reddit will return an error. This could be used to avoid accidental reposts.</p></td>
+the past, reddit will return an error. This could be used to avoid accidental reposts.</p></td>
         </tr>
 
     
@@ -4898,7 +4905,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
     
     <div class="description">
         <p><strong>Note</strong>: This function will not work when snoowrap is running in a browser, because the reddit server sends a
-  redirect which cannot be followed by a CORS request.</p>
+redirect which cannot be followed by a CORS request.</p>
     </div>
     
 
@@ -5133,7 +5140,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>Describes the timespan that posts should be retrieved from. Should be one of
-  <code>hour, day, week, month, year, all</code></p></td>
+<code>hour, day, week, month, year, all</code></p></td>
         </tr>
 
     
@@ -5377,7 +5384,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>Describes the timespan that posts should be retrieved from. Should be one of
-  <code>hour, day, week, month, year, all</code></p></td>
+<code>hour, day, week, month, year, all</code></p></td>
         </tr>
 
     
@@ -5995,12 +6002,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
 
             
 
-            <td class="description last"><p>Restricts the results to the specified type. This should be one of <code>banuser, unbanuser,
-  removelink, approvelink, removecomment, approvecomment, addmoderator, invitemoderator, uninvitemoderator,
-  acceptmoderatorinvite, removemoderator, addcontributor, removecontributor, editsettings, editflair, distinguish, marknsfw,
-  wikibanned, wikicontributor, wikiunbanned, wikipagelisted, removewikicontributor, wikirevise, wikipermlevel,
-  ignorereports, unignorereports, setpermissions, setsuggestedsort, sticky, unsticky, setcontestmode, unsetcontestmode,
-  lock, unlock, muteuser, unmuteuser, createrule, editrule, deleterule, spoiler, unspoiler</code></p></td>
+            <td class="description last"><p>Restricts the results to the specified type. This should be one of <code>banuser, unbanuser, removelink, approvelink, removecomment, approvecomment, addmoderator, invitemoderator, uninvitemoderator, acceptmoderatorinvite, removemoderator, addcontributor, removecontributor, editsettings, editflair, distinguish, marknsfw, wikibanned, wikicontributor, wikiunbanned, wikipagelisted, removewikicontributor, wikirevise, wikipermlevel, ignorereports, unignorereports, setpermissions, setsuggestedsort, sticky, unsticky, setcontestmode, unsetcontestmode, lock, unlock, muteuser, unmuteuser, createrule, editrule, deleterule, spoiler, unspoiler</code></p></td>
         </tr>
 
     
@@ -7916,7 +7918,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>Describes the timespan that posts should be retrieved frome. One of
-  <code>hour, day, week, month, year, all</code></p></td>
+<code>hour, day, week, month, year, all</code></p></td>
         </tr>
 
     
@@ -10066,7 +10068,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>An Object containing {[option name]: new value} mappings of the options that should be modified.
-  Any omitted option names will simply retain their previous values.</p>
+Any omitted option names will simply retain their previous values.</p>
                 <h6 class="method-params-label method-subparams-label">Properties</h6>
                 
 
@@ -10162,7 +10164,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>The text that appears with this Subreddit on the search page, or on the
-  blocked-access page if this subreddit is private. (500 characters max)</p></td>
+blocked-access page if this subreddit is private. (500 characters max)</p></td>
         </tr>
 
     
@@ -10279,7 +10281,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>Determines whether ads should be hidden on this subreddit. (This is only
-  allowed for gold-only subreddits.)</p></td>
+allowed for gold-only subreddits.)</p></td>
         </tr>
 
     
@@ -10360,7 +10362,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>Determines who should be able to access the subreddit. This should be one of
-  <code>public, private, restricted, gold_restricted, gold_only, archived, employees_only</code>.</p></td>
+<code>public, private, restricted, gold_restricted, gold_only, archived, employees_only</code>.</p></td>
         </tr>
 
     
@@ -10401,7 +10403,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>Determines what types of submissions are allowed on the subreddit. This should
-  be one of <code>any, link, self</code>.</p></td>
+be one of <code>any, link, self</code>.</p></td>
         </tr>
 
     
@@ -10440,7 +10442,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>Custom text to display on the button that submits a link. If
-  this is omitted, the default text will be displayed.</p></td>
+this is omitted, the default text will be displayed.</p></td>
         </tr>
 
     
@@ -10479,7 +10481,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>Custom text to display on the button that submits a selfpost. If
-  this is omitted, the default text will be displayed.</p></td>
+this is omitted, the default text will be displayed.</p></td>
         </tr>
 
     
@@ -10520,7 +10522,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>Determines who can edit wiki pages on the subreddit. This should be one of
-  <code>modonly, anyone, disabled</code>.</p></td>
+<code>modonly, anyone, disabled</code>.</p></td>
         </tr>
 
     
@@ -10561,7 +10563,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>The minimum amount of subreddit karma needed for someone to edit this
-  subreddit's wiki. (This is only relevant if <code>options.wikimode</code> is set to <code>anyone</code>.)</p></td>
+subreddit's wiki. (This is only relevant if <code>options.wikimode</code> is set to <code>anyone</code>.)</p></td>
         </tr>
 
     
@@ -10602,7 +10604,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>The minimum account age (in days) needed for someone to edit this subreddit's
-  wiki. (This is only relevant if <code>options.wikimode</code> is set to <code>anyone</code>.)</p></td>
+wiki. (This is only relevant if <code>options.wikimode</code> is set to <code>anyone</code>.)</p></td>
         </tr>
 
     
@@ -10643,7 +10645,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>The spam filter strength for links on this subreddit. This should be one of
-  <code>low, high, all</code>.</p></td>
+<code>low, high, all</code>.</p></td>
         </tr>
 
     
@@ -10684,7 +10686,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>The spam filter strength for selfposts on this subreddit. This should be
-  one of <code>low, high, all</code>.</p></td>
+one of <code>low, high, all</code>.</p></td>
         </tr>
 
     
@@ -10725,7 +10727,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>The spam filter strength for comments on this subreddit. This should be one
-  of <code>low, high, all</code>.</p></td>
+of <code>low, high, all</code>.</p></td>
         </tr>
 
     
@@ -10806,7 +10808,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>Determines whether the new subreddit should be able to appear in /r/all and
-  trending subreddits</p></td>
+trending subreddits</p></td>
         </tr>
 
     
@@ -10887,7 +10889,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>Determines whether media previews should be expanded by default on this
-  subreddit</p></td>
+subreddit</p></td>
         </tr>
 
     
@@ -10928,7 +10930,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>Determines whether image uploads and links to image hosting sites should be
-  enabled on this subreddit</p></td>
+enabled on this subreddit</p></td>
         </tr>
 
     
@@ -10969,7 +10971,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>Determines whether posts by site-wide banned users should be
-  excluded from the modqueue.</p></td>
+excluded from the modqueue.</p></td>
         </tr>
 
     
@@ -11010,7 +11012,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>Determines whether the /about/traffic page for this subreddit should be
-  viewable by anyone.</p></td>
+viewable by anyone.</p></td>
         </tr>
 
     
@@ -11051,7 +11053,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>Determines whether deleted and removed comments should be
-  collapsed by default</p></td>
+collapsed by default</p></td>
         </tr>
 
     
@@ -11090,8 +11092,8 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>The suggested comment sort for the subreddit. This should be
-  one of <code>confidence, top, new, controversial, old, random, qa</code>.If left blank, there will be no suggested sort,
-  which means that users will see the sort method that is set in their own preferences (usually <code>confidence</code>.)</p></td>
+one of <code>confidence, top, new, controversial, old, random, qa</code>.If left blank, there will be no suggested sort,
+which means that users will see the sort method that is set in their own preferences (usually <code>confidence</code>.)</p></td>
         </tr>
 
     
@@ -12201,8 +12203,8 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>The image file that should get uploaded. This should either be the path to an
-  image file, or a <a href="https://nodejs.org/api/stream.html#stream_class_stream_readable">ReadableStream</a> in environments (e.g.
-  browsers) where the filesystem is unavailable.</p></td>
+image file, or a <a href="https://nodejs.org/api/stream.html#stream_class_stream_readable">ReadableStream</a> in environments (e.g.
+browsers) where the filesystem is unavailable.</p></td>
         </tr>
 
     
@@ -12468,8 +12470,8 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>The image file that should get uploaded. This should either be the path to an
-  image file, or a <a href="https://nodejs.org/api/stream.html#stream_class_stream_readable">ReadableStream</a> for environments (e.g.
-  browsers) where the filesystem is unavailable.</p></td>
+image file, or a <a href="https://nodejs.org/api/stream.html#stream_class_stream_readable">ReadableStream</a> for environments (e.g.
+browsers) where the filesystem is unavailable.</p></td>
         </tr>
 
     
@@ -12735,8 +12737,8 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>The image file that should get uploaded. This should either be the path to an
-  image file, or a <a href="https://nodejs.org/api/stream.html#stream_class_stream_readable">ReadableStream</a> for environments (e.g.
-  browsers) where the filesystem is unavailable.</p></td>
+image file, or a <a href="https://nodejs.org/api/stream.html#stream_class_stream_readable">ReadableStream</a> for environments (e.g.
+browsers) where the filesystem is unavailable.</p></td>
         </tr>
 
     
@@ -13002,8 +13004,8 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>The image file that should get uploaded. This should either be the path to an
-  image file, or a <a href="https://nodejs.org/api/stream.html#stream_class_stream_readable">ReadableStream</a> for environments (e.g.
-  browsers) where the filesystem is unavailable.</p></td>
+image file, or a <a href="https://nodejs.org/api/stream.html#stream_class_stream_readable">ReadableStream</a> for environments (e.g.
+browsers) where the filesystem is unavailable.</p></td>
         </tr>
 
     
@@ -13656,8 +13658,8 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>The moderator permissions that this user should have. This should be an array
-  containing some combination of <code>&quot;wiki&quot;, &quot;posts&quot;, &quot;access&quot;, &quot;mail&quot;, &quot;config&quot;, &quot;flair&quot;</code>. To add a moderator with full
-  permissions, omit this property entirely.</p></td>
+containing some combination of <code>&quot;wiki&quot;, &quot;posts&quot;, &quot;access&quot;, &quot;mail&quot;, &quot;config&quot;, &quot;flair&quot;</code>. To add a moderator with full
+permissions, omit this property entirely.</p></td>
         </tr>
 
     
@@ -14732,7 +14734,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>The ban message. This will get sent to the user in a private message, alerting them
-  that they have been banned.</p></td>
+that they have been banned.</p></td>
         </tr>
 
     
@@ -14835,7 +14837,7 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>A note that appears on the moderation log, usually used to indicate the reason for the
-  ban. This is not visible to the banned user. (300 characters max)</p></td>
+ban. This is not visible to the banned user. (300 characters max)</p></td>
         </tr>
 
     
@@ -16528,8 +16530,8 @@ the crosspost is being submitted, and that subreddit be configured to allow cros
             
 
             <td class="description last"><p>The new moderator permissions that this user should have. This should be an array
-  containing some combination of <code>&quot;wiki&quot;, &quot;posts&quot;, &quot;access&quot;, &quot;mail&quot;, &quot;config&quot;, &quot;flair&quot;</code>. To add a moderator with full
-  permissions, omit this property entirely.</p></td>
+containing some combination of <code>&quot;wiki&quot;, &quot;posts&quot;, &quot;access&quot;, &quot;mail&quot;, &quot;config&quot;, &quot;flair&quot;</code>. To add a moderator with full
+permissions, omit this property entirely.</p></td>
         </tr>
 
     
@@ -17165,8 +17167,8 @@ automatically called when an unknown property is accessed on an unfetched conten
             
 <div class="param-desc">
     <p>A version of this object with all of its fetched properties from reddit. This will not mutate the
-  object. Once an object has been fetched once, its properties will be cached, so they might end up out-of-date if this
-  function is called again. To refresh an object, use refresh().</p>
+object. Once an object has been fetched once, its properties will be cached, so they might end up out-of-date if this
+function is called again. To refresh an object, use refresh().</p>
 </div>
 
 
@@ -17345,7 +17347,7 @@ setTimeout(() =&gt; {
     
     <div class="description">
         <p>It is usually not necessary to call this method directly; simply running JSON.stringify(some_object) will strip the
-  private properties anyway.</p>
+private properties anyway.</p>
     </div>
     
 
@@ -17516,7 +17518,7 @@ console.log('Thanks for reading the snoowrap docs! Try using the `snoowrap` glob
 
 
 <span class="jsdoc-message">
-	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.2</a>
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

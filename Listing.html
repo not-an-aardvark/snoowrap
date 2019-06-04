@@ -33,7 +33,14 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="snoowrap.html">snoowrap</a></li><li><a href="RedditContent.html">RedditContent</a></li><li><a href="ReplyableContent.html">ReplyableContent</a></li><li><a href="VoteableContent.html">VoteableContent</a></li><li><a href="Comment.html">Comment</a></li><li><a href="RedditUser.html">RedditUser</a></li><li><a href="Submission.html">Submission</a></li><li><a href="LiveThread.html">LiveThread</a></li><li><a href="PrivateMessage.html">PrivateMessage</a></li><li><a href="Subreddit.html">Subreddit</a></li><li><a href="MultiReddit.html">MultiReddit</a></li><li><a href="WikiPage.html">WikiPage</a></li><li><a href="Listing.html">Listing</a></li>
+					<li><a href="snoowrap.html">snoowrap</a></li><li><a href="RedditContent.html">RedditContent</a></li><li><a href="ReplyableContent.html">ReplyableContent</a></li><li><a href="VoteableContent.html">VoteableContent</a></li><li><a href="Comment.html">Comment</a></li><li><a href="RedditUser.html">RedditUser</a></li><li><a href="Submission.html">Submission</a></li><li><a href="LiveThread.html">LiveThread</a></li><li><a href="PrivateMessage.html">PrivateMessage</a></li><li><a href="Subreddit.html">Subreddit</a></li><li><a href="MultiReddit.html">MultiReddit</a></li><li><a href="ModmailConversation.html">ModmailConversation</a></li><li><a href="ModmailConversationAuthor.html">ModmailConversationAuthor</a></li><li><a href="WikiPage.html">WikiPage</a></li><li><a href="Listing.html">Listing</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="global.html">Global</a></li>
 				</ul>
 			</li>
 			
@@ -433,11 +440,11 @@ you don't have to worry about the distinction.</p>
             
 
             <td class="description last"><p>For a Listing that contains comment objects on a Submission, this option can
-  be used to save a few API calls, provided that only top-level comments are being examined. If this is set to <code>true</code>, snoowrap
-  is able to fetch 100 Comments per API call rather than 20, but all returned Comments will have no fetched replies by default.</p>
+be used to save a few API calls, provided that only top-level comments are being examined. If this is set to <code>true</code>, snoowrap
+is able to fetch 100 Comments per API call rather than 20, but all returned Comments will have no fetched replies by default.</p>
 <p>Internal details: When <code>skipReplies</code> is set to <code>true</code>, snoowrap uses reddit's <code>api/info</code> endpoint to fetch Comments. When
-  <code>skipReplies</code> is set to <code>false</code>, snoowrap uses reddit's <code>api/morechildren</code> endpoint. It's worth noting that reddit does
-  not allow concurrent requests to the <code>api/morechildren</code> endpoint by the same account.</p></td>
+<code>skipReplies</code> is set to <code>false</code>, snoowrap uses reddit's <code>api/morechildren</code> endpoint. It's worth noting that reddit does
+not allow concurrent requests to the <code>api/morechildren</code> endpoint by the same account.</p></td>
         </tr>
 
     
@@ -478,7 +485,7 @@ you don't have to worry about the distinction.</p>
             
 
             <td class="description last"><p>If <code>true</code>, the resulting Listing will contain the existing elements in addition to
-  the newly-fetched elements. If <code>false</code>, the resulting Listing will only contain the newly-fetched elements.</p></td>
+the newly-fetched elements. If <code>false</code>, the resulting Listing will only contain the newly-fetched elements.</p></td>
         </tr>
 
     
@@ -550,10 +557,10 @@ you don't have to worry about the distinction.</p>
             
 <div class="param-desc">
     <p>A new Listing containing the newly-fetched elements. If <code>options.append</code> is <code>true</code>, the new Listing will
-  also contain all elements that were in the original Listing. Under most circumstances, the newly-fetched elements will appear
-  at the end of the new Listing. However, if reverse pagination is enabled (i.e. if this Listing was created with a <code>before</code>
-  query parameter), then the newly-fetched elements will appear at the beginning. In any case, continuity is maintained, i.e.
-  the order of items in the Listing will be the same as the order in which they appear on reddit.</p>
+also contain all elements that were in the original Listing. Under most circumstances, the newly-fetched elements will appear
+at the end of the new Listing. However, if reverse pagination is enabled (i.e. if this Listing was created with a <code>before</code>
+query parameter), then the newly-fetched elements will appear at the beginning. In any case, continuity is maintained, i.e.
+the order of items in the Listing will be the same as the order in which they appear on reddit.</p>
 </div>
 
 
@@ -727,7 +734,7 @@ you don't have to worry about the distinction.</p>
             
 <div class="param-desc">
     <p>A new fully-fetched Listing. Keep in mind that this method has the potential to exhaust your
-  ratelimit quickly if the Listing doesn't have a clear end (e.g. with posts on the front page), so use it with discretion.</p>
+ratelimit quickly if the Listing doesn't have a clear end (e.g. with posts on the front page), so use it with discretion.</p>
 </div>
 
 
@@ -823,7 +830,7 @@ console.log('Thanks for reading the snoowrap docs! Try using the `snoowrap` glob
 
 
 <span class="jsdoc-message">
-	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.2</a>
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

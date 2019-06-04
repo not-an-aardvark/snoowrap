@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>snoowrap Class: RedditContent</title>
+	<title>snoowrap Class: ModmailConversationAuthor</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -72,19 +72,17 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: RedditContent</h1>
+	<h1 class="page-title">Class: ModmailConversationAuthor</h1>
 <section>
 
 <header>
     
         <h2>
-        RedditContent
+        ModmailConversationAuthor
         </h2>
         
-            <div class="class-description"><p>A base class for content from reddit. With the expection of Listings, all content types extend this class.
-This class should be considered 'abstract', to the extend that JavaScript classes can be -- it should not be necessary to
-instantiate it directly.</p>
-<style> #RedditContent {display: none} </style></div>
+            <div class="class-description"><p>A class representing an author from a modmail conversation</p>
+<style> #ModmailConversationAuthor {display: none} </style></div>
         
     
 </header>
@@ -96,7 +94,7 @@ instantiate it directly.</p>
         
 <hr>
 <dt>
-    <h4 class="name" id="RedditContent"><span class="type-signature"></span>new RedditContent()</h4>
+    <h4 class="name" id="ModmailConversationAuthor"><span class="type-signature"></span>new ModmailConversationAuthor()</h4>
     
     
 </dt>
@@ -164,10 +162,28 @@ instantiate it directly.</p>
     
 
     
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">// Get a Modmail Conversation author with a given ID
+r.getNewModmailConversation(&#x27;75hxt&#x27;).getParticipant()</pre>
+
+
+    
 </dd>
 
     
     </div>
+
+    
+        <h3 class="subsection-title">Extends</h3>
+
+        
+
+
+    <ul>
+        <li><a href="RedditContent.html">RedditContent</a></li>
+    </ul>
+
 
     
 
@@ -185,6 +201,115 @@ instantiate it directly.</p>
         <h3 class="subsection-title">Methods</h3>
 
         <dl>
+            
+<hr>
+<dt>
+    <h4 class="name" id="getUser"><span class="type-signature"></span>getUser()</h4>
+    
+    
+    <p class="summary"><p>Gets information on a Reddit user for the given modmail.</p></p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>An unfetched RedditUser object for the requested user</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="RedditUser.html">RedditUser</a></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">r.getNewModmailConversation(&#x27;efy3lax&#x27;).getParticipant().getUser()
+// =&gt; RedditUser { name: &#x27;not_an_aardvark&#x27; }
+r.getNewModmailConversation(&#x27;efy3lax&#x27;).getParticipant().getUser().link_karma.then(console.log)
+// =&gt; 6</pre>
+
+
+    
+</dd>
+
+        
             
 <hr>
 <dt>
@@ -222,7 +347,21 @@ automatically called when an unknown property is accessed on an unfetched conten
 	
 
 	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="RedditContent.html#fetch">RedditContent#fetch</a>
+			</li>
+		</ul>
+	</dd>
+	
 
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="RedditContent.html#fetch">RedditContent#fetch</a>
+    </li></ul></dd>
     
 
     
@@ -340,7 +479,21 @@ r.getComment(&#x27;d1xchqn&#x27;).body.then(console.log);
 	
 
 	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="RedditContent.html#refresh">RedditContent#refresh</a>
+			</li>
+		</ul>
+	</dd>
+	
 
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="RedditContent.html#refresh">RedditContent#refresh</a>
+    </li></ul></dd>
     
 
     
@@ -460,7 +613,21 @@ private properties anyway.</p>
 	
 
 	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="RedditContent.html#toJSON">RedditContent#toJSON</a>
+			</li>
+		</ul>
+	</dd>
+	
 
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="RedditContent.html#toJSON">RedditContent#toJSON</a>
+    </li></ul></dd>
     
 
     
