@@ -1025,6 +1025,8 @@ const snoowrap = class snoowrap {
   }
 
   /**
+   * @summary Represents the unread count in {ModmailConversation}. Each of these properties
+   * correspond to the amount of unread conversations of that type.
    * @typedef {Object} UnreadCount
    * @property {number} highlighted
    * @property {number} notifications
