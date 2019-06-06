@@ -1,4 +1,4 @@
-# snoowrap [![Build Status](https://travis-ci.org/not-an-aardvark/snoowrap.svg?branch=master)](https://travis-ci.org/not-an-aardvark/snoowrap)
+# snoowrap [![Build Status](https://travis-ci.org/not-an-aardvark/snoowrap.svg?branch=master)](https://travis-ci.org/not-an-aardvark/snoowrap) [![Gitter chat](https://badges.gitter.im/not-an-aardvark/snoowrap.svg)](https://gitter.im/not-an-aardvark/snoowrap 'Join the chat at https://gitter.im/not-an-aardvark/snoowrap')
 
 A fully-featured JavaScript wrapper for the reddit API. ([Documentation](https://not-an-aardvark.github.io/snoowrap))
 
