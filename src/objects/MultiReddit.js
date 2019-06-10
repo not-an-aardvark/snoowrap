@@ -45,6 +45,7 @@ const MultiReddit = class MultiReddit extends RedditContent {
   * @param {string} options.newName The new name for this multireddit.
   * @returns {Promise} A Promise that fulfills with this multireddit
   * @example r.getUser('multi-mod').getMultireddit('coding_languages').copy({newName: 'cookie_languages '})
+  * @deprecated Reddit no longer provides the corresponding API endpoint. Please use `edit()` with a new name.
   */
   rename ({new_name, newName = new_name}) {
     return this._r._getMyName().then(name => this._post({
@@ -58,7 +59,7 @@ const MultiReddit = class MultiReddit extends RedditContent {
   * @summary Edits the properties of this multireddit.
   * @desc **Note**: Any omitted properties here will simply retain their previous values.
   * @param {object} options
-  * @param {string} [options.name] The name of the new multireddit. 50 characters max
+  * @param {string} [options.name] The name of the new multireddit. 50 characters max.
   * @param {string} [options.description] A description for the new multireddit, in markdown.
   * @param {string} [options.visibility] The multireddit's visibility setting. One of `private`, `public`, `hidden`.
   * @param {string} [options.icon_name] One of `art and design`, `ask`, `books`, `business`, `cars`, `comics`, `cute animals`,
@@ -70,10 +71,11 @@ const MultiReddit = class MultiReddit extends RedditContent {
   * @returns {Promise} The updated version of this multireddit
   * @example r.getUser('not_an_aardvark').getMultireddit('cookie_languages').edit({visibility: 'hidden'})
   */
-  edit ({description, icon_name, key_color, visibility, weighting_scheme}) {
+  edit ({name = '', description, icon_name, key_color, visibility, weighting_scheme}) {
+    const display_name = name.length ? name : this.name;
     return this._put({uri: `api/multi${this._path}`, form: {model: JSON.stringify({
       description_md: description,
-      display_name: this.name,
+      display_name,
       icon_name,
       key_color,
       visibility,
