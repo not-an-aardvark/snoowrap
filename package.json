@@ -5,6 +5,7 @@
   "description": "A JavaScript wrapper for the reddit API",
   "main": "dist/snoowrap.js",
   "scripts": {
+    "prepublishOnly": "npm run compile",
     "compile": "babel -q -d dist/ src/",
     "lint": "eslint --ignore-path .gitignore . --cache",
     "test": "npm run lint && npm run test:mocha",
