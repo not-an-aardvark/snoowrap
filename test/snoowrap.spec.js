@@ -1782,7 +1782,8 @@ describe('snoowrap', function () {
       expect(multis).to.be.an.instanceof(Array);
       expect(multis[0]).to.be.an.instanceof(snoowrap.objects.MultiReddit);
     });
-    it('can rename a multireddit', async () => {
+    // deprecated endpoint
+    it.skip('can rename a multireddit', async () => {
       const new_name = require('crypto').randomBytes(8).toString('hex');
       await my_multi.rename({new_name});
       expect(my_multi.name).to.equal(new_name);
@@ -1793,8 +1794,13 @@ describe('snoowrap', function () {
       expect(new_multi.name).to.equal(multi_name);
       expect(_.map(new_multi.subreddits, 'display_name').sort()).to.eql(['Cookies', 'snoowrap_testing']);
     });
+    it('can rename a multireddit\'s display name', async () => {
+      const new_name = require('crypto').randomBytes(8).toString('hex');
+      const edited_multi = await my_multi.edit({name: new_name});
+      expect(edited_multi.display_name).to.equal(new_name);
+    });
     it('can delete a multireddit', async () => {
-      // Deleting a multi seems to randomly fail on reddit's end sometimes, even when it returns a 200 response.
+      // Deleting a multi seems to randomly fail on Reddit's end sometimes, even when it returns a 200 response.
       const new_name = require('crypto').randomBytes(8).toString('hex');
       const temp_multi = await my_multi.copy({new_name});
       await temp_multi.delete();
