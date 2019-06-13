@@ -1,6 +1,6 @@
 {
   "name": "snoowrap",
-  "version": "1.16.0",
+  "version": "1.17.0",
   "license": "MIT",
   "description": "A JavaScript wrapper for the reddit API",
   "main": "dist/snoowrap.js",

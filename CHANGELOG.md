@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.17.0 (2019-06-13)
+
+* Deprecated `MultiReddit#rename` (this endpoint is no longer supported by reddit.com)
+
 ## v1.16.0 (2019-06-04)
 
 * Added support for new modmail
