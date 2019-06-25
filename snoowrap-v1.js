@@ -1088,12 +1088,20 @@ var _RedditContent2 = _interopRequireDefault(_RedditContent);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * @summary Represents the current status of a given Modmail conversation.
+ * @type {Readonly<{New: number, InProgress: number, Archived: number}>}
+ */
 var conversationStates = exports.conversationStates = Object.freeze({
   New: 0,
   InProgress: 1,
   Archived: 2
 });
 
+/**
+ * @summary Represents all the possible states that is used within a Modmail conversations.
+ * @type {Readonly<{UnArchive: number, Highlight: number, Archive: number, ReportedToAdmins: number, Mute: number, UnHighlight: number, Unmute: number}>}
+ */
 var modActionStates = exports.modActionStates = Object.freeze({
   Highlight: 0,
   UnHighlight: 1,
@@ -1199,7 +1207,7 @@ var ModmailConversation = class ModmailConversation extends _RedditContent2.defa
   }
 
   /**
-   * @summary Removed highligted from a ModmailConversation
+   * @summary Removed highlighted from a ModmailConversation
    * @return {Promise}
    * @example
    *
@@ -5013,6 +5021,8 @@ var snoowrap = class snoowrap {
    account while running snoowrap in a browser), then you should use {@link snoowrap.getAuthUrl} and
    {@link snoowrap.fromAuthCode} instead.
    *
+   * To edit snoowrap specific settings, see {@link snoowrap#config}.
+   *
    * snoowrap supports several different options for pre-existing authentication:
    * 1. *Refresh token*: To authenticate with a refresh token, pass an object with the properties `userAgent`, `clientId`,
    `clientSecret`, and `refreshToken` to the snoowrap constructor. You will need to get the refresh token from reddit
@@ -5228,7 +5238,7 @@ var snoowrap = class snoowrap {
   }
 
   /**
-   * @summary Retrieves or modifies the configuration options for this requester.
+   * @summary Retrieves or modifies the configuration options for this snoowrap instance.
    * @param {object} [options] A map of `{[config property name]: value}`. Note that any omitted config properties will simply
    retain whatever value they had previously. (In other words, if you only want to change one property, you only need to put
    that one property in this parameter. To get the current configuration without modifying anything, simply omit this
@@ -5257,7 +5267,8 @@ var snoowrap = class snoowrap {
    * @param {boolean} [options.proxies=true] Setting this to `false` disables snoowrap's method-chaining feature. This causes
    the syntax for using snoowrap to become a bit heavier, but allows for consistency between environments that support the ES6
    `Proxy` object and environments that don't. This option is a no-op in environments that don't support the `Proxy` object,
-   since method chaining is always disabled in those environments.
+   since method chaining is always disabled in those environments. Note, changing this setting must be done before making
+   any requests.
    * @returns {object} An updated Object containing all of the configuration values
    * @example
    *
@@ -6063,7 +6074,7 @@ var snoowrap = class snoowrap {
   }
 
   /**
-   * @summary Represents the unread count in {ModmailConversation}. Each of these properties
+   * @summary Represents the unread count in a {@link ModmailConversation}. Each of these properties
    * correspond to the amount of unread conversations of that type.
    * @typedef {Object} UnreadCount
    * @property {number} highlighted
@@ -7278,7 +7289,7 @@ function fromByteArray (uint8) {
  * 
  */
 /**
- * bluebird build version 3.5.5
+ * bluebird build version 3.5.3
  * Features enabled: core, race, call_get, generators, map, nodeify, promisify, props, reduce, settle, some, using, timers, filter, any, each
 */
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.Promise=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof _dereq_=="function"&&_dereq_;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof _dereq_=="function"&&_dereq_;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
@@ -8616,8 +8627,8 @@ function parseLineInfo(line) {
 
 function setBounds(firstLineError, lastLineError) {
     if (!longStackTracesIsSupported()) return;
-    var firstStackLines = (firstLineError.stack || "").split("\n");
-    var lastStackLines = (lastLineError.stack || "").split("\n");
+    var firstStackLines = firstLineError.stack.split("\n");
+    var lastStackLines = lastLineError.stack.split("\n");
     var firstIndex = -1;
     var lastIndex = -1;
     var firstFileName;
@@ -10141,11 +10152,6 @@ Promise.prototype.caught = Promise.prototype["catch"] = function (fn) {
         }
         catchInstances.length = j;
         fn = arguments[i];
-
-        if (typeof fn !== "function") {
-            throw new TypeError("The last argument to .catch() " +
-                "must be a function, got " + util.toString(fn));
-        }
         return this.then(undefined, catchFilter(catchInstances, fn, this));
     }
     return this.then(undefined, fn);
@@ -10753,14 +10759,6 @@ Promise.prototype._settledValue = function() {
     }
 };
 
-if (typeof Symbol !== "undefined" && Symbol.toStringTag) {
-    es5.defineProperty(Promise.prototype, Symbol.toStringTag, {
-        get: function () {
-            return "Object";
-        }
-    });
-}
-
 function deferResolve(v) {this.promise._resolveCallback(v);}
 function deferReject(v) {this.promise._rejectCallback(v, false);}
 
@@ -10787,10 +10785,12 @@ _dereq_("./synchronous_inspection")(Promise);
 _dereq_("./join")(
     Promise, PromiseArray, tryConvertToPromise, INTERNAL, async, getDomain);
 Promise.Promise = Promise;
-Promise.version = "3.5.5";
-_dereq_('./call_get.js')(Promise);
-_dereq_('./generators.js')(Promise, apiRejection, INTERNAL, tryConvertToPromise, Proxyable, debug);
+Promise.version = "3.5.3";
 _dereq_('./map.js')(Promise, PromiseArray, apiRejection, tryConvertToPromise, INTERNAL, debug);
+_dereq_('./call_get.js')(Promise);
+_dereq_('./using.js')(Promise, apiRejection, tryConvertToPromise, createContext, INTERNAL, debug);
+_dereq_('./timers.js')(Promise, INTERNAL, debug);
+_dereq_('./generators.js')(Promise, apiRejection, INTERNAL, tryConvertToPromise, Proxyable, debug);
 _dereq_('./nodeify.js')(Promise);
 _dereq_('./promisify.js')(Promise, INTERNAL);
 _dereq_('./props.js')(Promise, PromiseArray, tryConvertToPromise, apiRejection);
@@ -10798,11 +10798,9 @@ _dereq_('./race.js')(Promise, INTERNAL, tryConvertToPromise, apiRejection);
 _dereq_('./reduce.js')(Promise, PromiseArray, apiRejection, tryConvertToPromise, INTERNAL, debug);
 _dereq_('./settle.js')(Promise, PromiseArray, debug);
 _dereq_('./some.js')(Promise, PromiseArray, apiRejection);
-_dereq_('./timers.js')(Promise, INTERNAL, debug);
-_dereq_('./using.js')(Promise, apiRejection, tryConvertToPromise, createContext, INTERNAL, debug);
-_dereq_('./any.js')(Promise);
-_dereq_('./each.js')(Promise, INTERNAL);
 _dereq_('./filter.js')(Promise, INTERNAL);
+_dereq_('./each.js')(Promise, INTERNAL);
+_dereq_('./any.js')(Promise);
                                                          
     util.toFastProperties(Promise);                                          
     util.toFastProperties(Promise.prototype);                                
@@ -11774,8 +11772,7 @@ if (util.isNode && typeof MutationObserver === "undefined") {
 } else if ((typeof MutationObserver !== "undefined") &&
           !(typeof window !== "undefined" &&
             window.navigator &&
-            (window.navigator.standalone || window.cordova)) &&
-          ("classList" in document.documentElement)) {
+            (window.navigator.standalone || window.cordova))) {
     schedule = (function() {
         var div = document.createElement("div");
         var opts = {attributes: true};
@@ -12903,12 +12900,7 @@ var ret = {
     domainBind: domainBind
 };
 ret.isRecentNode = ret.isNode && (function() {
-    var version;
-    if (process.versions && process.versions.node) {    
-        version = process.versions.node.split(".").map(Number);
-    } else if (process.version) {
-        version = process.version.split(".").map(Number);
-    }
+    var version = process.versions.node.split(".").map(Number);
     return (version[0] === 0 && version[1] > 10) || (version[0] > 0);
 })();
 
