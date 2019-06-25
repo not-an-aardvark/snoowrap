@@ -1,5 +1,10 @@
 import RedditContent from './RedditContent.js';
 
+
+/**
+ * @summary Represents the current status of a given Modmail conversation.
+ * @type {Readonly<{New: number, InProgress: number, Archived: number}>}
+ */
 export const conversationStates = Object.freeze({
   New: 0,
   InProgress: 1,
@@ -7,6 +12,10 @@ export const conversationStates = Object.freeze({
 });
 
 
+/**
+ * @summary Represents all the possible states that is used within a Modmail conversations.
+ * @type {Readonly<{UnArchive: number, Highlight: number, Archive: number, ReportedToAdmins: number, Mute: number, UnHighlight: number, Unmute: number}>}
+ */
 export const modActionStates = Object.freeze({
   Highlight: 0,
   UnHighlight: 1,
@@ -115,7 +124,7 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
   }
 
   /**
-   * @summary Removed highligted from a ModmailConversation
+   * @summary Removed highlighted from a ModmailConversation
    * @return {Promise}
    * @example
    *

@@ -38,6 +38,8 @@ const snoowrap = class snoowrap {
    account while running snoowrap in a browser), then you should use {@link snoowrap.getAuthUrl} and
    {@link snoowrap.fromAuthCode} instead.
    *
+   * To edit snoowrap specific settings, see {@link snoowrap#config}.
+   *
    * snoowrap supports several different options for pre-existing authentication:
    * 1. *Refresh token*: To authenticate with a refresh token, pass an object with the properties `userAgent`, `clientId`,
    `clientSecret`, and `refreshToken` to the snoowrap constructor. You will need to get the refresh token from reddit
@@ -241,7 +243,7 @@ const snoowrap = class snoowrap {
   }
 
   /**
-   * @summary Retrieves or modifies the configuration options for this requester.
+   * @summary Retrieves or modifies the configuration options for this snoowrap instance.
    * @param {object} [options] A map of `{[config property name]: value}`. Note that any omitted config properties will simply
    retain whatever value they had previously. (In other words, if you only want to change one property, you only need to put
    that one property in this parameter. To get the current configuration without modifying anything, simply omit this
@@ -270,7 +272,8 @@ const snoowrap = class snoowrap {
    * @param {boolean} [options.proxies=true] Setting this to `false` disables snoowrap's method-chaining feature. This causes
    the syntax for using snoowrap to become a bit heavier, but allows for consistency between environments that support the ES6
    `Proxy` object and environments that don't. This option is a no-op in environments that don't support the `Proxy` object,
-   since method chaining is always disabled in those environments.
+   since method chaining is always disabled in those environments. Note, changing this setting must be done before making
+   any requests.
    * @returns {object} An updated Object containing all of the configuration values
    * @example
    *
@@ -1025,7 +1028,7 @@ const snoowrap = class snoowrap {
   }
 
   /**
-   * @summary Represents the unread count in {ModmailConversation}. Each of these properties
+   * @summary Represents the unread count in a {@link ModmailConversation}. Each of these properties
    * correspond to the amount of unread conversations of that type.
    * @typedef {Object} UnreadCount
    * @property {number} highlighted
