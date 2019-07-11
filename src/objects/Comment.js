@@ -36,6 +36,22 @@ const Comment = class Comment extends VoteableContent {
   get _uri () {
     return `api/info?id=${this.name}`;
   }
+  /**
+  * @summary Locks this Comment, preventing new comments from being posted on it.
+  * @returns {Promise} The updated version of this Comment
+  * @example r.getComment('d1xclfo').lock()
+  */
+  lock () {
+    return this._post({uri: 'api/lock', form: {id: this.name}}).return(this);
+  }
+  /**
+  * @summary Unlocks this Comment, allowing comments to be posted on it again.
+  * @returns {Promise} The updated version of this Comment
+  * @example r.getComment('d1xclfo').unlock()
+  */
+  unlock () {
+    return this._post({uri: 'api/unlock', form: {id: this.name}}).return(this);
+  }
 };
 
 export default Comment;
