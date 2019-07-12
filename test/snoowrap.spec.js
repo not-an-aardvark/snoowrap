@@ -578,6 +578,19 @@ describe('snoowrap', function () {
       expect(await r.getComment('d2dof1c').expandReplies().replies.is_finished).to.be.true();
     });
   });
+  
+  describe('acting on a comment', () => {
+    let comment;
+    beforeEach(() => {
+      comment = r.getComment('coip909');
+    });
+    it('can lock/unlock a comment', async () => {
+      await comment.lock();
+      expect(await comment.refresh().locked).to.be.true();
+      await comment.unlock();
+      expect(await comment.refresh().locked).to.be.false();
+    });
+  });
 
   describe("getting a subreddit's information", () => {
     let subreddit;
