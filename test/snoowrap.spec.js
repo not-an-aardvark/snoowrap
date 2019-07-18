@@ -582,7 +582,7 @@ describe('snoowrap', function () {
   describe('acting on a comment', () => {
     let comment;
     beforeEach(() => {
-      comment = r.getComment('coip909');
+      comment = r.getComment('dchbcq5');
     });
     it('can lock/unlock a comment', async () => {
       await comment.lock();
