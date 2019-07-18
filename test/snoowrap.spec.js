@@ -578,7 +578,7 @@ describe('snoowrap', function () {
       expect(await r.getComment('d2dof1c').expandReplies().replies.is_finished).to.be.true();
     });
   });
-  
+
   describe('acting on a comment', () => {
     let comment;
     beforeEach(() => {
