@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.18.0 (2019-07-23)
+
+* Added support for locking and unlocking comments
+
 ## v1.17.0 (2019-06-13)
 
 * Deprecated `MultiReddit#rename` (this endpoint is no longer supported by reddit.com)
