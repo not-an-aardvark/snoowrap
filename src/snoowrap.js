@@ -769,6 +769,20 @@ const snoowrap = class snoowrap {
   getNewComments (subredditName, options) {
     return this._getSortedFrontpage('comments', subredditName, options);
   }
+  
+  
+  /**
+   *  @summary Get list of content by IDs.
+   *  @param {string[]} ids An array of fullname IDs you want to fetch the content of.
+   *  @returns {Promise} A listing of content requested, can be any class fetchable by API. e.g. Comment, Submission
+  */
+  getContentByIDs (ids) {
+    if (!/t(1|3)_/g.test(ids)) {
+      throw new errors.InvalidMethodCallError('No valid IDs provided.');
+    }
+    return this._promiseWrap(this.oauthRequest({uri: '/api/info', method: 'get', qs: {id: ids.join(',')}}));
+  }
+
 
   /**
    * @summary Gets a single random Submission.
