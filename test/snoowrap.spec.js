@@ -1079,6 +1079,10 @@ describe('snoowrap', function () {
       expect(list3).to.have.lengthOf(2);
       expect(list3.every(post => post instanceof snoowrap.objects.Submission)).to.be.true();
     });
+    it('can get multiple posts by fullname id', async () => {
+      const posts = await r.getContentByIDs(['t3_9l9vof', 't3_9la341']);
+      expect(posts.length).to.be.greaterThan(1);
+    });
   });
 
   describe('self-property fetching', () => {
