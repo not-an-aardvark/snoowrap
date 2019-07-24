@@ -769,8 +769,7 @@ const snoowrap = class snoowrap {
   getNewComments (subredditName, options) {
     return this._getSortedFrontpage('comments', subredditName, options);
   }
-  
-  
+
   /**
    *  @summary Get list of content by IDs.
    *  @param {Array<string|Submission|Comment>} ids An array of fullname IDs or a Submission/Comment object you want to fetch the content of.
@@ -808,7 +807,6 @@ const snoowrap = class snoowrap {
 
     return this._get({uri: '/api/info', method: 'get', qs: {id: prefixedIds.join(',')}});
   }
-
 
   /**
    * @summary Gets a single random Submission.
