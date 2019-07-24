@@ -769,6 +769,46 @@ const snoowrap = class snoowrap {
   getNewComments (subredditName, options) {
     return this._getSortedFrontpage('comments', subredditName, options);
   }
+  
+  
+  /**
+   *  @summary Get list of content by IDs.
+   *  @param {Array<string|Submission|Comment>} ids An array of fullname IDs or a Submission/Comment object you want to fetch the content of.
+   *  @returns {Promise} A listing of content requested, can be any class fetchable by API. e.g. Comment, Submission
+   *  @example
+   *
+   * r.getContentByIds(['t3_9l9vof','t3_9la341']).then(console.log);
+   * // => Listing [
+   * //  Submission { approved_at_utc: null, ... }
+   * //  Submission { approved_at_utc: null, ... }
+   * // ]
+   *
+   * r.getContentByIds([r.getSubmission('9l9vof'), r.getSubmission('9la341')]).then(console.log);
+   * // => Listing [
+   * //  Submission { approved_at_utc: null, ... }
+   * //  Submission { approved_at_utc: null, ... }
+   * // ]
+  */
+  getContentByIds (ids) {
+    if (ids.length === undefined || typeof ids === 'string') {
+      throw new TypeError('Invalid argument: You need to pass an array of fullname IDs or Submission/Comment object!');
+    }
+
+    const prefixedIds = ids.map(id => {
+      if (id instanceof snoowrap.objects.Submission || id instanceof snoowrap.objects.Comment) {
+        return id.name;
+      } else if (typeof id === 'string') {
+        if (!/t(1|3)_/g.test(ids)) {
+          throw new TypeError('Invalid argument: List of IDs needs to be fullnames.');
+        }
+        return id;
+      }
+      throw new TypeError('ID must be either a string, Submission, or Comment.');
+    });
+
+    return this._get({uri: '/api/info', method: 'get', qs: {id: prefixedIds.join(',')}});
+  }
+
 
   /**
    * @summary Gets a single random Submission.
