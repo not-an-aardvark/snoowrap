@@ -1079,33 +1079,21 @@ describe('snoowrap', function () {
       expect(list3).to.have.lengthOf(2);
       expect(list3.every(post => post instanceof snoowrap.objects.Submission)).to.be.true();
     });
-    it('can get multiple posts by fullname id', async () => {
-      const posts = await r.getContentByIds(['t3_9l9vof', 't3_9la341']);
-      expect(posts).to.have.lengthOf(2);
-      expect(posts.every(post => post instanceof snoowrap.objects.Submission)).to.be.true();
+    it('can get a post and a comment by fullname id', async () => {
+      const listing = await r.getContentByIds(['t3_9l9vof', 't1_erx7tl8']);
+      expect(listing).to.have.lengthOf(2);
+      expect(listing[0] instanceof snoowrap.objects.Submission).to.be.true();
+      expect(listing[1] instanceof snoowrap.objects.Comment).to.be.true();
     });
-    it('can get multiple posts by submission object', async () => {
-      const posts = await r.getContentByIds([r.getSubmission('9l9vof'), r.getSubmission('9la341')]);
-      expect(posts).to.have.lengthOf(2);
-      expect(posts.every(post => post instanceof snoowrap.objects.Submission)).to.be.true();
-    });
-    it('can get multiple comments by fullname id', async () => {
-      const comments = await r.getContentByIds(['t1_erx7rym', 't1_erx7tl8']);
-      expect(comments).to.have.lengthOf(2);
-      expect(comments.every(comment => comment instanceof snoowrap.objects.Comment)).to.be.true();
-    });
-    it('can get multiple comments by comment object', async () => {
-      const comments = await r.getContentByIds([r.getComment('erx7rym'), r.getComment('erx7tl8')]);
-      expect(comments).to.have.lengthOf(2);
-      expect(comments.every(comment => comment instanceof snoowrap.objects.Comment)).to.be.true();
+    it('can get a post and a comment by submission and comment object', async () => {
+      const listing = await r.getContentByIds([r.getSubmission('9l9vof'), r.getComment('erx7tl8')]);
+      expect(listing).to.have.lengthOf(2);
+      expect(listing[0] instanceof snoowrap.objects.Submission).to.be.true();
+      expect(listing[1] instanceof snoowrap.objects.Comment).to.be.true();
     });
     it('cant get multiple posts by regular id', async () => {
       const posts = () => r.getContentByIds(['9l9vof', '9la341']);
       expect(await posts).to.throw(TypeError);
-    });
-    it('cant get multiple comments by regular id', async () => {
-      const comments = () => r.getContentByIds(['erx7rym', 'erx7tl8']);
-      expect(await comments).to.throw(TypeError);
     });
   });
 
