@@ -771,9 +771,9 @@ const snoowrap = class snoowrap {
   }
 
   /**
-   *  @summary Get list of content by IDs.
-   *  @param {Array<string|Submission|Comment>} ids An array of fullname IDs or a Submission/Comment object you want to fetch the content of.
-   *  @returns {Promise} A listing of content requested, can be any class fetchable by API. e.g. Comment, Submission
+   *  @summary Get list of content by IDs. Returns a listing of the requested content.
+   *  @param {Array<string|Submission|Comment>} ids An array of content IDs. Can include the id itself, or a Submission or Comment object.
+can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>} A listing of content requested, can be any class fetchable by API. e.g. Comment, Submission
    *  @example
    *
    * r.getContentByIds(['t3_9l9vof','t3_9la341']).then(console.log);
@@ -789,8 +789,8 @@ const snoowrap = class snoowrap {
    * // ]
   */
   getContentByIds (ids) {
-    if (ids.length === undefined || typeof ids === 'string') {
-      throw new TypeError('Invalid argument: You need to pass an array of fullname IDs or Submission/Comment object!');
+    if (!Array.isArray(ids)) {
+      throw new TypeError('Invalid argument: Argument needs to be an array.');
     }
 
     const prefixedIds = ids.map(id => {
@@ -798,11 +798,11 @@ const snoowrap = class snoowrap {
         return id.name;
       } else if (typeof id === 'string') {
         if (!/t(1|3)_/g.test(ids)) {
-          throw new TypeError('Invalid argument: List of IDs needs to be fullnames.');
+          throw new TypeError('Invalid argument: Ids need to include Submission or Comment prefix, e.g. t1_, t3_.');
         }
         return id;
       }
-      throw new TypeError('ID must be either a string, Submission, or Comment.');
+      throw new TypeError('Id must be either a string, Submission, or Comment.');
     });
 
     return this._get({uri: '/api/info', method: 'get', qs: {id: prefixedIds.join(',')}});
