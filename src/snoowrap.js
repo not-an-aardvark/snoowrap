@@ -773,14 +773,23 @@ const snoowrap = class snoowrap {
   
   /**
    *  @summary Get list of content by IDs.
-   *  @param {string[]} ids An array of fullname IDs you want to fetch the content of.
+   *  @param {Array<string|Submission|Comment>} ids An array of fullname IDs you want to fetch the content of.
    *  @returns {Promise} A listing of content requested, can be any class fetchable by API. e.g. Comment, Submission
   */
-  getContentByIDs (ids) {
-    if (!/t(1|3)_/g.test(ids)) {
-      throw new errors.InvalidMethodCallError('No valid IDs provided.');
+  getContentByIds (ids) {
+    if (typeof ids[0] === 'object') {
+      if ('name' in ids[0]) {
+        const objectId = [];
+        for (let i = 0; i < ids.length; i++) {
+          objectId.push(ids[i].name);
+        }
+        ids = objectId;
+      }
     }
-    return this._promiseWrap(this.oauthRequest({uri: '/api/info', method: 'get', qs: {id: ids.join(',')}}));
+    if (!/t(1|3)_/g.test(ids)) {
+      throw new TypeError('Invalid argument: List of IDs need to be fullnames.');
+    }
+    return this._get({uri: '/api/info', method: 'get', qs: {id: ids.join(',')}});
   }
 
 
