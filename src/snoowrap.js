@@ -773,23 +773,40 @@ const snoowrap = class snoowrap {
   
   /**
    *  @summary Get list of content by IDs.
-   *  @param {Array<string|Submission|Comment>} ids An array of fullname IDs you want to fetch the content of.
+   *  @param {Array<string|Submission|Comment>} ids An array of fullname IDs or a Submission/Comment object you want to fetch the content of.
    *  @returns {Promise} A listing of content requested, can be any class fetchable by API. e.g. Comment, Submission
+   *  @example
+   *
+   * r.getContentByIds(['t3_9l9vof','t3_9la341']).then(console.log);
+   * // => Listing [
+   * //  Submission { approved_at_utc: null, ... }
+   * //  Submission { approved_at_utc: null, ... }
+   * // ]
+   *
+   * r.getContentByIds([r.getSubmission('9l9vof'), r.getSubmission('9la341')]).then(console.log);
+   * // => Listing [
+   * //  Submission { approved_at_utc: null, ... }
+   * //  Submission { approved_at_utc: null, ... }
+   * // ]
   */
   getContentByIds (ids) {
-    if (typeof ids[0] === 'object') {
-      if ('name' in ids[0]) {
-        const objectId = [];
-        for (let i = 0; i < ids.length; i++) {
-          objectId.push(ids[i].name);
+    if (ids.length === undefined || typeof ids === 'string') {
+      throw new TypeError('Invalid argument: You need to pass an array of fullname IDs or Submission/Comment object!');
+    }
+
+    const prefixedIds = ids.map(id => {
+      if (id instanceof snoowrap.objects.Submission || id instanceof snoowrap.objects.Comment) {
+        return id.name;
+      } else if (typeof id === 'string') {
+        if (!/t(1|3)_/g.test(ids)) {
+          throw new TypeError('Invalid argument: List of IDs needs to be fullnames.');
         }
-        ids = objectId;
+        return id;
       }
-    }
-    if (!/t(1|3)_/g.test(ids)) {
-      throw new TypeError('Invalid argument: List of IDs need to be fullnames.');
-    }
-    return this._get({uri: '/api/info', method: 'get', qs: {id: ids.join(',')}});
+      throw new TypeError('ID must be either a string, Submission, or Comment.');
+    });
+
+    return this._get({uri: '/api/info', method: 'get', qs: {id: prefixedIds.join(',')}});
   }
 
 
