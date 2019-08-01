@@ -1,4 +1,4 @@
-import Snoowrap = require('snoowrap');
+import Snoowrap = require('../dist/snoowrap');
 import {
   Comment,
   Listing,
@@ -9,7 +9,7 @@ import {
   Submission,
   Subreddit,
   WikiPage,
-} from 'snoowrap';
+} from '../dist/snoowrap';
 
 const r = new Snoowrap({
   userAgent: 'foo',
