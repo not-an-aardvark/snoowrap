@@ -45,20 +45,20 @@ describe('snoowrap', function () {
     r.config({request_delay: 1000});
 
     if (!isBrowser) {
-      cookieAgent = request.defaults({
+      const defaultRequest = request.defaults({
         headers: {'user-agent': oauthInfo.user_agent},
         json: true,
         jar: request.jar(),
         baseUrl: 'https://www.reddit.com/'
       });
 
-      const loginResponse = await cookieAgent.post({
+      const loginResponse = await defaultRequest.post({
         uri: 'api/login',
         form: {user: oauthInfo.username, passwd: oauthInfo.password, api_type: 'json'}
       });
 
       expect(loginResponse.json.errors.length).to.equal(0);
-      cookieAgent = cookieAgent.defaults({headers: {'X-Modhash': loginResponse.json.data.modhash}});
+      cookieAgent = defaultRequest.defaults({headers: {'X-Modhash': loginResponse.json.data.modhash}});
     }
   });
 

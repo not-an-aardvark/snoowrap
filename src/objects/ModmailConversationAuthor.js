@@ -10,7 +10,6 @@ import RedditContent from './RedditContent';
  * @extends RedditContent
  */
 const ModmailConversationAuthor = class ModmailParticipant extends RedditContent {
-
   constructor (options, r, hasFetched) {
     super(options, r, hasFetched);
 
@@ -38,7 +37,6 @@ const ModmailConversationAuthor = class ModmailParticipant extends RedditContent
   getUser () {
     return this._r.getUser(this.name);
   }
-
 };
 
 export default ModmailConversationAuthor;

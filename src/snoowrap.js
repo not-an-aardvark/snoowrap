@@ -64,19 +64,19 @@ const snoowrap = class snoowrap {
    * @param {string} [options.accessToken] An access token for your app
    */
   constructor ({
-                 // The function signature for the constructor is a bit large due to the snake_case aliases. Essentially, it accepts an
-                 // object with properties {userAgent, clientId, clientSecret, refreshToken, accessToken, username, password}.
-                 // Additionally, if snake_case properties are provided and camelCase properties are not (e.g. `user_agent` is provided but
-                 // `userAgent` is not), then the `userAgent` identifier gets set to the provided `user_agent` property. This is needed for
-                 // backwards compatibility; snoowrap previously only accepted snake_case props, but now it also accepts camelCase props.
-                 user_agent, userAgent = user_agent,
-                 client_id, clientId = client_id,
-                 client_secret, clientSecret = client_secret,
-                 refresh_token, refreshToken = refresh_token,
-                 access_token, accessToken = access_token,
-                 username,
-                 password
-               } = {}) {
+    // The function signature for the constructor is a bit large due to the snake_case aliases. Essentially, it accepts an
+    // object with properties {userAgent, clientId, clientSecret, refreshToken, accessToken, username, password}.
+    // Additionally, if snake_case properties are provided and camelCase properties are not (e.g. `user_agent` is provided but
+    // `userAgent` is not), then the `userAgent` identifier gets set to the provided `user_agent` property. This is needed for
+    // backwards compatibility; snoowrap previously only accepted snake_case props, but now it also accepts camelCase props.
+    user_agent, userAgent = user_agent,
+    client_id, clientId = client_id,
+    client_secret, clientSecret = client_secret,
+    refresh_token, refreshToken = refresh_token,
+    access_token, accessToken = access_token,
+    username,
+    password
+  } = {}) {
     if (!userAgent && !isBrowser) {
       return requiredArg('userAgent');
     }
@@ -149,13 +149,13 @@ const snoowrap = class snoowrap {
    * window.location = authenticationUrl; // send the user to the authentication url
    */
   static getAuthUrl ({
-                       clientId = requiredArg('clientId'),
-                       scope = requiredArg('scope'),
-                       redirectUri = requiredArg('redirectUri'),
-                       permanent = true,
-                       state = '_',
-                       endpointDomain = 'reddit.com'
-                     }) {
+    clientId = requiredArg('clientId'),
+    scope = requiredArg('scope'),
+    redirectUri = requiredArg('redirectUri'),
+    permanent = true,
+    state = '_',
+    endpointDomain = 'reddit.com'
+  }) {
     if (!(Array.isArray(scope) && scope.length && scope.every(scopeValue => scopeValue && typeof scopeValue === 'string'))) {
       throw new TypeError('Missing `scope` argument; a non-empty list of OAuth scopes must be provided');
     }
@@ -209,13 +209,13 @@ const snoowrap = class snoowrap {
    * })
    */
   static fromAuthCode ({
-                         code = requiredArg('code'),
-                         userAgent = isBrowser ? global.navigator.userAgent : requiredArg('userAgent'),
-                         clientId = requiredArg('clientId'),
-                         clientSecret,
-                         redirectUri = requiredArg('redirectUri'),
-                         endpointDomain = 'reddit.com'
-                       }) {
+    code = requiredArg('code'),
+    userAgent = isBrowser ? global.navigator.userAgent : requiredArg('userAgent'),
+    clientId = requiredArg('clientId'),
+    clientSecret,
+    redirectUri = requiredArg('redirectUri'),
+    endpointDomain = 'reddit.com'
+  }) {
     return this.prototype.credentialedClientRequest.call({
       userAgent,
       clientId,
@@ -567,17 +567,17 @@ const snoowrap = class snoowrap {
   }
 
   _submit ({
-             captcha_response, captchaResponse = captcha_response,
-             captcha_iden, captchaIden = captcha_iden,
-             kind,
-             resubmit = true,
-             send_replies = true, sendReplies = send_replies,
-             crosspost_fullname,
-             text,
-             title,
-             url,
-             subreddit_name, subredditName = subreddit_name
-           }) {
+    captcha_response, captchaResponse = captcha_response,
+    captcha_iden, captchaIden = captcha_iden,
+    kind,
+    resubmit = true,
+    send_replies = true, sendReplies = send_replies,
+    crosspost_fullname,
+    text,
+    title,
+    url,
+    subreddit_name, subredditName = subreddit_name
+  }) {
     return this._post({
       uri: 'api/submit', form: {
         api_type, captcha: captchaResponse, iden: captchaIden, sendreplies: sendReplies, sr: subredditName, kind, resubmit,
@@ -958,10 +958,10 @@ const snoowrap = class snoowrap {
    * // ModmailConversation { messages: [...], objIds: [...], subject: 'test subject', ... }
    */
   createModmailDiscussion ({
-                               body,
-                               subject,
-                               srName
-                             }) {
+    body,
+    subject,
+    srName
+  }) {
     const parsedFromSr = srName.replace(/^\/?r\//, ''); // Convert '/r/subreddit_name' to 'subreddit_name'
     // _newObject ignores most of the response, no practical way to parse the returned content yet
     return this._post({
@@ -1192,13 +1192,13 @@ const snoowrap = class snoowrap {
    * // (message created on reddit)
    */
   composeMessage ({
-                    captcha,
-                    from_subreddit, fromSubreddit = from_subreddit,
-                    captcha_iden, captchaIden = captcha_iden,
-                    subject,
-                    text,
-                    to
-                  }) {
+    captcha,
+    from_subreddit, fromSubreddit = from_subreddit,
+    captcha_iden, captchaIden = captcha_iden,
+    subject,
+    text,
+    to
+  }) {
     let parsedTo = to;
     let parsedFromSr = fromSubreddit;
     if (to instanceof snoowrap.objects.RedditUser) {
@@ -1301,39 +1301,39 @@ const snoowrap = class snoowrap {
   }
 
   _createOrEditSubreddit ({
-                            allow_images = true,
-                            allow_top = true,
-                            captcha,
-                            captcha_iden,
-                            collapse_deleted_comments = false,
-                            comment_score_hide_mins = 0,
-                            description,
-                            exclude_banned_modqueue = false,
-                            'header-title': header_title,
-                            hide_ads = false,
-                            lang = 'en',
-                            link_type = 'any',
-                            name,
-                            over_18 = false,
-                            public_description,
-                            public_traffic = false,
-                            show_media = false,
-                            show_media_preview = true,
-                            spam_comments = 'high',
-                            spam_links = 'high',
-                            spam_selfposts = 'high',
-                            spoilers_enabled = false,
-                            sr,
-                            submit_link_label = '',
-                            submit_text_label = '',
-                            submit_text = '',
-                            suggested_comment_sort = 'confidence',
-                            title,
-                            type = 'public',
-                            wiki_edit_age,
-                            wiki_edit_karma,
-                            wikimode = 'modonly'
-                          }) {
+    allow_images = true,
+    allow_top = true,
+    captcha,
+    captcha_iden,
+    collapse_deleted_comments = false,
+    comment_score_hide_mins = 0,
+    description,
+    exclude_banned_modqueue = false,
+    'header-title': header_title,
+    hide_ads = false,
+    lang = 'en',
+    link_type = 'any',
+    name,
+    over_18 = false,
+    public_description,
+    public_traffic = false,
+    show_media = false,
+    show_media_preview = true,
+    spam_comments = 'high',
+    spam_links = 'high',
+    spam_selfposts = 'high',
+    spoilers_enabled = false,
+    sr,
+    submit_link_label = '',
+    submit_text_label = '',
+    submit_text = '',
+    suggested_comment_sort = 'confidence',
+    title,
+    type = 'public',
+    wiki_edit_age,
+    wiki_edit_karma,
+    wikimode = 'modonly'
+  }) {
     return this._post({
       uri: 'api/site_admin', form: {
         allow_images, allow_top, api_type, captcha, collapse_deleted_comments, comment_score_hide_mins, description,
@@ -1647,9 +1647,9 @@ const snoowrap = class snoowrap {
    * => MultiReddit { display_name: 'myMulti', ... }
    */
   createMultireddit ({
-                       name, description, subreddits, visibility = 'private', icon_name = '', key_color = '#000000',
-                       weighting_scheme = 'classic'
-                     }) {
+    name, description, subreddits, visibility = 'private', icon_name = '', key_color = '#000000',
+    weighting_scheme = 'classic'
+  }) {
     return this._post({
       uri: 'api/multi', form: {
         model: JSON.stringify({
