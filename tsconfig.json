@@ -7,15 +7,19 @@
         ],
         "noImplicitAny": true,
         "noImplicitThis": true,
+        "strict": true,
+        "allowJs": true,
         "strictNullChecks": true,
         "strictFunctionTypes": true,
-        "types": [],
-        "noEmit": true,
         "forceConsistentCasingInFileNames": true,
         "noUnusedLocals": true,
-		"outDir": "dist"
-	},
+		"outDir": "./dist"
+    },
 	"include": [
-		"src"
-	]
+        "./src/*",
+		"./src/**/*"
+    ],
+    "exclude": [
+        "./src/snoowrap-tests.ts"
+    ]
 }
