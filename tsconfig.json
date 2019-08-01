@@ -8,7 +8,6 @@
         "noImplicitAny": true,
         "noImplicitThis": true,
         "strict": true,
-        "allowJs": true,
         "strictNullChecks": true,
         "strictFunctionTypes": true,
         "forceConsistentCasingInFileNames": true,
