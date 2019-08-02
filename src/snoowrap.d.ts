@@ -12,6 +12,8 @@ import {
   SortedListingOptions,
   LiveThread as _LiveThread,
   LiveThreadSettings,
+  ModmailConversation as _ModmailConversation,
+  ModmailConversation,
   MultiReddit as _MultiReddit,
   MultiRedditProperties,
   PrivateMessage as _PrivateMessage,
@@ -74,6 +76,15 @@ declare class Snoowrap {
   getNew(subredditName?: string, options?: ListingOptions): Promise<_Listing<_Submission>>;
   getNewCaptchaIdentifier(): Promise<string>;
   getNewComments(subredditName?: string, options?: ListingOptions): Promise<_Listing<_Comment>>;
+  getNewModmailConversations(options?: ListingOptions & { entity?: string }): Promise<_Listing<_ModmailConversation>>;
+  createModmailDiscussion(options: { body: string, subject: string, srName: string }): Promise<_ModmailConversation>;
+  getNewModmailConversation(id: string): Promise<_ModmailConversation>;
+  // TODO
+  markNewModmailConversationsAsRead(convs: _ModmailConversation[]): any;
+  markNewModmailConversationsAsUnread(convs: _ModmailConversation[]): any;
+  getNewModmailSubreddits(): Promise<_Subreddit[]>;
+  getUnreadNewModmailConversationsCount(): Promise<{ highlighted: number, notifications: number, archived: number, new: number, inprogress: number, mod: number }>;
+  bulkReadNewModmail(subs: Array<_Subreddit | string>, state: 'new'|'inprogress'|'mod'|'notifications'|'archived'|'highlighted'|'all'): Promise<_Listing<_ModmailConversation>>;
   getNewSubreddits(options?: ListingOptions): Promise<_Listing<_Subreddit>>;
   getOauthScopeList(): Promise<{ [key: string]: { description: string; id: string; name: string } }>;
   getPopularSubreddit(options?: ListingOptions): Promise<_Listing<_Subreddit>>;
