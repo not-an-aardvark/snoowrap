@@ -36,7 +36,6 @@ export const modActionStates = Object.freeze({
  * @extends RedditContent
  */
 const ModmailConversation = class ModmailConversation extends RedditContent {
-
   static get conversationStates () {
     return conversationStates;
   }
