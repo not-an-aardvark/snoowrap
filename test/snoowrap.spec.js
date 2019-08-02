@@ -1964,6 +1964,14 @@ describe('snoowrap', function () {
       expect(await conversations[0].participant).to.be.an.instanceof(snoowrap.objects.ModmailConversationAuthor);
     });
 
+    it('can view a list of conversation from a subreddit', async () => {
+      const conversations = await r.getSubreddit('SpyTecSnoowrapTesting').getNewModmailConversations({limit: 2});
+      expect(conversations).to.have.lengthOf(2);
+      expect(conversations).to.be.an.instanceof(snoowrap.objects.Listing);
+      expect(conversations[0]).to.be.an.instanceof(snoowrap.objects.ModmailConversation);
+      expect(await conversations[0].participant).to.be.an.instanceof(snoowrap.objects.ModmailConversationAuthor);
+    });
+
     it('can view a specific conversation', async () => {
       const conversation = await r.getNewModmailConversation('75hxt').fetch();
       expect(conversation).to.be.an.instanceof(snoowrap.objects.ModmailConversation);
