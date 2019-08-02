@@ -79,9 +79,8 @@ declare class Snoowrap {
   getNewModmailConversations(options?: ListingOptions & { entity?: string }): Promise<_Listing<_ModmailConversation>>;
   createModmailDiscussion(options: { body: string, subject: string, srName: string }): Promise<_ModmailConversation>;
   getNewModmailConversation(id: string): Promise<_ModmailConversation>;
-  // TODO
-  markNewModmailConversationsAsRead(convs: _ModmailConversation[]): any;
-  markNewModmailConversationsAsUnread(convs: _ModmailConversation[]): any;
+  markNewModmailConversationsAsRead(convs: _ModmailConversation[]): Promise<void>;
+  markNewModmailConversationsAsUnread(convs: _ModmailConversation[]): Promise<void>;
   getNewModmailSubreddits(): Promise<_Subreddit[]>;
   getUnreadNewModmailConversationsCount(): Promise<{ highlighted: number, notifications: number, archived: number, new: number, inprogress: number, mod: number }>;
   bulkReadNewModmail(subs: Array<_Subreddit | string>, state: 'new'|'inprogress'|'mod'|'notifications'|'archived'|'highlighted'|'all'): Promise<_Listing<_ModmailConversation>>;

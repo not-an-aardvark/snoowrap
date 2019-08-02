@@ -9,15 +9,24 @@ export interface BanStatus {
     isPermanent: boolean;
 }
 
-// TODO: I couldn't find any definitions for this, nor
-// get the field to appear in testing
-export type RecentPost = any;
+export interface RecentPost {
+    date: string;
+    permalink: string;
+    title: string;
+}
 
 export interface RecentConvo {
-    date: Date;
+    date: string;
     permalink: string;
     id: string;
     subject: string;
+}
+
+export interface RecentComment {
+    date: string;
+    permalink: string;
+    title: string;
+    comment: string;
 }
 
 export default class ModmailConversationAuthor extends RedditContent<ModmailConversationAuthor> {
@@ -35,6 +44,7 @@ export default class ModmailConversationAuthor extends RedditContent<ModmailConv
     isShadowBanned?: boolean;
     recentPosts?: { [id: string]: RecentPost };
     recentConvos?: { [id: string]: RecentConvo };
+    recentComments?: { [id: string]: RecentComment };
 
     getUser(): Promise<RedditUser>;
 }
