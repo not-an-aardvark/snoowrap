@@ -7,6 +7,7 @@ import RedditUser from './RedditUser';
 import Submission from './Submission';
 import { RichTextFlair } from './VoteableContent';
 import WikiPage, { WikiPageRevision } from './WikiPage';
+import ModmailConversation from './ModmailConversation';
 
 export default class Subreddit extends RedditContent<Subreddit> {
   accounts_active_is_fuzzed: boolean;
@@ -117,6 +118,7 @@ export default class Subreddit extends RedditContent<Subreddit> {
   getModerationLog(opts?: ListingOptions & { mods?: string[]; type?: ModActionType}): Promise<Listing<ModAction>>;
   getModerators(options?: ListingOptions & { name?: string }): RedditUser[];
   getModmail(options?: ListingOptions): Promise<Listing<PrivateMessage>>;
+  getNewModmailConversations(options?: ListingOptions): Promise<Listing<ModmailConversation>>;
   getModqueue(options?: ListingOptions & { only?: 'links' | 'comments' }): Promise<Listing<Submission | Comment>>;
   getMutedUsers(options?: ListingOptions & { name?: string }): Promise<Listing<MutedUser>>;
   getMyFlair(): Promise<FlairTemplate>;
