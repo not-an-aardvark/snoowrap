@@ -32,6 +32,8 @@ export = Snoowrap;
 declare class Snoowrap {
   static getAuthUrl(options: Snoowrap.AuthUrlOptions): string;
   static fromAuthCode(options: Snoowrap.AuthCodeOptions): Promise<Snoowrap>;
+  
+  _newObject (objectType: string, content: object[]|object, _hasFetched?: boolean): Array<unknown>|object;
   static noConflict(): typeof Snoowrap;
 
   accessToken: string;
