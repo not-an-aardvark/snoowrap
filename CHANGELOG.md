@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.19.0 (2019-08-05)
+
+* Added TypeScript definitions
+* Added `Subreddit#getNewModmailConversations`
+* Added `snoowrap#getContentByIds`
+
 ## v1.18.0 (2019-07-23)
 
 * Added support for locking and unlocking comments
