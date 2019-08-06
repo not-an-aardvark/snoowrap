@@ -753,7 +753,7 @@ describe('snoowrap', function () {
       await submission.setSuggestedSort('top');
       expect(await submission.refresh().suggested_sort).to.equal('top');
     });
-    it('can get the "related submissions" endpoint (deprecated on reddit.com)', async function () {
+    it.skip('can get the "related submissions" endpoint (deprecated on reddit.com)', async function () {
       if (isBrowser) {
         return this.skip();
       }
