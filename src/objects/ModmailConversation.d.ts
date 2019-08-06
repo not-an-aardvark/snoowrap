@@ -71,7 +71,6 @@ export default class ModmailConversation extends RedditContent<ModmailConversati
     state: number;
     lastUnread?: any;
     numMessages: number;
-
     messages?: ModmailMessage[];
 
     getParticipant(): Promise<ModmailConversationAuthor>;

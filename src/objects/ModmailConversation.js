@@ -1,7 +1,9 @@
 import RedditContent from './RedditContent.js';
 
-
 /**
+ * @global
+ * @enum {number}
+ * @readonly
  * @summary Represents the current status of a given Modmail conversation.
  * @type {Readonly<{New: number, InProgress: number, Archived: number}>}
  */
@@ -13,6 +15,9 @@ export const conversationStates = Object.freeze({
 
 
 /**
+ * @global
+ * @enum {number}
+ * @readonly
  * @summary Represents all the possible states that is used within a Modmail conversations.
  * @type {Readonly<{UnArchive: number, Highlight: number, Archive: number, ReportedToAdmins: number, Mute: number, UnHighlight: number, Unmute: number}>}
  */
@@ -27,8 +32,10 @@ export const modActionStates = Object.freeze({
 });
 
 /**
+ * @class
  * A class representing a conversation from new modmail
  * <style> #ModmailConversation {display: none} </style>
+ * @name ModmailConversation
  * @example
  *
  * // Get a Modmail Conversation with a given ID
