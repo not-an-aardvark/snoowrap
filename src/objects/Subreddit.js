@@ -468,7 +468,7 @@ const Subreddit = class Subreddit extends RedditContent {
   * @returns {Promise} The retrieved Submission object
   * @example
   *
-  * r.getSubreddit('snoowrap').getRandomSubmission.then(console.log)
+  * r.getSubreddit('snoowrap').getRandomSubmission().then(console.log)
   * // => Submission { ... }
   */
   getRandomSubmission () {
