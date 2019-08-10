@@ -1286,6 +1286,9 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 /**
+ * @global
+ * @enum {number}
+ * @readonly
  * @summary Represents the current status of a given Modmail conversation.
  * @type {Readonly<{New: number, InProgress: number, Archived: number}>}
  */
@@ -1295,6 +1298,9 @@ var conversationStates = Object.freeze({
   Archived: 2
 });
 /**
+ * @global
+ * @enum {number}
+ * @readonly
  * @summary Represents all the possible states that is used within a Modmail conversations.
  * @type {Readonly<{UnArchive: number, Highlight: number, Archive: number, ReportedToAdmins: number, Mute: number, UnHighlight: number, Unmute: number}>}
  */
@@ -1310,8 +1316,10 @@ var modActionStates = Object.freeze({
   Unmute: 6
 });
 /**
+ * @class
  * A class representing a conversation from new modmail
  * <style> #ModmailConversation {display: none} </style>
+ * @name ModmailConversation
  * @example
  *
  * // Get a Modmail Conversation with a given ID
@@ -3734,7 +3742,7 @@ var Subreddit = class Subreddit extends _RedditContent.default {
   * @returns {Promise} The retrieved Submission object
   * @example
   *
-  * r.getSubreddit('snoowrap').getRandomSubmission.then(console.log)
+  * r.getSubreddit('snoowrap').getRandomSubmission().then(console.log)
   * // => Submission { ... }
   */
 
@@ -8384,7 +8392,7 @@ var snoowrap = class snoowrap {
     /* This second case is used as a fallback in case the endpoint unexpectedly ends up returning something other than a
     Listing (e.g. Submission#getRelated, which used to return a Listing but no longer does due to upstream reddit API
     changes), in which case using fetch_more() as above will throw an error.
-     This fallback only works if there are no other meta-properties provided for the Listing, such as _transform. If there are
+      This fallback only works if there are no other meta-properties provided for the Listing, such as _transform. If there are
     other meta-properties,  the function will still end up throwing an error, but there's not really any good way to handle it
     (predicting upstream changes can only go so far). More importantly, in the limited cases where it's used, the fallback
     should have no effect on the returned results */
