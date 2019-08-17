@@ -20,7 +20,6 @@ rules:
   key-spacing: error
   keyword-spacing: error
   linebreak-style: [error, unix]
-  max-len: [error, 128]
   max-statements-per-line: error
   new-parens: error
   no-caller: error
@@ -109,8 +108,11 @@ extends:
 plugins:
   - import
   - promise
+  - '@typescript-eslint'
 
 root: true
+
+parser: "@typescript-eslint/parser"
 
 parserOptions:
   ecmaVersion: 2017

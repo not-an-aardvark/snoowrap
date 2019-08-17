@@ -1,14 +1,15 @@
 {
+  "ignore": ["**/*.d.ts"],
   "plugins": [
-    "lodash",
-    "transform-async-to-generator",
-    "transform-es2015-arrow-functions",
-    "transform-es2015-block-scoping",
-    "transform-es2015-destructuring",
-    "transform-es2015-modules-commonjs",
-    "transform-es2015-parameters",
-    "transform-es2015-spread",
-    "transform-es2015-template-literals",
-    "transform-object-rest-spread"
+    "@babel/plugin-transform-typescript",
+    "@babel/plugin-transform-async-to-generator",
+    "@babel/plugin-transform-arrow-functions",
+    "@babel/plugin-transform-block-scoping",
+    "@babel/plugin-transform-destructuring",
+    "@babel/plugin-transform-modules-commonjs",
+    "@babel/plugin-transform-parameters",
+    "@babel/plugin-transform-spread",
+    "@babel/plugin-transform-template-literals",
+    "@babel/plugin-proposal-object-rest-spread"
   ]
 }

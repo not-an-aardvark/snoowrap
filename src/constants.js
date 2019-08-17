@@ -1,5 +1,5 @@
 export const MODULE_NAME = 'snoowrap';
-export const VERSION = '1.15.2';
+export const VERSION = '1.19.0';
 export const DOCS_LINK = 'https://not-an-aardvark.github.io/snoowrap/';
 export const API_RULES_LINK = 'https://github.com/reddit/reddit/wiki/API';
 /* USER_KEYS and SUBREDDIT_KEYS are keys that are replaced by RedditUser and Subreddit objects when encountered in
@@ -28,7 +28,9 @@ export const KINDS = {
   wikipagelisting: 'WikiPageListing',
   LiveUpdateEvent: 'LiveThread',
   LiveUpdate: 'LiveUpdate',
-  LabeledMulti: 'MultiReddit'
+  LabeledMulti: 'MultiReddit',
+  ModmailConversation: 'ModmailConversation',
+  ModmailConversationAuthor: 'ModmailConversationAuthor'
 };
 export const USERNAME_REGEX = /^[\w-]{1,20}$/;
 export const MODERATOR_PERMISSIONS = ['wiki', 'posts', 'access', 'mail', 'config', 'flair'];

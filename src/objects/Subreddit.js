@@ -468,7 +468,7 @@ const Subreddit = class Subreddit extends RedditContent {
   * @returns {Promise} The retrieved Submission object
   * @example
   *
-  * r.getSubreddit('snoowrap').getRandomSubmission.then(console.log)
+  * r.getSubreddit('snoowrap').getRandomSubmission().then(console.log)
   * // => Submission { ... }
   */
   getRandomSubmission () {
@@ -534,6 +534,21 @@ const Subreddit = class Subreddit extends RedditContent {
   */
   getModmail (options) {
     return this._getListing({uri: `r/${this.display_name}/about/message/moderator`, qs: options});
+  }
+  /**
+  * @summary Gets a list of ModmailConversations from the subreddit.
+  * @param {object} [options={}] Options for the resulting Listing
+  * @returns {Promise<Listing<ModmailConversation>>} A Listing containing Subreddits
+  * @example
+  *
+  * r.getSubreddit('snoowrap').getNewModmailConversations({limit: 2}).then(console.log)
+  * // => Listing [
+  * //  ModmailConversation { messages: [...], objIds: [...], subject: 'test subject', ... },
+  * //  ModmailConversation { messages: [...], objIds: [...], subject: 'test subject', ... }
+  * // ]
+  */
+  getNewModmailConversations (options = {}) {
+    return this._r.getNewModmailConversations({...options, entity: this.display_name});
   }
   /**
   * @summary Gets the moderation log for this subreddit.

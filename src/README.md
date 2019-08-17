@@ -14,7 +14,7 @@ cd snoowrap/
 npm install
 ```
 
-At the moment, the unit tests are run on the reddit.com live site. (This will hopefully change soon -- see [issue #8](https://github.com/not-an-aardvark/snoowrap/issues/8).) As a result, you will need to generate a reddit.com OAuth token the first time in order to run the tests on your own machine. This can be done using [reddit-oauth-helper](https://github.com/not-an-aardvark/reddit-oauth-helper).
+The unit tests are run live on Reddit. As a result, you will need to generate a reddit.com OAuth token the first time in order to run the tests on your own machine. This can be done using [reddit-oauth-helper](https://github.com/not-an-aardvark/reddit-oauth-helper).
 
 Put these credentials in a file called `oauth_info.json` in the project root directory. The file should look something like this:
 

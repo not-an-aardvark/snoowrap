@@ -1,5 +1,24 @@
 # Changelog
 
+## v1.19.0 (2019-08-05)
+
+* Added TypeScript definitions
+* Added `Subreddit#getNewModmailConversations`
+* Added `snoowrap#getContentByIds`
+
+## v1.18.0 (2019-07-23)
+
+* Added support for locking and unlocking comments
+
+## v1.17.0 (2019-06-13)
+
+* Deprecated `MultiReddit#rename` (this endpoint is no longer supported by reddit.com)
+
+## v1.16.0 (2019-06-04)
+
+* Added support for new modmail
+* Added `/best` endpoint
+
 ## v1.15.2 (2018-01-05)
 
 * Fixed an error when deleting images from subreddit stylesheets
