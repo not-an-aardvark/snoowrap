@@ -239,7 +239,7 @@ describe('snoowrap', function () {
         snoowrap.fromApplicationOnlyAuth({userAgent: 'bar'});
       }).to.throw(TypeError);
     });
-    it('returns a Promise for a valid installed requester', async () => {
+    it('returns a snoowrap instance for a valid installed requester', async () => {
       const newRequester = await snoowrap.fromApplicationOnlyAuth({
         userAgent: oauthInfo.user_agent,
         grantType: snoowrap.grantType.INSTALLED_CLIENT,
@@ -248,7 +248,7 @@ describe('snoowrap', function () {
       });
       expect(await newRequester.getHot('redditdev', {limit: 1})).to.have.lengthOf(1);
     });
-    it('returns a Promise for a valid client requester', async () => {
+    it('returns a snoowrap instance for a valid client requester', async () => {
       const newRequester = await snoowrap.fromApplicationOnlyAuth({
         userAgent: oauthInfo.user_agent,
         grantType: snoowrap.grantType.CLIENT_CREDENTIALS,
