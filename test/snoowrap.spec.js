@@ -23,7 +23,8 @@ describe('snoowrap', function () {
       refresh_token: process.env.SNOOWRAP_REFRESH_TOKEN,
       username: process.env.SNOOWRAP_USERNAME,
       password: process.env.SNOOWRAP_PASSWORD,
-      redirect_uri: process.env.SNOOWRAP_REDIRECT_URI
+      redirect_uri: process.env.SNOOWRAP_REDIRECT_URI,
+      installed_app_client_id: process.env.SNOOWRAP_INSTALLED_APP_CLIENT_ID
     } : require('../oauth_info.json');
 
     r = new snoowrap({
@@ -216,6 +217,45 @@ describe('snoowrap', function () {
       });
 
       expect(await newRequester.getMe().name).to.equal(oauthInfo.username);
+    });
+  });
+
+  describe('.fromApplicationOnlyAuth', () => {
+    it('throws a TypeError if no userAgent is provided in node', function () {
+      if (isBrowser) {
+        return this.skip();
+      }
+      expect(() => {
+        snoowrap.fromApplicationOnlyAuth({clientId: 'bar', deviceId: 'baz'});
+      }).to.throw(TypeError);
+    });
+    it('throws a TypeError if no clientId is provided', () => {
+      expect(() => {
+        snoowrap.fromApplicationOnlyAuth({userAgent: 'bar'});
+      }).to.throw(TypeError);
+    });
+    it('throws a TypeError if no grantType is provided', () => {
+      expect(() => {
+        snoowrap.fromApplicationOnlyAuth({userAgent: 'bar'});
+      }).to.throw(TypeError);
+    });
+    it('returns a snoowrap instance for a valid installed requester', async () => {
+      const newRequester = await snoowrap.fromApplicationOnlyAuth({
+        userAgent: oauthInfo.user_agent,
+        grantType: snoowrap.grantType.INSTALLED_CLIENT,
+        clientId: oauthInfo.installed_app_client_id,
+        deviceId: oauthInfo.device_id
+      });
+      expect(await newRequester.getHot('redditdev', {limit: 1})).to.have.lengthOf(1);
+    });
+    it('returns a snoowrap instance for a valid client requester', async () => {
+      const newRequester = await snoowrap.fromApplicationOnlyAuth({
+        userAgent: oauthInfo.user_agent,
+        grantType: snoowrap.grantType.CLIENT_CREDENTIALS,
+        clientId: oauthInfo.client_id,
+        clientSecret: oauthInfo.client_secret
+      });
+      expect(await newRequester.getHot('redditdev', {limit: 1})).to.have.lengthOf(1);
     });
   });
 

@@ -27,6 +27,7 @@ Put these credentials in a file called `oauth_info.json` in the project root dir
   "username": "put a username here",
   "password": "put a password here",
   "redirect_uri": "put the redirect URI here"
+  "installed_app_client_id" "put_your_installed_app_client_id_here"
 }
 ```
 
