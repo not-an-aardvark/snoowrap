@@ -640,6 +640,14 @@ const snoowrap = class snoowrap {
   }
 
   /**
+   * @param {string} query a query to search
+   * @returns {Promise} A promis with array os subreddits starting with that query
+   */
+  searchSubreddit (query) {
+    return this._post({uri:'api/search_subreddits', form: {query}})
+  }
+
+  /**
    * @summary Marks a list of submissions as 'visited'.
    * @desc **Note**: This endpoint only works if the authenticated user is subscribed to reddit gold.
    * @param {Submission[]} links A list of Submission objects to mark
