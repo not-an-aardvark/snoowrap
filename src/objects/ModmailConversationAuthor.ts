@@ -1,4 +1,33 @@
 import RedditContent from './RedditContent';
+import RedditUser from './RedditUser';
+import * as Snoowrap from '../snoowrap';
+
+export interface BanStatus {
+  endDate?: string | null;
+  reason: string;
+  isBanned: boolean;
+  isPermanent: boolean;
+}
+
+export interface RecentPost {
+  date: string;
+  permalink: string;
+  title: string;
+}
+
+export interface RecentConvo {
+  date: string;
+  permalink: string;
+  id: string;
+  subject: string;
+}
+
+export interface RecentComment {
+  date: string;
+  permalink: string;
+  title: string;
+  comment: string;
+}
 
 /**
  * A class representing an author from a modmail conversation
@@ -9,8 +38,24 @@ import RedditContent from './RedditContent';
  * r.getNewModmailConversation('75hxt').getParticipant()
  * @extends RedditContent
  */
-const ModmailConversationAuthor = class ModmailParticipant extends RedditContent {
-  constructor (options, r, hasFetched) {
+export default class ModmailConversationAuthor extends RedditContent<ModmailConversationAuthor> {
+  name!: string;
+  isMod?: boolean;
+  isAdmin?: boolean;
+  isOp?: boolean;
+  isParticipant?: boolean;
+  isHidden?: boolean;
+  isDeleted?: boolean;
+
+  // these fields only show up sometimes
+  banStatus?: BanStatus;
+  isSuspended?: boolean;
+  isShadowBanned?: boolean;
+  recentPosts?: { [id: string]: RecentPost };
+  recentConvos?: { [id: string]: RecentConvo };
+  recentComments?: { [id: string]: RecentComment };
+
+  constructor (options: any, r: Snoowrap, hasFetched: boolean) {
     super(options, r, hasFetched);
 
     options.recentComments = Object.keys(options.recentComments).map(commentId => this._r._newObject('Comment', {
@@ -34,9 +79,7 @@ const ModmailConversationAuthor = class ModmailParticipant extends RedditContent
    * r.getNewModmailConversation('efy3lax').getParticipant().getUser().link_karma.then(console.log)
    * // => 6
    */
-  getUser () {
+  getUser (): Promise<RedditUser> {
     return this._r.getUser(this.name);
   }
 };
-
-export default ModmailConversationAuthor;
