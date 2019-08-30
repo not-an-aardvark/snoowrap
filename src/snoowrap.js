@@ -1112,7 +1112,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
 
   /**
    * @summary Marks all conversations in array as read.
-   * @param {ModmailConversation[]} conversations to mark as read
+   * @param {ModmailConversation[]|string[]} conversations to mark as read
    * @example
    *
    * r.markNewModmailConversationsAsRead(['pics', 'sweden'])
@@ -1124,7 +1124,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
 
   /**
    * @summary Marks all conversations in array as unread.
-   * @param {ModmailConversation[]} conversations to mark as unread
+   * @param {ModmailConversation[]|string[]} conversations to mark as unread
    * @example
    *
    * r.markNewModmailConversationsAsUnread(['pics', 'sweden'])
