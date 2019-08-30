@@ -4,10 +4,11 @@ import Subreddit from './Subreddit.js';
 import ModmailConversationAuthor from './ModmailConversationAuthor.js';
 
 /**
- * @public
- * @enum conversationStates
- * @description testing
+ * @global
+ * @enum {number}
  * @readonly
+ * @summary Represents the current status of a given Modmail conversation.
+ * @type {Readonly<{New: number, InProgress: number, Archived: number}>}
  */
 export enum conversationStates {
   New = 0,
@@ -17,10 +18,11 @@ export enum conversationStates {
 
 
 /**
- * @public
- * @enum modActionStates
- * @description testing
+ * @global
+ * @enum {number}
  * @readonly
+ * @summary Represents all the possible states that is used within a Modmail conversations.
+ * @type {Readonly<{UnArchive: number, Highlight: number, Archive: number, ReportedToAdmins: number, Mute: number, UnHighlight: number, Unmute: number}>}
  */
 export enum modActionStates {
   Highlight = 0,
@@ -32,12 +34,6 @@ export enum modActionStates {
   Unmute = 6,
 }
 
-
-/**
- * Testing of test
- * @public
- * @interface
- */
 export interface ModmailMessage {
   body: string;
   bodyMarkdown: string;
@@ -47,11 +43,6 @@ export interface ModmailMessage {
   id: string;
 }
 
-
-/**
- * @public
- * @interface
- */
 export interface Author {
   isMod: boolean;
   isAdmin: boolean;
@@ -63,21 +54,12 @@ export interface Author {
   isDeleted: boolean;
 }
 
-
-/**
- * @public
- * @interface
- */
 export interface Owner {
   displayName: string;
   type: string;
   id: string;
 }
 
-/**
- * @public
- * @interface
- */
 export interface ObjId {
   id: string;
   key: string;
