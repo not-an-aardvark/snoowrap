@@ -1185,7 +1185,8 @@ describe('snoowrap', function () {
 
   describe('fetching subreddits by query', () => {
     it('should fail because query length is over 50 characters', async () => {
-      const query = 'learnprogramminglearnprogramminglearnprogramminglearnprogramminglearnprogramminglearnprogramminglearnprogramming';
+      // Get a query that's longer than 50 characters
+      const query = "x".repeat(51);
       const config = {
         exact: true,
         include_over_18: false,
