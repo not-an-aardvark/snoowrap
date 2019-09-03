@@ -1,3 +1,4 @@
+// @ts-ignore
 import {addSnakeCaseShadowProps} from './helpers.js';
 
 export default function () {

@@ -1,9 +1,14 @@
 import {defaults, forOwn, includes, isEmpty, map, mapValues, omit, omitBy, snakeCase, values} from 'lodash';
+// @ts-ignore Change when request_handler is changed
 import Promise from './Promise.js';
+// @ts-ignore Change when request_handler is changed
 import promiseWrap from 'promise-chains';
-import util from 'util';
+import * as util from 'util';
+// @ts-ignore Change when request_handler is changed
 import * as requestHandler from './request_handler.js';
+// @ts-ignore
 import {HTTP_VERBS, KINDS, MAX_LISTING_ITEMS, MODULE_NAME, USER_KEYS, SUBREDDIT_KEYS, VERSION} from './constants.js';
+// @ts-ignore Change when request_handler is changed
 import * as errors from './errors.js';
 import {
   addEmptyRepliesListing,
@@ -13,11 +18,170 @@ import {
   handleJsonErrors,
   isBrowser,
   requiredArg
+  // @ts-ignore Change when request_handler is changed
 } from './helpers.js';
 import createConfig from './create_config.js';
 import * as objects from './objects/index.js';
 
 const api_type = 'json';
+
+
+import {
+  Comment as _Comment,
+  Listing as _Listing,
+  ListingOptions,
+  SortedListingOptions,
+  LiveThread as _LiveThread,
+  LiveThreadSettings,
+  ModmailConversation as _ModmailConversation,
+  ModmailConversation,
+  MultiReddit as _MultiReddit,
+  MultiRedditProperties,
+  PrivateMessage as _PrivateMessage,
+  RedditContent as _RedditContent,
+  RedditUser as _RedditUser,
+  ReplyableContent as _ReplyableContent,
+  Submission as _Submission,
+  Subreddit as _Subreddit,
+  SubredditSettings,
+  VoteableContent as _VoteableContent,
+  WikiPage as _WikiPage,
+} from './objects';
+
+
+declare namespace Snoowrap {
+  export interface SnoowrapOptions {
+    userAgent: string;
+    clientId?: string;
+    clientSecret?: string;
+    username?: string;
+    password?: string;
+    refreshToken?: string;
+    accessToken?: string;
+    user_agent: string;
+    client_id?: string;
+    client_secret?: string;
+    refresh_token?: string;
+    access_token?: string;
+  }
+
+  export interface ConfigOptions {
+    endpointDomain?: string;
+    requestDelay?: number;
+    requestTimeout?: number;
+    continueAfterRatelimitError?: boolean;
+    retryErrorCodes?: number[];
+    maxRetryAttempts?: number;
+    warnings?: boolean;
+    debug?: boolean;
+    proxies?: boolean;
+  }
+
+  export interface AuthUrlOptions {
+    clientId: string;
+    scope: string[];
+    redirectUri: string;
+    permanent?: boolean; // defaults to true
+    state?: string;
+    endpointDomain?: string;
+  }
+
+  export interface AuthCodeOptions {
+    code: string;
+    userAgent: string;
+    clientId: string;
+    clientSecret?: string;
+    redirectUri: string;
+    endpointDomain?: string;
+    deviceId?: string;
+    grantType?: Snoowrap.GrantType
+  }
+
+  export type Sort = 'confidence' | 'top' | 'new' | 'controversial' | 'old' | 'random' | 'qa';
+
+  export interface ModAction extends RedditContent<ModAction> {
+    target_body: string;
+    mod_id36: string;
+    created_utc: number;
+    subreddit: Subreddit;
+    target_title: string | null;
+    target_permalink: string;
+    subreddit_name_prefixed: string;
+    details: string | null;
+    action: string;
+    target_author: string;
+    target_fullname: string;
+    sr_id36: string;
+    id: string;
+    mod: string;
+    description: string | null;
+  }
+
+  export interface SubmitSelfPostOptions {
+    text?: string;
+    subredditName: string;
+    title: string;
+    sendReplies?: boolean;
+    captchaIden?: string;
+    captchaResponse?: string;
+  }
+
+  export interface SubmitLinkOptions {
+    url: string;
+    resubmit?: boolean;
+  }
+
+  export interface ComposeMessageParams {
+    to: RedditUser | Subreddit | string;
+    subject: string;
+    text: string;
+    fromSubreddit?: Subreddit | string;
+    captchaIden?: string;
+    captchaResponse?: string;
+  }
+
+  export interface BaseSearchOptions {
+    query: string;
+    time?: 'hour' | 'day' | 'week' | 'month' | 'year' | 'all';
+    sort?: 'relevance' | 'hot' | 'top' | 'new' | 'comments';
+    syntax?: 'cloudsearch' | 'lucene' | 'plain';
+  }
+
+  export interface SearchOptions extends BaseSearchOptions {
+    subreddit?: Subreddit | string;
+    restrictSr?: boolean;
+  }
+
+  export interface Trophy {
+    icon_70: string;
+    icon_40: string;
+    name: string;
+    url: string;
+    award_id: string;
+    id: string;
+    description: string;
+  }
+
+  export enum GrantType {
+    CLIENT_CREDENTIALS = 'client_credentials',
+    INSTALLED_CLIENT = 'https://oauth.reddit.com/grants/installed_client'
+  }
+
+  export {
+    _Comment as Comment,
+    _Listing as Listing,
+    _LiveThread as LiveThread,
+    _MultiReddit as MultiReddit,
+    _PrivateMessage as PrivateMessage,
+    _RedditContent as RedditContent,
+    _RedditUser as RedditUser,
+    _ReplyableContent as ReplyableContent,
+    _Submission as Submission,
+    _Subreddit as Subreddit,
+    _VoteableContent as VoteableContent,
+    _WikiPage as WikiPage,
+  };
+}
 
 /** The class for a snoowrap requester.
  * A requester is the base object that is used to fetch content from reddit. Each requester contains a single set of OAuth
@@ -31,6 +195,17 @@ const api_type = 'json';
  exposed since they are useful externally as well.
  */
 const snoowrap = class snoowrap {
+  accessToken!: string;
+  clientId!: string;
+  clientSecret!: string;
+  password!: string;
+  ratelimitExpiration!: number;
+  ratelimitRemaining!: number;
+  refreshToken!: string;
+  scope!: string[];
+  tokenExpiration!: number;
+  userAgent!: string;
+  username!: string;
   /**
    * @summary Constructs a new requester.
    * @desc You should use the snoowrap constructor if you are able to authorize a reddit account in advance (e.g. for a Node.js
@@ -76,7 +251,7 @@ const snoowrap = class snoowrap {
     access_token, accessToken = access_token,
     username,
     password
-  } = {}) {
+  }: Snoowrap.SnoowrapOptions) {
     if (!userAgent && !isBrowser) {
       return requiredArg('userAgent');
     }
@@ -155,8 +330,8 @@ const snoowrap = class snoowrap {
     permanent = true,
     state = '_',
     endpointDomain = 'reddit.com'
-  }) {
-    if (!(Array.isArray(scope) && scope.length && scope.every(scopeValue => scopeValue && typeof scopeValue === 'string'))) {
+  }: Snoowrap.AuthUrlOptions): string {
+    if (!(Array.isArray(scope) && scope.length && scope.every(scopeValue => typeof scopeValue === 'string'))) {
       throw new TypeError('Missing `scope` argument; a non-empty list of OAuth scopes must be provided');
     }
     return `
@@ -215,19 +390,21 @@ const snoowrap = class snoowrap {
     clientSecret,
     redirectUri = requiredArg('redirectUri'),
     endpointDomain = 'reddit.com'
-  }) {
+  }: Snoowrap.AuthCodeOptions) {
+    // @ts-ignore
     return this.prototype.credentialedClientRequest.call({
       userAgent,
       clientId,
       clientSecret,
       // Use `this.prototype.rawRequest` function to allow for custom `rawRequest` method usage in subclasses.
+      // @ts-ignore
       rawRequest: this.prototype.rawRequest
     }, {
       method: 'post',
       baseUrl: `https://www.${endpointDomain}/`,
       uri: 'api/v1/access_token',
       form: {grant_type: 'authorization_code', code, redirect_uri: redirectUri}
-    }).then(response => {
+    }).then((response: any) => {
       if (response.error) {
         throw new errors.RequestError(`API Error: ${response.error} - ${response.error_description}`);
       }
@@ -245,11 +422,8 @@ const snoowrap = class snoowrap {
    * in application-only auth.
    * @returns {object} The enumeration of possible grant_type values
    */
-  static get grantType () {
-    return {
-      CLIENT_CREDENTIALS: 'client_credentials',
-      INSTALLED_CLIENT: 'https://oauth.reddit.com/grants/installed_client'
-    };
+  static get grantType (): typeof Snoowrap.GrantType {
+    return Snoowrap.GrantType;
   }
   /**
   * @summary Creates a snoowrap requester from a "user-less" Authorization token
@@ -305,23 +479,25 @@ const snoowrap = class snoowrap {
     deviceId,
     grantType = snoowrap.grantType.INSTALLED_CLIENT,
     endpointDomain = 'reddit.com'
-  }) {
+  }: Snoowrap.AuthCodeOptions) {
     if (grantType === snoowrap.grantType.INSTALLED_CLIENT) {
       if (!deviceId || !(deviceId.length >= 30 && deviceId.length <= 40)) {
         throw new TypeError('deviceId needs to be between 30 and 40 characters');
       }
     }
+    // @ts-ignore
     return this.prototype.credentialedClientRequest.call({
       clientId,
       clientSecret,
       // Use `this.prototype.rawRequest` function to allow for custom `rawRequest` method usage in subclasses.
+    // @ts-ignore
       rawRequest: this.prototype.rawRequest
     }, {
       method: 'post',
       baseUrl: `https://www.${endpointDomain}/`,
       uri: 'api/v1/access_token',
       form: {grant_type: grantType, device_id: deviceId}
-    }).then(response => {
+    }).then((response: any) => {
       if (response.error) {
         throw new errors.RequestError(`API Error: ${response.error} - ${response.error_description}`);
       }
@@ -331,7 +507,8 @@ const snoowrap = class snoowrap {
       return requester;
     });
   }
-  _newObject (objectType, content, _hasFetched = false) {
+  _newObject (objectType: string, content: object[]|object, _hasFetched?: boolean): Array<unknown>|object {
+    // @ts-ignore
     return Array.isArray(content) ? content : new snoowrap.objects[objectType](content, this, _hasFetched);
   }
 
