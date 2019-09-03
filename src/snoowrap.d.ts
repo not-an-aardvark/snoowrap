@@ -32,6 +32,7 @@ export = Snoowrap;
 declare class Snoowrap {
   static getAuthUrl(options: Snoowrap.AuthUrlOptions): string;
   static fromAuthCode(options: Snoowrap.AuthCodeOptions): Promise<Snoowrap>;
+  static fromApplicationOnlyAuth(options: Snoowrap.AuthCodeOptions): Promise<Snoowrap>;
   
   _newObject (objectType: string, content: object[]|object, _hasFetched?: boolean): Array<unknown>|object;
   static noConflict(): typeof Snoowrap;
@@ -158,6 +159,7 @@ declare namespace Snoowrap {
     clientSecret?: string;
     redirectUri: string;
     endpointDomain?: string;
+    deviceId?: string;
   }
 
   export type Sort = 'confidence' | 'top' | 'new' | 'controversial' | 'old' | 'random' | 'qa';

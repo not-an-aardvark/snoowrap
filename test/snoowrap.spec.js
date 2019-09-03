@@ -24,7 +24,8 @@ describe('snoowrap', function () {
       username: process.env.SNOOWRAP_USERNAME,
       password: process.env.SNOOWRAP_PASSWORD,
       redirect_uri: process.env.SNOOWRAP_REDIRECT_URI,
-      installed_app_client_id: process.env.SNOOWRAP_INSTALLED_APP_CLIENT_ID
+      installed_app_client_id: process.env.SNOOWRAP_INSTALLED_APP_CLIENT_ID,
+      device_id: process.env.SNOOWRAP_DEVICE_ID
     } : require('../oauth_info.json');
 
     r = new snoowrap({
@@ -246,7 +247,7 @@ describe('snoowrap', function () {
         clientId: oauthInfo.installed_app_client_id,
         deviceId: oauthInfo.device_id
       });
-      expect(await newRequester.getHot('redditdev', {limit: 1})).to.have.lengthOf(1);
+      expect(await newRequester.getHot('redditdev', {limit: 1})).to.have.length.above(0).and.at.most(3);
     });
     it('returns a snoowrap instance for a valid client requester', async () => {
       const newRequester = await snoowrap.fromApplicationOnlyAuth({
@@ -255,7 +256,8 @@ describe('snoowrap', function () {
         clientId: oauthInfo.client_id,
         clientSecret: oauthInfo.client_secret
       });
-      expect(await newRequester.getHot('redditdev', {limit: 1})).to.have.lengthOf(1);
+      // We may get no posts, or we maybe have 2 stickies and a post - 3 in total.
+      expect(await newRequester.getHot('redditdev', {limit: 1})).to.have.length.above(0).and.at.most(3);
     });
   });
 
