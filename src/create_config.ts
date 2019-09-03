@@ -1,6 +1,18 @@
 // @ts-ignore
 import {addSnakeCaseShadowProps} from './helpers.js';
 
+export interface ConfigOptions {
+  endpointDomain: string;
+  requestDelay: number;
+  requestTimeout: number;
+  continueAfterRatelimitError: boolean;
+  retryErrorCodes: number[];
+  maxRetryAttempts: number;
+  warnings: boolean;
+  debug: boolean;
+  proxies: boolean;
+}
+
 export default function () {
   const config = Object.create(null);
   config.endpointDomain = 'reddit.com';
