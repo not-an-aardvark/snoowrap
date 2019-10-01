@@ -46,9 +46,23 @@ import {
   VoteableContent,
   WikiPage,
 } from './objects';
+import { Options as RequestOptions } from 'request';
 
 
 declare namespace Snoowrap {
+  // Make sure RequestHandler functions are typed - don't know how this works
+  class RequestHandler {}
+  export interface RequestHandler {
+    _get(options: {[key: string]: any}): Promise<any>;
+    _post(options: {[key: string]: any}): Promise<any>;
+    _put(options: {[key: string]: any}): Promise<any>;
+    _delete(options: {[key: string]: any}): Promise<any>;
+    _head(options: {[key: string]: any}): Promise<any>;
+    _patch(options: {[key: string]: any}): Promise<any>;
+    oauthRequest(options: RequestOptions, attempts: number): Promise<any>;
+    unauthenticatedRequest(options: RequestOptions): Promise<any>;
+  }
+  
   export interface SnoowrapOptions {
     userAgent: string;
     clientId?: string;
@@ -165,6 +179,23 @@ declare namespace Snoowrap {
     CLIENT_CREDENTIALS = 'client_credentials',
     INSTALLED_CLIENT = 'https://oauth.reddit.com/grants/installed_client'
   }
+
+  export interface ObjectType {
+    Comment: typeof Comment;
+    Listing: typeof Listing;
+    LiveThread: typeof LiveThread;
+    ModmailConversation: typeof ModmailConversation;
+    MultiReddit: typeof MultiReddit;
+    PrivateMessage: typeof PrivateMessage;
+    RedditContent: typeof RedditContent;
+    RedditUser: typeof RedditUser;
+    ReplyableContent: typeof ReplyableContent;
+    Submission: typeof Submission;
+    Subreddit: typeof Subreddit;
+    VoteableContent: typeof VoteableContent;
+    WikiPage: typeof WikiPage;
+    [key: string]: {prototype: any};
+  }
 }
 
 /** The class for a snoowrap requester.
@@ -178,7 +209,7 @@ declare namespace Snoowrap {
  [API rules](https://github.com/reddit/reddit/wiki/API).) These properties primarily exist for internal use, but they are
  exposed since they are useful externally as well.
  */
-const snoowrap = class snoowrap {
+export default class snoowrap extends Snoowrap.RequestHandler {
   accessToken!: string;
   clientId!: string;
   clientSecret!: string;
@@ -191,6 +222,11 @@ const snoowrap = class snoowrap {
   userAgent!: string;
   username!: string;
   private _config!: ConfigOptions;
+  static errors: object[]|undefined;
+  static version: string = VERSION;
+  static objects: Snoowrap.ObjectType;
+  static _previousSnoowrap: snoowrap;
+  _ownUserInfo: any;
   /**
    * @summary Constructs a new requester.
    * @desc You should use the snoowrap constructor if you are able to authorize a reddit account in advance (e.g. for a Node.js
@@ -658,13 +694,13 @@ const snoowrap = class snoowrap {
    * r.getMe().then(console.log);
    * // => RedditUser { is_employee: false, has_mail: false, name: 'snoowrap_testing', ... }
    */
-  getMe () {
+  getMe (): RedditUser {
     return this._get({uri: 'api/v1/me'}).then((result: unknown)=> {
       this._ownUserInfo = this._newObject('RedditUser', result as object, true);
       return this._ownUserInfo;
     });
   }
-
+  
   _getMyName () {
     return Promise.resolve(this._ownUserInfo ? this._ownUserInfo.name : this.getMe().get('name'));
   }
@@ -2040,13 +2076,13 @@ can get a post and a comment
     return responseTree;
   }
 
-  _getListing ({uri, qs = {}, ...options}) {
+  _getListing<T>({uri, qs = {}, ...options}: {uri: string, qs: {limit?: number}}) {
     /* When the response type is expected to be a Listing, add a `count` parameter with a very high number.
     This ensures that reddit returns a `before` property in the resulting Listing to enable pagination.
     (Aside from the additional parameter, this function is equivalent to snoowrap.prototype._get) */
     const mergedQuery = {count: 9999, ...qs};
     return qs.limit || !isEmpty(options)
-      ? this._newObject('Listing', {_query: mergedQuery, _uri: uri, ...options}).fetchMore(qs.limit || MAX_LISTING_ITEMS)
+      ? (this._newObject<Listing<T>>('Listing', {_query: mergedQuery, _uri: uri, ...options}) as Listing<T>).fetchMore(qs.limit || MAX_LISTING_ITEMS)
       /* This second case is used as a fallback in case the endpoint unexpectedly ends up returning something other than a
       Listing (e.g. Submission#getRelated, which used to return a Listing but no longer does due to upstream reddit API
       changes), in which case using fetch_more() as above will throw an error.
@@ -2055,7 +2091,7 @@ can get a post and a comment
       other meta-properties,  the function will still end up throwing an error, but there's not really any good way to handle it
       (predicting upstream changes can only go so far). More importantly, in the limited cases where it's used, the fallback
       should have no effect on the returned results */
-      : this._get({uri, qs: mergedQuery}).then(listing => {
+      : this._get({uri, qs: mergedQuery}).then((listing: unknown) => {
         if (Array.isArray(listing)) {
           listing.filter(item => item.constructor._name === 'Comment').forEach(addEmptyRepliesListing);
         }
@@ -2071,13 +2107,13 @@ can get a post and a comment
    */
   static noConflict () {
     if (isBrowser) {
-      global[MODULE_NAME] = this._previousSnoowrap;
+      (global as any)[MODULE_NAME] = this._previousSnoowrap;
     }
     return this;
   }
 };
 
-function identity (value) {
+function identity (value: string) {
   return value;
 }
 
@@ -2096,23 +2132,33 @@ const classFuncDescriptors = {configurable: true, writable: true};
 Object.defineProperties to ensure that the properties are non-enumerable. */
 Object.defineProperties(snoowrap.prototype, mapValues(requestHandler, func => ({value: func, ...classFuncDescriptors})));
 
-HTTP_VERBS.forEach(method => {
+// TODO: Move to main class with decorators
+HTTP_VERBS.forEach((method: string) => {
   /* Define method shortcuts for each of the HTTP verbs. i.e. `snoowrap.prototype._post` is the same as `oauth_request` except
   that the HTTP method defaults to `post`, and the result is promise-wrapped. Use Object.defineProperty to ensure that the
   properties are non-enumerable. */
   Object.defineProperty(snoowrap.prototype, `_${method}`, {
-    value (options) {
+    value (options: object) {
       return this._promiseWrap(this.oauthRequest({...options, method}));
     }, ...classFuncDescriptors
   });
 });
 
+function nonEnumerable(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  for (const key in classFuncDescriptors) {
+    if (classFuncDescriptors.hasOwnProperty(key)) {
+      const config = (classFuncDescriptors as any)[key];
+      (descriptor as any)[key] = config;
+    }
+  }
+};
+
 /* `objects` will be an object containing getters for each content type, due to the way objects are exported from
 objects/index.js. To unwrap these getters into direct properties, use lodash.mapValues with an identity function. */
-snoowrap.objects = mapValues(objects, value => value);
+snoowrap.objects = mapValues<Snoowrap.ObjectType, any>(objects, (value: any) => value);
 
-forOwn(KINDS, value => {
-  snoowrap.objects[value] = snoowrap.objects[value] || class extends objects.RedditContent {
+forOwn(KINDS, (value: string) => {
+  snoowrap.objects[value]  = snoowrap.objects[value] || class extends objects.RedditContent<typeof value> {
   };
   Object.defineProperty(snoowrap.objects[value], '_name', {value, configurable: true});
 });
@@ -2125,11 +2171,10 @@ values(snoowrap.objects).concat(snoowrap).map(func => func.prototype).forEach(fu
 });
 
 snoowrap.errors = errors;
-snoowrap.version = VERSION;
 
 if (!module.parent && isBrowser) { // check if the code is being run in a browser through browserify, etc.
-  snoowrap._previousSnoowrap = global[MODULE_NAME];
-  global[MODULE_NAME] = snoowrap;
+  snoowrap._previousSnoowrap = (global as any)[MODULE_NAME];
+  (global as any)[MODULE_NAME] = snoowrap;
 }
 
 module.exports = snoowrap;
