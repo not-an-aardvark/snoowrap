@@ -225,6 +225,13 @@ export interface SubredditSettings {
   title: string;
   public_description: string;
   description: string;
+  sr?: Subreddit;
+  captcha?: string;
+  captcha_iden?: string;
+  comment_score_hide_mins?: number;
+  'header-title': string;
+  show_media_preview: boolean;
+  allow_images?: boolean;
   submit_text?: string;
   hide_ads?: boolean;
   lang?: string;

@@ -47,6 +47,7 @@ import {
   WikiPage,
 } from './objects';
 import { Options as RequestOptions } from 'request';
+import { any } from 'bluebird';
 
 
 declare namespace Snoowrap {
@@ -135,8 +136,12 @@ declare namespace Snoowrap {
     subredditName: string;
     title: string;
     sendReplies?: boolean;
+    send_replies?: boolean;
     captchaIden?: string;
     captchaResponse?: string;
+    subreddit_name: string;
+    captcha_iden?: string;
+    captcha_response?: string;
   }
 
   export interface SubmitLinkOptions {
@@ -149,8 +154,12 @@ declare namespace Snoowrap {
     subject: string;
     text: string;
     fromSubreddit?: Subreddit | string;
+    captcha?: string
     captchaIden?: string;
     captchaResponse?: string;
+    from_subreddit?: Subreddit | string;
+    captcha_iden?: string;
+    captcha_response?: string;
   }
 
   export interface BaseSearchOptions {
@@ -216,7 +225,7 @@ export default class snoowrap extends Snoowrap.RequestHandler {
   password!: string;
   ratelimitExpiration!: number;
   ratelimitRemaining!: number;
-  refreshToken!: string;
+  refreshToken!: string|null;
   scope!: string[];
   tokenExpiration!: number;
   userAgent!: string;
@@ -273,6 +282,7 @@ export default class snoowrap extends Snoowrap.RequestHandler {
     username,
     password
   }: Snoowrap.SnoowrapOptions) {
+    super();
     if (!userAgent && !isBrowser) {
       return requiredArg('userAgent');
     }
@@ -688,13 +698,13 @@ export default class snoowrap extends Snoowrap.RequestHandler {
 
   /**
    * @summary Gets information on the requester's own user profile.
-   * @returns {RedditUser} A RedditUser object corresponding to the requester's profile
+   * @returns {Promise<RedditUser>} A RedditUser object corresponding to the requester's profile
    * @example
    *
    * r.getMe().then(console.log);
    * // => RedditUser { is_employee: false, has_mail: false, name: 'snoowrap_testing', ... }
    */
-  getMe (): RedditUser {
+  getMe (): Promise<RedditUser> {
     return this._get({uri: 'api/v1/me'}).then((result: unknown)=> {
       this._ownUserInfo = this._newObject('RedditUser', result as object, true);
       return this._ownUserInfo;
@@ -814,7 +824,7 @@ export default class snoowrap extends Snoowrap.RequestHandler {
    * // => 'o5M18uy4mk0IW4hs0fu2GNPdXb1Dxe9d'
    */
   getNewCaptchaIdentifier (): Promise<string> {
-    return this._post({uri: 'api/new_captcha', form: {api_type}}).then(res => res.json.data.iden);
+    return this._post({uri: 'api/new_captcha', form: {api_type}}).then((res: any) => res.json.data.iden);
   }
 
   /**
@@ -868,13 +878,13 @@ export default class snoowrap extends Snoowrap.RequestHandler {
     title,
     url,
     subreddit_name, subredditName = subreddit_name
-  }) {
+  }: any) {
     return this._post({
       uri: 'api/submit', form: {
         api_type, captcha: captchaResponse, iden: captchaIden, sendreplies: sendReplies, sr: subredditName, kind, resubmit,
         crosspost_fullname, text, title, url
       }
-    }).tap(handleJsonErrors(this)).then(result => this.getSubmission(result.json.data.id));
+    }).tap(handleJsonErrors(this)).then((result: any) => this.getSubmission(result.json.data.id));
   }
 
   /**
@@ -946,7 +956,7 @@ export default class snoowrap extends Snoowrap.RequestHandler {
    *
    * await r.submitCrosspost({ title: 'I found an interesting post', originalPost: '6vths0', subredditName: 'snoowrap' })
    */
-  submitCrosspost (options): Promise<Submission> {
+  submitCrosspost (options: {subredditName: string, title: string, originalPost: string|Submission, sendReplies?: boolean, resubmit?: boolean}): Promise<Submission> {
     return this._submit({
       ...options,
       kind: 'crosspost',
@@ -956,10 +966,10 @@ export default class snoowrap extends Snoowrap.RequestHandler {
     });
   }
 
-  _getSortedFrontpage (sortType, subredditName, options = {}) {
+  _getSortedFrontpage (sortType: string, subredditName?: string, options: {time?: any, [index:string]:any} = {}) {
     // Handle things properly if only a time parameter is provided but not the subreddit name
     let opts = options;
-    let subName = subredditName;
+    let subName: string|undefined = subredditName;
     if (typeof subredditName === 'object' && isEmpty(omitBy(opts, option => option === undefined))) {
       /* In this case, "subredditName" ends up referring to the second argument, which is not actually a name since the user
       decided to omit that parameter. */
@@ -1004,7 +1014,7 @@ export default class snoowrap extends Snoowrap.RequestHandler {
   /**
    * @summary Gets a Listing of best posts.
    * @param {object} [options={}] Options for the resulting Listing
-   * @returns {Promise<Listing>} A Listing containing the retrieved submissions
+   * @returns {Promise<Listing<Submission>>} A Listing containing the retrieved submissions
    * @example
    *
    * r.getBest().then(console.log)
@@ -1019,7 +1029,7 @@ export default class snoowrap extends Snoowrap.RequestHandler {
    //   Submission { domain: 'self.redditdev', banned_by: null, subreddit: Subreddit { display_name: 'redditdev' }, ...}
    * // ]
    */
-  getBest (options) {
+  getBest (options: ListingOptions): Promise<Listing<Submission>> {
     return this._getSortedFrontpage('best', undefined, options);
   }
 
@@ -1248,7 +1258,7 @@ can get a post and a comment
    */
   getNewModmailConversations (options?: ListingOptions & { entity?: string }): Promise<Listing<ModmailConversation>> {
     return this._getListing({
-      uri: 'api/mod/conversations', qs: options, _name: 'ModmailConversation', _transform: response => {
+      uri: 'api/mod/conversations', qs: options, _name: 'ModmailConversation', _transform: (response: any) => {
         response.after = null;
         response.before = null;
         response.children = [];
@@ -1296,7 +1306,7 @@ can get a post and a comment
       uri: 'api/mod/conversations', form: {
         body, subject, srName: parsedFromSr
       }
-    }).then(res => this._newObject('ModmailConversation', {id: res.conversation.id}));
+    }).then((res: any) => this._newObject('ModmailConversation', {id: res.conversation.id}));
   }
 
   /**
@@ -1350,9 +1360,9 @@ can get a post and a comment
    * // ]
    */
   getNewModmailSubreddits (): Promise<Listing<Subreddit>> {
-    return this._get({uri: 'api/mod/conversations/subreddits'}).then(response => {
+    return this._get({uri: 'api/mod/conversations/subreddits'}).then((response: any) => {
       return Object.values(response.subreddits).map(s => {
-        return this._newObject('Subreddit', s);
+        return this._newObject<Subreddit>('Subreddit', {s});
       });
     });
   }
@@ -1412,11 +1422,11 @@ can get a post and a comment
     return this._post({uri: 'api/mod/conversations/bulk/read', form: {
       entity: subredditNames.join(','),
       state
-    }}).then(res => {
+    }}).then((res: any) => {
       return this._newObject('Listing', {
         after: null,
         before: null,
-        children: res.conversation_ids.map(id => {
+        children: res.conversation_ids.map((id: string) => {
           return this._newObject('ModmailConversation', {id});
         })
       });
@@ -1456,8 +1466,8 @@ can get a post and a comment
    * // Alternatively, just pass in a comment object directly.
    * r.markMessagesAsRead([r.getMessage('51shsd'), r.getComment('d3zhb5k')])
    */
-  markMessagesAsRead (messages: PrivateMessage[] | string[]): Promise<void> {
-    const messageIds = messages.map(message => addFullnamePrefix(message, 't4_'));
+  markMessagesAsRead (messages: Array<PrivateMessage|string>): Promise<void> {
+    const messageIds = messages.map((message: PrivateMessage | string) => addFullnamePrefix(message, 't4_'));
     return this._post({uri: 'api/read_message', form: {id: messageIds.join(',')}});
   }
 
@@ -1478,8 +1488,8 @@ can get a post and a comment
    * // Alternatively, just pass in a comment object directly.
    * r.markMessagesAsRead([r.getMessage('51shsd'), r.getComment('d3zhb5k')])
    */
-  markMessagesAsUnread (messages: PrivateMessage[] | string[]): Promise<void> {
-    const messageIds = messages.map(message => addFullnamePrefix(message, 't4_'));
+  markMessagesAsUnread (messages: Array<PrivateMessage|string>): Promise<void> {
+    const messageIds = messages.map((message: PrivateMessage | string) => addFullnamePrefix(message, 't4_'));
     return this._post({uri: 'api/unread_message', form: {id: messageIds.join(',')}});
   }
 
@@ -1761,7 +1771,7 @@ can get a post and a comment
    */
   searchSubredditTopics (options: { query: string; }): Promise<Subreddit[]> {
     const {query} = options;
-    return this._get({uri: 'api/subreddits_by_topic', qs: {query}}).map(result => this.getSubreddit(result.name));
+    return this._get({uri: 'api/subreddits_by_topic', qs: {query}}).map((result: any) => this.getSubreddit(result.name));
   }
 
   /**
@@ -1850,7 +1860,7 @@ can get a post and a comment
    * r.getPopularSubreddits().then(console.log)
    * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
    */
-  getPopularSubreddits (options) {
+  getPopularSubreddits (options: ListingOptions & {include_categories: boolean}) {
     return this._getListing({uri: 'subreddits/popular', qs: options});
   }
 
@@ -1928,7 +1938,7 @@ can get a post and a comment
     return this._post({
       uri: 'api/live/create',
       form: {api_type, description, nsfw, resources, title}
-    }).tap(handleJsonErrors(this)).then(result => this.getLivethread(result.json.data.id));
+    }).tap(handleJsonErrors(this)).then((result: any) => this.getLivethread(result.json.data.id));
   }
 
   /**
@@ -2076,7 +2086,7 @@ can get a post and a comment
     return responseTree;
   }
 
-  _getListing<T>({uri, qs = {}, ...options}: {uri: string, qs: {limit?: number}}) {
+  _getListing<T>({uri, qs = {}, ...options}: {uri: string, qs?: ListingOptions & {[any:string]: any}, options?: {[any:string]: any}}) {
     /* When the response type is expected to be a Listing, add a `count` parameter with a very high number.
     This ensures that reddit returns a `before` property in the resulting Listing to enable pagination.
     (Aside from the additional parameter, this function is equivalent to snoowrap.prototype._get) */
