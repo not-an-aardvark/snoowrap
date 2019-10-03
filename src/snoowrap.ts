@@ -47,10 +47,9 @@ import {
   WikiPage,
 } from './objects';
 import { Options as RequestOptions } from 'request';
-import { any } from 'bluebird';
 
 
-declare namespace Snoowrap {
+export declare namespace Snoowrap {
   // Make sure RequestHandler functions are typed - don't know how this works
   class RequestHandler {}
   export interface RequestHandler {
@@ -219,7 +218,7 @@ declare namespace Snoowrap {
  exposed since they are useful externally as well.
  */
 export default class snoowrap extends Snoowrap.RequestHandler {
-  accessToken!: string;
+  accessToken!: string|null;
   clientId!: string;
   clientSecret!: string;
   password!: string;
@@ -227,7 +226,7 @@ export default class snoowrap extends Snoowrap.RequestHandler {
   ratelimitRemaining!: number;
   refreshToken!: string|null;
   scope!: string[];
-  tokenExpiration!: number;
+  tokenExpiration!: number|null;
   userAgent!: string;
   username!: string;
   private _config!: ConfigOptions;
@@ -1258,6 +1257,7 @@ can get a post and a comment
    */
   getNewModmailConversations (options?: ListingOptions & { entity?: string }): Promise<Listing<ModmailConversation>> {
     return this._getListing({
+      // @ts-ignore _name is somehow not working - need to fix
       uri: 'api/mod/conversations', qs: options, _name: 'ModmailConversation', _transform: (response: any) => {
         response.after = null;
         response.before = null;
@@ -1683,7 +1683,7 @@ can get a post and a comment
         spam_selfposts, spoilers_enabled, sr, submit_link_label, submit_text, submit_text_label, suggested_comment_sort,
         title, type, wiki_edit_age, wiki_edit_karma, wikimode
       }
-    }).then(handleJsonErrors(this.getSubreddit(name || sr)));
+    }).then(handleJsonErrors(this.getSubreddit(name || sr || "")));
   }
 
   /**
@@ -1990,7 +1990,7 @@ can get a post and a comment
   createMultireddit ({
     name, description, subreddits, visibility = 'private', icon_name, key_color = '#000000',
     weighting_scheme = 'classic'
-  }: MultiRedditProperties & { name: string; subreddits: Subreddit[] | string[]}): Promise<MultiReddit> {
+  }: MultiRedditProperties & { name: string; subreddits: Array<Subreddit|string>}): Promise<MultiReddit> {
     return this._post({
       uri: 'api/multi', form: {
         model: JSON.stringify({
@@ -1998,7 +1998,7 @@ can get a post and a comment
           description_md: description,
           icon_name,
           key_color,
-          subreddits: subreddits.map(sub => ({name: typeof sub === 'string' ? sub : sub.display_name})),
+          subreddits: subreddits.map((sub: Subreddit|string) => ({name: typeof sub === 'string' ? sub : sub.display_name})),
           visibility,
           weighting_scheme
         })
@@ -2006,7 +2006,8 @@ can get a post and a comment
     });
   }
 
-  _revokeToken (token) {
+  _revokeToken (token: string) {
+    // @ts-ignore
     return this.credentialedClientRequest({uri: 'api/v1/revoke_token', form: {token}, method: 'post'});
   }
 
@@ -2019,7 +2020,7 @@ can get a post and a comment
    * @example r.revokeAccessToken();
    */
   revokeAccessToken (): Promise<void> {
-    return this._revokeToken(this.accessToken).then(() => {
+    return this._revokeToken(this.accessToken || "").then(() => {
       this.accessToken = null;
       this.tokenExpiration = null;
     });
@@ -2035,34 +2036,36 @@ can get a post and a comment
    * @example r.revokeRefreshToken();
    */
   revokeRefreshToken (): Promise<void> {
-    return this._revokeToken(this.refreshToken).then(() => {
+    return this.refreshToken && this._revokeToken(this.refreshToken).then(() => {
       this.refreshToken = null;
       this.accessToken = null; // Revoking a refresh token also revokes any associated access tokens.
       this.tokenExpiration = null;
     });
   }
 
-  _selectFlair ({flair_template_id, link, name, text, subredditName}) {
+  _selectFlair ({flair_template_id, link, name, text, subredditName}: {flair_template_id: string, link: string, name: string, text: string, subredditName: string}) {
     if (!flair_template_id) {
       throw new errors.InvalidMethodCallError('No flair template ID provided');
     }
-    return Promise.resolve(subredditName).then(subName => {
+    return Promise.resolve(subredditName).then((subName: string) => {
       return this._post({uri: `r/${subName}/api/selectflair`, form: {api_type, flair_template_id, link, name, text}});
     });
   }
 
-  _assignFlair ({css_class, cssClass = css_class, link, name, text, subreddit_name, subredditName = subreddit_name}) {
-    return this._promiseWrap(Promise.resolve(subredditName).then(displayName => {
+  _assignFlair ({css_class, cssClass = css_class, link, name, text, subreddit_name, subredditName = subreddit_name}: {css_class?: string, cssClass?: string, link: string, name: string, text: string, subreddit_name?: string, subredditName?: string}) {
+    return this._promiseWrap(Promise.resolve(subredditName).then((displayName: string) => {
       return this._post({uri: `r/${displayName}/api/flair`, form: {api_type, name, text, link, css_class: cssClass}});
     }));
   }
 
-  _populate (responseTree) {
+  _populate (responseTree: {[index:string]: any}|null): object|null {
     if (typeof responseTree === 'object' && responseTree !== null) {
       // Map {kind: 't2', data: {name: 'some_username', ... }} to a RedditUser (e.g.) with the same properties
       if (Object.keys(responseTree).length === 2 && responseTree.kind && responseTree.data) {
+        // @ts-ignore
         return this._newObject(KINDS[responseTree.kind] || 'RedditContent', this._populate(responseTree.data), true);
       }
+      // @ts-ignore
       const result = (Array.isArray(responseTree) ? map : mapValues)(responseTree, (value, key) => {
         // Maps {author: 'some_username'} to {author: RedditUser { name: 'some_username' } }
         if (value !== null && USER_KEYS.has(key)) {
@@ -2130,6 +2133,7 @@ function identity (value: string) {
 defineInspectFunc(snoowrap.prototype, function () {
   // Hide confidential information (tokens, client IDs, etc.), as well as private properties, from the console.log output.
   const keysForHiddenValues = ['clientSecret', 'refreshToken', 'accessToken', 'password'];
+  // @ts-ignore TODO: this can't be resolved
   const formatted = mapValues(omitBy(this, (value, key) => typeof key === 'string' && key.startsWith('_')), (value, key) => {
     return includes(keysForHiddenValues, key) ? value && '(redacted)' : value;
   });
@@ -2153,15 +2157,6 @@ HTTP_VERBS.forEach((method: string) => {
     }, ...classFuncDescriptors
   });
 });
-
-function nonEnumerable(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-  for (const key in classFuncDescriptors) {
-    if (classFuncDescriptors.hasOwnProperty(key)) {
-      const config = (classFuncDescriptors as any)[key];
-      (descriptor as any)[key] = config;
-    }
-  }
-};
 
 /* `objects` will be an object containing getters for each content type, due to the way objects are exported from
 objects/index.js. To unwrap these getters into direct properties, use lodash.mapValues with an identity function. */
