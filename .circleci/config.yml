@@ -11,8 +11,11 @@ workflows:
     jobs:
     - build
     - test_lint:
-      requires:
-        - build
+        requires:
+          - build
+    - test_ts_types:
+        requires:
+          - build
 jobs:
   build:
     docker: 
