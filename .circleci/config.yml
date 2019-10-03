@@ -1,0 +1,47 @@
+version: 2.1
+
+references:
+  attach_workspace: &attach_workspace
+    attach_workspace:
+      at: ~/project
+
+workflows:
+  version: 2
+  build_and_lint:
+    jobs:
+    - build
+    - test_lint:
+      requires:
+        - build
+jobs:
+  build:
+    docker: 
+      - image: circleci/node:8.15
+    steps:
+      - checkout # check out the code in the project directory
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - "*"
+      - run:
+          name: Conditional install
+          command: npm install
+      - run:
+          name: Build Dist
+          command: yarn build
+  test_lint:
+    docker: 
+      - image: circleci/node:8.15
+    steps:
+      - *attach_workspace
+      - run:
+          name: Run lint
+          command: npm run lint
+  test_ts_types:
+    docker: 
+      - image: circleci/node:8.15
+    steps:
+      - *attach_workspace
+      - run:
+          name: Run TS type check
+          command: npm run type-check
