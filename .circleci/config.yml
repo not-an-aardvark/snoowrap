@@ -22,7 +22,7 @@ jobs:
             - "*"
       - run:
           name: Install Dependencies
-          command: npm install
+          command: npm ci
       - save_cache:
           paths: *js_deps_paths
           key: *js_deps_cache_key
