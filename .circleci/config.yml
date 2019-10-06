@@ -4,9 +4,9 @@ references:
   js_deps_paths: &js_deps_paths
   - node_modules/
   js_deps_cache_key: &js_deps_cache_key
-    js-deps-v{{.Environment.CACHE_VERSION}}-{{checksum "package-lock.json"}}
+    js-deps-v{{checksum "package-lock.json"}}
   build_cache_key: &build_cache_key
-    build-cache-v{{.Environment.CACHE_VERSION}}-{{checksum "package-lock.json"}}
+    build-cache-v{{checksum "package-lock.json"}}
   attach_workspace: &attach_workspace
     attach_workspace:
       at: ~/project
