@@ -1,0 +1,82 @@
+version: 2.1
+
+references:
+  js_deps_paths: &js_deps_paths
+  - node_modules/
+  js_deps_cache_key: &js_deps_cache_key
+    js-deps-v{{.Environment.CACHE_VERSION}}-{{checksum "package-lock.json"}}
+  build_cache_key: &build_cache_key
+    build-cache-v{{.Environment.CACHE_VERSION}}-{{checksum "package-lock.json"}}
+  attach_workspace: &attach_workspace
+    attach_workspace:
+      at: ~/project
+jobs:
+  install:
+    docker: 
+      - image: circleci/node:8.15
+    steps:
+      - checkout # check out the code in the project directory
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - "*"
+      - run:
+          name: Install Dependencies
+          command: npm install
+      - save_cache:
+          paths: *js_deps_paths
+          key: *js_deps_cache_key
+      - restore_cache:
+          keys:
+          - *build_cache_key
+  test_ts_types:
+    docker: 
+      - image: circleci/node:8.15
+    steps:
+      - *attach_workspace
+      - restore_cache:
+          keys:
+          - *js_deps_cache_key
+      - run:
+          name: Run TS type check
+          command: npm run type-check
+  build:
+    docker: 
+      - image: circleci/node:8.15
+    steps:
+      - *attach_workspace
+      - restore_cache:
+          keys:
+          - *js_deps_cache_key
+      - run:
+          name: Build Dist
+          command: npm run build:babel
+      - run:
+          name: Build TS Types
+          command: npm run build:types
+  test_lint:
+    docker: 
+      - image: circleci/node:8.15
+    steps:
+      - *attach_workspace
+      - restore_cache:
+          keys:
+          - *js_deps_cache_key
+      - run:
+          name: Run lint
+          command: npm run lint
+
+workflows:
+  version: 2
+  build_and_lint:
+    jobs:
+    - install
+    - test_ts_types:
+        requires:
+          - install
+    - build:
+        requires:
+          - install
+    - test_lint:
+        requires:
+          - build
