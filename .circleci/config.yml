@@ -1,23 +1,17 @@
 version: 2.1
 
 references:
+  js_deps_paths: &js_deps_paths
+  - node_modules/
+  js_deps_cache_key: &js_deps_cache_key
+    js-deps-v{{checksum "package-lock.json"}}
+  build_cache_key: &build_cache_key
+    build-cache-v{{checksum "package-lock.json"}}
   attach_workspace: &attach_workspace
     attach_workspace:
       at: ~/project
-
-workflows:
-  version: 2
-  build_and_lint:
-    jobs:
-    - build
-    - test_lint:
-        requires:
-          - build
-    - test_ts_types:
-        requires:
-          - build
 jobs:
-  build:
+  install:
     docker: 
       - image: circleci/node:8.15
     steps:
@@ -27,24 +21,62 @@ jobs:
           paths:
             - "*"
       - run:
-          name: Conditional install
-          command: npm install
-      - run:
-          name: Build Dist
-          command: yarn build
-  test_lint:
-    docker: 
-      - image: circleci/node:8.15
-    steps:
-      - *attach_workspace
-      - run:
-          name: Run lint
-          command: npm run lint
+          name: Install Dependencies
+          command: npm ci
+      - save_cache:
+          paths: *js_deps_paths
+          key: *js_deps_cache_key
+      - restore_cache:
+          keys:
+          - *build_cache_key
   test_ts_types:
     docker: 
       - image: circleci/node:8.15
     steps:
       - *attach_workspace
+      - restore_cache:
+          keys:
+          - *js_deps_cache_key
       - run:
           name: Run TS type check
           command: npm run type-check
+  build:
+    docker: 
+      - image: circleci/node:8.15
+    steps:
+      - *attach_workspace
+      - restore_cache:
+          keys:
+          - *js_deps_cache_key
+      - run:
+          name: Build Dist
+          command: npm run build:babel
+      - run:
+          name: Build TS Types
+          command: npm run build:types
+  test_lint:
+    docker: 
+      - image: circleci/node:8.15
+    steps:
+      - *attach_workspace
+      - restore_cache:
+          keys:
+          - *js_deps_cache_key
+      - run:
+          name: Run lint
+          command: npm run lint
+
+workflows:
+  version: 2
+  build_and_lint:
+    jobs:
+    - install
+    - test_ts_types:
+        requires:
+          - install
+    - build:
+        requires:
+          - install
+    - test_lint:
+        requires:
+          - build
