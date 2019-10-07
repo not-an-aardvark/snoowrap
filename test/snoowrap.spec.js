@@ -2057,7 +2057,8 @@ describe('snoowrap', function () {
       expect(conversation.lastUnread).to.be.a('string');
     });
 
-    it('create a mod discussion', async () => {
+    // skip to avoid spamming
+    it.skip('create a mod discussion', async () => {
       const conversation = await r.createModmailDiscussion({
         body: 'testBody',
         subject: 'testSubject',

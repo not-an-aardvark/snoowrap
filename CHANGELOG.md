@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.20.0 (2019-10-07)
+
+* Added application only auth `snoowrap#applicationOnlyAuth`
+* Fixed ModmailConversation TypeScript definitions
+* Converted ModmailConversationAuthor to TypeScript
+
 ## v1.19.0 (2019-08-05)
 
 * Added TypeScript definitions
