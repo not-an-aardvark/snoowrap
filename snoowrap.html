@@ -525,6 +525,74 @@ with an installed app (which does not have a client secret), pass an empty strin
     
 
     
+        <h3 class="subsection-title">Members</h3>
+
+        <dl>
+            
+<hr>
+<dt class="name" id=".grantType">
+    <h4 id=".grantType"><span class="type-signature">&lt;static> </span>grantType<span class="type-signature"></span></h4>
+
+    
+    <p class="summary"><p>Returns the grant types available for app-only authentication</p></p>
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Per the Reddit API OAuth docs, there are two different grant types depending on whether the app is an installed client
+or a confidential client such as a web app or string. This getter returns the possible values for the &quot;grant_type&quot; field
+in application-only auth.</p>
+    </div>
+    
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        </dl>
+    
 
     
         <h3 class="subsection-title">Methods</h3>
@@ -953,7 +1021,16 @@ reddit.com (as opposed to some other site with a reddit-like API), you can omit 
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var authenticationUrl = snoowrap.getAuthUrl({  clientId: &#x27;foobarbazquuux&#x27;,  scope: [&#x27;identity&#x27;, &#x27;wikiread&#x27;, &#x27;wikiedit&#x27;],  redirectUri: &#x27;https://example.com/reddit_callback&#x27;,  permanent: false,  state: &#x27;fe211bebc52eb3da9bef8db6e63104d3&#x27; // a random string, this could be validated when the user is redirected back});// --&gt; &#x27;https://www.reddit.com/api/v1/authorize?client_id=foobarbaz&amp;response_type=code&amp;state= ...&#x27;window.location = authenticationUrl; // send the user to the authentication url</pre>
+    <pre class="sunlight-highlight-javascript">var authenticationUrl = snoowrap.getAuthUrl({
+  clientId: &#x27;foobarbazquuux&#x27;,
+  scope: [&#x27;identity&#x27;, &#x27;wikiread&#x27;, &#x27;wikiedit&#x27;],
+  redirectUri: &#x27;https://example.com/reddit_callback&#x27;,
+  permanent: false,
+  state: &#x27;fe211bebc52eb3da9bef8db6e63104d3&#x27; // a random string, this could be validated when the user is redirected back
+});
+// --&gt; &#x27;https://www.reddit.com/api/v1/authorize?client_id=foobarbaz&amp;response_type=code&amp;state= ...&#x27;
+
+window.location = authenticationUrl; // send the user to the authentication url</pre>
 
 
     
@@ -1361,7 +1438,7 @@ value.</p></td>
     </dt>
     <dd>
         
-<span class="param-type">Promise</span>
+<span class="param-type">Promise.&lt;<a href="snoowrap.html">snoowrap</a>></span>
 
 
 
@@ -1374,7 +1451,470 @@ value.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">// Get the &#x60;code&#x60; querystring param (assuming the user was redirected from reddit)var code = new URL(window.location.href).searchParams.get(&#x27;code&#x27;);snoowrap.fromAuthCode({  code: code,  userAgent: &#x27;My app&#x27;,  clientId: &#x27;foobarbazquuux&#x27;,  redirectUri: &#x27;example.com&#x27;}).then(r =&gt; {  // Now we have a requester that can access reddit through the user&#x27;s account  return r.getHot().then(posts =&gt; {    // do something with posts from the front page  });})</pre>
+    <pre class="sunlight-highlight-javascript">// Get the &#x60;code&#x60; querystring param (assuming the user was redirected from reddit)
+var code = new URL(window.location.href).searchParams.get(&#x27;code&#x27;);
+
+snoowrap.fromAuthCode({
+  code: code,
+  userAgent: &#x27;My app&#x27;,
+  clientId: &#x27;foobarbazquuux&#x27;,
+  redirectUri: &#x27;example.com&#x27;
+}).then(r =&gt; {
+  // Now we have a requester that can access reddit through the user&#x27;s account
+  return r.getHot().then(posts =&gt; {
+    // do something with posts from the front page
+  });
+})</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".fromApplicationOnlyAuth"><span class="type-signature">&lt;static> </span>fromApplicationOnlyAuth(options)</h4>
+    
+    
+    <p class="summary"><p>Creates a snoowrap requester from a &quot;user-less&quot; Authorization token</p></p>
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>In some cases, 3rd party app clients may wish to make API requests without a user context. App clients can request
+a &quot;user-less&quot; Authorization token via either the standard client_credentials grant, or the reddit specific
+extension to this grant, https://oauth.reddit.com/grants/installed_client. Which grant type an app uses depends on
+the app-type and its use case.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <h6 class="method-params-label method-subparams-label">Properties</h6>
+                
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>userAgent</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>A unique description of what your app does. This argument is not necessary when snoowrap
+is running in a browser.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>clientId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>The client ID of your app (assigned by reddit). If your code is running clientside in a
+browser, using an &quot;Installed&quot; app type is recommended. From the reddit docs: &quot;reddit <em>may</em> choose to use this ID to generate
+aggregate data about user counts. Clients that wish to remain anonymous should use the value DO_NOT_TRACK_THIS_DEVICE.&quot;</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>clientSecret</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>The client secret of your app. Only required for &quot;client_credentials&quot; grant type.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>deviceId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>A unique, per-device ID generated by your client. Only required
+for &quot;Installed&quot; grant type, needs to be between 20-30 characters long.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>grantType</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    snoowrap.grantType.INSTALLED_CLIENT
+                
+                </td>
+            
+
+            <td class="description last"><p>The type of &quot;user-less&quot;
+token to use <a href="snoowrap.html#.grantType"><code>snoowrap.grantType</code></a></p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>endpointDomain</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    'reddit.com'
+                
+                </td>
+            
+
+            <td class="description last"><p>The endpoint domain that the returned requester should be configured
+to use. If the user is authenticating on reddit.com (as opposed to some other site with a reddit-like API), you can omit this
+value.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A Promise that fulfills with a <code>snoowrap</code> instance</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;<a href="snoowrap.html">snoowrap</a>></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">snoowrap.fromApplicationOnlyAuth({
+  userAgent: &#x27;My app&#x27;,
+  clientId: &#x27;foobarbazquuux&#x27;,
+  deviceId: &#x27;unique id between 20-30 chars&#x27;
+  grantType: snoowrap.grantType.INSTALLED_CLIENT
+}).then(r =&gt; {
+  // Now we have a requester that can access reddit through a &quot;user-less&quot; Auth token
+  return r.getHot().then(posts =&gt; {
+    // do something with posts from the front page
+  });
+})
+
+snoowrap.fromApplicationOnlyAuth({
+  userAgent: &#x27;My app&#x27;,
+  clientId: &#x27;foobarbazquuux&#x27;,
+  clientSecret: &#x27;your web app secret&#x27;
+  grantType: snoowrap.grantType.CLIENT_CREDENTIALS
+}).then(r =&gt; {
+  // Now we have a requester that can access reddit through a &quot;user-less&quot; Auth token
+  return r.getHot().then(posts =&gt; {
+    // do something with posts from the front page
+  });
+})</pre>
 
 
     
@@ -1952,7 +2492,8 @@ any requests.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.config({requestDelay: 1000, warnings: false});// sets the request delay to 1000 milliseconds, and suppresses warnings.</pre>
+    <pre class="sunlight-highlight-javascript">r.config({requestDelay: 1000, warnings: false});
+// sets the request delay to 1000 milliseconds, and suppresses warnings.</pre>
 
 
     
@@ -2108,7 +2649,10 @@ any requests.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;)// =&gt; RedditUser { name: &#x27;not_an_aardvark&#x27; }r.getUser(&#x27;not_an_aardvark&#x27;).link_karma.then(console.log)// =&gt; 6</pre>
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;)
+// =&gt; RedditUser { name: &#x27;not_an_aardvark&#x27; }
+r.getUser(&#x27;not_an_aardvark&#x27;).link_karma.then(console.log)
+// =&gt; 6</pre>
 
 
     
@@ -2264,7 +2808,10 @@ any requests.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getComment(&#x27;c0b6xx0&#x27;)// =&gt; Comment { name: &#x27;t1_c0b6xx0&#x27; }r.getComment(&#x27;c0b6xx0&#x27;).author.name.then(console.log)// =&gt; &#x27;Kharos&#x27;</pre>
+    <pre class="sunlight-highlight-javascript">r.getComment(&#x27;c0b6xx0&#x27;)
+// =&gt; Comment { name: &#x27;t1_c0b6xx0&#x27; }
+r.getComment(&#x27;c0b6xx0&#x27;).author.name.then(console.log)
+// =&gt; &#x27;Kharos&#x27;</pre>
 
 
     
@@ -2420,7 +2967,10 @@ any requests.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;AskReddit&#x27;)// =&gt; Subreddit { display_name: &#x27;AskReddit&#x27; }r.getSubreddit(&#x27;AskReddit&#x27;).created_utc.then(console.log)// =&gt; 1201233135</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;AskReddit&#x27;)
+// =&gt; Subreddit { display_name: &#x27;AskReddit&#x27; }
+r.getSubreddit(&#x27;AskReddit&#x27;).created_utc.then(console.log)
+// =&gt; 1201233135</pre>
 
 
     
@@ -2576,7 +3126,10 @@ any requests.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubmission(&#x27;2np694&#x27;)// =&gt; Submission { name: &#x27;t3_2np694&#x27; }r.getSubmission(&#x27;2np694&#x27;).title.then(console.log)// =&gt; &#x27;What tasty food would be distusting if eaten over rice?&#x27;</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubmission(&#x27;2np694&#x27;)
+// =&gt; Submission { name: &#x27;t3_2np694&#x27; }
+r.getSubmission(&#x27;2np694&#x27;).title.then(console.log)
+// =&gt; &#x27;What tasty food would be distusting if eaten over rice?&#x27;</pre>
 
 
     
@@ -2732,7 +3285,11 @@ any requests.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getMessage(&#x27;51shnw&#x27;)// =&gt; PrivateMessage { name: &#x27;t4_51shnw&#x27; }r.getMessage(&#x27;51shnw&#x27;).subject.then(console.log)// =&gt; &#x27;Example&#x27;// See here for a screenshot of the PM in question https://i.gyazo.com/24f3b97e55b6ff8e3a74cb026a58b167.png</pre>
+    <pre class="sunlight-highlight-javascript">r.getMessage(&#x27;51shnw&#x27;)
+// =&gt; PrivateMessage { name: &#x27;t4_51shnw&#x27; }
+r.getMessage(&#x27;51shnw&#x27;).subject.then(console.log)
+// =&gt; &#x27;Example&#x27;
+// See here for a screenshot of the PM in question https://i.gyazo.com/24f3b97e55b6ff8e3a74cb026a58b167.png</pre>
 
 
     
@@ -2890,7 +3447,10 @@ any requests.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getLivethread(&#x27;whrdxo8dg9n0&#x27;)// =&gt; LiveThread { id: &#x27;whrdxo8dg9n0&#x27; }r.getLivethread(&#x27;whrdxo8dg9n0&#x27;).nsfw.then(console.log)// =&gt; false</pre>
+    <pre class="sunlight-highlight-javascript">r.getLivethread(&#x27;whrdxo8dg9n0&#x27;)
+// =&gt; LiveThread { id: &#x27;whrdxo8dg9n0&#x27; }
+r.getLivethread(&#x27;whrdxo8dg9n0&#x27;).nsfw.then(console.log)
+// =&gt; false</pre>
 
 
     
@@ -2996,7 +3556,8 @@ any requests.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getMe().then(console.log);// =&gt; RedditUser { is_employee: false, has_mail: false, name: &#x27;snoowrap_testing&#x27;, ... }</pre>
+    <pre class="sunlight-highlight-javascript">r.getMe().then(console.log);
+// =&gt; RedditUser { is_employee: false, has_mail: false, name: &#x27;snoowrap_testing&#x27;, ... }</pre>
 
 
     
@@ -3102,7 +3663,12 @@ any requests.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getKarma().then(console.log)// =&gt; [//  { sr: Subreddit { display_name: &#x27;redditdev&#x27; }, comment_karma: 16, link_karma: 1 },//  { sr: Subreddit { display_name: &#x27;programming&#x27; }, comment_karma: 2, link_karma: 1 },//  ...// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getKarma().then(console.log)
+// =&gt; [
+//  { sr: Subreddit { display_name: &#x27;redditdev&#x27; }, comment_karma: 16, link_karma: 1 },
+//  { sr: Subreddit { display_name: &#x27;programming&#x27; }, comment_karma: 2, link_karma: 1 },
+//  ...
+// ]</pre>
 
 
     
@@ -3208,7 +3774,8 @@ any requests.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getPreferences().then(console.log)// =&gt; { default_theme_sr: null, threaded_messages: true, hide_downs: false, ... }</pre>
+    <pre class="sunlight-highlight-javascript">r.getPreferences().then(console.log)
+// =&gt; { default_theme_sr: null, threaded_messages: true, hide_downs: false, ... }</pre>
 
 
     
@@ -3365,7 +3932,9 @@ not included in this object will simply retain its current value.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.updatePreferences({threaded_messages: false, hide_downs: true})// =&gt; { default_theme_sr: null, threaded_messages: false,hide_downs: true, ... }// (preferences updated on reddit)</pre>
+    <pre class="sunlight-highlight-javascript">r.updatePreferences({threaded_messages: false, hide_downs: true})
+// =&gt; { default_theme_sr: null, threaded_messages: false,hide_downs: true, ... }
+// (preferences updated on reddit)</pre>
 
 
     
@@ -3471,7 +4040,17 @@ not included in this object will simply retain its current value.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getMyTrophies().then(console.log)// =&gt; TrophyList { trophies: [//   Trophy { icon_70: &#x27;https://s3.amazonaws.com/redditstatic/award/verified_email-70.png&#x27;,//     description: null,//     url: null,//     icon_40: &#x27;https://s3.amazonaws.com/redditstatic/award/verified_email-40.png&#x27;,//     award_id: &#x27;o&#x27;,//     id: &#x27;16fn29&#x27;,//     name: &#x27;Verified Email&#x27;//   }// ] }</pre>
+    <pre class="sunlight-highlight-javascript">r.getMyTrophies().then(console.log)
+// =&gt; TrophyList { trophies: [
+//   Trophy { icon_70: &#x27;https://s3.amazonaws.com/redditstatic/award/verified_email-70.png&#x27;,
+//     description: null,
+//     url: null,
+//     icon_40: &#x27;https://s3.amazonaws.com/redditstatic/award/verified_email-40.png&#x27;,
+//     award_id: &#x27;o&#x27;,
+//     id: &#x27;16fn29&#x27;,
+//     name: &#x27;Verified Email&#x27;
+//   }
+// ] }</pre>
 
 
     
@@ -3577,7 +4156,8 @@ not included in this object will simply retain its current value.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getFriends().then(console.log)// =&gt; [ [ RedditUser { date: 1457927963, name: &#x27;not_an_aardvark&#x27;, id: &#x27;t2_k83md&#x27; } ], [] ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getFriends().then(console.log)
+// =&gt; [ [ RedditUser { date: 1457927963, name: &#x27;not_an_aardvark&#x27;, id: &#x27;t2_k83md&#x27; } ], [] ]</pre>
 
 
     
@@ -3683,7 +4263,8 @@ not included in this object will simply retain its current value.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getBlockedUsers().then(console.log)// =&gt; [ RedditUser { date: 1457928120, name: &#x27;actually_an_aardvark&#x27;, id: &#x27;t2_q3519&#x27; } ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getBlockedUsers().then(console.log)
+// =&gt; [ RedditUser { date: 1457928120, name: &#x27;actually_an_aardvark&#x27;, id: &#x27;t2_q3519&#x27; } ]</pre>
 
 
     
@@ -3789,7 +4370,8 @@ not included in this object will simply retain its current value.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.checkCaptchaRequirement().then(console.log)// =&gt; false</pre>
+    <pre class="sunlight-highlight-javascript">r.checkCaptchaRequirement().then(console.log)
+// =&gt; false</pre>
 
 
     
@@ -3895,7 +4477,8 @@ not included in this object will simply retain its current value.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getNewCaptchaIdentifier().then(console.log)// =&gt; &#x27;o5M18uy4mk0IW4hs0fu2GNPdXb1Dxe9d&#x27;</pre>
+    <pre class="sunlight-highlight-javascript">r.getNewCaptchaIdentifier().then(console.log)
+// =&gt; &#x27;o5M18uy4mk0IW4hs0fu2GNPdXb1Dxe9d&#x27;</pre>
 
 
     
@@ -4158,7 +4741,8 @@ not included in this object will simply retain its current value.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSavedCategories().then(console.log)// =&gt; [ { category: &#x27;cute cat pictures&#x27; }, { category: &#x27;interesting articles&#x27; } ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSavedCategories().then(console.log)
+// =&gt; [ { category: &#x27;cute cat pictures&#x27; }, { category: &#x27;interesting articles&#x27; } ]</pre>
 
 
     
@@ -4318,7 +4902,9 @@ not included in this object will simply retain its current value.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var submissions = [r.getSubmission(&#x27;4a9u54&#x27;), r.getSubmission(&#x27;4a95nb&#x27;)]r.markAsVisited(submissions)// (the links will now appear purple on reddit)</pre>
+    <pre class="sunlight-highlight-javascript">var submissions = [r.getSubmission(&#x27;4a9u54&#x27;), r.getSubmission(&#x27;4a95nb&#x27;)]
+r.markAsVisited(submissions)
+// (the links will now appear purple on reddit)</pre>
 
 
     
@@ -4731,7 +5317,13 @@ requires a captcha to submit posts and comments.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.submitSelfpost({  subredditName: &#x27;snoowrap_testing&#x27;,  title: &#x27;This is a selfpost&#x27;,  text: &#x27;This is the text body of the selfpost&#x27;}).then(console.log)// =&gt; Submission { name: &#x27;t3_4abmsz&#x27; }// (new selfpost created on reddit)</pre>
+    <pre class="sunlight-highlight-javascript">r.submitSelfpost({
+  subredditName: &#x27;snoowrap_testing&#x27;,
+  title: &#x27;This is a selfpost&#x27;,
+  text: &#x27;This is the text body of the selfpost&#x27;
+}).then(console.log)
+// =&gt; Submission { name: &#x27;t3_4abmsz&#x27; }
+// (new selfpost created on reddit)</pre>
 
 
     
@@ -5183,7 +5775,13 @@ requires a captcha to submit posts and comments.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.submitLink({  subredditName: &#x27;snoowrap_testing&#x27;,  title: &#x27;I found a cool website!&#x27;,  url: &#x27;https://google.com&#x27;}).then(console.log)// =&gt; Submission { name: &#x27;t3_4abnfe&#x27; }// (new linkpost created on reddit)</pre>
+    <pre class="sunlight-highlight-javascript">r.submitLink({
+  subredditName: &#x27;snoowrap_testing&#x27;,
+  title: &#x27;I found a cool website!&#x27;,
+  url: &#x27;https://google.com&#x27;
+}).then(console.log)
+// =&gt; Submission { name: &#x27;t3_4abnfe&#x27; }
+// (new linkpost created on reddit)</pre>
 
 
     
@@ -5782,8 +6380,24 @@ the front page of reddit.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getHot().then(console.log)// =&gt; Listing [//  Submission { domain: &#x27;imgur.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;pics&#x27; }, ... },//  Submission { domain: &#x27;i.imgur.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;funny&#x27; }, ... },//  ...// ]r.getHot(&#x27;gifs&#x27;).then(console.log)// =&gt; Listing [//  Submission { domain: &#x27;i.imgur.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;gifs&#x27; }, ... },//  Submission { domain: &#x27;i.imgur.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;gifs&#x27; }, ... },//  ...// ]r.getHot(&#x27;redditdev&#x27;, {limit: 1}).then(console.log)// =&gt; Listing [
-   //   Submission { domain: &#x27;self.redditdev&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;redditdev&#x27; }, ...}// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getHot().then(console.log)
+// =&gt; Listing [
+//  Submission { domain: &#x27;imgur.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;pics&#x27; }, ... },
+//  Submission { domain: &#x27;i.imgur.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;funny&#x27; }, ... },
+//  ...
+// ]
+
+r.getHot(&#x27;gifs&#x27;).then(console.log)
+// =&gt; Listing [
+//  Submission { domain: &#x27;i.imgur.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;gifs&#x27; }, ... },
+//  Submission { domain: &#x27;i.imgur.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;gifs&#x27; }, ... },
+//  ...
+// ]
+
+r.getHot(&#x27;redditdev&#x27;, {limit: 1}).then(console.log)
+// =&gt; Listing [
+   //   Submission { domain: &#x27;self.redditdev&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;redditdev&#x27; }, ...}
+// ]</pre>
 
 
     
@@ -5959,8 +6573,17 @@ the front page of reddit.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getBest().then(console.log)// =&gt; Listing [//  Submission { domain: &#x27;imgur.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;pics&#x27; }, ... },//  Submission { domain: &#x27;i.imgur.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;funny&#x27; }, ... },//  ...// ]r.getBest({limit: 1}).then(console.log)// =&gt; Listing [
-   //   Submission { domain: &#x27;self.redditdev&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;redditdev&#x27; }, ...}// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getBest().then(console.log)
+// =&gt; Listing [
+//  Submission { domain: &#x27;imgur.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;pics&#x27; }, ... },
+//  Submission { domain: &#x27;i.imgur.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;funny&#x27; }, ... },
+//  ...
+// ]
+
+r.getBest({limit: 1}).then(console.log)
+// =&gt; Listing [
+   //   Submission { domain: &#x27;self.redditdev&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;redditdev&#x27; }, ...}
+// ]</pre>
 
 
     
@@ -6175,7 +6798,12 @@ the front page of reddit.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getNew().then(console.log)// =&gt; Listing [//  Submission { domain: &#x27;self.Jokes&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;Jokes&#x27; }, ... },//  Submission { domain: &#x27;self.AskReddit&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;AskReddit&#x27; }, ... },//  ...// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getNew().then(console.log)
+// =&gt; Listing [
+//  Submission { domain: &#x27;self.Jokes&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;Jokes&#x27; }, ... },
+//  Submission { domain: &#x27;self.AskReddit&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;AskReddit&#x27; }, ... },
+//  ...
+// ]</pre>
 
 
     
@@ -6390,7 +7018,11 @@ the front page of reddit.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getNewComments().then(console.log)// =&gt; Listing [//  Comment { link_title: &#x27;What amazing book should be made into a movie, but hasn\&#x27;t been yet?&#x27;, ... }//  Comment { link_title: &#x27;How far back in time could you go and still understand English?&#x27;, ... }// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getNewComments().then(console.log)
+// =&gt; Listing [
+//  Comment { link_title: &#x27;What amazing book should be made into a movie, but hasn\&#x27;t been yet?&#x27;, ... }
+//  Comment { link_title: &#x27;How far back in time could you go and still understand English?&#x27;, ... }
+// ]</pre>
 
 
     
@@ -6523,7 +7155,17 @@ can get a post and a comment   *  @returns {Promise&lt;Listing&lt;Submission|Com
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getContentByIds([&#x27;t3_9l9vof&#x27;,&#x27;t3_9la341&#x27;]).then(console.log);// =&gt; Listing [//  Submission { approved_at_utc: null, ... }//  Submission { approved_at_utc: null, ... }// ]r.getContentByIds([r.getSubmission(&#x27;9l9vof&#x27;), r.getSubmission(&#x27;9la341&#x27;)]).then(console.log);// =&gt; Listing [//  Submission { approved_at_utc: null, ... }//  Submission { approved_at_utc: null, ... }// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getContentByIds([&#x27;t3_9l9vof&#x27;,&#x27;t3_9la341&#x27;]).then(console.log);
+// =&gt; Listing [
+//  Submission { approved_at_utc: null, ... }
+//  Submission { approved_at_utc: null, ... }
+// ]
+
+r.getContentByIds([r.getSubmission(&#x27;9l9vof&#x27;), r.getSubmission(&#x27;9la341&#x27;)]).then(console.log);
+// =&gt; Listing [
+//  Submission { approved_at_utc: null, ... }
+//  Submission { approved_at_utc: null, ... }
+// ]</pre>
 
 
     
@@ -6697,7 +7339,8 @@ the front page of reddit.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getRandomSubmission(&#x27;aww&#x27;).then(console.log)// =&gt; Submission { domain: &#x27;i.imgur.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;aww&#x27; }, ... }</pre>
+    <pre class="sunlight-highlight-javascript">r.getRandomSubmission(&#x27;aww&#x27;).then(console.log)
+// =&gt; Submission { domain: &#x27;i.imgur.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;aww&#x27; }, ... }</pre>
 
 
     
@@ -6975,7 +7618,19 @@ the front page of reddit.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getTop({time: &#x27;all&#x27;, limit: 2}).then(console.log)// =&gt; Listing [//  Submission { domain: &#x27;self.AskReddit&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;AskReddit&#x27; }, ... },//  Submission { domain: &#x27;imgur.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;funny&#x27; }, ... }// ]r.getTop(&#x27;AskReddit&#x27;).then(console.log)// =&gt; Listing [//  Submission { domain: &#x27;self.AskReddit&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;AskReddit&#x27; }, ... },//  Submission { domain: &#x27;self.AskReddit&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;AskReddit&#x27; }, ... },//  Submission { domain: &#x27;self.AskReddit&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;AskReddit&#x27; }, ... },//  ...// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getTop({time: &#x27;all&#x27;, limit: 2}).then(console.log)
+// =&gt; Listing [
+//  Submission { domain: &#x27;self.AskReddit&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;AskReddit&#x27; }, ... },
+//  Submission { domain: &#x27;imgur.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;funny&#x27; }, ... }
+// ]
+
+r.getTop(&#x27;AskReddit&#x27;).then(console.log)
+// =&gt; Listing [
+//  Submission { domain: &#x27;self.AskReddit&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;AskReddit&#x27; }, ... },
+//  Submission { domain: &#x27;self.AskReddit&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;AskReddit&#x27; }, ... },
+//  Submission { domain: &#x27;self.AskReddit&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;AskReddit&#x27; }, ... },
+//  ...
+// ]</pre>
 
 
     
@@ -7253,7 +7908,11 @@ the front page of reddit.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getControversial(&#x27;technology&#x27;).then(console.log)// =&gt; Listing [//  Submission { domain: &#x27;thenextweb.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;technology&#x27; }, ... },//  Submission { domain: &#x27;pcmag.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;technology&#x27; }, ... }// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getControversial(&#x27;technology&#x27;).then(console.log)
+// =&gt; Listing [
+//  Submission { domain: &#x27;thenextweb.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;technology&#x27; }, ... },
+//  Submission { domain: &#x27;pcmag.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;technology&#x27; }, ... }
+// ]</pre>
 
 
     
@@ -7456,7 +8115,11 @@ the front page of reddit.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getRising(&#x27;technology&#x27;).then(console.log)// =&gt; Listing [//  Submission { domain: &#x27;thenextweb.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;technology&#x27; }, ... },//  Submission { domain: &#x27;pcmag.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;technology&#x27; }, ... }// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getRising(&#x27;technology&#x27;).then(console.log)
+// =&gt; Listing [
+//  Submission { domain: &#x27;thenextweb.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;technology&#x27; }, ... },
+//  Submission { domain: &#x27;pcmag.com&#x27;, banned_by: null, subreddit: Subreddit { display_name: &#x27;technology&#x27; }, ... }
+// ]</pre>
 
 
     
@@ -7632,7 +8295,11 @@ the front page of reddit.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getUnreadMessages().then(console.log)// =&gt; Listing [//  PrivateMessage { body: &#x27;hi!&#x27;, was_comment: false, first_message: null, ... },//  Comment { body: &#x27;this is a reply&#x27;, link_title: &#x27;Yay, a selfpost!&#x27;, was_comment: true, ... }// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getUnreadMessages().then(console.log)
+// =&gt; Listing [
+//  PrivateMessage { body: &#x27;hi!&#x27;, was_comment: false, first_message: null, ... },
+//  Comment { body: &#x27;this is a reply&#x27;, link_title: &#x27;Yay, a selfpost!&#x27;, was_comment: true, ... }
+// ]</pre>
 
 
     
@@ -7872,7 +8539,11 @@ mentions).</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getInbox().then(console.log)// =&gt; Listing [//  PrivateMessage { body: &#x27;hi!&#x27;, was_comment: false, first_message: null, ... },//  Comment { body: &#x27;this is a reply&#x27;, link_title: &#x27;Yay, a selfpost!&#x27;, was_comment: true, ... }// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getInbox().then(console.log)
+// =&gt; Listing [
+//  PrivateMessage { body: &#x27;hi!&#x27;, was_comment: false, first_message: null, ... },
+//  Comment { body: &#x27;this is a reply&#x27;, link_title: &#x27;Yay, a selfpost!&#x27;, was_comment: true, ... }
+// ]</pre>
 
 
     
@@ -8048,7 +8719,11 @@ mentions).</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getModmail({limit: 2}).then(console.log)// =&gt; Listing [//  PrivateMessage { body: &#x27;/u/not_an_aardvark has accepted an invitation to become moderator ... &#x27;, ... },//  PrivateMessage { body: &#x27;/u/not_an_aardvark has been invited by /u/actually_an_aardvark to ...&#x27;, ... }// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getModmail({limit: 2}).then(console.log)
+// =&gt; Listing [
+//  PrivateMessage { body: &#x27;/u/not_an_aardvark has accepted an invitation to become moderator ... &#x27;, ... },
+//  PrivateMessage { body: &#x27;/u/not_an_aardvark has been invited by /u/actually_an_aardvark to ...&#x27;, ... }
+// ]</pre>
 
 
     
@@ -8216,7 +8891,11 @@ mentions).</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getNewModmailConversations({limit: 2}).then(console.log)// =&gt; Listing [//  ModmailConversation { messages: [...], objIds: [...], subject: &#x27;test subject&#x27;, ... },//  ModmailConversation { messages: [...], objIds: [...], subject: &#x27;test subject&#x27;, ... }// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getNewModmailConversations({limit: 2}).then(console.log)
+// =&gt; Listing [
+//  ModmailConversation { messages: [...], objIds: [...], subject: &#x27;test subject&#x27;, ... },
+//  ModmailConversation { messages: [...], objIds: [...], subject: &#x27;test subject&#x27;, ... }
+// ]</pre>
 
 
     
@@ -8470,7 +9149,12 @@ mentions).</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.createModeratorDiscussion({  body: &#x27;test body&#x27;,  subject: &#x27;test subject&#x27;,  srName: &#x27;AskReddit&#x27;}).then(console.log)// ModmailConversation { messages: [...], objIds: [...], subject: &#x27;test subject&#x27;, ... }</pre>
+    <pre class="sunlight-highlight-javascript">r.createModeratorDiscussion({
+  body: &#x27;test body&#x27;,
+  subject: &#x27;test subject&#x27;,
+  srName: &#x27;AskReddit&#x27;
+}).then(console.log)
+// ModmailConversation { messages: [...], objIds: [...], subject: &#x27;test subject&#x27;, ... }</pre>
 
 
     
@@ -8626,7 +9310,8 @@ mentions).</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getNewModmailConversation(&#x27;75hxt&#x27;).then(console.log)// ModmailConversation { messages: [...], objIds: [...], ... }</pre>
+    <pre class="sunlight-highlight-javascript">r.getNewModmailConversation(&#x27;75hxt&#x27;).then(console.log)
+// ModmailConversation { messages: [...], objIds: [...], ... }</pre>
 
 
     
@@ -8996,7 +9681,11 @@ mentions).</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getNewModmailSubreddits().then(console.log)// =&gt; Listing [//  Subreddit { display_name: &#x27;tipofmytongue&#x27;, ... },//  Subreddit { display_name: &#x27;EarthPorn&#x27;, ... },// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getNewModmailSubreddits().then(console.log)
+// =&gt; Listing [
+//  Subreddit { display_name: &#x27;tipofmytongue&#x27;, ... },
+//  Subreddit { display_name: &#x27;EarthPorn&#x27;, ... },
+// ]</pre>
 
 
     
@@ -9102,7 +9791,15 @@ mentions).</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getUnreadNewModmailConversationsCount().then(console.log)// =&gt; {//  highlighted: 1,//  notifications: 0,//  archived: 0,//  new: 2,//  inprogress: 5,//  mod: 1,// }</pre>
+    <pre class="sunlight-highlight-javascript">r.getUnreadNewModmailConversationsCount().then(console.log)
+// =&gt; {
+//  highlighted: 1,
+//  notifications: 0,
+//  archived: 0,
+//  new: 2,
+//  inprogress: 5,
+//  mod: 1,
+// }</pre>
 
 
     
@@ -9303,7 +10000,17 @@ mentions).</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.bulkReadNewModmail([&#x27;AskReddit&#x27;], &#x27;all&#x27;).then(console.log)// =&gt; Listing [//  ModmailConversation { id: &#x27;75hxt&#x27; },//  ModmailConversation { id: &#x27;75hxg&#x27; }// ]r.bulkReadNewModmail([r.getSubreddit(&#x27;AskReddit&#x27;)], &#x27;all&#x27;).then(console.log)// =&gt; Listing [//  ModmailConversation { id: &#x27;75hxt&#x27; },//  ModmailConversation { id: &#x27;75hxg&#x27; }// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.bulkReadNewModmail([&#x27;AskReddit&#x27;], &#x27;all&#x27;).then(console.log)
+// =&gt; Listing [
+//  ModmailConversation { id: &#x27;75hxt&#x27; },
+//  ModmailConversation { id: &#x27;75hxg&#x27; }
+// ]
+
+r.bulkReadNewModmail([r.getSubreddit(&#x27;AskReddit&#x27;)], &#x27;all&#x27;).then(console.log)
+// =&gt; Listing [
+//  ModmailConversation { id: &#x27;75hxt&#x27; },
+//  ModmailConversation { id: &#x27;75hxg&#x27; }
+// ]</pre>
 
 
     
@@ -9479,7 +10186,11 @@ mentions).</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSentMessages().then(console.log)// =&gt; Listing [//  PrivateMessage { body: &#x27;you have been added as an approved submitter to ...&#x27;, ... },//  PrivateMessage { body: &#x27;you have been banned from posting to ...&#x27; ... }// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSentMessages().then(console.log)
+// =&gt; Listing [
+//  PrivateMessage { body: &#x27;you have been added as an approved submitter to ...&#x27;, ... },
+//  PrivateMessage { body: &#x27;you have been banned from posting to ...&#x27; ... }
+// ]</pre>
 
 
     
@@ -9640,7 +10351,14 @@ prefix such as <code>t1_</code> is specified.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.markMessagesAsRead([&#x27;51shsd&#x27;, &#x27;51shxv&#x27;])// To reference a comment by ID, be sure to use the &#x60;t1_&#x60; prefix, otherwise snoowrap will be unable to distinguish the// comment ID from a PrivateMessage ID.r.markMessagesAsRead([&#x27;t5_51shsd&#x27;, &#x27;t1_d3zhb5k&#x27;])// Alternatively, just pass in a comment object directly.r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb5k&#x27;)])</pre>
+    <pre class="sunlight-highlight-javascript">r.markMessagesAsRead([&#x27;51shsd&#x27;, &#x27;51shxv&#x27;])
+
+// To reference a comment by ID, be sure to use the &#x60;t1_&#x60; prefix, otherwise snoowrap will be unable to distinguish the
+// comment ID from a PrivateMessage ID.
+r.markMessagesAsRead([&#x27;t5_51shsd&#x27;, &#x27;t1_d3zhb5k&#x27;])
+
+// Alternatively, just pass in a comment object directly.
+r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb5k&#x27;)])</pre>
 
 
     
@@ -9801,7 +10519,14 @@ as <code>t1_</code> is included.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.markMessagesAsUnread([&#x27;51shsd&#x27;, &#x27;51shxv&#x27;])// To reference a comment by ID, be sure to use the &#x60;t1_&#x60; prefix, otherwise snoowrap will be unable to distinguish the// comment ID from a PrivateMessage ID.r.markMessagesAsUnread([&#x27;t5_51shsd&#x27;, &#x27;t1_d3zhb5k&#x27;])// Alternatively, just pass in a comment object directly.r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb5k&#x27;)])</pre>
+    <pre class="sunlight-highlight-javascript">r.markMessagesAsUnread([&#x27;51shsd&#x27;, &#x27;51shxv&#x27;])
+
+// To reference a comment by ID, be sure to use the &#x60;t1_&#x60; prefix, otherwise snoowrap will be unable to distinguish the
+// comment ID from a PrivateMessage ID.
+r.markMessagesAsUnread([&#x27;t5_51shsd&#x27;, &#x27;t1_d3zhb5k&#x27;])
+
+// Alternatively, just pass in a comment object directly.
+r.markMessagesAsRead([r.getMessage(&#x27;51shsd&#x27;), r.getComment(&#x27;d3zhb5k&#x27;)])</pre>
 
 
     
@@ -9912,7 +10637,11 @@ Further requests will cause the API to return a 429 error.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.readAllMessages().then(function () {  r.getUnreadMessages().then(console.log)})// =&gt; Listing []// (messages marked as &#x27;read&#x27; on reddit)</pre>
+    <pre class="sunlight-highlight-javascript">r.readAllMessages().then(function () {
+  r.getUnreadMessages().then(console.log)
+})
+// =&gt; Listing []
+// (messages marked as &#x27;read&#x27; on reddit)</pre>
 
 
     
@@ -10305,7 +11034,12 @@ requires a captcha to submit posts and comments.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.composeMessage({  to: &#x27;actually_an_aardvark&#x27;,  subject: &quot;Hi, how&#x27;s it going?&quot;,  text: &#x27;Long time no see&#x27;})// (message created on reddit)</pre>
+    <pre class="sunlight-highlight-javascript">r.composeMessage({
+  to: &#x27;actually_an_aardvark&#x27;,
+  subject: &quot;Hi, how&#x27;s it going?&quot;,
+  text: &#x27;Long time no see&#x27;
+})
+// (message created on reddit)</pre>
 
 
     
@@ -10415,7 +11149,20 @@ requires a captcha to submit posts and comments.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getOauthScopeList().then(console.log)// =&gt; {//  creddits: {//    description: &#x27;Spend my reddit gold creddits on giving gold to other users.&#x27;,//    id: &#x27;creddits&#x27;,//    name: &#x27;Spend reddit gold creddits&#x27;//  },//  modcontributors: {//    description: &#x27;Add/remove users to approved submitter lists and ban/unban or mute/unmute users from ...&#x27;,//    id: &#x27;modcontributors&#x27;,//    name: &#x27;Approve submitters and ban users&#x27;//  },//  ...// }</pre>
+    <pre class="sunlight-highlight-javascript">r.getOauthScopeList().then(console.log)
+// =&gt; {
+//  creddits: {
+//    description: &#x27;Spend my reddit gold creddits on giving gold to other users.&#x27;,
+//    id: &#x27;creddits&#x27;,
+//    name: &#x27;Spend reddit gold creddits&#x27;
+//  },
+//  modcontributors: {
+//    description: &#x27;Add/remove users to approved submitter lists and ban/unban or mute/unmute users from ...&#x27;,
+//    id: &#x27;modcontributors&#x27;,
+//    name: &#x27;Approve submitters and ban users&#x27;
+//  },
+//  ...
+// }</pre>
 
 
     
@@ -10835,7 +11582,16 @@ requires a captcha to submit posts and comments.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.search({  query: &#x27;Cute kittens&#x27;,  subreddit: &#x27;aww&#x27;,  sort: &#x27;top&#x27;}).then(console.log)// =&gt; Listing [//  Submission { domain: &#x27;i.imgur.com&#x27;, banned_by: null, ... },//  Submission { domain: &#x27;imgur.com&#x27;, banned_by: null, ... },//  ...// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.search({
+  query: &#x27;Cute kittens&#x27;,
+  subreddit: &#x27;aww&#x27;,
+  sort: &#x27;top&#x27;
+}).then(console.log)
+// =&gt; Listing [
+//  Submission { domain: &#x27;i.imgur.com&#x27;, banned_by: null, ... },
+//  Submission { domain: &#x27;imgur.com&#x27;, banned_by: null, ... },
+//  ...
+// ]</pre>
 
 
     
@@ -11137,7 +11893,13 @@ requires a captcha to submit posts and comments.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.searchSubredditNames({query: &#x27;programming&#x27;}).then(console.log)// =&gt; [//  &#x27;programming&#x27;,//  &#x27;programmingcirclejerk&#x27;,//  &#x27;programminghorror&#x27;,//  ...// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.searchSubredditNames({query: &#x27;programming&#x27;}).then(console.log)
+// =&gt; [
+//  &#x27;programming&#x27;,
+//  &#x27;programmingcirclejerk&#x27;,
+//  &#x27;programminghorror&#x27;,
+//  ...
+// ]</pre>
 
 
     
@@ -12401,7 +13163,15 @@ which means that users will see the sort method that is set in their own prefere
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.createSubreddit({  name: &#x27;snoowrap_testing2&#x27;,  title: &#x27;snoowrap testing: the sequel&#x27;,  public_description: &#x27;thanks for reading the snoowrap docs!&#x27;,  description: &#x27;This text will go on the sidebar&#x27;,  type: &#x27;private&#x27;}).then(console.log)// =&gt; Subreddit { display_name: &#x27;snoowrap_testing2&#x27; }// (/r/snoowrap_testing2 created on reddit)</pre>
+    <pre class="sunlight-highlight-javascript">r.createSubreddit({
+  name: &#x27;snoowrap_testing2&#x27;,
+  title: &#x27;snoowrap testing: the sequel&#x27;,
+  public_description: &#x27;thanks for reading the snoowrap docs!&#x27;,
+  description: &#x27;This text will go on the sidebar&#x27;,
+  type: &#x27;private&#x27;
+}).then(console.log)
+// =&gt; Subreddit { display_name: &#x27;snoowrap_testing2&#x27; }
+// (/r/snoowrap_testing2 created on reddit)</pre>
 
 
     
@@ -12616,7 +13386,13 @@ which means that users will see the sort method that is set in their own prefere
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.searchSubredditTopics({query: &#x27;movies&#x27;}).then(console.log)// =&gt; [//  Subreddit { display_name: &#x27;tipofmytongue&#x27; },//  Subreddit { display_name: &#x27;remove&#x27; },//  Subreddit { display_name: &#x27;horror&#x27; },//  ...// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.searchSubredditTopics({query: &#x27;movies&#x27;}).then(console.log)
+// =&gt; [
+//  Subreddit { display_name: &#x27;tipofmytongue&#x27; },
+//  Subreddit { display_name: &#x27;remove&#x27; },
+//  Subreddit { display_name: &#x27;horror&#x27; },
+//  ...
+// ]</pre>
 
 
     
@@ -12784,7 +13560,19 @@ which means that users will see the sort method that is set in their own prefere
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubscriptions({limit: 2}).then(console.log)// =&gt; Listing [//  Subreddit {//    display_name: &#x27;gadgets&#x27;,//    title: &#x27;reddit gadget guide&#x27;,//    ...//  },//  Subreddit {//    display_name: &#x27;sports&#x27;,//    title: &#x27;the sportspage of the Internet&#x27;,//    ...//  }// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubscriptions({limit: 2}).then(console.log)
+// =&gt; Listing [
+//  Subreddit {
+//    display_name: &#x27;gadgets&#x27;,
+//    title: &#x27;reddit gadget guide&#x27;,
+//    ...
+//  },
+//  Subreddit {
+//    display_name: &#x27;sports&#x27;,
+//    title: &#x27;the sportspage of the Internet&#x27;,
+//    ...
+//  }
+// ]</pre>
 
 
     
@@ -12952,7 +13740,14 @@ which means that users will see the sort method that is set in their own prefere
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getContributorSubreddits().then(console.log)// =&gt; Listing [//  Subreddit {//    display_name: &#x27;snoowrap_testing&#x27;,//    title: &#x27;snoowrap&#x27;,//    ...//  }// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getContributorSubreddits().then(console.log)
+// =&gt; Listing [
+//  Subreddit {
+//    display_name: &#x27;snoowrap_testing&#x27;,
+//    title: &#x27;snoowrap&#x27;,
+//    ...
+//  }
+// ]</pre>
 
 
     
@@ -13120,7 +13915,14 @@ which means that users will see the sort method that is set in their own prefere
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getModeratedSubreddits().then(console.log)// =&gt; Listing [//  Subreddit {//    display_name: &#x27;snoowrap_testing&#x27;,//    title: &#x27;snoowrap&#x27;,//    ...//  }// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getModeratedSubreddits().then(console.log)
+// =&gt; Listing [
+//  Subreddit {
+//    display_name: &#x27;snoowrap_testing&#x27;,
+//    title: &#x27;snoowrap&#x27;,
+//    ...
+//  }
+// ]</pre>
 
 
     
@@ -13326,7 +14128,8 @@ which means that users will see the sort method that is set in their own prefere
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.searchSubreddits({query: &#x27;cookies&#x27;}).then(console.log)// =&gt; Listing [ Subreddit { ... }, Subreddit { ... }, ...]</pre>
+    <pre class="sunlight-highlight-javascript">r.searchSubreddits({query: &#x27;cookies&#x27;}).then(console.log)
+// =&gt; Listing [ Subreddit { ... }, Subreddit { ... }, ...]</pre>
 
 
     
@@ -13494,7 +14297,8 @@ which means that users will see the sort method that is set in their own prefere
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getPopularSubreddits().then(console.log)// =&gt; Listing [ Subreddit { ... }, Subreddit { ... }, ...]</pre>
+    <pre class="sunlight-highlight-javascript">r.getPopularSubreddits().then(console.log)
+// =&gt; Listing [ Subreddit { ... }, Subreddit { ... }, ...]</pre>
 
 
     
@@ -13662,7 +14466,8 @@ which means that users will see the sort method that is set in their own prefere
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getNewSubreddits().then(console.log)// =&gt; Listing [ Subreddit { ... }, Subreddit { ... }, ...]</pre>
+    <pre class="sunlight-highlight-javascript">r.getNewSubreddits().then(console.log)
+// =&gt; Listing [ Subreddit { ... }, Subreddit { ... }, ...]</pre>
 
 
     
@@ -13830,7 +14635,8 @@ which means that users will see the sort method that is set in their own prefere
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getGoldSubreddits().then(console.log)// =&gt; Listing [ Subreddit { ... }, Subreddit { ... }, ...]</pre>
+    <pre class="sunlight-highlight-javascript">r.getGoldSubreddits().then(console.log)
+// =&gt; Listing [ Subreddit { ... }, Subreddit { ... }, ...]</pre>
 
 
     
@@ -13998,7 +14804,8 @@ which means that users will see the sort method that is set in their own prefere
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getDefaultSubreddits().then(console.log)// =&gt; Listing [ Subreddit { ... }, Subreddit { ... }, ...]</pre>
+    <pre class="sunlight-highlight-javascript">r.getDefaultSubreddits().then(console.log)
+// =&gt; Listing [ Subreddit { ... }, Subreddit { ... }, ...]</pre>
 
 
     
@@ -14159,7 +14966,10 @@ settings.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.checkUsernameAvailability(&#x27;not_an_aardvark&#x27;).then(console.log)// =&gt; falser.checkUsernameAvailability(&#x27;eqwZAr9qunx7IHqzWVeF&#x27;).then(console.log)// =&gt; true</pre>
+    <pre class="sunlight-highlight-javascript">r.checkUsernameAvailability(&#x27;not_an_aardvark&#x27;).then(console.log)
+// =&gt; false
+r.checkUsernameAvailability(&#x27;eqwZAr9qunx7IHqzWVeF&#x27;).then(console.log)
+// =&gt; true</pre>
 
 
     
@@ -14497,7 +15307,8 @@ settings.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.createLivethread({title: &#x27;My livethread&#x27;}).then(console.log)// =&gt; LiveThread { id: &#x27;wpimncm1f01j&#x27; }</pre>
+    <pre class="sunlight-highlight-javascript">r.createLivethread({title: &#x27;My livethread&#x27;}).then(console.log)
+// =&gt; LiveThread { id: &#x27;wpimncm1f01j&#x27; }</pre>
 
 
     
@@ -14714,7 +15525,8 @@ otherwise.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getMyMultireddits().then(console.log)=&gt; [ MultiReddit { ... }, MultiReddit { ... }, ... ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getMyMultireddits().then(console.log)
+=&gt; [ MultiReddit { ... }, MultiReddit { ... }, ... ]</pre>
 
 
     
@@ -15171,7 +15983,12 @@ otherwise.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.createMultireddit({  name: &#x27;myMulti&#x27;,  description: &#x27;An example multireddit&#x27;,  subreddits: [&#x27;snoowrap&#x27;, &#x27;snoowrap_testing&#x27;]}).then(console.log)=&gt; MultiReddit { display_name: &#x27;myMulti&#x27;, ... }</pre>
+    <pre class="sunlight-highlight-javascript">r.createMultireddit({
+  name: &#x27;myMulti&#x27;,
+  description: &#x27;An example multireddit&#x27;,
+  subreddits: [&#x27;snoowrap&#x27;, &#x27;snoowrap_testing&#x27;]
+}).then(console.log)
+=&gt; MultiReddit { display_name: &#x27;myMulti&#x27;, ... }</pre>
 
 
     
