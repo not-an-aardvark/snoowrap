@@ -134,4 +134,6 @@ To do a release:
     * Run `npm run bundle-size` and update `README.md` with the new size of `snoowrap-v1.min.js` in the "Browsers" section, if needed. (This doesn't need to be kept up to date every release, but running it once in a while is nice to make sure the advertised size isn't wildly off.)
 1. Consider running `npm test`, or making sure the latest build on master is passing.
 1. Run `npm publish` to publish the package to npm.
+1. Push the released to GitHub (`git commit` followed by `git push`)
+1. Create a tag for the release (e.g. `git tag v1.20.0`) and push the tag to GitHub (`git push --tag`)
 1. To update the docs website and the browser build, run `scripts/deploy/deploy_docs.sh`. Note that this script will create a git commit and push it to GitHub.
