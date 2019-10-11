@@ -268,6 +268,8 @@ const snoowrap = class snoowrap {
   * for "Installed" grant type, needs to be between 20-30 characters long.
   * @param {string} [options.grantType=snoowrap.grantType.INSTALLED_CLIENT] The type of "user-less"
   * token to use {@link snoowrap.grantType}
+  * @param {boolean} options.permanent=true If `true`, the app will have indefinite access. If `false`,
+  access will expire after 1 hour.
   * @param {string} [options.endpointDomain='reddit.com'] The endpoint domain that the returned requester should be configured
   to use. If the user is authenticating on reddit.com (as opposed to some other site with a reddit-like API), you can omit this
   value.
@@ -304,6 +306,7 @@ const snoowrap = class snoowrap {
     clientSecret,
     deviceId,
     grantType = snoowrap.grantType.INSTALLED_CLIENT,
+    permanent = true,
     endpointDomain = 'reddit.com'
   }) {
     if (grantType === snoowrap.grantType.INSTALLED_CLIENT) {
@@ -320,7 +323,7 @@ const snoowrap = class snoowrap {
       method: 'post',
       baseUrl: `https://www.${endpointDomain}/`,
       uri: 'api/v1/access_token',
-      form: {grant_type: grantType, device_id: deviceId}
+      form: {grant_type: grantType, device_id: deviceId, duration: permanent ? 'permanent' : 'temporary'}
     }).then(response => {
       if (response.error) {
         throw new errors.RequestError(`API Error: ${response.error} - ${response.error_description}`);
