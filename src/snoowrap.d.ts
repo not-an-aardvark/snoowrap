@@ -164,11 +164,11 @@ declare namespace Snoowrap {
 
   export type Sort = 'confidence' | 'top' | 'new' | 'controversial' | 'old' | 'random' | 'qa';
 
-  export interface ModAction extends RedditContent<ModAction> {
+  export interface ModAction extends _RedditContent<ModAction> {
     target_body: string;
     mod_id36: string;
     created_utc: number;
-    subreddit: Subreddit;
+    subreddit: _Subreddit;
     target_title: string | null;
     target_permalink: string;
     subreddit_name_prefixed: string;
@@ -197,10 +197,10 @@ declare namespace Snoowrap {
   }
 
   export interface ComposeMessageParams {
-    to: RedditUser | Subreddit | string;
+    to: _RedditUser | _Subreddit | string;
     subject: string;
     text: string;
-    fromSubreddit?: Subreddit | string;
+    fromSubreddit?: _Subreddit | string;
     captchaIden?: string;
     captchaResponse?: string;
   }
@@ -213,7 +213,7 @@ declare namespace Snoowrap {
   }
 
   export interface SearchOptions extends BaseSearchOptions {
-    subreddit?: Subreddit | string;
+    subreddit?: _Subreddit | string;
     restrictSr?: boolean;
   }
 
