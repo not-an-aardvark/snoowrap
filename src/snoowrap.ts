@@ -1,9 +1,14 @@
 import {defaults, forOwn, includes, isEmpty, map, mapValues, omit, omitBy, snakeCase, values} from 'lodash';
+// @ts-ignore Change when request_handler is changed
 import Promise from './Promise.js';
+// @ts-ignore Change when request_handler is changed
 import promiseWrap from 'promise-chains';
-import util from 'util';
+import * as util from 'util';
+// @ts-ignore Change when request_handler is changed
 import * as requestHandler from './request_handler.js';
+// @ts-ignore
 import {HTTP_VERBS, KINDS, MAX_LISTING_ITEMS, MODULE_NAME, USER_KEYS, SUBREDDIT_KEYS, VERSION} from './constants.js';
+// @ts-ignore Change when request_handler is changed
 import * as errors from './errors.js';
 import {
   addEmptyRepliesListing,
@@ -13,11 +18,193 @@ import {
   handleJsonErrors,
   isBrowser,
   requiredArg
+  // @ts-ignore Change when request_handler is changed
 } from './helpers.js';
-import createConfig from './create_config.js';
+import createConfig, { ConfigOptions } from './create_config.js';
 import * as objects from './objects/index.js';
 
 const api_type = 'json';
+
+
+import {
+  Comment,
+  Listing,
+  ListingOptions,
+  SortedListingOptions,
+  LiveThread,
+  LiveThreadSettings,
+  ModmailConversation,
+  MultiReddit,
+  MultiRedditProperties,
+  PrivateMessage,
+  RedditContent,
+  RedditUser,
+  ReplyableContent,
+  Submission,
+  Subreddit,
+  SubredditSettings,
+  VoteableContent,
+  WikiPage,
+} from './objects';
+import { Options as RequestOptions } from 'request';
+
+
+export declare namespace Snoowrap {
+  // Make sure RequestHandler functions are typed - don't know how this works
+  class RequestHandler {}
+  export interface RequestHandler {
+    _get(options: {[key: string]: any}): Promise<any>;
+    _post(options: {[key: string]: any}): Promise<any>;
+    _put(options: {[key: string]: any}): Promise<any>;
+    _delete(options: {[key: string]: any}): Promise<any>;
+    _head(options: {[key: string]: any}): Promise<any>;
+    _patch(options: {[key: string]: any}): Promise<any>;
+    oauthRequest(options: RequestOptions, attempts: number): Promise<any>;
+    unauthenticatedRequest(options: RequestOptions): Promise<any>;
+  }
+  
+  export interface SnoowrapOptions {
+    userAgent: string;
+    clientId?: string;
+    clientSecret?: string;
+    username?: string;
+    password?: string;
+    refreshToken?: string;
+    accessToken?: string;
+    user_agent: string;
+    client_id?: string;
+    client_secret?: string;
+    refresh_token?: string;
+    access_token?: string;
+  }
+
+  export interface ConfigOptions {
+    endpointDomain?: string;
+    requestDelay?: number;
+    requestTimeout?: number;
+    continueAfterRatelimitError?: boolean;
+    retryErrorCodes?: number[];
+    maxRetryAttempts?: number;
+    warnings?: boolean;
+    debug?: boolean;
+    proxies?: boolean;
+  }
+
+  export interface AuthUrlOptions {
+    clientId: string;
+    scope: string[];
+    redirectUri: string;
+    permanent?: boolean; // defaults to true
+    state?: string;
+    endpointDomain?: string;
+  }
+
+  export interface AuthCodeOptions {
+    code: string;
+    userAgent: string;
+    clientId: string;
+    clientSecret?: string;
+    redirectUri: string;
+    endpointDomain?: string;
+    deviceId?: string;
+    grantType?: Snoowrap.GrantType
+  }
+
+  export type Sort = 'confidence' | 'top' | 'new' | 'controversial' | 'old' | 'random' | 'qa';
+
+  export interface ModAction extends RedditContent<ModAction> {
+    target_body: string;
+    mod_id36: string;
+    created_utc: number;
+    subreddit: Subreddit;
+    target_title: string | null;
+    target_permalink: string;
+    subreddit_name_prefixed: string;
+    details: string | null;
+    action: string;
+    target_author: string;
+    target_fullname: string;
+    sr_id36: string;
+    id: string;
+    mod: string;
+    description: string | null;
+  }
+
+  export interface SubmitSelfPostOptions {
+    text?: string;
+    subredditName: string;
+    title: string;
+    sendReplies?: boolean;
+    send_replies?: boolean;
+    captchaIden?: string;
+    captchaResponse?: string;
+    subreddit_name: string;
+    captcha_iden?: string;
+    captcha_response?: string;
+  }
+
+  export interface SubmitLinkOptions {
+    url: string;
+    resubmit?: boolean;
+  }
+
+  export interface ComposeMessageParams {
+    to: RedditUser | Subreddit | string;
+    subject: string;
+    text: string;
+    fromSubreddit?: Subreddit | string;
+    captcha?: string
+    captchaIden?: string;
+    captchaResponse?: string;
+    from_subreddit?: Subreddit | string;
+    captcha_iden?: string;
+    captcha_response?: string;
+  }
+
+  export interface BaseSearchOptions {
+    query: string;
+    time?: 'hour' | 'day' | 'week' | 'month' | 'year' | 'all';
+    sort?: 'relevance' | 'hot' | 'top' | 'new' | 'comments';
+    syntax?: 'cloudsearch' | 'lucene' | 'plain';
+  }
+
+  export interface SearchOptions extends BaseSearchOptions {
+    subreddit?: Subreddit | string;
+    restrictSr?: boolean;
+  }
+
+  export interface Trophy {
+    icon_70: string;
+    icon_40: string;
+    name: string;
+    url: string;
+    award_id: string;
+    id: string;
+    description: string;
+  }
+
+  export enum GrantType {
+    CLIENT_CREDENTIALS = 'client_credentials',
+    INSTALLED_CLIENT = 'https://oauth.reddit.com/grants/installed_client'
+  }
+
+  export interface ObjectType {
+    Comment: typeof Comment;
+    Listing: typeof Listing;
+    LiveThread: typeof LiveThread;
+    ModmailConversation: typeof ModmailConversation;
+    MultiReddit: typeof MultiReddit;
+    PrivateMessage: typeof PrivateMessage;
+    RedditContent: typeof RedditContent;
+    RedditUser: typeof RedditUser;
+    ReplyableContent: typeof ReplyableContent;
+    Submission: typeof Submission;
+    Subreddit: typeof Subreddit;
+    VoteableContent: typeof VoteableContent;
+    WikiPage: typeof WikiPage;
+    [key: string]: {prototype: any};
+  }
+}
 
 /** The class for a snoowrap requester.
  * A requester is the base object that is used to fetch content from reddit. Each requester contains a single set of OAuth
@@ -30,7 +217,24 @@ const api_type = 'json';
  [API rules](https://github.com/reddit/reddit/wiki/API).) These properties primarily exist for internal use, but they are
  exposed since they are useful externally as well.
  */
-const snoowrap = class snoowrap {
+export default class snoowrap extends Snoowrap.RequestHandler {
+  accessToken!: string|null;
+  clientId!: string;
+  clientSecret!: string;
+  password!: string;
+  ratelimitExpiration!: number;
+  ratelimitRemaining!: number;
+  refreshToken!: string|null;
+  scope!: string[];
+  tokenExpiration!: number|null;
+  userAgent!: string;
+  username!: string;
+  private _config!: ConfigOptions;
+  static errors: object[]|undefined;
+  static version: string = VERSION;
+  static objects: Snoowrap.ObjectType;
+  static _previousSnoowrap: snoowrap;
+  _ownUserInfo: any;
   /**
    * @summary Constructs a new requester.
    * @desc You should use the snoowrap constructor if you are able to authorize a reddit account in advance (e.g. for a Node.js
@@ -76,7 +280,8 @@ const snoowrap = class snoowrap {
     access_token, accessToken = access_token,
     username,
     password
-  } = {}) {
+  }: Snoowrap.SnoowrapOptions) {
+    super();
     if (!userAgent && !isBrowser) {
       return requiredArg('userAgent');
     }
@@ -155,8 +360,8 @@ const snoowrap = class snoowrap {
     permanent = true,
     state = '_',
     endpointDomain = 'reddit.com'
-  }) {
-    if (!(Array.isArray(scope) && scope.length && scope.every(scopeValue => scopeValue && typeof scopeValue === 'string'))) {
+  }: Snoowrap.AuthUrlOptions): string {
+    if (!(Array.isArray(scope) && scope.length && scope.every(scopeValue => typeof scopeValue === 'string'))) {
       throw new TypeError('Missing `scope` argument; a non-empty list of OAuth scopes must be provided');
     }
     return `
@@ -215,19 +420,21 @@ const snoowrap = class snoowrap {
     clientSecret,
     redirectUri = requiredArg('redirectUri'),
     endpointDomain = 'reddit.com'
-  }) {
+  }: Snoowrap.AuthCodeOptions) {
+    // @ts-ignore
     return this.prototype.credentialedClientRequest.call({
       userAgent,
       clientId,
       clientSecret,
       // Use `this.prototype.rawRequest` function to allow for custom `rawRequest` method usage in subclasses.
+      // @ts-ignore
       rawRequest: this.prototype.rawRequest
     }, {
       method: 'post',
       baseUrl: `https://www.${endpointDomain}/`,
       uri: 'api/v1/access_token',
       form: {grant_type: 'authorization_code', code, redirect_uri: redirectUri}
-    }).then(response => {
+    }).then((response: any) => {
       if (response.error) {
         throw new errors.RequestError(`API Error: ${response.error} - ${response.error_description}`);
       }
@@ -245,11 +452,8 @@ const snoowrap = class snoowrap {
    * in application-only auth.
    * @returns {object} The enumeration of possible grant_type values
    */
-  static get grantType () {
-    return {
-      CLIENT_CREDENTIALS: 'client_credentials',
-      INSTALLED_CLIENT: 'https://oauth.reddit.com/grants/installed_client'
-    };
+  static get grantType (): typeof Snoowrap.GrantType {
+    return Snoowrap.GrantType;
   }
   /**
   * @summary Creates a snoowrap requester from a "user-less" Authorization token
@@ -305,23 +509,25 @@ const snoowrap = class snoowrap {
     deviceId,
     grantType = snoowrap.grantType.INSTALLED_CLIENT,
     endpointDomain = 'reddit.com'
-  }) {
+  }: Snoowrap.AuthCodeOptions) {
     if (grantType === snoowrap.grantType.INSTALLED_CLIENT) {
       if (!deviceId || !(deviceId.length >= 30 && deviceId.length <= 40)) {
         throw new TypeError('deviceId needs to be between 30 and 40 characters');
       }
     }
+    // @ts-ignore
     return this.prototype.credentialedClientRequest.call({
       clientId,
       clientSecret,
       // Use `this.prototype.rawRequest` function to allow for custom `rawRequest` method usage in subclasses.
+    // @ts-ignore
       rawRequest: this.prototype.rawRequest
     }, {
       method: 'post',
       baseUrl: `https://www.${endpointDomain}/`,
       uri: 'api/v1/access_token',
       form: {grant_type: grantType, device_id: deviceId}
-    }).then(response => {
+    }).then((response: any) => {
       if (response.error) {
         throw new errors.RequestError(`API Error: ${response.error} - ${response.error_description}`);
       }
@@ -331,8 +537,9 @@ const snoowrap = class snoowrap {
       return requester;
     });
   }
-  _newObject (objectType, content, _hasFetched = false) {
-    return Array.isArray(content) ? content : new snoowrap.objects[objectType](content, this, _hasFetched);
+  _newObject<T>(objectType: string, content: T[]|object, _hasFetched?: boolean): T|T[] {
+    // @ts-ignore
+    return Array.isArray(content) ? content : new snoowrap.objects[objectType](content, this, _hasFetched) as T;
   }
 
   /**
@@ -381,13 +588,13 @@ const snoowrap = class snoowrap {
     return Object.assign(this._config, options);
   }
 
-  _warn (...args) {
+  _warn (...args: any[]) {
     if (this._config.warnings) {
       console.warn('[warning]', ...args); // eslint-disable-line no-console
     }
   }
 
-  _debug (...args) {
+  _debug (...args: any[]) {
     if (this._config.debug) {
       console.log('[debug]', ...args); // eslint-disable-line no-console
     }
@@ -408,8 +615,8 @@ const snoowrap = class snoowrap {
    * r.getUser('not_an_aardvark').link_karma.then(console.log)
    * // => 6
    */
-  getUser (name) {
-    return this._newObject('RedditUser', {name: (name + '').replace(/^\/?u\//, '')});
+  getUser (name: string): RedditUser {
+    return this._newObject<RedditUser>('RedditUser', {name: (name + '').replace(/^\/?u\//, '')}) as RedditUser;
   }
 
   /**
@@ -423,8 +630,8 @@ const snoowrap = class snoowrap {
    * r.getComment('c0b6xx0').author.name.then(console.log)
    * // => 'Kharos'
    */
-  getComment (commentId) {
-    return this._newObject('Comment', {name: addFullnamePrefix(commentId, 't1_')});
+  getComment (commentId: string): Comment {
+    return this._newObject<Comment>('Comment', {name: addFullnamePrefix(commentId, 't1_')}) as Comment;
   }
 
   /**
@@ -438,8 +645,8 @@ const snoowrap = class snoowrap {
    * r.getSubreddit('AskReddit').created_utc.then(console.log)
    * // => 1201233135
    */
-  getSubreddit (displayName) {
-    return this._newObject('Subreddit', {display_name: displayName.replace(/^\/?r\//, '')});
+  getSubreddit (displayName: string): Subreddit {
+    return this._newObject<Subreddit>('Subreddit', {display_name: displayName.replace(/^\/?r\//, '')}) as Subreddit;
   }
 
   /**
@@ -453,8 +660,8 @@ const snoowrap = class snoowrap {
    * r.getSubmission('2np694').title.then(console.log)
    * // => 'What tasty food would be distusting if eaten over rice?'
    */
-  getSubmission (submissionId) {
-    return this._newObject('Submission', {name: addFullnamePrefix(submissionId, 't3_')});
+  getSubmission (submissionId: string): Submission {
+    return this._newObject<Submission>('Submission', {name: addFullnamePrefix(submissionId, 't3_')}) as Submission;
   }
 
   /**
@@ -469,8 +676,8 @@ const snoowrap = class snoowrap {
    * // => 'Example'
    * // See here for a screenshot of the PM in question https://i.gyazo.com/24f3b97e55b6ff8e3a74cb026a58b167.png
    */
-  getMessage (messageId) {
-    return this._newObject('PrivateMessage', {name: addFullnamePrefix(messageId, 't4_')});
+  getMessage (messageId: string): PrivateMessage {
+    return this._newObject<PrivateMessage>('PrivateMessage', {name: addFullnamePrefix(messageId, 't4_')}) as PrivateMessage;
   }
 
   /**
@@ -484,25 +691,25 @@ const snoowrap = class snoowrap {
    * r.getLivethread('whrdxo8dg9n0').nsfw.then(console.log)
    * // => false
    */
-  getLivethread (threadId) {
-    return this._newObject('LiveThread', {id: addFullnamePrefix(threadId, 'LiveUpdateEvent_').slice(16)});
+  getLivethread (threadId: string): LiveThread {
+    return this._newObject<LiveThread>('LiveThread', {id: addFullnamePrefix(threadId, 'LiveUpdateEvent_').slice(16)}) as LiveThread;
   }
 
   /**
    * @summary Gets information on the requester's own user profile.
-   * @returns {RedditUser} A RedditUser object corresponding to the requester's profile
+   * @returns {Promise<RedditUser>} A RedditUser object corresponding to the requester's profile
    * @example
    *
    * r.getMe().then(console.log);
    * // => RedditUser { is_employee: false, has_mail: false, name: 'snoowrap_testing', ... }
    */
-  getMe () {
-    return this._get({uri: 'api/v1/me'}).then(result => {
-      this._ownUserInfo = this._newObject('RedditUser', result, true);
+  getMe (): Promise<RedditUser> {
+    return this._get({uri: 'api/v1/me'}).then((result: unknown)=> {
+      this._ownUserInfo = this._newObject('RedditUser', result as object, true);
       return this._ownUserInfo;
     });
   }
-
+  
   _getMyName () {
     return Promise.resolve(this._ownUserInfo ? this._ownUserInfo.name : this.getMe().get('name'));
   }
@@ -546,7 +753,7 @@ const snoowrap = class snoowrap {
    * // => { default_theme_sr: null, threaded_messages: false,hide_downs: true, ... }
    * // (preferences updated on reddit)
    */
-  updatePreferences (updatedPreferences) {
+  updatePreferences (updatedPreferences: any): Promise<void> {
     return this._patch({uri: 'api/v1/me/prefs', body: updatedPreferences});
   }
 
@@ -567,7 +774,7 @@ const snoowrap = class snoowrap {
    * //   }
    * // ] }
    */
-  getMyTrophies () {
+  getMyTrophies (): Promise<Snoowrap.Trophy[]> {
     return this._get({uri: 'api/v1/me/trophies'});
   }
 
@@ -579,7 +786,7 @@ const snoowrap = class snoowrap {
    * r.getFriends().then(console.log)
    * // => [ [ RedditUser { date: 1457927963, name: 'not_an_aardvark', id: 't2_k83md' } ], [] ]
    */
-  getFriends () {
+  getFriends (): Promise<RedditUser[]> {
     return this._get({uri: 'prefs/friends'});
   }
 
@@ -591,7 +798,7 @@ const snoowrap = class snoowrap {
    * r.getBlockedUsers().then(console.log)
    * // => [ RedditUser { date: 1457928120, name: 'actually_an_aardvark', id: 't2_q3519' } ]
    */
-  getBlockedUsers () {
+  getBlockedUsers (): Promise<RedditUser[]> {
     return this._get({uri: 'prefs/blocked'});
   }
 
@@ -603,7 +810,7 @@ const snoowrap = class snoowrap {
    * r.checkCaptchaRequirement().then(console.log)
    * // => false
    */
-  checkCaptchaRequirement () {
+  checkCaptchaRequirement (): Promise<boolean> {
     return this._get({uri: 'api/needs_captcha'});
   }
 
@@ -615,8 +822,8 @@ const snoowrap = class snoowrap {
    * r.getNewCaptchaIdentifier().then(console.log)
    * // => 'o5M18uy4mk0IW4hs0fu2GNPdXb1Dxe9d'
    */
-  getNewCaptchaIdentifier () {
-    return this._post({uri: 'api/new_captcha', form: {api_type}}).then(res => res.json.data.iden);
+  getNewCaptchaIdentifier (): Promise<string> {
+    return this._post({uri: 'api/new_captcha', form: {api_type}}).then((res: any) => res.json.data.iden);
   }
 
   /**
@@ -628,7 +835,7 @@ const snoowrap = class snoowrap {
    * r.getCaptchaImage('o5M18uy4mk0IW4hs0fu2GNPdXb1Dxe9d').then(console.log)
    // => (A long, incoherent string representing the image in PNG format)
    */
-  getCaptchaImage (identifier) {
+  getCaptchaImage (identifier: string): Promise<string> {
     return this._get({uri: `captcha/${identifier}`});
   }
 
@@ -640,7 +847,7 @@ const snoowrap = class snoowrap {
    * r.getSavedCategories().then(console.log)
    * // => [ { category: 'cute cat pictures' }, { category: 'interesting articles' } ]
    */
-  getSavedCategories () {
+  getSavedCategories (): Promise<any[]> {
     return this._get({uri: 'api/saved_categories'}).get('categories');
   }
 
@@ -655,7 +862,7 @@ const snoowrap = class snoowrap {
    * r.markAsVisited(submissions)
    * // (the links will now appear purple on reddit)
    */
-  markAsVisited (links) {
+  markAsVisited (links: Submission[]): Promise<void> {
     return this._post({uri: 'api/store_visits', links: map(links, 'name').join(',')});
   }
 
@@ -670,13 +877,13 @@ const snoowrap = class snoowrap {
     title,
     url,
     subreddit_name, subredditName = subreddit_name
-  }) {
+  }: any) {
     return this._post({
       uri: 'api/submit', form: {
         api_type, captcha: captchaResponse, iden: captchaIden, sendreplies: sendReplies, sr: subredditName, kind, resubmit,
         crosspost_fullname, text, title, url
       }
-    }).tap(handleJsonErrors(this)).then(result => this.getSubmission(result.json.data.id));
+    }).tap(handleJsonErrors(this)).then((result: any) => this.getSubmission(result.json.data.id));
   }
 
   /**
@@ -700,7 +907,7 @@ const snoowrap = class snoowrap {
    * // => Submission { name: 't3_4abmsz' }
    * // (new selfpost created on reddit)
    */
-  submitSelfpost (options) {
+  submitSelfpost (options: Snoowrap.SubmitSelfPostOptions): Promise<Submission> {
     return this._submit({...options, kind: 'self'});
   }
 
@@ -727,7 +934,7 @@ const snoowrap = class snoowrap {
    * // => Submission { name: 't3_4abnfe' }
    * // (new linkpost created on reddit)
    */
-  submitLink (options) {
+  submitLink (options: Snoowrap.SubmitLinkOptions): Promise<Submission> {
     return this._submit({...options, kind: 'link'});
   }
 
@@ -743,12 +950,12 @@ const snoowrap = class snoowrap {
    * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission
    * @param {boolean} [options.resubmit=true] If this is false and same link has already been submitted to this subreddit in
    the past, reddit will return an error. This could be used to avoid accidental reposts.
-   * @returns {Promise} The newly-created Submission object
+   * @returns {Promise<Submission>} The newly-created Submission object
    * @example
    *
    * await r.submitCrosspost({ title: 'I found an interesting post', originalPost: '6vths0', subredditName: 'snoowrap' })
    */
-  submitCrosspost (options) {
+  submitCrosspost (options: {subredditName: string, title: string, originalPost: string|Submission, sendReplies?: boolean, resubmit?: boolean}): Promise<Submission> {
     return this._submit({
       ...options,
       kind: 'crosspost',
@@ -758,10 +965,10 @@ const snoowrap = class snoowrap {
     });
   }
 
-  _getSortedFrontpage (sortType, subredditName, options = {}) {
+  _getSortedFrontpage (sortType: string, subredditName?: string, options: {time?: any, [index:string]:any} = {}) {
     // Handle things properly if only a time parameter is provided but not the subreddit name
     let opts = options;
-    let subName = subredditName;
+    let subName: string|undefined = subredditName;
     if (typeof subredditName === 'object' && isEmpty(omitBy(opts, option => option === undefined))) {
       /* In this case, "subredditName" ends up referring to the second argument, which is not actually a name since the user
       decided to omit that parameter. */
@@ -777,7 +984,7 @@ const snoowrap = class snoowrap {
    * @param {string} [subredditName] The subreddit to get posts from. If not provided, posts are fetched from
    the front page of reddit.
    * @param {object} [options={}] Options for the resulting Listing
-   * @returns {Promise} A Listing containing the retrieved submissions
+   * @returns {Promise<Listing<Submission>>} A Listing containing the retrieved submissions
    * @example
    *
    * r.getHot().then(console.log)
@@ -799,14 +1006,14 @@ const snoowrap = class snoowrap {
    //   Submission { domain: 'self.redditdev', banned_by: null, subreddit: Subreddit { display_name: 'redditdev' }, ...}
    * // ]
    */
-  getHot (subredditName, options) {
+  getHot (subredditName?: string, options?: ListingOptions): Promise<Listing<Submission>> {
     return this._getSortedFrontpage('hot', subredditName, options);
   }
 
   /**
    * @summary Gets a Listing of best posts.
    * @param {object} [options={}] Options for the resulting Listing
-   * @returns {Promise<Listing>} A Listing containing the retrieved submissions
+   * @returns {Promise<Listing<Submission>>} A Listing containing the retrieved submissions
    * @example
    *
    * r.getBest().then(console.log)
@@ -821,7 +1028,7 @@ const snoowrap = class snoowrap {
    //   Submission { domain: 'self.redditdev', banned_by: null, subreddit: Subreddit { display_name: 'redditdev' }, ...}
    * // ]
    */
-  getBest (options) {
+  getBest (options: ListingOptions): Promise<Listing<Submission>> {
     return this._getSortedFrontpage('best', undefined, options);
   }
 
@@ -830,7 +1037,7 @@ const snoowrap = class snoowrap {
    * @param {string} [subredditName] The subreddit to get posts from. If not provided, posts are fetched from
    the front page of reddit.
    * @param {object} [options={}] Options for the resulting Listing
-   * @returns {Promise} A Listing containing the retrieved submissions
+   * @returns {Promise<Listing<Submission>>} A Listing containing the retrieved submissions
    * @example
    *
    * r.getNew().then(console.log)
@@ -841,7 +1048,7 @@ const snoowrap = class snoowrap {
    * // ]
    *
    */
-  getNew (subredditName, options) {
+  getNew (subredditName?: string, options?: ListingOptions): Promise<Listing<Submission>> {
     return this._getSortedFrontpage('new', subredditName, options);
   }
 
@@ -850,7 +1057,7 @@ const snoowrap = class snoowrap {
    * @param {string} [subredditName] The subreddit to get comments from. If not provided, posts are fetched from
    the front page of reddit.
    * @param {object} [options={}] Options for the resulting Listing
-   * @returns {Promise} A Listing containing the retrieved comments
+   * @returns {Promise<Listing<Comment>>} A Listing containing the retrieved comments
    * @example
    *
    * r.getNewComments().then(console.log)
@@ -859,14 +1066,15 @@ const snoowrap = class snoowrap {
    * //  Comment { link_title: 'How far back in time could you go and still understand English?', ... }
    * // ]
    */
-  getNewComments (subredditName, options) {
+  getNewComments (subredditName?: string, options?: ListingOptions): Promise<Listing<Comment>> {
     return this._getSortedFrontpage('comments', subredditName, options);
   }
 
   /**
    *  @summary Get list of content by IDs. Returns a listing of the requested content.
    *  @param {Array<string|Submission|Comment>} ids An array of content IDs. Can include the id itself, or a Submission or Comment object.
-can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>} A listing of content requested, can be any class fetchable by API. e.g. Comment, Submission
+can get a post and a comment   
+   *  @returns {Promise<Listing<Submission|Comment>>} A listing of content requested, can be any class fetchable by API. e.g. Comment, Submission
    *  @example
    *
    * r.getContentByIds(['t3_9l9vof','t3_9la341']).then(console.log);
@@ -881,16 +1089,17 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * //  Submission { approved_at_utc: null, ... }
    * // ]
   */
-  getContentByIds (ids) {
+  getContentByIds (ids:Array<Submission|Comment|string>) {
     if (!Array.isArray(ids)) {
       throw new TypeError('Invalid argument: Argument needs to be an array.');
     }
 
     const prefixedIds = ids.map(id => {
+      // @ts-ignore snoowrap.objects is undefined
       if (id instanceof snoowrap.objects.Submission || id instanceof snoowrap.objects.Comment) {
         return id.name;
       } else if (typeof id === 'string') {
-        if (!/t(1|3)_/g.test(ids)) {
+        if (!/t(1|3)_/g.test(id)) {
           throw new TypeError('Invalid argument: Ids need to include Submission or Comment prefix, e.g. t1_, t3_.');
         }
         return id;
@@ -907,13 +1116,13 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    redirect which cannot be followed by a CORS request.
    * @param {string} [subredditName] The subreddit to get the random submission. If not provided, the post is fetched from
    the front page of reddit.
-   * @returns {Promise} The retrieved Submission object
+   * @returns {Promise<Submission>} The retrieved Submission object
    * @example
    *
    * r.getRandomSubmission('aww').then(console.log)
    * // => Submission { domain: 'i.imgur.com', banned_by: null, subreddit: Subreddit { display_name: 'aww' }, ... }
    */
-  getRandomSubmission (subredditName) {
+  getRandomSubmission (subredditName?: string): Promise<Submission> {
     return this._get({uri: `${subredditName ? `r/${subredditName}/` : ''}random`});
   }
 
@@ -924,7 +1133,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * @param {object} [options={}] Options for the resulting Listing
    * @param {string} [options.time] Describes the timespan that posts should be retrieved from. Should be one of
    `hour, day, week, month, year, all`
-   * @returns {Promise} A Listing containing the retrieved submissions
+   * @returns {Promise<Listing<Submission>>} A Listing containing the retrieved submissions
    * @example
    *
    * r.getTop({time: 'all', limit: 2}).then(console.log)
@@ -941,7 +1150,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * //  ...
    * // ]
    */
-  getTop (subredditName, options) {
+  getTop (subredditName?: string, options?: SortedListingOptions): Promise<Listing<Submission>> {
     return this._getSortedFrontpage('top', subredditName, options);
   }
 
@@ -952,7 +1161,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * @param {object} [options={}] Options for the resulting Listing
    * @param {string} [options.time] Describes the timespan that posts should be retrieved from. Should be one of
    `hour, day, week, month, year, all`
-   * @returns {Promise} A Listing containing the retrieved submissions
+   * @returns {Promise<Listing<Submission>>} A Listing containing the retrieved submissions
    * @example
    *
    * r.getControversial('technology').then(console.log)
@@ -961,7 +1170,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * //  Submission { domain: 'pcmag.com', banned_by: null, subreddit: Subreddit { display_name: 'technology' }, ... }
    * // ]
    */
-  getControversial (subredditName, options) {
+  getControversial (subredditName?: string, options?: SortedListingOptions): Promise<Listing<Submission>> {
     return this._getSortedFrontpage('controversial', subredditName, options);
   }
 
@@ -970,7 +1179,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * @param {string} [subredditName] The subreddit to get posts from. If not provided, posts are fetched from
    the front page of reddit.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing the retrieved submissions
+   * @returns {Promise<Listing<Submission>>} A Listing containing the retrieved submissions
    * @example
    *
    * r.getRising('technology').then(console.log)
@@ -979,14 +1188,14 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * //  Submission { domain: 'pcmag.com', banned_by: null, subreddit: Subreddit { display_name: 'technology' }, ... }
    * // ]
    */
-  getRising (subredditName, options) {
+  getRising (subredditName?: string, options?: ListingOptions): Promise<Listing<Submission>> {
     return this._getSortedFrontpage('rising', subredditName, options);
   }
 
   /**
    * @summary Gets the authenticated user's unread messages.
    * @param {object} [options={}] Options for the resulting Listing
-   * @returns {Promise} A Listing containing unread items in the user's inbox
+   * @returns {Promise<Listing<PrivateMessage>>} A Listing containing unread items in the user's inbox
    * @example
    *
    * r.getUnreadMessages().then(console.log)
@@ -995,7 +1204,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * //  Comment { body: 'this is a reply', link_title: 'Yay, a selfpost!', was_comment: true, ... }
    * // ]
    */
-  getUnreadMessages (options = {}) {
+  getUnreadMessages (options?: ListingOptions): Promise<Listing<PrivateMessage>> {
     return this._getListing({uri: 'message/unread', qs: options});
   }
 
@@ -1014,14 +1223,14 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * //  Comment { body: 'this is a reply', link_title: 'Yay, a selfpost!', was_comment: true, ... }
    * // ]
    */
-  getInbox ({filter, ...options} = {}) {
-    return this._getListing({uri: `message/${filter || 'inbox'}`, qs: options});
+  getInbox (options?: { filter?: string }): Promise<Listing<PrivateMessage | Comment>> {
+    return this._getListing({uri: `message/${options ? options.filter : 'inbox'}`, qs: options});
   }
 
   /**
    * @summary Gets the authenticated user's modmail.
    * @param {object} [options={}] Options for the resulting Listing
-   * @returns {Promise} A Listing of the user's modmail
+   * @returns {Promise<Listing<PrivateMessage>>} A Listing of the user's modmail
    * @example
    *
    * r.getModmail({limit: 2}).then(console.log)
@@ -1030,7 +1239,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * //  PrivateMessage { body: '/u/not_an_aardvark has been invited by /u/actually_an_aardvark to ...', ... }
    * // ]
    */
-  getModmail (options = {}) {
+  getModmail (options?: ListingOptions): Promise<Listing<PrivateMessage>> {
     return this._getListing({uri: 'message/moderator', qs: options});
   }
 
@@ -1046,9 +1255,10 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * //  ModmailConversation { messages: [...], objIds: [...], subject: 'test subject', ... }
    * // ]
    */
-  getNewModmailConversations (options = {}) {
+  getNewModmailConversations (options?: ListingOptions & { entity?: string }): Promise<Listing<ModmailConversation>> {
     return this._getListing({
-      uri: 'api/mod/conversations', qs: options, _name: 'ModmailConversation', _transform: response => {
+      // @ts-ignore _name is somehow not working - need to fix
+      uri: 'api/mod/conversations', qs: options, _name: 'ModmailConversation', _transform: (response: any) => {
         response.after = null;
         response.before = null;
         response.children = [];
@@ -1088,18 +1298,15 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * }).then(console.log)
    * // ModmailConversation { messages: [...], objIds: [...], subject: 'test subject', ... }
    */
-  createModmailDiscussion ({
-    body,
-    subject,
-    srName
-  }) {
+  createModmailDiscussion (options: { body: string, subject: string, srName: string }): Promise<ModmailConversation> {
+    const {body, subject, srName} = options;
     const parsedFromSr = srName.replace(/^\/?r\//, ''); // Convert '/r/subreddit_name' to 'subreddit_name'
     // _newObject ignores most of the response, no practical way to parse the returned content yet
     return this._post({
       uri: 'api/mod/conversations', form: {
         body, subject, srName: parsedFromSr
       }
-    }).then(res => this._newObject('ModmailConversation', {id: res.conversation.id}));
+    }).then((res: any) => this._newObject('ModmailConversation', {id: res.conversation.id}));
   }
 
   /**
@@ -1111,18 +1318,19 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * r.getNewModmailConversation('75hxt').then(console.log)
    * // ModmailConversation { messages: [...], objIds: [...], ... }
    */
-  getNewModmailConversation (id) {
-    return this._newObject('ModmailConversation', {id});
+  getNewModmailConversation (id: string): Promise<ModmailConversation>{
+    return this._newObject<ModmailConversation>('ModmailConversation', {id});
   }
 
   /**
    * @summary Marks all conversations in array as read.
    * @param {ModmailConversation[]} conversations to mark as read
+   * @returns {Promise<void>}
    * @example
    *
    * r.markNewModmailConversationsAsRead(['pics', 'sweden'])
    */
-  markNewModmailConversationsAsRead (conversations) {
+  markNewModmailConversationsAsRead (conversations: ModmailConversation[]): Promise<void> {
     const conversationIds = conversations.map(message => addFullnamePrefix(message, ''));
     return this._post({uri: 'api/mod/conversations/read', form: {conversationIds: conversationIds.join(',')}});
   }
@@ -1130,11 +1338,12 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
   /**
    * @summary Marks all conversations in array as unread.
    * @param {ModmailConversation[]} conversations to mark as unread
+   * @returns {Promise<void>}
    * @example
    *
    * r.markNewModmailConversationsAsUnread(['pics', 'sweden'])
    */
-  markNewModmailConversationsAsUnread (conversations) {
+  markNewModmailConversationsAsUnread (conversations: ModmailConversation[]): Promise<void> {
     const conversationIds = conversations.map(message => addFullnamePrefix(message, ''));
     return this._post({uri: 'api/mod/conversations/unread', form: {conversationIds: conversationIds.join(',')}});
   }
@@ -1150,10 +1359,10 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * //  Subreddit { display_name: 'EarthPorn', ... },
    * // ]
    */
-  getNewModmailSubreddits () {
-    return this._get({uri: 'api/mod/conversations/subreddits'}).then(response => {
+  getNewModmailSubreddits (): Promise<Listing<Subreddit>> {
+    return this._get({uri: 'api/mod/conversations/subreddits'}).then((response: any) => {
       return Object.values(response.subreddits).map(s => {
-        return this._newObject('Subreddit', s);
+        return this._newObject<Subreddit>('Subreddit', {s});
       });
     });
   }
@@ -1185,7 +1394,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * //  mod: 1,
    * // }
    */
-  getUnreadNewModmailConversationsCount () {
+  getUnreadNewModmailConversationsCount (): Promise<{ highlighted: number, notifications: number, archived: number, new: number, inprogress: number, mod: number }> {
     return this._get({uri: 'api/mod/conversations/unread/count'});
   }
 
@@ -1208,16 +1417,16 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * //  ModmailConversation { id: '75hxg' }
    * // ]
    */
-  bulkReadNewModmail (subreddits, state) {
-    const subredditNames = subreddits.map(s => typeof s === 'string' ? s.replace(/^\/?r\//, '') : s.display_name);
+  bulkReadNewModmail (subreddits: Array<Subreddit | string>, state: 'new'|'inprogress'|'mod'|'notifications'|'archived'|'highlighted'|'all'): Promise<Listing<ModmailConversation>> {
+    const subredditNames: string[] = subreddits.map(s => typeof s === 'string' ? s.replace(/^\/?r\//, '') : s.display_name);
     return this._post({uri: 'api/mod/conversations/bulk/read', form: {
       entity: subredditNames.join(','),
       state
-    }}).then(res => {
+    }}).then((res: any) => {
       return this._newObject('Listing', {
         after: null,
         before: null,
-        children: res.conversation_ids.map(id => {
+        children: res.conversation_ids.map((id: string) => {
           return this._newObject('ModmailConversation', {id});
         })
       });
@@ -1227,7 +1436,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
   /**
    * @summary Gets the user's sent messages.
    * @param {object} [options={}] options for the resulting Listing
-   * @returns {Promise} A Listing of the user's sent messages
+   * @returns {Promise<Listing<PrivateMessage>>} A Listing of the user's sent messages
    * @example
    *
    * r.getSentMessages().then(console.log)
@@ -1236,7 +1445,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * //  PrivateMessage { body: 'you have been banned from posting to ...' ... }
    * // ]
    */
-  getSentMessages (options = {}) {
+  getSentMessages (options?: ListingOptions): Promise<Listing<PrivateMessage>> {
     return this._getListing({uri: 'message/sent', qs: options});
   }
 
@@ -1245,7 +1454,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * @param {PrivateMessage[]|String[]} messages An Array of PrivateMessage or Comment objects. Can also contain strings
    representing message or comment IDs. If strings are provided, they are assumed to represent PrivateMessages unless a fullname
    prefix such as `t1_` is specified.
-   * @returns {Promise} A Promise that fulfills when the request is complete
+   * @returns {Promise<void>} A Promise that fulfills when the request is complete
    * @example
    *
    * r.markMessagesAsRead(['51shsd', '51shxv'])
@@ -1257,8 +1466,8 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * // Alternatively, just pass in a comment object directly.
    * r.markMessagesAsRead([r.getMessage('51shsd'), r.getComment('d3zhb5k')])
    */
-  markMessagesAsRead (messages) {
-    const messageIds = messages.map(message => addFullnamePrefix(message, 't4_'));
+  markMessagesAsRead (messages: Array<PrivateMessage|string>): Promise<void> {
+    const messageIds = messages.map((message: PrivateMessage | string) => addFullnamePrefix(message, 't4_'));
     return this._post({uri: 'api/read_message', form: {id: messageIds.join(',')}});
   }
 
@@ -1279,8 +1488,8 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * // Alternatively, just pass in a comment object directly.
    * r.markMessagesAsRead([r.getMessage('51shsd'), r.getComment('d3zhb5k')])
    */
-  markMessagesAsUnread (messages) {
-    const messageIds = messages.map(message => addFullnamePrefix(message, 't4_'));
+  markMessagesAsUnread (messages: Array<PrivateMessage|string>): Promise<void> {
+    const messageIds = messages.map((message: PrivateMessage | string) => addFullnamePrefix(message, 't4_'));
     return this._post({uri: 'api/unread_message', form: {id: messageIds.join(',')}});
   }
 
@@ -1297,7 +1506,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * // => Listing []
    * // (messages marked as 'read' on reddit)
    */
-  readAllMessages () {
+  readAllMessages (): Promise<void> {
     return this._post({uri: 'api/read_all_messages'});
   }
 
@@ -1329,7 +1538,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
     subject,
     text,
     to
-  }) {
+  }: Snoowrap.ComposeMessageParams): Promise<any> {
     let parsedTo = to;
     let parsedFromSr = fromSubreddit;
     if (to instanceof snoowrap.objects.RedditUser) {
@@ -1370,7 +1579,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * //  ...
    * // }
    */
-  getOauthScopeList () {
+  getOauthScopeList (): Promise<{ [key: string]: { description: string; id: string; name: string } }> {
     return this._get({uri: 'api/v1/scopes'});
   }
 
@@ -1384,7 +1593,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * @param {boolean} [options.restrictSr=true] Restricts search results to the given subreddit
    * @param {string} [options.sort] Determines how the results should be sorted. One of `relevance, hot, top, new, comments`
    * @param {string} [options.syntax='plain'] Specifies a syntax for the search. One of `cloudsearch, lucene, plain`
-   * @returns {Promise} A Listing containing the search results.
+   * @returns {Promise<Listing<Submission>>} A Listing containing the search results.
    * @example
    *
    * r.search({
@@ -1398,7 +1607,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * //  ...
    * // ]
    */
-  search (options) {
+  search (options: Snoowrap.SearchOptions): Promise<Listing<Submission>> {
     if (options.subreddit instanceof snoowrap.objects.Subreddit) {
       options.subreddit = options.subreddit.display_name;
     }
@@ -1427,7 +1636,8 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * //  ...
    * // ]
    */
-  searchSubredditNames ({exact = false, include_nsfw = true, includeNsfw = include_nsfw, query}) {
+  searchSubredditNames (options: { query: string; exact?: boolean; includeNsfw?: boolean; }): Promise<string[]> {
+    const {query, exact, includeNsfw} = options;
     return this._post({uri: 'api/search_reddit_names', qs: {exact, include_over_18: includeNsfw, query}}).get('names');
   }
 
@@ -1464,7 +1674,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
     wiki_edit_age,
     wiki_edit_karma,
     wikimode = 'modonly'
-  }) {
+  }: SubredditSettings) {
     return this._post({
       uri: 'api/site_admin', form: {
         allow_images, allow_top, api_type, captcha, collapse_deleted_comments, comment_score_hide_mins, description,
@@ -1473,7 +1683,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
         spam_selfposts, spoilers_enabled, sr, submit_link_label, submit_text, submit_text_label, suggested_comment_sort,
         title, type, wiki_edit_age, wiki_edit_karma, wikimode
       }
-    }).then(handleJsonErrors(this.getSubreddit(name || sr)));
+    }).then(handleJsonErrors(this.getSubreddit(name || sr || "")));
   }
 
   /**
@@ -1539,7 +1749,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * // => Subreddit { display_name: 'snoowrap_testing2' }
    * // (/r/snoowrap_testing2 created on reddit)
    */
-  createSubreddit (options) {
+  createSubreddit (options: SubredditSettings): Promise<Subreddit> {
     return this._createOrEditSubreddit(options);
   }
 
@@ -1559,14 +1769,15 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * //  ...
    * // ]
    */
-  searchSubredditTopics ({query}) {
-    return this._get({uri: 'api/subreddits_by_topic', qs: {query}}).map(result => this.getSubreddit(result.name));
+  searchSubredditTopics (options: { query: string; }): Promise<Subreddit[]> {
+    const {query} = options;
+    return this._get({uri: 'api/subreddits_by_topic', qs: {query}}).map((result: any) => this.getSubreddit(result.name));
   }
 
   /**
    * @summary Gets a list of subreddits that the currently-authenticated user is subscribed to.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing Subreddits
+   * @returns {Promise<Listing<Subreddit>>} A Listing containing Subreddits
    * @example
    *
    * r.getSubscriptions({limit: 2}).then(console.log)
@@ -1583,14 +1794,14 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * //  }
    * // ]
    */
-  getSubscriptions (options) {
+  getSubscriptions (options?: ListingOptions): Promise<Listing<Subreddit>> {
     return this._getListing({uri: 'subreddits/mine/subscriber', qs: options});
   }
 
   /**
    * @summary Gets a list of subreddits in which the currently-authenticated user is an approved submitter.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing Subreddits
+   * @returns {Promise<Listing<Subreddit>>} A Listing containing Subreddits
    * @example
    *
    * r.getContributorSubreddits().then(console.log)
@@ -1603,14 +1814,14 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * // ]
    *
    */
-  getContributorSubreddits (options) {
+  getContributorSubreddits (options?: ListingOptions): Promise<Listing<Subreddit>> {
     return this._getListing({uri: 'subreddits/mine/contributor', qs: options});
   }
 
   /**
    * @summary Gets a list of subreddits in which the currently-authenticated user is a moderator.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing Subreddits
+   * @returns {Promise<Listing<Subreddit>>} A Listing containing Subreddits
    * @example
    *
    * r.getModeratedSubreddits().then(console.log)
@@ -1622,7 +1833,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * //  }
    * // ]
    */
-  getModeratedSubreddits (options) {
+  getModeratedSubreddits (options?: ListingOptions): Promise<Listing<Subreddit>> {
     return this._getListing({uri: 'subreddits/mine/moderator', qs: options});
   }
 
@@ -1636,9 +1847,8 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * r.searchSubreddits({query: 'cookies'}).then(console.log)
    * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
    */
-  searchSubreddits (options) {
-    options.q = options.query;
-    return this._getListing({uri: 'subreddits/search', qs: omit(options, 'query')});
+  searchSubreddits (options: ListingOptions & { query: string }): Promise<Listing<Subreddit>> {
+    return this._getListing({uri: 'subreddits/search', qs: {q: options.query, ...omit(options, 'query')}});
   }
 
   /**
@@ -1650,46 +1860,46 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * r.getPopularSubreddits().then(console.log)
    * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
    */
-  getPopularSubreddits (options) {
+  getPopularSubreddits (options: ListingOptions & {include_categories: boolean}) {
     return this._getListing({uri: 'subreddits/popular', qs: options});
   }
 
   /**
    * @summary Gets a list of subreddits, arranged by age.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing Subreddits
+   * @returns {Promise<Listing<Subreddit>>} A Listing containing Subreddits
    * @example
    *
    * r.getNewSubreddits().then(console.log)
    * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
    */
-  getNewSubreddits (options) {
+  getNewSubreddits (options?: ListingOptions): Promise<Listing<Subreddit>> {
     return this._getListing({uri: 'subreddits/new', qs: options});
   }
 
   /**
    * @summary Gets a list of gold-exclusive subreddits.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing Subreddits
+   * @returns {Promise<Listing<Subreddit>>} A Listing containing Subreddits
    * @example
    *
    * r.getGoldSubreddits().then(console.log)
    * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
    */
-  getGoldSubreddits (options) {
+  getGoldSubreddits (options?: ListingOptions): Promise<Listing<Subreddit>> {
     return this._getListing({uri: 'subreddits/gold', qs: options});
   }
 
   /**
    * @summary Gets a list of default subreddits.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing Subreddits
+   * @returns {Promise<Listing<Subreddit>>} A Listing containing Subreddits
    * @example
    *
    * r.getDefaultSubreddits().then(console.log)
    * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
    */
-  getDefaultSubreddits (options) {
+  getDefaultSubreddits (options?: ListingOptions): Promise<Listing<Subreddit>> {
     return this._getListing({uri: 'subreddits/default', qs: options});
   }
 
@@ -1698,7 +1908,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * @desc **Note:** This function will not work when snoowrap is running in a browser, due to an issue with reddit's CORS
    settings.
    * @param {string} name The username in question
-   * @returns {Promise} A Promise that fulfills with a Boolean (`true` or `false`)
+   * @returns {Promise<boolean>} A Promise that fulfills with a Boolean (`true` or `false`)
    * @example
    *
    * r.checkUsernameAvailability('not_an_aardvark').then(console.log)
@@ -1706,7 +1916,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * r.checkUsernameAvailability('eqwZAr9qunx7IHqzWVeF').then(console.log)
    * // => true
    */
-  checkUsernameAvailability (name) {
+  checkUsernameAvailability (name: string): Promise<boolean> {
     // The oauth endpoint listed in reddit's documentation doesn't actually work, so just send an unauthenticated request.
     return this.unauthenticatedRequest({uri: 'api/username_available.json', qs: {user: name}});
   }
@@ -1718,39 +1928,39 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * @param {string} [options.description] A descriptions of the thread. 120 characters max
    * @param {string} [options.resources] Information and useful links related to the thread. 120 characters max
    * @param {boolean} [options.nsfw=false] Determines whether the thread is Not Safe For Work
-   * @returns {Promise} A Promise that fulfills with the new LiveThread when the request is complete
+   * @returns {Promise<LiveThread>} A Promise that fulfills with the new LiveThread when the request is complete
    * @example
    *
    * r.createLivethread({title: 'My livethread'}).then(console.log)
    * // => LiveThread { id: 'wpimncm1f01j' }
    */
-  createLivethread ({title, description, resources, nsfw = false}) {
+  createLivethread ({title, description, resources, nsfw = false}: LiveThreadSettings): Promise<LiveThread> {
     return this._post({
       uri: 'api/live/create',
       form: {api_type, description, nsfw, resources, title}
-    }).tap(handleJsonErrors(this)).then(result => this.getLivethread(result.json.data.id));
+    }).tap(handleJsonErrors(this)).then((result: any) => this.getLivethread(result.json.data.id));
   }
 
   /**
    * @summary Gets the "happening now" LiveThread, if it exists
    * @desc This is the LiveThread that is occasionally linked at the top of reddit.com, relating to current events.
-   * @returns {Promise} A Promise that fulfills with the "happening now" LiveThread if it exists, or rejects with a 404 error
+   * @returns {Promise<LiveThread | undefined>} A Promise that fulfills with the "happening now" LiveThread if it exists, or rejects with a 404 error
    otherwise.
    * @example r.getCurrentEventsLivethread().then(thread => thread.stream.on('update', console.log))
    */
-  getStickiedLivethread () {
+  getStickiedLivethread (): Promise<LiveThread | undefined> {
     return this._get({uri: 'api/live/happening_now'});
   }
 
   /**
    * @summary Gets the user's own multireddits.
-   * @returns {Promise} A Promise for an Array containing the requester's MultiReddits.
+   * @returns {Promise<MultiReddit[]>} A Promise for an Array containing the requester's MultiReddits.
    * @example
    *
    * r.getMyMultireddits().then(console.log)
    * => [ MultiReddit { ... }, MultiReddit { ... }, ... ]
    */
-  getMyMultireddits () {
+  getMyMultireddits (): Promise<MultiReddit[]> {
     return this._get({uri: 'api/multi/mine', qs: {expand_srs: true}});
   }
 
@@ -1761,13 +1971,13 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * @param {string} options.description A description for the new multireddit, in markdown.
    * @param {Array} options.subreddits An Array of Subreddit objects (or subreddit names) that this multireddit should compose of
    * @param {string} [options.visibility='private'] The multireddit's visibility setting. One of `private`, `public`, `hidden`.
-   * @param {string} [options.icon_name=''] One of `art and design`, `ask`, `books`, `business`, `cars`, `comics`,
+   * @param {string} [options.icon_name] One of `art and design`, `ask`, `books`, `business`, `cars`, `comics`,
    `cute animals`, `diy`, `entertainment`, `food and drink`, `funny`, `games`, `grooming`, `health`, `life advice`, `military`,
    `models pinup`, `music`, `news`, `philosophy`, `pictures and gifs`, `science`, `shopping`, `sports`, `style`, `tech`,
    `travel`, `unusual stories`, `video`, `None`
    * @param {string} [options.key_color='#000000'] A six-digit RGB hex color, preceded by '#'
    * @param {string} [options.weighting_scheme='classic'] One of `classic`, `fresh`
-   * @returns {Promise} A Promise for the newly-created MultiReddit object
+   * @returns {Promise<MultiReddit>} A Promise for the newly-created MultiReddit object
    * @example
    *
    * r.createMultireddit({
@@ -1778,9 +1988,9 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    * => MultiReddit { display_name: 'myMulti', ... }
    */
   createMultireddit ({
-    name, description, subreddits, visibility = 'private', icon_name = '', key_color = '#000000',
+    name, description, subreddits, visibility = 'private', icon_name, key_color = '#000000',
     weighting_scheme = 'classic'
-  }) {
+  }: MultiRedditProperties & { name: string; subreddits: Array<Subreddit|string>}): Promise<MultiReddit> {
     return this._post({
       uri: 'api/multi', form: {
         model: JSON.stringify({
@@ -1788,7 +1998,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
           description_md: description,
           icon_name,
           key_color,
-          subreddits: subreddits.map(sub => ({name: typeof sub === 'string' ? sub : sub.display_name})),
+          subreddits: subreddits.map((sub: Subreddit|string) => ({name: typeof sub === 'string' ? sub : sub.display_name})),
           visibility,
           weighting_scheme
         })
@@ -1796,7 +2006,8 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
     });
   }
 
-  _revokeToken (token) {
+  _revokeToken (token: string) {
+    // @ts-ignore
     return this.credentialedClientRequest({uri: 'api/v1/revoke_token', form: {token}, method: 'post'});
   }
 
@@ -1808,8 +2019,8 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    are made after this one.
    * @example r.revokeAccessToken();
    */
-  revokeAccessToken () {
-    return this._revokeToken(this.accessToken).then(() => {
+  revokeAccessToken (): Promise<void> {
+    return this._revokeToken(this.accessToken || "").then(() => {
       this.accessToken = null;
       this.tokenExpiration = null;
     });
@@ -1824,35 +2035,37 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    been accidentally leaked to a third party.
    * @example r.revokeRefreshToken();
    */
-  revokeRefreshToken () {
-    return this._revokeToken(this.refreshToken).then(() => {
+  revokeRefreshToken (): Promise<void> {
+    return this.refreshToken && this._revokeToken(this.refreshToken).then(() => {
       this.refreshToken = null;
       this.accessToken = null; // Revoking a refresh token also revokes any associated access tokens.
       this.tokenExpiration = null;
     });
   }
 
-  _selectFlair ({flair_template_id, link, name, text, subredditName}) {
+  _selectFlair ({flair_template_id, link, name, text, subredditName}: {flair_template_id: string, link: string, name: string, text: string, subredditName: string}) {
     if (!flair_template_id) {
       throw new errors.InvalidMethodCallError('No flair template ID provided');
     }
-    return Promise.resolve(subredditName).then(subName => {
+    return Promise.resolve(subredditName).then((subName: string) => {
       return this._post({uri: `r/${subName}/api/selectflair`, form: {api_type, flair_template_id, link, name, text}});
     });
   }
 
-  _assignFlair ({css_class, cssClass = css_class, link, name, text, subreddit_name, subredditName = subreddit_name}) {
-    return this._promiseWrap(Promise.resolve(subredditName).then(displayName => {
+  _assignFlair ({css_class, cssClass = css_class, link, name, text, subreddit_name, subredditName = subreddit_name}: {css_class?: string, cssClass?: string, link: string, name: string, text: string, subreddit_name?: string, subredditName?: string}) {
+    return this._promiseWrap(Promise.resolve(subredditName).then((displayName: string) => {
       return this._post({uri: `r/${displayName}/api/flair`, form: {api_type, name, text, link, css_class: cssClass}});
     }));
   }
 
-  _populate (responseTree) {
+  _populate (responseTree: {[index:string]: any}|null): object|null {
     if (typeof responseTree === 'object' && responseTree !== null) {
       // Map {kind: 't2', data: {name: 'some_username', ... }} to a RedditUser (e.g.) with the same properties
       if (Object.keys(responseTree).length === 2 && responseTree.kind && responseTree.data) {
+        // @ts-ignore
         return this._newObject(KINDS[responseTree.kind] || 'RedditContent', this._populate(responseTree.data), true);
       }
+      // @ts-ignore
       const result = (Array.isArray(responseTree) ? map : mapValues)(responseTree, (value, key) => {
         // Maps {author: 'some_username'} to {author: RedditUser { name: 'some_username' } }
         if (value !== null && USER_KEYS.has(key)) {
@@ -1876,13 +2089,13 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
     return responseTree;
   }
 
-  _getListing ({uri, qs = {}, ...options}) {
+  _getListing<T>({uri, qs = {}, ...options}: {uri: string, qs?: ListingOptions & {[any:string]: any}, options?: {[any:string]: any}}) {
     /* When the response type is expected to be a Listing, add a `count` parameter with a very high number.
     This ensures that reddit returns a `before` property in the resulting Listing to enable pagination.
     (Aside from the additional parameter, this function is equivalent to snoowrap.prototype._get) */
     const mergedQuery = {count: 9999, ...qs};
     return qs.limit || !isEmpty(options)
-      ? this._newObject('Listing', {_query: mergedQuery, _uri: uri, ...options}).fetchMore(qs.limit || MAX_LISTING_ITEMS)
+      ? (this._newObject<Listing<T>>('Listing', {_query: mergedQuery, _uri: uri, ...options}) as Listing<T>).fetchMore(qs.limit || MAX_LISTING_ITEMS)
       /* This second case is used as a fallback in case the endpoint unexpectedly ends up returning something other than a
       Listing (e.g. Submission#getRelated, which used to return a Listing but no longer does due to upstream reddit API
       changes), in which case using fetch_more() as above will throw an error.
@@ -1891,7 +2104,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
       other meta-properties,  the function will still end up throwing an error, but there's not really any good way to handle it
       (predicting upstream changes can only go so far). More importantly, in the limited cases where it's used, the fallback
       should have no effect on the returned results */
-      : this._get({uri, qs: mergedQuery}).then(listing => {
+      : this._get({uri, qs: mergedQuery}).then((listing: unknown) => {
         if (Array.isArray(listing)) {
           listing.filter(item => item.constructor._name === 'Comment').forEach(addEmptyRepliesListing);
         }
@@ -1907,19 +2120,20 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    */
   static noConflict () {
     if (isBrowser) {
-      global[MODULE_NAME] = this._previousSnoowrap;
+      (global as any)[MODULE_NAME] = this._previousSnoowrap;
     }
     return this;
   }
 };
 
-function identity (value) {
+function identity (value: string) {
   return value;
 }
 
 defineInspectFunc(snoowrap.prototype, function () {
   // Hide confidential information (tokens, client IDs, etc.), as well as private properties, from the console.log output.
   const keysForHiddenValues = ['clientSecret', 'refreshToken', 'accessToken', 'password'];
+  // @ts-ignore TODO: this can't be resolved
   const formatted = mapValues(omitBy(this, (value, key) => typeof key === 'string' && key.startsWith('_')), (value, key) => {
     return includes(keysForHiddenValues, key) ? value && '(redacted)' : value;
   });
@@ -1932,12 +2146,13 @@ const classFuncDescriptors = {configurable: true, writable: true};
 Object.defineProperties to ensure that the properties are non-enumerable. */
 Object.defineProperties(snoowrap.prototype, mapValues(requestHandler, func => ({value: func, ...classFuncDescriptors})));
 
-HTTP_VERBS.forEach(method => {
+// TODO: Move to main class with decorators
+HTTP_VERBS.forEach((method: string) => {
   /* Define method shortcuts for each of the HTTP verbs. i.e. `snoowrap.prototype._post` is the same as `oauth_request` except
   that the HTTP method defaults to `post`, and the result is promise-wrapped. Use Object.defineProperty to ensure that the
   properties are non-enumerable. */
   Object.defineProperty(snoowrap.prototype, `_${method}`, {
-    value (options) {
+    value (options: object) {
       return this._promiseWrap(this.oauthRequest({...options, method}));
     }, ...classFuncDescriptors
   });
@@ -1945,10 +2160,10 @@ HTTP_VERBS.forEach(method => {
 
 /* `objects` will be an object containing getters for each content type, due to the way objects are exported from
 objects/index.js. To unwrap these getters into direct properties, use lodash.mapValues with an identity function. */
-snoowrap.objects = mapValues(objects, value => value);
+snoowrap.objects = mapValues<Snoowrap.ObjectType, any>(objects, (value: any) => value);
 
-forOwn(KINDS, value => {
-  snoowrap.objects[value] = snoowrap.objects[value] || class extends objects.RedditContent {
+forOwn(KINDS, (value: string) => {
+  snoowrap.objects[value]  = snoowrap.objects[value] || class extends objects.RedditContent<typeof value> {
   };
   Object.defineProperty(snoowrap.objects[value], '_name', {value, configurable: true});
 });
@@ -1961,11 +2176,10 @@ values(snoowrap.objects).concat(snoowrap).map(func => func.prototype).forEach(fu
 });
 
 snoowrap.errors = errors;
-snoowrap.version = VERSION;
 
 if (!module.parent && isBrowser) { // check if the code is being run in a browser through browserify, etc.
-  snoowrap._previousSnoowrap = global[MODULE_NAME];
-  global[MODULE_NAME] = snoowrap;
+  snoowrap._previousSnoowrap = (global as any)[MODULE_NAME];
+  (global as any)[MODULE_NAME] = snoowrap;
 }
 
 module.exports = snoowrap;

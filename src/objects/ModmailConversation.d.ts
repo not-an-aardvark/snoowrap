@@ -73,6 +73,7 @@ export default class ModmailConversation extends RedditContent<ModmailConversati
     numMessages: number;
     messages?: ModmailMessage[];
 
+    static _getConversationObjects(conversation: unknown, response: unknown): any
     getParticipant(): Promise<ModmailConversationAuthor>;
 
     isRead(): boolean;

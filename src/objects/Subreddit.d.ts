@@ -1,4 +1,4 @@
-import { BaseSearchOptions, ModAction, Sort, SubmitLinkOptions, SubmitSelfPostOptions } from '../snoowrap';
+import { Snoowrap } from '../snoowrap';
 import Comment from './Comment';
 import Listing, { ListingOptions } from './Listing';
 import PrivateMessage from './PrivateMessage';
@@ -69,7 +69,7 @@ export default class Subreddit extends RedditContent<Subreddit> {
   submit_text: string;
   subreddit_type: SubredditType;
   subscribers: number;
-  suggested_comment_sort: Sort | null;
+  suggested_comment_sort: Snoowrap.Sort | null;
   title: string;
   url: string;
   user_can_flair_in_sr: boolean;
@@ -115,7 +115,7 @@ export default class Subreddit extends RedditContent<Subreddit> {
   getEdited(options?: ListingOptions & { only?: 'links' | 'comments' }): Promise<Listing<Submission | Comment>>;
   getHot(options?: ListingOptions): Promise<Listing<Submission>>;
   getLinkFlairTemplates(linkId: string): Promise<FlairTemplate[]>;
-  getModerationLog(opts?: ListingOptions & { mods?: string[]; type?: ModActionType}): Promise<Listing<ModAction>>;
+  getModerationLog(opts?: ListingOptions & { mods?: string[]; type?: ModActionType}): Promise<Listing<Snoowrap.ModAction>>;
   getModerators(options?: ListingOptions & { name?: string }): RedditUser[];
   getModmail(options?: ListingOptions): Promise<Listing<PrivateMessage>>;
   getNewModmailConversations(options?: ListingOptions): Promise<Listing<ModmailConversation>>;
@@ -153,7 +153,7 @@ export default class Subreddit extends RedditContent<Subreddit> {
   removeModerator(options: { name: string; }): Promise<this>;
   removeWikiContributor(options: { name: string; }): Promise<this>;
   revokeModeratorInvite(options: { name: string; }): Promise<this>;
-  search(options: BaseSearchOptions): Promise<Listing<Submission>>;
+  search(options: Snoowrap.BaseSearchOptions): Promise<Listing<Submission>>;
   selectMyFlair(options: { flair_template_id: string; text?: string; }): Promise<this>;
   setModeratorPermissions(options: { name: string; permissions: ModeratorPermission; }): Promise<this>;
   setMultipleUserFlairs(flairs: Array<{
@@ -162,8 +162,8 @@ export default class Subreddit extends RedditContent<Subreddit> {
     cssClass: string;
   }>): Promise<this>;
   showMyFlair(): Promise<this>;
-  submitLink(options: SubmitLinkOptions): Promise<Submission>;
-  submitSelfPost(options: SubmitSelfPostOptions): Promise<Submission>;
+  submitLink(options: Snoowrap.SubmitLinkOptions): Promise<Submission>;
+  submitSelfPost(options: Snoowrap.SubmitSelfPostOptions): Promise<Submission>;
   subscribe(): Promise<this>;
   unbanUser(options: { name: string; }): Promise<this>;
   unmuteUser(options: { name: string; }): Promise<this>;
@@ -225,6 +225,13 @@ export interface SubredditSettings {
   title: string;
   public_description: string;
   description: string;
+  sr?: string;
+  captcha?: string;
+  captcha_iden?: string;
+  comment_score_hide_mins?: number;
+  'header-title': string;
+  show_media_preview: boolean;
+  allow_images?: boolean;
   submit_text?: string;
   hide_ads?: boolean;
   lang?: string;
@@ -244,7 +251,7 @@ export interface SubredditSettings {
   exclude_banned_modqueue?: boolean;
   public_traffic?: boolean;
   collapse_deleted_comments?: boolean;
-  suggested_comment_sort?: Sort; // TODO rename AvailableSorts?
+  suggested_comment_sort?: Snoowrap.Sort; // TODO rename AvailableSorts?
   spoilers_enabled?: boolean;
 }
 
