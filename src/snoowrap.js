@@ -306,11 +306,6 @@ const snoowrap = class snoowrap {
     grantType = snoowrap.grantType.INSTALLED_CLIENT,
     endpointDomain = 'reddit.com'
   }) {
-    if (grantType === snoowrap.grantType.INSTALLED_CLIENT) {
-      if (!deviceId || !(deviceId.length >= 30 && deviceId.length <= 40)) {
-        throw new TypeError('deviceId needs to be between 30 and 40 characters');
-      }
-    }
     return this.prototype.credentialedClientRequest.call({
       clientId,
       clientSecret,
