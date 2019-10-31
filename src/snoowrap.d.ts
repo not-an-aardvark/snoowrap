@@ -167,17 +167,18 @@ declare namespace Snoowrap {
 
   interface BaseAuthOnlyOptions extends BaseAuthOptions{
     userAgent: string
-    deviceId?: string
   }
 
   interface AuthOnlyCredentialsOptions extends BaseAuthOnlyOptions {
     clientSecret: string
     grantType: 'client_credentials',
+    deviceId?: string
   }
 
   interface AuthOnlyInstalledOptions extends BaseAuthOnlyOptions {
     clientSecret?: string
     grantType?: 'https://oauth.reddit.com/grants/installed_client'
+    deviceId: string
   }
 
   export type AuthOnlyOptions = AuthOnlyCredentialsOptions | AuthOnlyInstalledOptions
