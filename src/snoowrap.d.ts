@@ -32,8 +32,8 @@ export = Snoowrap;
 declare class Snoowrap {
   static getAuthUrl(options: Snoowrap.AuthUrlOptions): string;
   static fromAuthCode(options: Snoowrap.AuthCodeOptions): Promise<Snoowrap>;
-  static fromApplicationOnlyAuth(options: Snoowrap.AuthCodeOptions): Promise<Snoowrap>;
-  
+  static fromApplicationOnlyAuth(options: Snoowrap.AuthOnlyOptions): Promise<Snoowrap>;
+
   _newObject (objectType: string, content: object[]|object, _hasFetched?: boolean): Array<unknown>|object;
   static noConflict(): typeof Snoowrap;
 
@@ -143,24 +143,44 @@ declare namespace Snoowrap {
     proxies?: boolean;
   }
 
-  export interface AuthUrlOptions {
+  export interface BaseAuthOptions {
     clientId: string;
+    endpointDomain?: string;
+  }
+
+  export interface AuthUrlOptions extends BaseAuthOptions {
     scope: string[];
     redirectUri: string;
     permanent?: boolean; // defaults to true
     state?: string;
-    endpointDomain?: string;
   }
 
-  export interface AuthCodeOptions {
+  export interface AuthCodeOptions extends BaseAuthOptions {
     code: string;
     userAgent: string;
-    clientId: string;
     clientSecret?: string;
     redirectUri: string;
-    endpointDomain?: string;
     deviceId?: string;
   }
+
+  export type GrantType = 'client_credentials' | 'https://oauth.reddit.com/grants/installed_client'
+
+  interface BaseAuthOnlyOptions extends BaseAuthOptions{
+    userAgent: string
+    deviceId?: string
+  }
+
+  interface AuthOnlyCredentialsOptions extends BaseAuthOnlyOptions {
+    clientSecret: string
+    grantType: 'client_credentials',
+  }
+
+  interface AuthOnlyInstalledOptions extends BaseAuthOnlyOptions {
+    clientSecret?: string
+    grantType?: 'https://oauth.reddit.com/grants/installed_client'
+  }
+
+  export type AuthOnlyOptions = AuthOnlyCredentialsOptions | AuthOnlyInstalledOptions
 
   export type Sort = 'confidence' | 'top' | 'new' | 'controversial' | 'old' | 'random' | 'qa';
 
