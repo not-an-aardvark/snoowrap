@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.20.1 (2019-11-14)
+
+* Updated `snoowrap#applicationOnlyAuth` TypeScript definitions
+* Fixed TypeScript definitions for TypeScript v3.7.0
+* Fixed incorrect check for deviceId in `snoowrap#applicationOnlyAuth`
+* Fix incorrect docs for DO_NOT_TRACK_THIS_DEVICE param in `snoowrap#applicationOnlyAuth`
+
 ## v1.20.0 (2019-10-07)
 
 * Added application only auth `snoowrap#applicationOnlyAuth`
