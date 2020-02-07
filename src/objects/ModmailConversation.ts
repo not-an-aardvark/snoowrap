@@ -1,4 +1,7 @@
 import RedditContent from './RedditContent.js';
+import RedditUser from './RedditUser.js';
+import Subreddit from './Subreddit.js';
+import ModmailConversationAuthor from './ModmailConversationAuthor.js';
 
 /**
  * @global
@@ -7,11 +10,11 @@ import RedditContent from './RedditContent.js';
  * @summary Represents the current status of a given Modmail conversation.
  * @type {Readonly<{New: number, InProgress: number, Archived: number}>}
  */
-export const conversationStates = Object.freeze({
-  New: 0,
-  InProgress: 1,
-  Archived: 2
-});
+export enum conversationStates {
+  New = 0,
+  InProgress = 1,
+  Archived = 2,
+}
 
 
 /**
@@ -21,16 +24,46 @@ export const conversationStates = Object.freeze({
  * @summary Represents all the possible states that is used within a Modmail conversations.
  * @type {Readonly<{UnArchive: number, Highlight: number, Archive: number, ReportedToAdmins: number, Mute: number, UnHighlight: number, Unmute: number}>}
  */
-export const modActionStates = Object.freeze({
-  Highlight: 0,
-  UnHighlight: 1,
-  Archive: 2,
-  UnArchive: 3,
-  ReportedToAdmins: 4,
-  Mute: 5,
-  Unmute: 6
-});
+export enum modActionStates {
+  Highlight = 0,
+  UnHighlight = 1,
+  Archive = 2,
+  UnArchive = 3,
+  ReportedToAdmins = 4,
+  Mute = 5,
+  Unmute = 6,
+}
 
+export interface ModmailMessage {
+  body: string;
+  bodyMarkdown: string;
+  author: RedditUser;
+  isInternal: boolean;
+  date: string;
+  id: string;
+}
+
+export interface Author {
+  isMod: boolean;
+  isAdmin: boolean;
+  name: string;
+  isOp: boolean;
+  isParticipant: boolean;
+  isHidden: boolean;
+  id: any;
+  isDeleted: boolean;
+}
+
+export interface Owner {
+  displayName: string;
+  type: string;
+  id: string;
+}
+
+export interface ObjId {
+  id: string;
+  key: string;
+}
 /**
  * @class
  * A class representing a conversation from new modmail
@@ -42,7 +75,7 @@ export const modActionStates = Object.freeze({
  * r.getNewModmailConversation('75hxt')
  * @extends RedditContent
  */
-const ModmailConversation = class ModmailConversation extends RedditContent {
+export default class ModmailConversation extends RedditContent<ModmailConversation> {
   static get conversationStates () {
     return conversationStates;
   }
@@ -50,6 +83,25 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
   static get modActionStates () {
     return modActionStates;
   }
+
+  isAuto!: boolean;
+  objIds!: ObjId[];
+  isRepliable!: boolean;
+  lastUserUpdate?: any;
+  isInternal!: boolean;
+  lastModUpdate!: Date;
+  lastUpdated!: Date;
+  authors!: Author[];
+  // sometimes an Owner, sometimes a Subreddit
+  owner!: Owner | Subreddit;
+  id!: string;
+  isHighlighted!: boolean;
+  subject!: string;
+  participant!: ModmailConversationAuthor;
+  state!: number;
+  lastUnread?: any;
+  numMessages!: number;
+  messages?: ModmailMessage[];
 
   get _uri () {
     return `api/mod/conversations/${this.id}?markRead=false`;
@@ -61,7 +113,7 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
    * @return {ModmailConversation}
    * @private
    */
-  _transformApiResponse (response) {
+  _transformApiResponse (response: any): ModmailConversation {
     response.conversation.owner = this._r._newObject('Subreddit', {
       id: response.conversation.owner.id,
       display_name: response.conversation.owner.displayName
@@ -75,7 +127,7 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
     return this._r._newObject('ModmailConversation', {
       ...conversationObjects,
       ...response.conversation
-    }, true);
+    }, true) as ModmailConversation;
   }
 
   /**
@@ -85,8 +137,8 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
    * @return {object}
    * @private
    */
-  static _getConversationObjects (conversation, response) {
-    const conversationObjects = {};
+  static _getConversationObjects (conversation: any, response: any): object {
+    const conversationObjects: { [x: string]: any[]; } = {};
     for (const objId of conversation.objIds) {
       if (!conversationObjects[objId.key]) {
         conversationObjects[objId.key] = [];
@@ -103,7 +155,7 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
    *
    * r.getNewModmailConversation('75hxt').archive()
    */
-  archive () {
+  archive (): Promise<ModmailConversation> {
     return this._post({uri: `api/mod/conversations/${this.id}/archive`});
   }
 
@@ -114,7 +166,7 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
    *
    * r.getNewModmailConversation('75hxt').unarchive()
    */
-  unarchive () {
+  unarchive (): Promise<ModmailConversation> {
     return this._post({uri: `api/mod/conversations/${this.id}/unarchive`});
   }
 
@@ -125,7 +177,7 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
    *
    * r.getNewModmailConversation('75hxt').highlight()
    */
-  highlight () {
+  highlight (): Promise<ModmailConversation> {
     return this._post({uri: `api/mod/conversations/${this.id}/highlight`});
   }
 
@@ -136,7 +188,7 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
    *
    * r.getNewModmailConversation('75hxt').unhighlight()
    */
-  unhighlight () {
+  unhighlight (): Promise<ModmailConversation> {
     return this._delete({uri: `api/mod/conversations/${this.id}/highlight`});
   }
 
@@ -147,7 +199,7 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
    *
    * r.getNewModmailConversation('75hxt').mute()
    */
-  mute () {
+  mute (): Promise<ModmailConversation> {
     return this._post({uri: `api/mod/conversations/${this.id}/mute`});
   }
 
@@ -158,7 +210,7 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
    *
    * r.getNewModmailConversation('75hxt').unmute()
    */
-  unmute () {
+  unmute (): Promise<ModmailConversation> {
     return this._post({uri: `api/mod/conversations/${this.id}/unmute`});
   }
 
@@ -169,7 +221,7 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
    *
    * r.getNewModmailConversation('75hxt').read()
    */
-  read () {
+  read (): Promise<void> {
     return this._r.markNewModmailConversationsAsRead([this.id]);
   }
 
@@ -180,7 +232,7 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
    *
    * r.getNewModmailConversation('75hxt').unread()
    */
-  unread () {
+  unread (): Promise<void> {
     return this._r.markNewModmailConversationsAsUnread([this.id]);
   }
 
@@ -192,10 +244,10 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
    * r.getNewModmailConversation('75hxt').getParticipant().then(console.log)
    * // ModmailConversationAuthor { muteStatus: {...}, name: "SpyTec13", created: '2015-11-22T14:30:38.821292+00:00', ...}
    */
-  getParticipant () {
+  getParticipant (): Promise<ModmailConversationAuthor> {
     return this._get({uri: `api/mod/conversations/${this.id}/user`})
       .then(res => {
-        return this._r._newObject('ModmailConversationAuthor', res, true);
+        return this._r._newObject('ModmailConversationAuthor', res, true) as ModmailConversationAuthor;
       });
   }
 
@@ -203,7 +255,7 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
    * @summary Returns whether the ModmailConversation is read.
    * @return {boolean} true, if read. false otherwise
    */
-  isRead () {
+  isRead (): boolean {
     return this.lastUnread === null;
   }
 
@@ -212,4 +264,3 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
   }
 };
 
-export default ModmailConversation;
