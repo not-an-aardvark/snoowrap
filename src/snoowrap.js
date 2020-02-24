@@ -126,7 +126,7 @@ const snoowrap = class snoowrap {
    * @param {string} options.redirectUri The URL where the user should be redirected after authenticating. This **must** be the
    same as the redirect URI that is configured for the reddit app. (If there is a mismatch, the returned URL will display an
    error page instead of an authentication form.)
-   * @param {boolean} options.permanent=true If `true`, the app will have indefinite access to the user's account. If `false`,
+   * @param {boolean} [options.permanent=true] If `true`, the app will have indefinite access to the user's account. If `false`,
    access to the user's account will expire after 1 hour.
    * @param {string} [options.state] A string that can be used to verify a user after they are redirected back to the site. When
    the user is redirected from reddit, to the redirect URI after authenticating, the resulting URI will have this same `state`
@@ -269,6 +269,8 @@ const snoowrap = class snoowrap {
   * DO_NOT_TRACK_THIS_DEVICE."
   * @param {string} [options.grantType=snoowrap.grantType.INSTALLED_CLIENT] The type of "user-less"
   * token to use {@link snoowrap.grantType}
+  * @param {boolean} [options.permanent=true] If `true`, the app will have indefinite access. If `false`,
+  access will expire after 1 hour.
   * @param {string} [options.endpointDomain='reddit.com'] The endpoint domain that the returned requester should be configured
   to use. If the user is authenticating on reddit.com (as opposed to some other site with a reddit-like API), you can omit this
   value.
@@ -305,6 +307,7 @@ const snoowrap = class snoowrap {
     clientSecret,
     deviceId,
     grantType = snoowrap.grantType.INSTALLED_CLIENT,
+    permanent = true,
     endpointDomain = 'reddit.com'
   }) {
     return this.prototype.credentialedClientRequest.call({
@@ -316,7 +319,7 @@ const snoowrap = class snoowrap {
       method: 'post',
       baseUrl: `https://www.${endpointDomain}/`,
       uri: 'api/v1/access_token',
-      form: {grant_type: grantType, device_id: deviceId}
+      form: {grant_type: grantType, device_id: deviceId, duration: permanent ? 'permanent' : 'temporary'}
     }).then(response => {
       if (response.error) {
         throw new errors.RequestError(`API Error: ${response.error} - ${response.error_description}`);

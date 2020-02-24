@@ -160,6 +160,8 @@ declare namespace Snoowrap {
     userAgent: string;
     clientSecret?: string;
     redirectUri: string;
+    permanent?: boolean; // defaults to true
+    endpointDomain?: string;
     deviceId?: string;
   }
 
