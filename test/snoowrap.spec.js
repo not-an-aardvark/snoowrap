@@ -2031,8 +2031,6 @@ describe('snoowrap', function () {
 
     it('can archive a conversation', async () => {
       let conversation = await r.getNewModmailConversation('75hxt').fetch();
-      expect(conversation.state).to.not.equal(snoowrap.objects.ModmailConversation.conversationStates.Archived);
-
       await conversation.archive();
       conversation = await conversation.refresh();
       expect(conversation.state).to.equal(snoowrap.objects.ModmailConversation.conversationStates.Archived);
