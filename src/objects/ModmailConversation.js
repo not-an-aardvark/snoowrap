@@ -97,6 +97,24 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
   }
 
   /**
+   * @summary Reply to current ModmailConversation
+   * @param {string} body Markdown text
+   * @param {boolean} isAuthorHidden Subreddit-name reply if true, user's name if false
+   * @param {boolean} isInternal If reply should be to internal moderators only
+   * @return {Promise}
+   */
+  reply (body, isAuthorHidden = false, isInternal = false) {
+    return this._post({
+      uri: `api/mod/conversations/${this.id}`,
+      form: {
+        body,
+        isAuthorHidden,
+        isInternal
+      }
+    });
+  }
+
+  /**
    * @summary Archives the ModmailConversation
    * @return {Promise}
    * @example

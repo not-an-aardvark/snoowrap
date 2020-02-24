@@ -2020,6 +2020,11 @@ describe('snoowrap', function () {
       expect(conversation.participant).to.be.an.instanceof(snoowrap.objects.ModmailConversationAuthor);
     });
 
+    it('can reply to a conversation', async () => {
+      const conversation = r.getNewModmailConversation('75hxt');
+      await conversation.reply('testing1', true, true);
+    });
+
     it('can archive a conversation', async () => {
       let conversation = await r.getNewModmailConversation('75hxt').fetch();
       expect(conversation.state).to.not.equal(snoowrap.objects.ModmailConversation.conversationStates.Archived);
