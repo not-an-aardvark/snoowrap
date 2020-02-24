@@ -1,5 +1,5 @@
 export const MODULE_NAME = 'snoowrap';
-export const VERSION = '1.20.1';
+export const VERSION = '1.21.0';
 export const DOCS_LINK = 'https://not-an-aardvark.github.io/snoowrap/';
 export const API_RULES_LINK = 'https://github.com/reddit/reddit/wiki/API';
 /* USER_KEYS and SUBREDDIT_KEYS are keys that are replaced by RedditUser and Subreddit objects when encountered in

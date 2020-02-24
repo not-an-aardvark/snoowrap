@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.21.0 (2020-02-24)
+
+* Added `permanent` option to `snoowrap#applicationOnlyAuth`
+* Added `ModmailConversation#reply()`
+* TS: Added `snoowrap#getBest()` definitions
+* Bump dependencies
+
 ## v1.20.1 (2019-11-14)
 
 * Updated `snoowrap#applicationOnlyAuth` TypeScript definitions
