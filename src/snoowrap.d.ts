@@ -67,6 +67,7 @@ declare class Snoowrap {
   getFriends(): Promise<_RedditUser[]>;
   getGoldSubreddits(options?: ListingOptions): Promise<_Listing<_Subreddit>>;
   getHot(subredditName?: string, options?: ListingOptions): Promise<_Listing<_Submission>>;
+  getBest(options?: ListingOptions): Promise<_Listing<_Submission>>;
   getInbox(options?: { filter?: string }): Promise<_Listing<_PrivateMessage | _Comment>>;
   getKarma(): Promise<Array<{ sr: _Subreddit; comment_karma: number; link_karma: number; }>>;
   getLivethread(threadId: string): _LiveThread;
