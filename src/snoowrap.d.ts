@@ -32,8 +32,8 @@ export = Snoowrap;
 declare class Snoowrap {
   static getAuthUrl(options: Snoowrap.AuthUrlOptions): string;
   static fromAuthCode(options: Snoowrap.AuthCodeOptions): Promise<Snoowrap>;
-  static fromApplicationOnlyAuth(options: Snoowrap.AuthCodeOptions): Promise<Snoowrap>;
-  
+  static fromApplicationOnlyAuth(options: Snoowrap.AuthOnlyOptions): Promise<Snoowrap>;
+
   _newObject (objectType: string, content: object[]|object, _hasFetched?: boolean): Array<unknown>|object;
   static noConflict(): typeof Snoowrap;
 
@@ -143,19 +143,21 @@ declare namespace Snoowrap {
     proxies?: boolean;
   }
 
-  export interface AuthUrlOptions {
+  export interface BaseAuthOptions {
     clientId: string;
+    endpointDomain?: string;
+  }
+
+  export interface AuthUrlOptions extends BaseAuthOptions {
     scope: string[];
     redirectUri: string;
     permanent?: boolean; // defaults to true
     state?: string;
-    endpointDomain?: string;
   }
 
-  export interface AuthCodeOptions {
+  export interface AuthCodeOptions extends BaseAuthOptions {
     code: string;
     userAgent: string;
-    clientId: string;
     clientSecret?: string;
     redirectUri: string;
     permanent?: boolean; // defaults to true
@@ -163,13 +165,33 @@ declare namespace Snoowrap {
     deviceId?: string;
   }
 
+  export type GrantType = 'client_credentials' | 'https://oauth.reddit.com/grants/installed_client'
+
+  interface BaseAuthOnlyOptions extends BaseAuthOptions{
+    userAgent: string
+  }
+
+  interface AuthOnlyCredentialsOptions extends BaseAuthOnlyOptions {
+    clientSecret: string
+    grantType: 'client_credentials',
+    deviceId?: string
+  }
+
+  interface AuthOnlyInstalledOptions extends BaseAuthOnlyOptions {
+    clientSecret?: string
+    grantType?: 'https://oauth.reddit.com/grants/installed_client'
+    deviceId: string
+  }
+
+  export type AuthOnlyOptions = AuthOnlyCredentialsOptions | AuthOnlyInstalledOptions
+
   export type Sort = 'confidence' | 'top' | 'new' | 'controversial' | 'old' | 'random' | 'qa';
 
-  export interface ModAction extends RedditContent<ModAction> {
+  export interface ModAction extends _RedditContent<ModAction> {
     target_body: string;
     mod_id36: string;
     created_utc: number;
-    subreddit: Subreddit;
+    subreddit: _Subreddit;
     target_title: string | null;
     target_permalink: string;
     subreddit_name_prefixed: string;
@@ -198,10 +220,10 @@ declare namespace Snoowrap {
   }
 
   export interface ComposeMessageParams {
-    to: RedditUser | Subreddit | string;
+    to: _RedditUser | _Subreddit | string;
     subject: string;
     text: string;
-    fromSubreddit?: Subreddit | string;
+    fromSubreddit?: _Subreddit | string;
     captchaIden?: string;
     captchaResponse?: string;
   }
@@ -214,7 +236,7 @@ declare namespace Snoowrap {
   }
 
   export interface SearchOptions extends BaseSearchOptions {
-    subreddit?: Subreddit | string;
+    subreddit?: _Subreddit | string;
     restrictSr?: boolean;
   }
 

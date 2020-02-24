@@ -121,3 +121,19 @@ Most content constructors (`Comment`, `Submission`, etc.) are subclasses of the 
 `RedditContent` instances carry shortcut functions such as `_get`, `_post`, etc. These do the same thing as the corresponding functions on the snoowrap prototype.
 
 `RedditContent` objects also have a `_fetch` property. This starts out as `null` when the object is created, and gets set to a Promise and returned when `fetch()` is called for the first time. All subsequent calls to `fetch()` return the same Promise. This ensures that no objects get fetched more than once (unless it is explicitly re-fetched using `refresh()`).
+
+## Releases
+
+To do a release:
+
+1. Decide on the version number of the new release, based on the changes since the last release.
+1. Prepare the package for the release:
+    * Update the `version` field in `package.json`
+    * Update the `VERSION` constant in `src/constants.js`
+    * Add a new entry to `CHANGELOG.md` describing the release
+    * Run `npm run bundle-size` and update `README.md` with the new size of `snoowrap-v1.min.js` in the "Browsers" section, if needed. (This doesn't need to be kept up to date every release, but running it once in a while is nice to make sure the advertised size isn't wildly off.)
+1. Consider running `npm test`, or making sure the latest build on master is passing.
+1. Run `npm publish` to publish the package to npm.
+1. Push the released to GitHub (`git commit` followed by `git push`)
+1. Create a tag for the release (e.g. `git tag v1.20.0`) and push the tag to GitHub (`git push --tag`)
+1. To update the docs website and the browser build, run `scripts/deploy/deploy_docs.sh`. Note that this script will create a git commit and push it to GitHub.
