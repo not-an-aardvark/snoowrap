@@ -146,7 +146,7 @@ const snoowrap = class snoowrap {
    * });
    * // --> 'https://www.reddit.com/api/v1/authorize?client_id=foobarbaz&response_type=code&state= ...'
    *
-   * window.location = authenticationUrl; // send the user to the authentication url
+   * window.location.href = authenticationUrl; // send the user to the authentication url
    */
   static getAuthUrl ({
     clientId = requiredArg('clientId'),
