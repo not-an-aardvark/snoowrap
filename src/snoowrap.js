@@ -280,7 +280,7 @@ const snoowrap = class snoowrap {
   * snoowrap.fromApplicationOnlyAuth({
   *   userAgent: 'My app',
   *   clientId: 'foobarbazquuux',
-  *   deviceId: 'unique id between 20-30 chars'
+  *   deviceId: 'unique id between 20-30 chars',
   *   grantType: snoowrap.grantType.INSTALLED_CLIENT
   * }).then(r => {
   *   // Now we have a requester that can access reddit through a "user-less" Auth token
@@ -292,7 +292,7 @@ const snoowrap = class snoowrap {
   * snoowrap.fromApplicationOnlyAuth({
   *   userAgent: 'My app',
   *   clientId: 'foobarbazquuux',
-  *   clientSecret: 'your web app secret'
+  *   clientSecret: 'your web app secret',
   *   grantType: snoowrap.grantType.CLIENT_CREDENTIALS
   * }).then(r => {
   *   // Now we have a requester that can access reddit through a "user-less" Auth token
