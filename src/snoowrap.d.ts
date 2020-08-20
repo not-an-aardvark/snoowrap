@@ -90,7 +90,7 @@ declare class Snoowrap {
   bulkReadNewModmail(subs: Array<_Subreddit | string>, state: 'new'|'inprogress'|'mod'|'notifications'|'archived'|'highlighted'|'all'): Promise<_Listing<_ModmailConversation>>;
   getNewSubreddits(options?: ListingOptions): Promise<_Listing<_Subreddit>>;
   getOauthScopeList(): Promise<{ [key: string]: { description: string; id: string; name: string } }>;
-  getPopularSubreddit(options?: ListingOptions): Promise<_Listing<_Subreddit>>;
+  getPopularSubreddits(options?: ListingOptions): Promise<_Listing<_Subreddit>>;
   getPreferences(): Promise<any>;
   getRandomSubmission(subredditName?: string): Promise<_Submission>;
   getRising(subredditName?: string, options?: ListingOptions): Promise<_Listing<_Submission>>;
