@@ -89,6 +89,7 @@ export default class Submission extends VoteableContent<Submission> {
   preview: { enabled: boolean; images: ImagePreview[] };
   quarantine: boolean;
   removal_reason: string | null;
+  removed_by_category: string | null;
   /** Same content as media, except HTTPS */
   secure_media: Media | null;
   secure_media_embed: SecureMediaEmbed;
