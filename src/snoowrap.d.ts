@@ -239,6 +239,15 @@ declare namespace Snoowrap {
   export interface SearchOptions extends BaseSearchOptions {
     subreddit?: _Subreddit | string;
     restrictSr?: boolean;
+    after?: string;
+    before?: string;
+    category?: string;
+    count?: number;
+    include_facets?: boolean;
+    limit?: number
+    show?: 'all',
+    sr_detail?: string
+    type?: string
   }
 
   export interface Trophy {
