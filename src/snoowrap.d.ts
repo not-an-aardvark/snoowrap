@@ -216,8 +216,13 @@ declare namespace Snoowrap {
   }
 
   export interface SubmitLinkOptions {
+    subredditName: string;
+    title: string;
     url: string;
+    sendReplies?: boolean;
     resubmit?: boolean;
+    captchaIden?: string;
+    captchaResponse?: string;
   }
 
   export interface ComposeMessageParams {
