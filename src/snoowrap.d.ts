@@ -80,6 +80,7 @@ declare class Snoowrap {
   getNew(subredditName?: string, options?: ListingOptions): Promise<_Listing<_Submission>>;
   getNewCaptchaIdentifier(): Promise<string>;
   getNewComments(subredditName?: string, options?: ListingOptions): Promise<_Listing<_Comment>>;
+  getContentByIds(ids: Array<_Submission | _Comment | string>) : Promise<_Listing<_Submission | _Comment>>;
   getNewModmailConversations(options?: ListingOptions & { entity?: string }): Promise<_Listing<_ModmailConversation>>;
   createModmailDiscussion(options: { body: string, subject: string, srName: string }): Promise<_ModmailConversation>;
   getNewModmailConversation(id: string): Promise<_ModmailConversation>;
