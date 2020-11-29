@@ -163,7 +163,7 @@ export default class Subreddit extends RedditContent<Subreddit> {
   }>): Promise<this>;
   showMyFlair(): Promise<this>;
   submitLink(options: SubmitLinkOptions): Promise<Submission>;
-  submitSelfPost(options: SubmitSelfPostOptions): Promise<Submission>;
+  submitSelfpost(options: SubmitSelfPostOptions): Promise<Submission>;
   subscribe(): Promise<this>;
   unbanUser(options: { name: string; }): Promise<this>;
   unmuteUser(options: { name: string; }): Promise<this>;
