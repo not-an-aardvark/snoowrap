@@ -246,6 +246,7 @@ export interface SubredditSettings {
   collapse_deleted_comments?: boolean;
   suggested_comment_sort?: Sort; // TODO rename AvailableSorts?
   spoilers_enabled?: boolean;
+  default_set?: boolean;
 }
 
 interface ImageUploadOptions {
