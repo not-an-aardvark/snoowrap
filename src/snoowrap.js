@@ -1462,7 +1462,8 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
     type = 'public',
     wiki_edit_age,
     wiki_edit_karma,
-    wikimode = 'modonly'
+    wikimode = 'modonly',
+    ...otherKeys
   }) {
     return this._post({
       uri: 'api/site_admin', form: {
@@ -1470,7 +1471,8 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
         exclude_banned_modqueue, 'header-title': header_title, hide_ads, iden: captcha_iden, lang, link_type, name,
         over_18, public_description, public_traffic, show_media, show_media_preview, spam_comments, spam_links,
         spam_selfposts, spoilers_enabled, sr, submit_link_label, submit_text, submit_text_label, suggested_comment_sort,
-        title, type, wiki_edit_age, wiki_edit_karma, wikimode
+        title, type, wiki_edit_age, wiki_edit_karma, wikimode,
+        ...otherKeys
       }
     }).then(handleJsonErrors(this.getSubreddit(name || sr)));
   }
