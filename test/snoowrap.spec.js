@@ -5,7 +5,7 @@ const expect = require('chai').use(require('dirty-chai')).expect;
 const Promise = require('bluebird');
 const _ = require('lodash');
 const moment = require('moment');
-const request = require('request-promise');
+const axios = require('axios');
 const util = require('util');
 const snoowrap = require('..');
 
@@ -14,7 +14,7 @@ describe('snoowrap', function () {
   // TODO: split this test into multiple files
   this.timeout(60000);
   this.slow(Infinity);
-  let oauthInfo, r, r2, cookieAgent;
+  let oauthInfo, r, r2, defaultRequest;
   before(async () => {
     oauthInfo = process.env.CI ? {
       user_agent: process.env.SNOOWRAP_USER_AGENT,
@@ -47,20 +47,25 @@ describe('snoowrap', function () {
     r.config({request_delay: 1000});
 
     if (!isBrowser) {
-      const defaultRequest = request.defaults({
-        headers: {'user-agent': oauthInfo.user_agent},
-        json: true,
-        jar: request.jar(),
-        baseUrl: 'https://www.reddit.com/'
+      defaultRequest = axios.create({
+        baseURL: 'https://www.reddit.com/',
+        timeout: 3000,
+        maxRedirects: 0,
+        withCredentials: true,
+        headers: {
+          'User-Agent': oauthInfo.user_agent
+        }
       });
 
-      const loginResponse = await defaultRequest.post({
-        uri: 'api/login',
-        form: {user: oauthInfo.username, passwd: oauthInfo.password, api_type: 'json'}
-      });
+      const params = new URLSearchParams();
+      params.append('user', oauthInfo.username);
+      params.append('passwd', oauthInfo.password);
+      params.append('api_type', 'json');
 
-      expect(loginResponse.json.errors.length).to.equal(0);
-      cookieAgent = defaultRequest.defaults({headers: {'X-Modhash': loginResponse.json.data.modhash}});
+      const {data} = await defaultRequest.post('api/login', params);
+      expect(data.json.errors.length).to.equal(0);
+      // eslint-disable-next-line require-atomic-updates
+      defaultRequest.defaults.headers.common['X-Modhash'] = data.json.data.modhash;
     }
   });
 
@@ -193,21 +198,22 @@ describe('snoowrap', function () {
       }).to.throw(TypeError);
     });
     (isBrowser ? it.skip : it)('returns a Promise for a valid requester', async () => {
-      const authResponse = await cookieAgent.post({
-        uri: 'api/v1/authorize',
-        simple: false,
-        resolveWithFullResponse: true,
-        form: {
-          client_id: oauthInfo.client_id,
-          redirect_uri: oauthInfo.redirect_uri,
-          scope: 'identity',
-          state: '_',
-          response_type: 'code',
-          duration: 'temporary',
-          authorize: 'Allow'
+      const params = new URLSearchParams();
+      params.append('client_id', oauthInfo.client_id);
+      params.append('redirect_uri', oauthInfo.redirect_uri);
+      params.append('scope', 'identity');
+      params.append('state', '_');
+      params.append('response_type', 'response_type');
+      params.append('duration', 'temporary');
+      params.append('authorize', 'Allow');
+
+      const authResponse = await defaultRequest.post('api/v1/authorize', params, {
+        validateStatus (status) {
+          return status < 500;
         }
       });
-      expect(authResponse.statusCode).to.equal(302);
+
+      expect(authResponse.status).to.equal(302);
 
       const newRequester = await snoowrap.fromAuthCode({
         code: require('url').parse(authResponse.headers.location, true).query.code,
@@ -904,7 +910,7 @@ describe('snoowrap', function () {
       const l = await r.getTop({time: 'all', limit: 1});
       expect(l).to.have.lengthOf(1);
       r.config({request_delay: 5000});
-      const timer_promise = Promise.delay(9999);
+      const timer_promise = Promise.delay(15000);
       const expanded_l = await l.fetchMore({amount: 200});
       expect(expanded_l).to.have.lengthOf(201);
       expect(timer_promise.isFulfilled()).to.be.false();
@@ -2157,6 +2163,7 @@ describe('snoowrap', function () {
         'highlighted',
         'notifications',
         'archived',
+        'appeals',
         'new',
         'inprogress',
         'mod'
