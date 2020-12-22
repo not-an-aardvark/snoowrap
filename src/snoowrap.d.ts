@@ -71,7 +71,7 @@ declare class Snoowrap {
   getInbox(options?: { filter?: string }): Promise<_Listing<_PrivateMessage | _Comment>>;
   getKarma(): Promise<Array<{ sr: _Subreddit; comment_karma: number; link_karma: number; }>>;
   getLivethread(threadId: string): _LiveThread;
-  getMe(): _RedditUser;
+  getMe(): Promise<_RedditUser>;
   getMessage(messageId: string): _PrivateMessage;
   getModeratedSubreddits(options?: ListingOptions): Promise<_Listing<_Subreddit>>;
   getModmail(options?: ListingOptions): Promise<_Listing<_PrivateMessage>>;
@@ -103,7 +103,7 @@ declare class Snoowrap {
   getSubscriptions(options?: ListingOptions): _Listing<_Subreddit>;
   getTop(subredditName?: string, options?: SortedListingOptions): Promise<_Listing<_Submission>>;
   getUnreadMessages(options?: ListingOptions): Promise<_Listing<_PrivateMessage>>;
-  getUser(name: string): _RedditUser;
+  getUser(name: string): Promise<_RedditUser>;
   markAsVisited(links: _Submission[]): Promise<void>;
   markMessagesAsRead(messages: _PrivateMessage[] | string[]): Promise<void>;
   markMessagesAsUnread(messages: _PrivateMessage[] | string[]): Promise<void>;
