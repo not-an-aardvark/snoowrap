@@ -1,5 +1,19 @@
 # Changelog
 
+## v1.22.0
+
+* Added catch-all options for `Subreddit#editSettings`
+* TS: added `appeals` value to new modmail count
+* TS: fixed typo in `Subreddit#submitSelfpost`
+* TS: added type definition for `snoowrap#getContentByIds` 
+* TS: more properties to `SubmitLinkOptions` interface
+* TS: more properties to `SearchOptions` interface
+* TS: added `removed_by_category` property to `Submission` 
+* TS: fixed `snoowrap#getPopularSubreddits` typo
+* Fix missing commas in JSDoc examples
+* Fix `window.location` usage in JSDoc
+* Test: fixed failing test suite
+
 ## v1.21.0 (2020-02-24)
 
 * Added `permanent` option to `snoowrap#applicationOnlyAuth`
