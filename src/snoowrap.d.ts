@@ -87,8 +87,8 @@ declare class Snoowrap {
   markNewModmailConversationsAsRead(convs: _ModmailConversation[]): Promise<void>;
   markNewModmailConversationsAsUnread(convs: _ModmailConversation[]): Promise<void>;
   getNewModmailSubreddits(): Promise<_Subreddit[]>;
-  getUnreadNewModmailConversationsCount(): Promise<{ highlighted: number, notifications: number, archived: number, new: number, inprogress: number, mod: number }>;
-  bulkReadNewModmail(subs: Array<_Subreddit | string>, state: 'new'|'inprogress'|'mod'|'notifications'|'archived'|'highlighted'|'all'): Promise<_Listing<_ModmailConversation>>;
+  getUnreadNewModmailConversationsCount(): Promise<{ highlighted: number, notifications: number, archived: number, appeals: number, new: number, inprogress: number, mod: number }>;
+  bulkReadNewModmail(subs: Array<_Subreddit | string>, state: 'new'|'inprogress'|'mod'|'notifications'|'archived'|'appeals'|'highlighted'|'all'): Promise<_Listing<_ModmailConversation>>;
   getNewSubreddits(options?: ListingOptions): Promise<_Listing<_Subreddit>>;
   getOauthScopeList(): Promise<{ [key: string]: { description: string; id: string; name: string } }>;
   getPopularSubreddits(options?: ListingOptions): Promise<_Listing<_Subreddit>>;

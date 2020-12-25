@@ -54,9 +54,10 @@ describe('snoowrap', function () {
         baseUrl: 'https://www.reddit.com/'
       });
 
-      const loginResponse = await defaultRequest.post({
-        uri: 'api/login',
-        form: {user: oauthInfo.username, passwd: oauthInfo.password, api_type: 'json'}
+      const loginResponse = await defaultRequest.post('api/login').form({
+        user: oauthInfo.username,
+        passwd: oauthInfo.password,
+        api_type: 'json'
       });
 
       expect(loginResponse.json.errors.length).to.equal(0);
@@ -907,7 +908,7 @@ describe('snoowrap', function () {
       const timer_promise = Promise.delay(9999);
       const expanded_l = await l.fetchMore({amount: 200});
       expect(expanded_l).to.have.lengthOf(201);
-      expect(timer_promise.isFulfilled()).to.be.false();
+      expect(timer_promise.isFulfilled()).to.be.false('getTop timed out');
     });
     afterEach(() => {
       r.config({request_delay: initial_request_delay});
@@ -2157,6 +2158,7 @@ describe('snoowrap', function () {
         'highlighted',
         'notifications',
         'archived',
+        'appeals',
         'new',
         'inprogress',
         'mod'
