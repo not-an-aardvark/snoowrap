@@ -828,6 +828,8 @@ error page instead of an authentication form.)</p></td>
             
                 <td class="attributes">
                 
+                    &lt;optional><br>
+                
 
                 
 
@@ -1030,7 +1032,7 @@ reddit.com (as opposed to some other site with a reddit-like API), you can omit 
 });
 // --&gt; &#x27;https://www.reddit.com/api/v1/authorize?client_id=foobarbaz&amp;response_type=code&amp;state= ...&#x27;
 
-window.location = authenticationUrl; // send the user to the authentication url</pre>
+window.location.href = authenticationUrl; // send the user to the authentication url</pre>
 
 
     
@@ -1763,6 +1765,47 @@ token to use <a href="snoowrap.html#.grantType"><code>snoowrap.grantType</code><
 
         <tr>
             
+                <td class="name"><code>permanent</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"><p>If <code>true</code>, the app will have indefinite access. If <code>false</code>,
+access will expire after 1 hour.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>endpointDomain</code></td>
             
 
@@ -1896,7 +1939,7 @@ value.</p></td>
     <pre class="sunlight-highlight-javascript">snoowrap.fromApplicationOnlyAuth({
   userAgent: &#x27;My app&#x27;,
   clientId: &#x27;foobarbazquuux&#x27;,
-  deviceId: &#x27;unique id between 20-30 chars&#x27;
+  deviceId: &#x27;unique id between 20-30 chars&#x27;,
   grantType: snoowrap.grantType.INSTALLED_CLIENT
 }).then(r =&gt; {
   // Now we have a requester that can access reddit through a &quot;user-less&quot; Auth token
@@ -1908,7 +1951,7 @@ value.</p></td>
 snoowrap.fromApplicationOnlyAuth({
   userAgent: &#x27;My app&#x27;,
   clientId: &#x27;foobarbazquuux&#x27;,
-  clientSecret: &#x27;your web app secret&#x27;
+  clientSecret: &#x27;your web app secret&#x27;,
   grantType: snoowrap.grantType.CLIENT_CREDENTIALS
 }).then(r =&gt; {
   // Now we have a requester that can access reddit through a &quot;user-less&quot; Auth token

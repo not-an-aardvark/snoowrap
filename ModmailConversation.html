@@ -204,6 +204,200 @@ r.getNewModmailConversation(&#x27;75hxt&#x27;)</pre>
             
 <hr>
 <dt>
+    <h4 class="name" id="reply"><span class="type-signature"></span>reply(body, isAuthorHidden, isInternal)</h4>
+    
+    
+    <p class="summary"><p>Reply to current ModmailConversation</p></p>
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>body</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Markdown text</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>isAuthorHidden</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Subreddit-name reply if true, user's name if false</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>isInternal</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>If reply should be to internal moderators only</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
     <h4 class="name" id="archive"><span class="type-signature"></span>archive()</h4>
     
     
@@ -1338,17 +1532,7 @@ function is called again. To refresh an object, use refresh().</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;).fetch().then(userInfo =&gt; {
-  console.log(userInfo.name); // &#x27;not_an_aardvark&#x27;
-  console.log(userInfo.created_utc); // 1419104352
-});
-
-r.getComment(&#x27;d1xchqn&#x27;).fetch().then(comment =&gt; comment.body).then(console.log)
-// =&gt; &#x27;This is a little too interesting for my liking&#x27;
-
-// In environments that support ES2015 Proxies, the above line is equivalent to:
-r.getComment(&#x27;d1xchqn&#x27;).body.then(console.log);
-// =&gt; &#x27;This is a little too interesting for my liking&#x27;</pre>
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;).fetch().then(userInfo =&gt; {  console.log(userInfo.name); // &#x27;not_an_aardvark&#x27;  console.log(userInfo.created_utc); // 1419104352});r.getComment(&#x27;d1xchqn&#x27;).fetch().then(comment =&gt; comment.body).then(console.log)// =&gt; &#x27;This is a little too interesting for my liking&#x27;// In environments that support ES2015 Proxies, the above line is equivalent to:r.getComment(&#x27;d1xchqn&#x27;).body.then(console.log);// =&gt; &#x27;This is a little too interesting for my liking&#x27;</pre>
 
 
     
@@ -1463,16 +1647,7 @@ r.getComment(&#x27;d1xchqn&#x27;).body.then(console.log);
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var someComment = r.getComment(&#x27;cmfkyus&#x27;);
-var initialCommentBody = some_comment.fetch().then(comment =&gt; comment.body);
-
-setTimeout(() =&gt; {
-  someComment.refresh().then(refreshedComment =&gt; {
-    if (initialCommentBody.value() !== refreshedComment.body) {
-      console.log(&#x27;This comment has changed since 10 seconds ago.&#x27;);
-    }
-  });
-}, 10000);</pre>
+    <pre class="sunlight-highlight-javascript">var someComment = r.getComment(&#x27;cmfkyus&#x27;);var initialCommentBody = some_comment.fetch().then(comment =&gt; comment.body);setTimeout(() =&gt; {  someComment.refresh().then(refreshedComment =&gt; {    if (initialCommentBody.value() !== refreshedComment.body) {      console.log(&#x27;This comment has changed since 10 seconds ago.&#x27;);    }  });}, 10000);</pre>
 
 
     
@@ -1592,8 +1767,7 @@ private properties anyway.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var user = r.getUser(&#x27;not_an_aardvark&#x27;);
-JSON.stringify(user) // =&gt; &#x27;{&quot;name&quot;:&quot;not_an_aardvark&quot;}&#x27;</pre>
+    <pre class="sunlight-highlight-javascript">var user = r.getUser(&#x27;not_an_aardvark&#x27;);JSON.stringify(user) // =&gt; &#x27;{&quot;name&quot;:&quot;not_an_aardvark&quot;}&#x27;</pre>
 
 
     

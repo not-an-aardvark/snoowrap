@@ -189,8 +189,7 @@ paraphrased from reddit's descriptions <a href="https://www.reddit.com/dev/api#s
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">// Get a livethread with the given ID
-r.getLivethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
+    <pre class="sunlight-highlight-javascript">// Get a livethread with the given IDr.getLivethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
 
 
     
@@ -893,11 +892,7 @@ r.getLivethread(&#x27;whrdxo8dg9n0&#x27;)</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getLivethread(&#x27;whrdxo8dg9n0&#x27;).getContributors().then(console.log)
-// =&gt; [
-//  RedditUser { permissions: [&#x27;edit&#x27;], name: &#x27;not_an_aardvark&#x27;, id: &#x27;t2_k83md&#x27; },
-//  RedditUser { permissions: [&#x27;all&#x27;], id: &#x27;t2_u3l80&#x27;, name: &#x27;snoowrap_testing&#x27; }
-// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getLivethread(&#x27;whrdxo8dg9n0&#x27;).getContributors().then(console.log)// =&gt; [//  RedditUser { permissions: [&#x27;edit&#x27;], name: &#x27;not_an_aardvark&#x27;, id: &#x27;t2_k83md&#x27; },//  RedditUser { permissions: [&#x27;all&#x27;], id: &#x27;t2_u3l80&#x27;, name: &#x27;snoowrap_testing&#x27; }// ]</pre>
 
 
     
@@ -2780,12 +2775,7 @@ some combination of <code>'update', 'edit', 'manage'</code>. To give the contrib
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getLivethread(&#x27;whrdxo8dg9n0&#x27;).getRecentUpdates().then(console.log)
-// =&gt; Listing [
-//  LiveUpdate { ... },
-//  LiveUpdate { ... },
-//  ...
-// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getLivethread(&#x27;whrdxo8dg9n0&#x27;).getRecentUpdates().then(console.log)// =&gt; Listing [//  LiveUpdate { ... },//  LiveUpdate { ... },//  ...// ]</pre>
 
 
     
@@ -2953,12 +2943,7 @@ some combination of <code>'update', 'edit', 'manage'</code>. To give the contrib
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getLivethread(&#x27;whrdxo8dg9n0&#x27;).getDiscussions().then(console.log)
-// =&gt; Listing [
-//  Submission { ... },
-//  Submission { ... },
-//  ...
-// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getLivethread(&#x27;whrdxo8dg9n0&#x27;).getDiscussions().then(console.log)// =&gt; Listing [//  Submission { ... },//  Submission { ... },//  ...// ]</pre>
 
 
     
@@ -3057,11 +3042,7 @@ finished listening for updates on this LiveThread.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var myThread = r.getLivethread(&#x27;whrdxo8dg9n0&#x27;);
-myThread.stream.on(&#x27;update&#x27;, content =&gt; {
-  console.log(content);
-  myThread.closeStream();
-})</pre>
+    <pre class="sunlight-highlight-javascript">var myThread = r.getLivethread(&#x27;whrdxo8dg9n0&#x27;);myThread.stream.on(&#x27;update&#x27;, content =&gt; {  console.log(content);  myThread.closeStream();})</pre>
 
 
     
@@ -3191,17 +3172,7 @@ function is called again. To refresh an object, use refresh().</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;).fetch().then(userInfo =&gt; {
-  console.log(userInfo.name); // &#x27;not_an_aardvark&#x27;
-  console.log(userInfo.created_utc); // 1419104352
-});
-
-r.getComment(&#x27;d1xchqn&#x27;).fetch().then(comment =&gt; comment.body).then(console.log)
-// =&gt; &#x27;This is a little too interesting for my liking&#x27;
-
-// In environments that support ES2015 Proxies, the above line is equivalent to:
-r.getComment(&#x27;d1xchqn&#x27;).body.then(console.log);
-// =&gt; &#x27;This is a little too interesting for my liking&#x27;</pre>
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;).fetch().then(userInfo =&gt; {  console.log(userInfo.name); // &#x27;not_an_aardvark&#x27;  console.log(userInfo.created_utc); // 1419104352});r.getComment(&#x27;d1xchqn&#x27;).fetch().then(comment =&gt; comment.body).then(console.log)// =&gt; &#x27;This is a little too interesting for my liking&#x27;// In environments that support ES2015 Proxies, the above line is equivalent to:r.getComment(&#x27;d1xchqn&#x27;).body.then(console.log);// =&gt; &#x27;This is a little too interesting for my liking&#x27;</pre>
 
 
     
@@ -3321,16 +3292,7 @@ r.getComment(&#x27;d1xchqn&#x27;).body.then(console.log);
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var someComment = r.getComment(&#x27;cmfkyus&#x27;);
-var initialCommentBody = some_comment.fetch().then(comment =&gt; comment.body);
-
-setTimeout(() =&gt; {
-  someComment.refresh().then(refreshedComment =&gt; {
-    if (initialCommentBody.value() !== refreshedComment.body) {
-      console.log(&#x27;This comment has changed since 10 seconds ago.&#x27;);
-    }
-  });
-}, 10000);</pre>
+    <pre class="sunlight-highlight-javascript">var someComment = r.getComment(&#x27;cmfkyus&#x27;);var initialCommentBody = some_comment.fetch().then(comment =&gt; comment.body);setTimeout(() =&gt; {  someComment.refresh().then(refreshedComment =&gt; {    if (initialCommentBody.value() !== refreshedComment.body) {      console.log(&#x27;This comment has changed since 10 seconds ago.&#x27;);    }  });}, 10000);</pre>
 
 
     
@@ -3455,8 +3417,7 @@ private properties anyway.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var user = r.getUser(&#x27;not_an_aardvark&#x27;);
-JSON.stringify(user) // =&gt; &#x27;{&quot;name&quot;:&quot;not_an_aardvark&quot;}&#x27;</pre>
+    <pre class="sunlight-highlight-javascript">var user = r.getUser(&#x27;not_an_aardvark&#x27;);JSON.stringify(user) // =&gt; &#x27;{&quot;name&quot;:&quot;not_an_aardvark&quot;}&#x27;</pre>
 
 
     

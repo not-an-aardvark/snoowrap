@@ -164,8 +164,7 @@
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">// Get a subreddit by name
-r.getSubreddit(&#x27;AskReddit&#x27;)</pre>
+    <pre class="sunlight-highlight-javascript">// Get a subreddit by namer.getSubreddit(&#x27;AskReddit&#x27;)</pre>
 
 
     
@@ -2056,33 +2055,7 @@ responses from reddit.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).setMultipleUserFlairs([
-  {name: &#x27;actually_an_aardvark&#x27;, text: &quot;this is /u/actually_an_aardvark&#x27;s flair text&quot;, cssClass: &#x27;some-css-class&#x27;},
-  {name: &#x27;snoowrap_testing&#x27;, text: &quot;this is /u/snoowrap_testing&#x27;s flair text&quot;, cssClass: &#x27;some-css-class&#x27;}
-]);
-// the above request gets completed successfully
-
-r.getSubreddit(&#x27;snoowrap&#x27;).setMultipleUserFlairs([
-  {name: &#x27;actually_an_aardvark&#x27;, text: &#x27;foo&#x27;, cssClass: &#x27;valid-css-class&#x27;},
-  {name: &#x27;snoowrap_testing&#x27;, text: &#x27;bar&#x27;, cssClass: &quot;this isn&#x27;t a valid css class&quot;},
-  {name: &#x27;not_an_aardvark&#x27;, text: &#x27;baz&#x27;, cssClass: &quot;this also isn&#x27;t a valid css class&quot;}
-])
-// the Promise from the above request gets rejected, with the following rejection reason:
-[
-  {
-    status: &#x27;skipped&#x27;,
-    errors: { css: &#x27;invalid css class &#x60;this isn\&#x27;t a valid css class\&#x27;, ignoring&#x27; },
-    ok: false,
-    warnings: {}
-  },
-  {
-    status: &#x27;skipped&#x27;,
-    errors: { css: &#x27;invalid css class &#x60;this also isn\&#x27;t a valid css class\&#x27;, ignoring&#x27; },
-    ok: false,
-    warnings: {}
-  }
-]
-// note that /u/actually_an_aardvark&#x27;s flair still got set by the request, even though the other two flairs caused errors.</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).setMultipleUserFlairs([  {name: &#x27;actually_an_aardvark&#x27;, text: &quot;this is /u/actually_an_aardvark&#x27;s flair text&quot;, cssClass: &#x27;some-css-class&#x27;},  {name: &#x27;snoowrap_testing&#x27;, text: &quot;this is /u/snoowrap_testing&#x27;s flair text&quot;, cssClass: &#x27;some-css-class&#x27;}]);// the above request gets completed successfullyr.getSubreddit(&#x27;snoowrap&#x27;).setMultipleUserFlairs([  {name: &#x27;actually_an_aardvark&#x27;, text: &#x27;foo&#x27;, cssClass: &#x27;valid-css-class&#x27;},  {name: &#x27;snoowrap_testing&#x27;, text: &#x27;bar&#x27;, cssClass: &quot;this isn&#x27;t a valid css class&quot;},  {name: &#x27;not_an_aardvark&#x27;, text: &#x27;baz&#x27;, cssClass: &quot;this also isn&#x27;t a valid css class&quot;}])// the Promise from the above request gets rejected, with the following rejection reason:[  {    status: &#x27;skipped&#x27;,    errors: { css: &#x27;invalid css class &#x60;this isn\&#x27;t a valid css class\&#x27;, ignoring&#x27; },    ok: false,    warnings: {}  },  {    status: &#x27;skipped&#x27;,    errors: { css: &#x27;invalid css class &#x60;this also isn\&#x27;t a valid css class\&#x27;, ignoring&#x27; },    ok: false,    warnings: {}  }]// note that /u/actually_an_aardvark&#x27;s flair still got set by the request, even though the other two flairs caused errors.</pre>
 
 
     
@@ -2621,8 +2594,7 @@ submissions.</p></td>
     userFlairPosition: &#x27;left&#x27;,
     userFlairSelfAssignEnabled: false,
     linkFlairPosition: &#x27;right&#x27;,
-    linkFlairSelfAssignEnabled: false
-})</pre>
+    linkFlairSelfAssignEnabled: false})</pre>
 
 
     
@@ -3574,8 +3546,7 @@ requires a captcha to submit posts and comments.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).submitSelfpost({title: &#x27;this is a selfpost&#x27;, text: &quot;hi, how&#x27;s it going?&quot;}).then(console.log)
-// =&gt; Submission { name: &#x27;t3_4abmsz&#x27; }</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).submitSelfpost({title: &#x27;this is a selfpost&#x27;, text: &quot;hi, how&#x27;s it going?&quot;}).then(console.log)// =&gt; Submission { name: &#x27;t3_4abmsz&#x27; }</pre>
 
 
     
@@ -3991,8 +3962,7 @@ requires a captcha to submit posts and comments.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).submitLink({title: &#x27;I found a cool website&#x27;, url: &#x27;https://google.com&#x27;}).then(console.log)
-// =&gt; Submission { name: &#x27;t3_4abmsz&#x27; }</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).submitLink({title: &#x27;I found a cool website&#x27;, url: &#x27;https://google.com&#x27;}).then(console.log)// =&gt; Submission { name: &#x27;t3_4abmsz&#x27; }</pre>
 
 
     
@@ -4340,8 +4310,7 @@ the past, reddit will return an error. This could be used to avoid accidental re
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">await r.getSubreddit(&#x27;snoowrap&#x27;).submitCrosspost({ title: &#x27;I found an interesting post&#x27;, originalPost: &#x27;6vths0&#x27; })
-// =&gt; Submission { name: &#x27;t3_4abmsz&#x27; }</pre>
+    <pre class="sunlight-highlight-javascript">await r.getSubreddit(&#x27;snoowrap&#x27;).submitCrosspost({ title: &#x27;I found an interesting post&#x27;, originalPost: &#x27;6vths0&#x27; })// =&gt; Submission { name: &#x27;t3_4abmsz&#x27; }</pre>
 
 
     
@@ -4517,12 +4486,7 @@ the past, reddit will return an error. This could be used to avoid accidental re
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getHot().then(console.log)
-// =&gt; Listing [
-//  Submission { ... },
-//  Submission { ... },
-//  ...
-// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getHot().then(console.log)// =&gt; Listing [//  Submission { ... },//  Submission { ... },//  ...// ]</pre>
 
 
     
@@ -4698,12 +4662,7 @@ the past, reddit will return an error. This could be used to avoid accidental re
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getNew().then(console.log)
-// =&gt; Listing [
-//  Submission { ... },
-//  Submission { ... },
-//  ...
-// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getNew().then(console.log)// =&gt; Listing [//  Submission { ... },//  Submission { ... },//  ...// ]</pre>
 
 
     
@@ -4879,12 +4838,7 @@ the past, reddit will return an error. This could be used to avoid accidental re
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getNewComments().then(console.log)
-// =&gt; Listing [
-//  Comment { ... },
-//  Comment { ... },
-//  ...
-// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getNewComments().then(console.log)// =&gt; Listing [//  Comment { ... },//  Comment { ... },//  ...// ]</pre>
 
 
     
@@ -4995,8 +4949,7 @@ redirect which cannot be followed by a CORS request.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getRandomSubmission().then(console.log)
-// =&gt; Submission { ... }</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getRandomSubmission().then(console.log)// =&gt; Submission { ... }</pre>
 
 
     
@@ -5235,12 +5188,7 @@ redirect which cannot be followed by a CORS request.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getTop({time: &#x27;all&#x27;}).then(console.log)
-// =&gt; Listing [
-//  Comment { ... },
-//  Comment { ... },
-//  ...
-// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getTop({time: &#x27;all&#x27;}).then(console.log)// =&gt; Listing [//  Comment { ... },//  Comment { ... },//  ...// ]</pre>
 
 
     
@@ -5479,12 +5427,7 @@ redirect which cannot be followed by a CORS request.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getControversial({time: &#x27;week&#x27;}).then(console.log)
-// =&gt; Listing [
-//  Comment { ... },
-//  Comment { ... },
-//  ...
-// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getControversial({time: &#x27;week&#x27;}).then(console.log)// =&gt; Listing [//  Comment { ... },//  Comment { ... },//  ...// ]</pre>
 
 
     
@@ -5652,12 +5595,7 @@ redirect which cannot be followed by a CORS request.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getRising().then(console.log)
-// =&gt; Listing [
-//  Submission { ... },
-//  Submission { ... },
-//  ...
-// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getRising().then(console.log)// =&gt; Listing [//  Submission { ... },//  Submission { ... },//  ...// ]</pre>
 
 
     
@@ -6001,11 +5939,7 @@ redirect which cannot be followed by a CORS request.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getNewModmailConversations({limit: 2}).then(console.log)
-// =&gt; Listing [
-//  ModmailConversation { messages: [...], objIds: [...], subject: &#x27;test subject&#x27;, ... },
-//  ModmailConversation { messages: [...], objIds: [...], subject: &#x27;test subject&#x27;, ... }
-// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getNewModmailConversations({limit: 2}).then(console.log)// =&gt; Listing [//  ModmailConversation { messages: [...], objIds: [...], subject: &#x27;test subject&#x27;, ... },//  ModmailConversation { messages: [...], objIds: [...], subject: &#x27;test subject&#x27;, ... }// ]</pre>
 
 
     
@@ -6277,13 +6211,7 @@ redirect which cannot be followed by a CORS request.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getModerationLog().then(console.log)
-
-// =&gt; Listing [
-//  ModAction { description: null, mod: &#x27;snoowrap_testing&#x27;, action: &#x27;editflair&#x27;, ... }
-//  ModAction { description: null, mod: &#x27;snoowrap_testing&#x27;, action: &#x27;approvecomment&#x27;, ... }
-//  ModAction { description: null, mod: &#x27;snoowrap_testing&#x27;, action: &#x27;createrule&#x27;, ... }
-// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getModerationLog().then(console.log)// =&gt; Listing [//  ModAction { description: null, mod: &#x27;snoowrap_testing&#x27;, action: &#x27;editflair&#x27;, ... }//  ModAction { description: null, mod: &#x27;snoowrap_testing&#x27;, action: &#x27;approvecomment&#x27;, ... }//  ModAction { description: null, mod: &#x27;snoowrap_testing&#x27;, action: &#x27;createrule&#x27;, ... }// ]</pre>
 
 
     
@@ -6521,13 +6449,7 @@ redirect which cannot be followed by a CORS request.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getReports().then(console.log)
-// =&gt; Listing [
-//  Comment { ... },
-//  Comment { ... },
-//  Submission { ... },
-//  ...
-// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getReports().then(console.log)// =&gt; Listing [//  Comment { ... },//  Comment { ... },//  Submission { ... },//  ...// ]</pre>
 
 
     
@@ -6765,13 +6687,7 @@ redirect which cannot be followed by a CORS request.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getSpam().then(console.log)
-// =&gt; Listing [
-//  Comment { ... },
-//  Comment { ... },
-//  Submission { ... },
-//  ...
-// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getSpam().then(console.log)// =&gt; Listing [//  Comment { ... },//  Comment { ... },//  Submission { ... },//  ...// ]</pre>
 
 
     
@@ -7009,13 +6925,7 @@ redirect which cannot be followed by a CORS request.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getModqueue().then(console.log)
-// =&gt; Listing [
-//  Comment { ... },
-//  Comment { ... },
-//  Submission { ... },
-//  ...
-// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getModqueue().then(console.log)// =&gt; Listing [//  Comment { ... },//  Comment { ... },//  Submission { ... },//  ...// ]</pre>
 
 
     
@@ -7253,13 +7163,7 @@ redirect which cannot be followed by a CORS request.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getUnmoderated().then(console.log)
-// =&gt; Listing [
-//  Comment { ... },
-//  Comment { ... },
-//  Submission { ... },
-//  ...
-// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getUnmoderated().then(console.log)// =&gt; Listing [//  Comment { ... },//  Comment { ... },//  Submission { ... },//  ...// ]</pre>
 
 
     
@@ -7497,13 +7401,7 @@ redirect which cannot be followed by a CORS request.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getEdited().then(console.log)
-// =&gt; Listing [
-//  Comment { ... },
-//  Comment { ... },
-//  Submission { ... },
-//  ...
-// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getEdited().then(console.log)// =&gt; Listing [//  Comment { ... },//  Comment { ... },//  Submission { ... },//  ...// ]</pre>
 
 
     
@@ -7931,8 +7829,7 @@ redirect which cannot be followed by a CORS request.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getStylesheet().then(console.log)
-// =&gt; &#x27;.md blockquote,.md del,body{color:#121212}.usertext-body ... &#x27;</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getStylesheet().then(console.log)// =&gt; &#x27;.md blockquote,.md del,body{color:#121212}.usertext-body ... &#x27;</pre>
 
 
     
@@ -8271,12 +8168,7 @@ redirect which cannot be followed by a CORS request.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).search({query: &#x27;blah&#x27;, sort: &#x27;year&#x27;}).then(console.log)
-// =&gt; Listing [
-//  Submission { ... },
-//  Submission { ... },
-//  ...
-// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).search({query: &#x27;blah&#x27;, sort: &#x27;year&#x27;}).then(console.log)// =&gt; Listing [//  Submission { ... },//  Submission { ... },//  ...// ]</pre>
 
 
     
@@ -8482,11 +8374,7 @@ redirect which cannot be followed by a CORS request.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getBannedUsers().then(console.log)
-// =&gt; Listing [
-//  { date: 1461720936, note: &#x27;&#x27;, name: &#x27;actually_an_aardvark&#x27;, id: &#x27;t2_q3519&#x27; }
-//  ...
-// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getBannedUsers().then(console.log)// =&gt; Listing [//  { date: 1461720936, note: &#x27;&#x27;, name: &#x27;actually_an_aardvark&#x27;, id: &#x27;t2_q3519&#x27; }//  ...// ]</pre>
 
 
     
@@ -8692,11 +8580,7 @@ redirect which cannot be followed by a CORS request.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getBannedUsers().then(console.log)
-// =&gt; Listing [
-//  { date: 1461720936, name: &#x27;actually_an_aardvark&#x27;, id: &#x27;t2_q3519&#x27; }
-//  ...
-// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getBannedUsers().then(console.log)// =&gt; Listing [//  { date: 1461720936, name: &#x27;actually_an_aardvark&#x27;, id: &#x27;t2_q3519&#x27; }//  ...// ]</pre>
 
 
     
@@ -8902,11 +8786,7 @@ redirect which cannot be followed by a CORS request.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikibannedUsers().then(console.log)
-// =&gt; Listing [
-//  { date: 1461720936, note: &#x27;&#x27;, name: &#x27;actually_an_aardvark&#x27;, id: &#x27;t2_q3519&#x27; }
-//  ...
-// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikibannedUsers().then(console.log)// =&gt; Listing [//  { date: 1461720936, note: &#x27;&#x27;, name: &#x27;actually_an_aardvark&#x27;, id: &#x27;t2_q3519&#x27; }//  ...// ]</pre>
 
 
     
@@ -9112,11 +8992,7 @@ redirect which cannot be followed by a CORS request.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getContributors().then(console.log)
-// =&gt; Listing [
-//  { date: 1461720936, name: &#x27;actually_an_aardvark&#x27;, id: &#x27;t2_q3519&#x27; }
-//  ...
-// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getContributors().then(console.log)// =&gt; Listing [//  { date: 1461720936, name: &#x27;actually_an_aardvark&#x27;, id: &#x27;t2_q3519&#x27; }//  ...// ]</pre>
 
 
     
@@ -9322,11 +9198,7 @@ redirect which cannot be followed by a CORS request.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikiContributors().then(console.log)
-// =&gt; Listing [
-//  { date: 1461720936, name: &#x27;actually_an_aardvark&#x27;, id: &#x27;t2_q3519&#x27; }
-//  ...
-// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikiContributors().then(console.log)// =&gt; Listing [//  { date: 1461720936, name: &#x27;actually_an_aardvark&#x27;, id: &#x27;t2_q3519&#x27; }//  ...// ]</pre>
 
 
     
@@ -9544,11 +9416,7 @@ redirect which cannot be followed by a CORS request.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;AskReddit&#x27;).getModerators().then(console.log)
-// =&gt; [
-//  RedditUser { date: 1453862639, mod_permissions: [ &#x27;all&#x27; ], name: &#x27;not_an_aardvark&#x27;, id: &#x27;t2_k83md&#x27; },
-//  ...
-// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;AskReddit&#x27;).getModerators().then(console.log)// =&gt; [//  RedditUser { date: 1453862639, mod_permissions: [ &#x27;all&#x27; ], name: &#x27;not_an_aardvark&#x27;, id: &#x27;t2_k83md&#x27; },//  ...// ]</pre>
 
 
     
@@ -10178,8 +10046,7 @@ redirect which cannot be followed by a CORS request.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getSettings().then(console.log)
-// =&gt; SubredditSettings { default_set: true, submit_text: &#x27;&#x27;, subreddit_type: &#x27;private&#x27;, ... }</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getSettings().then(console.log)// =&gt; SubredditSettings { default_set: true, submit_text: &#x27;&#x27;, subreddit_type: &#x27;private&#x27;, ... }</pre>
 
 
     
@@ -11646,8 +11513,7 @@ which means that users will see the sort method that is set in their own prefere
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;AskReddit&#x27;).getRecommendedSubreddits().then(console.log);
-// [ &#x27;TheChurchOfRogers&#x27;, &#x27;Sleepycabin&#x27;, ... ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;AskReddit&#x27;).getRecommendedSubreddits().then(console.log);// [ &#x27;TheChurchOfRogers&#x27;, &#x27;Sleepycabin&#x27;, ... ]</pre>
 
 
     
@@ -11753,8 +11619,7 @@ which means that users will see the sort method that is set in their own prefere
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getSubmitText().then(console.log)
-// =&gt; &#x27;Welcome! Please be sure to read the rules.&#x27;</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getSubmitText().then(console.log)// =&gt; &#x27;Welcome! Please be sure to read the rules.&#x27;</pre>
 
 
     
@@ -13426,24 +13291,7 @@ browsers) where the filesystem is unavailable.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getRules().then(console.log)
-
-// =&gt; {
-  rules: [
-    {
-      kind: &#x27;all&#x27;,
-      short_name: &#x27;Rule 1: No violating rule 1&#x27;,
-      description: &#x27;Breaking this rule is not allowed.&#x27;,
-      ...
-    },
-    ...
-  ],
-  site_rules: [
-    &#x27;Spam&#x27;,
-    &#x27;Personal and confidential information&#x27;&#x27;,
-    &#x27;Threatening, harassing, or inciting violence&#x27;
-  ]
-}</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getRules().then(console.log)// =&gt; {  rules: [    {      kind: &#x27;all&#x27;,      short_name: &#x27;Rule 1: No violating rule 1&#x27;,      description: &#x27;Breaking this rule is not allowed.&#x27;,      ...    },    ...  ],  site_rules: [    &#x27;Spam&#x27;,    &#x27;Personal and confidential information&#x27;&#x27;,    &#x27;Threatening, harassing, or inciting violence&#x27;  ]}</pre>
 
 
     
@@ -13681,8 +13529,7 @@ browsers) where the filesystem is unavailable.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getSticky({num: 2})
-// =&gt; Submission { ... }</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getSticky({num: 2})// =&gt; Submission { ... }</pre>
 
 
     
@@ -16962,8 +16809,7 @@ permissions, omit this property entirely.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikiPage(&#x27;index&#x27;)
-// =&gt; WikiPage { title: &#x27;index&#x27;, subreddit: Subreddit { display_name: &#x27;snoowrap&#x27; } }</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikiPage(&#x27;index&#x27;)// =&gt; WikiPage { title: &#x27;index&#x27;, subreddit: Subreddit { display_name: &#x27;snoowrap&#x27; } }</pre>
 
 
     
@@ -17069,13 +16915,7 @@ permissions, omit this property entirely.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikiPages().then(console.log)
-// =&gt; [
-//   WikiPage { title: &#x27;index&#x27;, subreddit: Subreddit { display_name: &#x27;snoowrap&#x27;} }
-//   WikiPage { title: &#x27;config/sidebar&#x27;, subreddit: Subreddit { display_name: &#x27;snoowrap&#x27;} }
-//   WikiPage { title: &#x27;secret_things&#x27;, subreddit: Subreddit { display_name: &#x27;snoowrap&#x27;} }
-//   WikiPage { title: &#x27;config/submit_text&#x27;, subreddit: Subreddit { display_name: &#x27;snoowrap&#x27;} }
-// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikiPages().then(console.log)// =&gt; [//   WikiPage { title: &#x27;index&#x27;, subreddit: Subreddit { display_name: &#x27;snoowrap&#x27;} }//   WikiPage { title: &#x27;config/sidebar&#x27;, subreddit: Subreddit { display_name: &#x27;snoowrap&#x27;} }//   WikiPage { title: &#x27;secret_things&#x27;, subreddit: Subreddit { display_name: &#x27;snoowrap&#x27;} }//   WikiPage { title: &#x27;config/submit_text&#x27;, subreddit: Subreddit { display_name: &#x27;snoowrap&#x27;} }// ]</pre>
 
 
     
@@ -17243,11 +17083,7 @@ permissions, omit this property entirely.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikiRevisions().then(console.log)
-// =&gt; Listing [
-//  { page: &#x27;index&#x27;, reason: &#x27;added cookies&#x27;, ... },
-//  ...
-// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikiRevisions().then(console.log)// =&gt; Listing [//  { page: &#x27;index&#x27;, reason: &#x27;added cookies&#x27;, ... },//  ...// ]</pre>
 
 
     
@@ -17372,17 +17208,7 @@ function is called again. To refresh an object, use refresh().</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;).fetch().then(userInfo =&gt; {
-  console.log(userInfo.name); // &#x27;not_an_aardvark&#x27;
-  console.log(userInfo.created_utc); // 1419104352
-});
-
-r.getComment(&#x27;d1xchqn&#x27;).fetch().then(comment =&gt; comment.body).then(console.log)
-// =&gt; &#x27;This is a little too interesting for my liking&#x27;
-
-// In environments that support ES2015 Proxies, the above line is equivalent to:
-r.getComment(&#x27;d1xchqn&#x27;).body.then(console.log);
-// =&gt; &#x27;This is a little too interesting for my liking&#x27;</pre>
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;).fetch().then(userInfo =&gt; {  console.log(userInfo.name); // &#x27;not_an_aardvark&#x27;  console.log(userInfo.created_utc); // 1419104352});r.getComment(&#x27;d1xchqn&#x27;).fetch().then(comment =&gt; comment.body).then(console.log)// =&gt; &#x27;This is a little too interesting for my liking&#x27;// In environments that support ES2015 Proxies, the above line is equivalent to:r.getComment(&#x27;d1xchqn&#x27;).body.then(console.log);// =&gt; &#x27;This is a little too interesting for my liking&#x27;</pre>
 
 
     
@@ -17497,16 +17323,7 @@ r.getComment(&#x27;d1xchqn&#x27;).body.then(console.log);
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var someComment = r.getComment(&#x27;cmfkyus&#x27;);
-var initialCommentBody = some_comment.fetch().then(comment =&gt; comment.body);
-
-setTimeout(() =&gt; {
-  someComment.refresh().then(refreshedComment =&gt; {
-    if (initialCommentBody.value() !== refreshedComment.body) {
-      console.log(&#x27;This comment has changed since 10 seconds ago.&#x27;);
-    }
-  });
-}, 10000);</pre>
+    <pre class="sunlight-highlight-javascript">var someComment = r.getComment(&#x27;cmfkyus&#x27;);var initialCommentBody = some_comment.fetch().then(comment =&gt; comment.body);setTimeout(() =&gt; {  someComment.refresh().then(refreshedComment =&gt; {    if (initialCommentBody.value() !== refreshedComment.body) {      console.log(&#x27;This comment has changed since 10 seconds ago.&#x27;);    }  });}, 10000);</pre>
 
 
     
@@ -17626,8 +17443,7 @@ private properties anyway.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var user = r.getUser(&#x27;not_an_aardvark&#x27;);
-JSON.stringify(user) // =&gt; &#x27;{&quot;name&quot;:&quot;not_an_aardvark&quot;}&#x27;</pre>
+    <pre class="sunlight-highlight-javascript">var user = r.getUser(&#x27;not_an_aardvark&#x27;);JSON.stringify(user) // =&gt; &#x27;{&quot;name&quot;:&quot;not_an_aardvark&quot;}&#x27;</pre>
 
 
     
