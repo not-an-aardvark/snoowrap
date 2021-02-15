@@ -13,7 +13,7 @@ export const consoleLogger = Object.freeze({
 
   debug (...args) {
     // eslint-disable-next-line no-console
-    console.debug('[info]', ...args);
+    console.debug('[debug]', ...args);
   },
 
   trace (...args) {
