@@ -1,5 +1,27 @@
 import {addSnakeCaseShadowProps} from './helpers.js';
 
+export const consoleLogger = Object.freeze({
+  warn (...args) {
+    // eslint-disable-next-line no-console
+    console.warn('[warning]', ...args);
+  },
+
+  info (...args) {
+    // eslint-disable-next-line no-console
+    console.info('[info]', ...args);
+  },
+
+  debug (...args) {
+    // eslint-disable-next-line no-console
+    console.debug('[info]', ...args);
+  },
+
+  trace (...args) {
+    // eslint-disable-next-line no-console
+    console.trace('[trace]', ...args);
+  }
+});
+
 export default function () {
   const config = Object.create(null);
   config.endpointDomain = 'reddit.com';
@@ -10,7 +32,7 @@ export default function () {
   config.maxRetryAttempts = 3;
   config.warnings = true;
   config.debug = false;
-  config.logger = console;
+  config.logger = consoleLogger;
   config.proxies = true;
 
   return addSnakeCaseShadowProps(config);

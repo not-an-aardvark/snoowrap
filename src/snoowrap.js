@@ -384,13 +384,13 @@ const snoowrap = class snoowrap {
 
   _warn (...args) {
     if (this._config.warnings) {
-      this._config.logger.warn('[warning]', ...args);
+      this._config.logger.warn(...args);
     }
   }
 
   _debug (...args) {
     if (this._config.debug) {
-      this._config.logger.debug('[debug]', ...args);
+      this._config.logger.debug(...args);
     }
   }
 
