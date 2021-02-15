@@ -142,6 +142,7 @@ declare namespace Snoowrap {
     maxRetryAttempts?: number;
     warnings?: boolean;
     debug?: boolean;
+    logger?: Pick<typeof console, 'warn' | 'info' | 'debug' | 'trace'>;
     proxies?: boolean;
   }
 

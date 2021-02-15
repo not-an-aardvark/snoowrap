@@ -10,6 +10,7 @@ export default function () {
   config.maxRetryAttempts = 3;
   config.warnings = true;
   config.debug = false;
+  config.logger = console;
   config.proxies = true;
 
   return addSnakeCaseShadowProps(config);

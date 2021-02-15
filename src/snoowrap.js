@@ -361,6 +361,8 @@ const snoowrap = class snoowrap {
    console. These can be disabled by setting this to `false`.
    * @param {boolean} [options.debug=false] If set to true, snoowrap will print out potentially-useful information for debugging
    purposes as it runs.
+   * @param {object} [options.logger=console] By default, snoowrap will log any warnings and debug output to the console.
+   A custom logger object may be supplied via this option; it must expose `warn`, `info`, `debug`, and `trace` functions.
    * @param {boolean} [options.proxies=true] Setting this to `false` disables snoowrap's method-chaining feature. This causes
    the syntax for using snoowrap to become a bit heavier, but allows for consistency between environments that support the ES6
    `Proxy` object and environments that don't. This option is a no-op in environments that don't support the `Proxy` object,
@@ -382,13 +384,13 @@ const snoowrap = class snoowrap {
 
   _warn (...args) {
     if (this._config.warnings) {
-      console.warn('[warning]', ...args); // eslint-disable-line no-console
+      this._config.logger.warn('[warning]', ...args);
     }
   }
 
   _debug (...args) {
     if (this._config.debug) {
-      console.log('[debug]', ...args); // eslint-disable-line no-console
+      this._config.logger.debug('[debug]', ...args);
     }
   }
 
