@@ -93,12 +93,12 @@ const Subreddit = class Subreddit extends RedditContent {
   createLinkFlairTemplate (options) {
     return this._createFlairTemplate({...options, flair_type: 'LINK_FLAIR'});
   }
-  _getFlairOptions ({name, link} = {}) { // TODO: Add shortcuts for this on RedditUser and Submission
-    return this._post({uri: `r/${this.display_name}/api/flairselector`, form: {name, link}});
+  _getFlairOptions ({name, link, is_newlink} = {}) { // TODO: Add shortcuts for this on RedditUser and Submission
+    return this._post({uri: `r/${this.display_name}/api/flairselector`, form: {name, link, is_newlink}});
   }
   /**
-  * @summary Gets the flair templates for a given link.
-  * @param {string} linkId The link's base36 ID
+  * @summary Gets the flair templates for the subreddit or a given link.
+  * @param {string} [linkId] The link's base36 ID
   * @returns {Promise} An Array of flair template options
   * @example
   *
@@ -116,8 +116,9 @@ const Subreddit = class Subreddit extends RedditContent {
   //  ...
   // ]
   */
-  getLinkFlairTemplates (linkId) {
-    return this._getFlairOptions({link: linkId}).get('choices');
+  getLinkFlairTemplates (linkId = null) {
+    const options = linkId ? {link: linkId} : {is_newlink: true};
+    return this._getFlairOptions(options).get('choices');
   }
   /**
   * @summary Gets the list of user flair templates on this subreddit.
