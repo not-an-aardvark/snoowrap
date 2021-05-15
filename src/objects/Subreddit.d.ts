@@ -114,7 +114,7 @@ export default class Subreddit extends RedditContent<Subreddit> {
   getControversial(options?: ListingOptions & { time?: string }): Promise<Listing<Submission>>;
   getEdited(options?: ListingOptions & { only?: 'links' | 'comments' }): Promise<Listing<Submission | Comment>>;
   getHot(options?: ListingOptions): Promise<Listing<Submission>>;
-  getLinkFlairTemplates(linkId: string): Promise<FlairTemplate[]>;
+  getLinkFlairTemplates(linkId?: string): Promise<FlairTemplate[]>;
   getModerationLog(opts?: ListingOptions & { mods?: string[]; type?: ModActionType}): Promise<Listing<ModAction>>;
   getModerators(options?: ListingOptions & { name?: string }): RedditUser[];
   getModmail(options?: ListingOptions): Promise<Listing<PrivateMessage>>;
