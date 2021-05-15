@@ -670,12 +670,17 @@ const snoowrap = class snoowrap {
     text,
     title,
     url,
-    subreddit_name, subredditName = subreddit_name
+    subreddit_name, subredditName = subreddit_name,
+    nsfw,
+    spoiler,
+    flairId,
+    flairText,
+    ...options
   }) {
     return this._post({
       uri: 'api/submit', form: {
         api_type, captcha: captchaResponse, iden: captchaIden, sendreplies: sendReplies, sr: subredditName, kind, resubmit,
-        crosspost_fullname, text, title, url
+        crosspost_fullname, text, title, url, spoiler, nsfw, flair_id: flairId, flair_text: flairText, ...options
       }
     }).tap(handleJsonErrors(this)).then(result => this.getSubmission(result.json.data.id));
   }

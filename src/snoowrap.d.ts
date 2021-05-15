@@ -215,6 +215,10 @@ declare namespace Snoowrap {
     sendReplies?: boolean;
     captchaIden?: string;
     captchaResponse?: string;
+    nsfw?: boolean;
+    spoiler?: boolean;
+    flairId?: string;
+    flairText?: string;
   }
 
   export interface SubmitLinkOptions {
@@ -225,6 +229,10 @@ declare namespace Snoowrap {
     resubmit?: boolean;
     captchaIden?: string;
     captchaResponse?: string;
+    nsfw?: boolean;
+    spoiler?: boolean;
+    flairId?: string;
+    flairText?: string;
   }
 
   export interface ComposeMessageParams {
