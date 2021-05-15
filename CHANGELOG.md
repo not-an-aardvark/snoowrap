@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.23.0
+* Add more submit options
+* Get flair selections for subreddit
+* Add join_requests state to new modmail
+* Allow custom logger to be supplied via config
+
 ## v1.22.0
 
 * Added catch-all options for `Subreddit#editSettings`
