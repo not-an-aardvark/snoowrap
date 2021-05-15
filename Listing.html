@@ -584,7 +584,12 @@ the order of items in the Listing will be the same as the order in which they ap
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getHot({limit: 25}).then(myListing =&gt; {  console.log(myListing.length); // =&gt; 25  myListing.fetchMore({amount: 10}).then(extendedListing =&gt; {    console.log(extendedListing.length); // =&gt; 35  })});</pre>
+    <pre class="sunlight-highlight-javascript">r.getHot({limit: 25}).then(myListing =&gt; {
+  console.log(myListing.length); // =&gt; 25
+  myListing.fetchMore({amount: 10}).then(extendedListing =&gt; {
+    console.log(extendedListing.length); // =&gt; 35
+  })
+});</pre>
 
 
     
@@ -753,7 +758,8 @@ ratelimit quickly if the Listing doesn't have a clear end (e.g. with posts on th
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getMe().getUpvotedContent().fetchAll().then(console.log)// =&gt; Listing [ Submission { ... }, Submission { ... }, ... ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getMe().getUpvotedContent().fetchAll().then(console.log)
+// =&gt; Listing [ Submission { ... }, Submission { ... }, ... ]</pre>
 
 
     

@@ -164,7 +164,8 @@
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">// Get a user with the given usernamer.getUser(&#x27;spez&#x27;)</pre>
+    <pre class="sunlight-highlight-javascript">// Get a user with the given username
+r.getUser(&#x27;spez&#x27;)</pre>
 
 
     
@@ -1088,7 +1089,8 @@ reddit gold.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;).getFriendInformation().then(console.log)// =&gt; { date: 1460318190, note: &#x27;Is an aardvark&#x27;, name: &#x27;actually_an_aardvark&#x27;, id: &#x27;t2_q3519&#x27; }</pre>
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;).getFriendInformation().then(console.log)
+// =&gt; { date: 1460318190, note: &#x27;Is an aardvark&#x27;, name: &#x27;actually_an_aardvark&#x27;, id: &#x27;t2_q3519&#x27; }</pre>
 
 
     
@@ -1194,7 +1196,12 @@ reddit gold.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;).getTrophies().then(console.log)// =&gt; TrophyList { trophies: [//  Trophy { ... },//  Trophy { ... },//  ...// ] }</pre>
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;).getTrophies().then(console.log)
+// =&gt; TrophyList { trophies: [
+//  Trophy { ... },
+//  Trophy { ... },
+//  ...
+// ] }</pre>
 
 
     
@@ -1362,7 +1369,13 @@ reddit gold.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;spez&#x27;).getOverview().then(console.log)// =&gt; Listing [//  Comment { ... },//  Comment { ... },//  Submission { ... },//  ...// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;spez&#x27;).getOverview().then(console.log)
+// =&gt; Listing [
+//  Comment { ... },
+//  Comment { ... },
+//  Submission { ... },
+//  ...
+// ]</pre>
 
 
     
@@ -1530,7 +1543,13 @@ reddit gold.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;spez&#x27;).getSubmissions().then(console.log)// =&gt; Listing [//  Submission { ... },//  Submission { ... },//  Submission { ... },//  ...// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;spez&#x27;).getSubmissions().then(console.log)
+// =&gt; Listing [
+//  Submission { ... },
+//  Submission { ... },
+//  Submission { ... },
+//  ...
+// ]</pre>
 
 
     
@@ -1698,7 +1717,13 @@ reddit gold.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;spez&#x27;).getComments().then(console.log)// =&gt; Listing [//  Comment { ... },//  Comment { ... },//  Comment { ... },//  ...// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;spez&#x27;).getComments().then(console.log)
+// =&gt; Listing [
+//  Comment { ... },
+//  Comment { ... },
+//  Comment { ... },
+//  ...
+// ]</pre>
 
 
     
@@ -1871,7 +1896,13 @@ make this information public in their preferences.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getMe().getUpvotedContent().then(console.log)// =&gt; Listing [//  Comment { ... },//  Comment { ... },//  Submission { ... },//  ...// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getMe().getUpvotedContent().then(console.log)
+// =&gt; Listing [
+//  Comment { ... },
+//  Comment { ... },
+//  Submission { ... },
+//  ...
+// ]</pre>
 
 
     
@@ -2044,7 +2075,13 @@ make this information public in their preferences.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getMe().getDownvotedContent().then(console.log)// =&gt; Listing [//  Comment { ... },//  Comment { ... },//  Submission { ... },//  ...// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getMe().getDownvotedContent().then(console.log)
+// =&gt; Listing [
+//  Comment { ... },
+//  Comment { ... },
+//  Submission { ... },
+//  ...
+// ]</pre>
 
 
     
@@ -2217,7 +2254,13 @@ attempting to view another users' hidden posts.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getMe().getHiddenContent().then(console.log)// =&gt; Listing [//  Comment { ... },//  Comment { ... },//  Submission { ... },//  ...// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getMe().getHiddenContent().then(console.log)
+// =&gt; Listing [
+//  Comment { ... },
+//  Comment { ... },
+//  Submission { ... },
+//  ...
+// ]</pre>
 
 
     
@@ -2390,7 +2433,13 @@ attempting to view other users' saved content.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getMe().getSavedContent().then(console.log)// =&gt; Listing [//  Comment { ... },//  Comment { ... },//  Submission { ... },//  ...// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getMe().getSavedContent().then(console.log)
+// =&gt; Listing [
+//  Comment { ... },
+//  Comment { ... },
+//  Submission { ... },
+//  ...
+// ]</pre>
 
 
     
@@ -2558,7 +2607,13 @@ attempting to view other users' saved content.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getMe().getGildedContent().then(console.log)// =&gt; Listing [//  Comment { ... },//  Comment { ... },//  Submission { ... },//  ...// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getMe().getGildedContent().then(console.log)
+// =&gt; Listing [
+//  Comment { ... },
+//  Comment { ... },
+//  Submission { ... },
+//  ...
+// ]</pre>
 
 
     
@@ -2714,7 +2769,12 @@ attempting to view other users' saved content.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;multi-mod&#x27;).getMultireddit(&#x27;coding_languages&#x27;)// =&gt; MultiReddit {//  name: &#x27;coding_languages&#x27;,//  curator: RedditUser { name: &#x27;multi-mod&#x27; },//  path: &#x27;/user/multi-mod/m/coding_languages&#x27;// }</pre>
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;multi-mod&#x27;).getMultireddit(&#x27;coding_languages&#x27;)
+// =&gt; MultiReddit {
+//  name: &#x27;coding_languages&#x27;,
+//  curator: RedditUser { name: &#x27;multi-mod&#x27; },
+//  path: &#x27;/user/multi-mod/m/coding_languages&#x27;
+// }</pre>
 
 
     
@@ -2820,7 +2880,14 @@ attempting to view other users' saved content.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;multi-mod&#x27;).getMultireddits().then(console.log)// =&gt; [  MultiReddit { ... },  MultiReddit { ... },  MultiReddit { ... },  ...]</pre>
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;multi-mod&#x27;).getMultireddits().then(console.log)
+
+// =&gt; [
+  MultiReddit { ... },
+  MultiReddit { ... },
+  MultiReddit { ... },
+  ...
+]</pre>
 
 
     
@@ -3931,7 +3998,9 @@ will fulfill even if this is not the case.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getInbox({limit: 1}).then(messages =&gt;  messages[0].blockAuthor(););</pre>
+    <pre class="sunlight-highlight-javascript">r.getInbox({limit: 1}).then(messages =&gt;
+  messages[0].blockAuthor();
+);</pre>
 
 
     
@@ -4056,7 +4125,17 @@ function is called again. To refresh an object, use refresh().</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;).fetch().then(userInfo =&gt; {  console.log(userInfo.name); // &#x27;not_an_aardvark&#x27;  console.log(userInfo.created_utc); // 1419104352});r.getComment(&#x27;d1xchqn&#x27;).fetch().then(comment =&gt; comment.body).then(console.log)// =&gt; &#x27;This is a little too interesting for my liking&#x27;// In environments that support ES2015 Proxies, the above line is equivalent to:r.getComment(&#x27;d1xchqn&#x27;).body.then(console.log);// =&gt; &#x27;This is a little too interesting for my liking&#x27;</pre>
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;).fetch().then(userInfo =&gt; {
+  console.log(userInfo.name); // &#x27;not_an_aardvark&#x27;
+  console.log(userInfo.created_utc); // 1419104352
+});
+
+r.getComment(&#x27;d1xchqn&#x27;).fetch().then(comment =&gt; comment.body).then(console.log)
+// =&gt; &#x27;This is a little too interesting for my liking&#x27;
+
+// In environments that support ES2015 Proxies, the above line is equivalent to:
+r.getComment(&#x27;d1xchqn&#x27;).body.then(console.log);
+// =&gt; &#x27;This is a little too interesting for my liking&#x27;</pre>
 
 
     
@@ -4171,7 +4250,16 @@ function is called again. To refresh an object, use refresh().</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var someComment = r.getComment(&#x27;cmfkyus&#x27;);var initialCommentBody = some_comment.fetch().then(comment =&gt; comment.body);setTimeout(() =&gt; {  someComment.refresh().then(refreshedComment =&gt; {    if (initialCommentBody.value() !== refreshedComment.body) {      console.log(&#x27;This comment has changed since 10 seconds ago.&#x27;);    }  });}, 10000);</pre>
+    <pre class="sunlight-highlight-javascript">var someComment = r.getComment(&#x27;cmfkyus&#x27;);
+var initialCommentBody = some_comment.fetch().then(comment =&gt; comment.body);
+
+setTimeout(() =&gt; {
+  someComment.refresh().then(refreshedComment =&gt; {
+    if (initialCommentBody.value() !== refreshedComment.body) {
+      console.log(&#x27;This comment has changed since 10 seconds ago.&#x27;);
+    }
+  });
+}, 10000);</pre>
 
 
     
@@ -4291,7 +4379,8 @@ private properties anyway.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var user = r.getUser(&#x27;not_an_aardvark&#x27;);JSON.stringify(user) // =&gt; &#x27;{&quot;name&quot;:&quot;not_an_aardvark&quot;}&#x27;</pre>
+    <pre class="sunlight-highlight-javascript">var user = r.getUser(&#x27;not_an_aardvark&#x27;);
+JSON.stringify(user) // =&gt; &#x27;{&quot;name&quot;:&quot;not_an_aardvark&quot;}&#x27;</pre>
 
 
     

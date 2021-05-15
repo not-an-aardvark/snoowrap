@@ -166,7 +166,8 @@ subreddit while running snoowrap in a browser. (This issue does not apply when r
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">// Get a wiki page on a given subreddit by namer.getSubreddit(&#x27;AskReddit&#x27;).getWikiPage(&#x27;rules&#x27;)</pre>
+    <pre class="sunlight-highlight-javascript">// Get a wiki page on a given subreddit by name
+r.getSubreddit(&#x27;AskReddit&#x27;).getWikiPage(&#x27;rules&#x27;)</pre>
 
 
     
@@ -301,7 +302,8 @@ subreddit while running snoowrap in a browser. (This issue does not apply when r
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikiPage(&#x27;index&#x27;).getSettings().then(console.log)// =&gt; WikiPageSettings { permlevel: 0, editors: [], listed: true }</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikiPage(&#x27;index&#x27;).getSettings().then(console.log)
+// =&gt; WikiPageSettings { permlevel: 0, editors: [], listed: true }</pre>
 
 
     
@@ -1399,7 +1401,16 @@ omitted, this edit is simply added to the most recent revision.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getRevisions({limit: 1}).then(console.log)// =&gt; Listing [//  {//    timestamp: 1460973194,//    reason: &#x27;Added a welcome message&#x27;,//    author: RedditUser { name: &#x27;not_an_aardvark&#x27;, id: &#x27;k83md&#x27;, ... },//    page: &#x27;index&#x27;,//    id: &#x27;506370b4-0508-11e6-b550-0e69f29e0c4d&#x27;//  }// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getRevisions({limit: 1}).then(console.log)
+// =&gt; Listing [
+//  {
+//    timestamp: 1460973194,
+//    reason: &#x27;Added a welcome message&#x27;,
+//    author: RedditUser { name: &#x27;not_an_aardvark&#x27;, id: &#x27;k83md&#x27;, ... },
+//    page: &#x27;index&#x27;,
+//    id: &#x27;506370b4-0508-11e6-b550-0e69f29e0c4d&#x27;
+//  }
+// ]</pre>
 
 
     
@@ -1979,7 +1990,12 @@ omitted, this edit is simply added to the most recent revision.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikiPage(&#x27;index&#x27;).getDiscussions().then(console.log)// =&gt; Listing [//  Submission { ... },//  Submission { ... },//  ...// ]</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubreddit(&#x27;snoowrap&#x27;).getWikiPage(&#x27;index&#x27;).getDiscussions().then(console.log)
+// =&gt; Listing [
+//  Submission { ... },
+//  Submission { ... },
+//  ...
+// ]</pre>
 
 
     
@@ -2104,7 +2120,17 @@ function is called again. To refresh an object, use refresh().</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;).fetch().then(userInfo =&gt; {  console.log(userInfo.name); // &#x27;not_an_aardvark&#x27;  console.log(userInfo.created_utc); // 1419104352});r.getComment(&#x27;d1xchqn&#x27;).fetch().then(comment =&gt; comment.body).then(console.log)// =&gt; &#x27;This is a little too interesting for my liking&#x27;// In environments that support ES2015 Proxies, the above line is equivalent to:r.getComment(&#x27;d1xchqn&#x27;).body.then(console.log);// =&gt; &#x27;This is a little too interesting for my liking&#x27;</pre>
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;).fetch().then(userInfo =&gt; {
+  console.log(userInfo.name); // &#x27;not_an_aardvark&#x27;
+  console.log(userInfo.created_utc); // 1419104352
+});
+
+r.getComment(&#x27;d1xchqn&#x27;).fetch().then(comment =&gt; comment.body).then(console.log)
+// =&gt; &#x27;This is a little too interesting for my liking&#x27;
+
+// In environments that support ES2015 Proxies, the above line is equivalent to:
+r.getComment(&#x27;d1xchqn&#x27;).body.then(console.log);
+// =&gt; &#x27;This is a little too interesting for my liking&#x27;</pre>
 
 
     
@@ -2219,7 +2245,16 @@ function is called again. To refresh an object, use refresh().</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var someComment = r.getComment(&#x27;cmfkyus&#x27;);var initialCommentBody = some_comment.fetch().then(comment =&gt; comment.body);setTimeout(() =&gt; {  someComment.refresh().then(refreshedComment =&gt; {    if (initialCommentBody.value() !== refreshedComment.body) {      console.log(&#x27;This comment has changed since 10 seconds ago.&#x27;);    }  });}, 10000);</pre>
+    <pre class="sunlight-highlight-javascript">var someComment = r.getComment(&#x27;cmfkyus&#x27;);
+var initialCommentBody = some_comment.fetch().then(comment =&gt; comment.body);
+
+setTimeout(() =&gt; {
+  someComment.refresh().then(refreshedComment =&gt; {
+    if (initialCommentBody.value() !== refreshedComment.body) {
+      console.log(&#x27;This comment has changed since 10 seconds ago.&#x27;);
+    }
+  });
+}, 10000);</pre>
 
 
     
@@ -2339,7 +2374,8 @@ private properties anyway.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var user = r.getUser(&#x27;not_an_aardvark&#x27;);JSON.stringify(user) // =&gt; &#x27;{&quot;name&quot;:&quot;not_an_aardvark&quot;}&#x27;</pre>
+    <pre class="sunlight-highlight-javascript">var user = r.getUser(&#x27;not_an_aardvark&#x27;);
+JSON.stringify(user) // =&gt; &#x27;{&quot;name&quot;:&quot;not_an_aardvark&quot;}&#x27;</pre>
 
 
     

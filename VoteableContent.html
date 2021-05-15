@@ -1900,7 +1900,8 @@ object is not modified</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getSubmission(&#x27;4fuq26&#x27;).expandReplies().then(console.log)// =&gt; (a very large comment tree containing every viewable comment on this thread)</pre>
+    <pre class="sunlight-highlight-javascript">r.getSubmission(&#x27;4fuq26&#x27;).expandReplies().then(console.log)
+// =&gt; (a very large comment tree containing every viewable comment on this thread)</pre>
 
 
     
@@ -3117,7 +3118,9 @@ will fulfill even if this is not the case.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getInbox({limit: 1}).then(messages =&gt;  messages[0].blockAuthor(););</pre>
+    <pre class="sunlight-highlight-javascript">r.getInbox({limit: 1}).then(messages =&gt;
+  messages[0].blockAuthor();
+);</pre>
 
 
     
@@ -3242,7 +3245,17 @@ function is called again. To refresh an object, use refresh().</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;).fetch().then(userInfo =&gt; {  console.log(userInfo.name); // &#x27;not_an_aardvark&#x27;  console.log(userInfo.created_utc); // 1419104352});r.getComment(&#x27;d1xchqn&#x27;).fetch().then(comment =&gt; comment.body).then(console.log)// =&gt; &#x27;This is a little too interesting for my liking&#x27;// In environments that support ES2015 Proxies, the above line is equivalent to:r.getComment(&#x27;d1xchqn&#x27;).body.then(console.log);// =&gt; &#x27;This is a little too interesting for my liking&#x27;</pre>
+    <pre class="sunlight-highlight-javascript">r.getUser(&#x27;not_an_aardvark&#x27;).fetch().then(userInfo =&gt; {
+  console.log(userInfo.name); // &#x27;not_an_aardvark&#x27;
+  console.log(userInfo.created_utc); // 1419104352
+});
+
+r.getComment(&#x27;d1xchqn&#x27;).fetch().then(comment =&gt; comment.body).then(console.log)
+// =&gt; &#x27;This is a little too interesting for my liking&#x27;
+
+// In environments that support ES2015 Proxies, the above line is equivalent to:
+r.getComment(&#x27;d1xchqn&#x27;).body.then(console.log);
+// =&gt; &#x27;This is a little too interesting for my liking&#x27;</pre>
 
 
     
@@ -3357,7 +3370,16 @@ function is called again. To refresh an object, use refresh().</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var someComment = r.getComment(&#x27;cmfkyus&#x27;);var initialCommentBody = some_comment.fetch().then(comment =&gt; comment.body);setTimeout(() =&gt; {  someComment.refresh().then(refreshedComment =&gt; {    if (initialCommentBody.value() !== refreshedComment.body) {      console.log(&#x27;This comment has changed since 10 seconds ago.&#x27;);    }  });}, 10000);</pre>
+    <pre class="sunlight-highlight-javascript">var someComment = r.getComment(&#x27;cmfkyus&#x27;);
+var initialCommentBody = some_comment.fetch().then(comment =&gt; comment.body);
+
+setTimeout(() =&gt; {
+  someComment.refresh().then(refreshedComment =&gt; {
+    if (initialCommentBody.value() !== refreshedComment.body) {
+      console.log(&#x27;This comment has changed since 10 seconds ago.&#x27;);
+    }
+  });
+}, 10000);</pre>
 
 
     
@@ -3477,7 +3499,8 @@ private properties anyway.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var user = r.getUser(&#x27;not_an_aardvark&#x27;);JSON.stringify(user) // =&gt; &#x27;{&quot;name&quot;:&quot;not_an_aardvark&quot;}&#x27;</pre>
+    <pre class="sunlight-highlight-javascript">var user = r.getUser(&#x27;not_an_aardvark&#x27;);
+JSON.stringify(user) // =&gt; &#x27;{&quot;name&quot;:&quot;not_an_aardvark&quot;}&#x27;</pre>
 
 
     

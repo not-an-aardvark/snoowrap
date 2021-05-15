@@ -2404,6 +2404,47 @@ purposes as it runs.</p></td>
 
         <tr>
             
+                <td class="name"><code>logger</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    console
+                
+                </td>
+            
+
+            <td class="description last"><p>By default, snoowrap will log any warnings and debug output to the console.
+A custom logger object may be supplied via this option; it must expose <code>warn</code>, <code>info</code>, <code>debug</code>, and <code>trace</code> functions.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>proxies</code></td>
             
 
@@ -9837,9 +9878,11 @@ mentions).</p></td>
         
     <pre class="sunlight-highlight-javascript">r.getUnreadNewModmailConversationsCount().then(console.log)
 // =&gt; {
-//  highlighted: 1,
+//  archived: 1,
+//  appeals: 1,
+//  highlighted: 0,
 //  notifications: 0,
-//  archived: 0,
+//  join_requests: 0,
 //  new: 2,
 //  inprogress: 5,
 //  mod: 1,
@@ -9927,6 +9970,21 @@ mentions).</p></td>
             <td class="type">
             
                 
+<span class="param-type">'archived'</span>
+|
+
+<span class="param-type">'appeals'</span>
+|
+
+<span class="param-type">'highlighted'</span>
+|
+
+<span class="param-type">'notifications'</span>
+|
+
+<span class="param-type">'join_requests'</span>
+|
+
 <span class="param-type">'new'</span>
 |
 
@@ -9934,15 +9992,6 @@ mentions).</p></td>
 |
 
 <span class="param-type">'mod'</span>
-|
-
-<span class="param-type">'notifications'</span>
-|
-
-<span class="param-type">'archived'</span>
-|
-
-<span class="param-type">'highlighted'</span>
 |
 
 <span class="param-type">'all'</span>
