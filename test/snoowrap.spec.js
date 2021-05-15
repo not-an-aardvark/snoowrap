@@ -2155,10 +2155,11 @@ describe('snoowrap', function () {
     it('can retrieve amount of of unread Modmail conversations', async () => {
       const count = await r.getUnreadNewModmailConversationsCount();
       expect(Object.keys(count)).to.have.members([
-        'highlighted',
-        'notifications',
         'archived',
         'appeals',
+        'highlighted',
+        'join_requests',
+        'notifications',
         'new',
         'inprogress',
         'mod'

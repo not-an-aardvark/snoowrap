@@ -1183,9 +1183,11 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
    *
    * r.getUnreadNewModmailConversationsCount().then(console.log)
    * // => {
-   * //  highlighted: 1,
+   * //  archived: 1,
+   * //  appeals: 1,
+   * //  highlighted: 0,
    * //  notifications: 0,
-   * //  archived: 0,
+   * //  join_requests: 0,
    * //  new: 2,
    * //  inprogress: 5,
    * //  mod: 1,
@@ -1198,7 +1200,7 @@ can get a post and a comment   *  @returns {Promise<Listing<Submission|Comment>>
   /**
    * @summary Mark Modmail conversations as read given the subreddit(s) and state.
    * @param {Subreddit[]|String[]} subreddits
-   * @param {('new'|'inprogress'|'mod'|'notifications'|'archived'|'highlighted'|'all')} state selected state to mark as read
+   * @param {('archived'|'appeals'|'highlighted'|'notifications'|'join_requests'|'new'|'inprogress'|'mod'|'all')} state selected state to mark as read
    * @returns {Promise<Listing<ModmailConversation>>} a Listing of ModmailConversations marked as read
    * @example
    *
