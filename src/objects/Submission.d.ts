@@ -129,6 +129,7 @@ export default class Submission extends VoteableContent<Submission> {
   unmarkNsfw(): Promise<this>;
   unmarkSpoiler(): Promise<this>;
   unsticky(): Promise<this>;
+  submitCrosspost(): Promise<this>;
 }
 
 interface ImagePreviewSource {
