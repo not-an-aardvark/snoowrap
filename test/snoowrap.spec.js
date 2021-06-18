@@ -1186,6 +1186,41 @@ describe('snoowrap', function () {
     });
   });
 
+  describe('fetching subreddits by query', () => {
+    it('should fail because query length is over 50 characters', async () => {
+      // Get a query that's longer than 50 characters
+      const query = "x".repeat(51);
+      const config = {
+        exact: true,
+        include_over_18: false,
+        include_unadvertisable: false
+      };
+      try {
+        await r.searchSubreddit(query, config);
+      } catch (e) {
+        expect(e.toString()).to.equal('Error: query can\'t be longer than 50 characters');
+      }
+    });
+    it('should return subreddit with exactly the name passed as query', async () => {
+      const query = 'learnprogramming';
+      const config = {
+        exact: true,
+        include_over_18: false,
+        include_unadvertisable: false
+      };
+      const {subreddits} = await r.searchSubreddit(query, config);
+      expect(subreddits.length).to.equal(1);
+      expect(subreddits[0].name).to.equal(query);
+    });
+    it('should return list subreddits that begin with a query string', async () => {
+      const query = 'learn';
+      const {subreddits} = await r.searchSubreddit(query);
+      const isIncludesQuery = subreddits.filter(sub => sub.name.toLowerCase().includes(query));
+      expect(isIncludesQuery.length).to.equal(subreddits.length);
+    });
+  });
+
+
   describe('subreddit flair', () => {
     let sub;
     before(() => {

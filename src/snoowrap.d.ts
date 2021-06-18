@@ -105,6 +105,7 @@ declare class Snoowrap {
   getUnreadMessages(options?: ListingOptions): Promise<_Listing<_PrivateMessage>>;
   getUser(name: string): _RedditUser;
   markAsVisited(links: _Submission[]): Promise<void>;
+  searchSubreddit(query: string, congif?: { exact?: boolean, include_over_18?: boolean, include_unadvertisable?: boolean }): Promise<_Listing<_Subreddit>>;
   markMessagesAsRead(messages: _PrivateMessage[] | string[]): Promise<void>;
   markMessagesAsUnread(messages: _PrivateMessage[] | string[]): Promise<void>;
   oauthRequest(options: RequestOptions): Promise<any>;

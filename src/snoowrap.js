@@ -646,6 +646,45 @@ const snoowrap = class snoowrap {
   }
 
   /**
+   * @param {string} query a query to search
+   * @param {Object} [config] config object
+   * @returns {Promise} A promise with array os subreddits starting with that query
+   * @example
+   * const config = {
+   *  exact:false,
+   *  include_over_18:false,
+   *  include_unadvertisable:false
+   * };
+   * const {subreddits} = await r.searchSubreddit("learn", config);
+   * => [
+   * {
+   *   active_user_count: 1705
+   *   allow_chat_post_creation: null
+   *   allow_images: false
+   *   icon_img: ""
+   *   key_color: ""
+   *   name: "learnprogramming"
+   *   subscriber_count: 1084731
+   * },
+   * {
+   *   active_user_count: 126
+   *   allow_chat_post_creation: null
+   *   allow_images: true
+   *   icon_img: ""
+   *   key_color: ""
+   *   name: "learnjavascript"
+   *   subscriber_count: 76606
+   * }
+   * ]
+   */
+  searchSubreddit (query, config = {exact: false, include_over_18: false, include_unadvertisable: false}) {
+    if (query.length > 50) {
+      throw new Error("query can't be longer than 50 characters");
+    }
+    return this._post({uri: 'api/search_subreddits', form: {query, ...config}});
+  }
+
+  /**
    * @summary Marks a list of submissions as 'visited'.
    * @desc **Note**: This endpoint only works if the authenticated user is subscribed to reddit gold.
    * @param {Submission[]} links A list of Submission objects to mark
