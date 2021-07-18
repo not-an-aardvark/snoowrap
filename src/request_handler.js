@@ -1,5 +1,4 @@
 import {includes, merge} from 'lodash';
-import Promise from './Promise.js';
 import {IDEMPOTENT_HTTP_VERBS, MAX_TOKEN_LATENCY} from './constants.js';
 import {rateLimitWarning, RateLimitError} from './errors.js';
 
@@ -41,51 +40,49 @@ domain name.
 * // equivalent to:
 * r.getTop({time: 'all'})
 */
-export function oauthRequest (options, attempts = 1) {
-  return Promise.resolve()
-    .then(() => this._awaitRatelimit())
-    .then(() => this._awaitRequestDelay())
-    .then(() => _awaitExponentialBackoff(attempts))
-    .then(() => this.updateAccessToken())
-    .then(token => {
-      return this.rawRequest(merge({
-        json: true,
-        headers: {'user-agent': this.userAgent},
-        baseUrl: `https://oauth.${this._config.endpointDomain}`,
-        qs: {raw_json: 1},
-        auth: {bearer: token},
-        resolveWithFullResponse: true,
-        timeout: this._config.requestTimeout,
-        transform: (body, response) => {
-          if (Object.prototype.hasOwnProperty.call(response.headers, 'x-ratelimit-remaining')) {
-            this.ratelimitRemaining = +response.headers['x-ratelimit-remaining'];
-            this.ratelimitExpiration = Date.now() + (response.headers['x-ratelimit-reset'] * 1000);
-          }
-          this._debug(
-            `Received a ${response.statusCode} status code from a \`${response.request.method}\` request`,
-            `sent to ${response.request.uri.href}. ratelimitRemaining: ${this.ratelimitRemaining}`
-          );
-          return response;
-        }
-      }, options));
-    }).then(response => {
-      const populated = this._populate(response.body);
-      if (populated && populated.constructor._name === 'Listing') {
-        populated._setUri(response.request.uri.href);
-      }
-      return populated;
-    }).catch(...this._config.retryErrorCodes.map(retryCode => ({statusCode: retryCode})), e => {
+export async function oauthRequest (options, attempts = 1) {
+  try {
+    await this._awaitRatelimit();
+    await this._awaitRequestDelay();
+    await _awaitExponentialBackoff(attempts);
+    const token = await this.updateAccessToken();
+    const response = await this.rawRequest(merge({
+      baseURL: `https://oauth.${this._config.endpointDomain}`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'user-agent': this.userAgent
+      },
+      params: {
+        raw_json: 1
+      },
+      timeout: this._config.requestTimeout
+    }, options));
+    if (response.headers['x-ratelimit-remaining']) {
+      this.ratelimitRemaining = +response.headers['x-ratelimit-remaining'];
+      this.ratelimitExpiration = Date.now() + (response.headers['x-ratelimit-reset'] * 1000);
+    }
+    this._debug(
+      `Received a ${response.status} status code from a \`${response.config.method}\` request`,
+      `sent to ${response.config.url}. ratelimitRemaining: ${this.ratelimitRemaining}`
+    );
+    const populated = this._populate(response.data);
+    if (populated && populated.constructor._name === 'Listing') {
+      populated._setUri(response.config.url);
+    }
+    return populated;
+  } catch (e) {
+    if (this._config.retryErrorCodes.some(retryCode => retryCode === e.response.status)) {
       if (!includes(IDEMPOTENT_HTTP_VERBS, e.response.request.method) || attempts >= this._config.maxRetryAttempts) {
         throw e;
       }
       /* If the error's status code is in the user's configured `retryStatusCodes` and this request still has attempts
       remaining, retry this request and increment the `attempts` counter. */
       this._warn(
-        `Received status code ${e.statusCode} from reddit.`,
+        `Received status code ${e.status} from reddit.`,
         `Retrying request (attempt ${attempts + 1}/${this._config.maxRetryAttempts})...`
       );
       return this.oauthRequest(options, attempts + 1);
-    }).catch({statusCode: 401}, e => {
+    } else if (e.response.status === 401) {
       /* If the server returns a 401 error, it's possible that the access token expired during the latency period as this
       request was being sent. In this scenario, snoowrap thought that the access token was valid for a few more seconds, so it
       didn't refresh the token, but the token had expired by the time the request reached the server. To handle this issue,
@@ -96,15 +93,8 @@ export function oauthRequest (options, attempts = 1) {
         return this.oauthRequest(options, attempts);
       }
       throw e;
-    });
-}
-
-export function _awaitExponentialBackoff (attempts) {
-  if (attempts === 1) {
-    return Promise.resolve();
+    }
   }
-
-  return Promise.delay((Math.pow(2, attempts - 1) + (Math.random() - 0.3)) * 1000);
 }
 
 export function _awaitRatelimit () {
@@ -115,20 +105,27 @@ export function _awaitRatelimit () {
       /* If the `continue_after_ratelimit_error` setting is enabled, queue the request, wait until the next ratelimit
       period, and then send it. */
       this._warn(rateLimitWarning(timeUntilExpiry));
-      return Promise.delay(timeUntilExpiry);
+      return new Promise(resolve => setTimeout(resolve, timeUntilExpiry));
     }
     // Otherwise, throw an error.
     throw new RateLimitError(timeUntilExpiry);
   }
   // If the ratelimit hasn't been exceeded, no delay is necessary.
-  return Promise.resolve();
 }
 
 export function _awaitRequestDelay () {
   const now = Date.now();
   const waitTime = this._nextRequestTimestamp - now;
   this._nextRequestTimestamp = Math.max(now, this._nextRequestTimestamp) + this._config.requestDelay;
-  return Promise.delay(waitTime);
+  return new Promise(resolve => setTimeout(resolve, waitTime));
+}
+
+export function _awaitExponentialBackoff (attempts) {
+  if (attempts === 1) {
+    return;
+  }
+  const waitTime = (Math.pow(2, attempts - 1) + (Math.random() - 0.3)) * 1000;
+  return new Promise(resolve => setTimeout(resolve, waitTime));
 }
 
 /**
@@ -161,12 +158,16 @@ snoowrap.prototype.credentialedClientRequest.call({
 */
 export function credentialedClientRequest (options) {
   const requestFunc = this.rawRequest || rawRequest;
-  return Promise.resolve(requestFunc.call(this, merge({
-    json: true,
-    auth: {user: this.clientId || this.client_id || '', pass: this.clientSecret || this.client_secret || ''},
-    headers: {'user-agent': this.userAgent},
-    baseUrl: this._config ? `https://www.${this._config.endpointDomain}` : undefined
-  }, options)));
+  return requestFunc.call(this, merge({
+    baseURL: this._config ? `https://www.${this._config.endpointDomain}` : undefined,
+    headers: {
+      'user-agent': this.userAgent
+    },
+    auth: {
+      username: this.clientId || this.client_id || '',
+      password: this.clientSecret || this.client_secret || ''
+    }
+  }, options));
 }
 
 /**
@@ -178,11 +179,12 @@ export function credentialedClientRequest (options) {
 * @instance
 */
 export function unauthenticatedRequest (options) {
-  return Promise.resolve(this.rawRequest(merge({
-    json: true,
-    headers: {'user-agent': this.userAgent},
-    baseUrl: `https://www.${this._config.endpointDomain}`
-  }, options)));
+  return this.rawRequest(merge({
+    baseURL: `https://www.${this._config.endpointDomain}`,
+    headers: {
+      'user-agent': this.userAgent
+    }
+  }, options));
 }
 
 /**
@@ -194,31 +196,31 @@ a stable feature, using it is rarely necessary unless an access token is needed 
 * @instance
 * @example r.updateAccessToken()
 */
-export function updateAccessToken () {
+export async function updateAccessToken () {
   // If the current access token is missing or expired, and it is possible to get a new one, do so.
   if ((!this.accessToken || Date.now() > this.tokenExpiration) && (this.refreshToken || (this.username && this.password))) {
-    return this.credentialedClientRequest({
+    const response = await this.credentialedClientRequest({
       method: 'post',
-      uri: 'api/v1/access_token',
+      url: 'api/v1/access_token',
       form: this.refreshToken
         ? {grant_type: 'refresh_token', refresh_token: this.refreshToken}
         : {grant_type: 'password', username: this.username, password: this.password}
-    }).then(tokenInfo => {
-      this.accessToken = tokenInfo.access_token;
-      this.tokenExpiration = Date.now() + (tokenInfo.expires_in * 1000);
-      if (tokenInfo.error === 'invalid_grant') {
-        throw new Error('"Invalid grant" error returned from reddit. (You might have incorrect credentials.)');
-      } else if (tokenInfo.error_description !== undefined) {
-        throw new Error(`Reddit returned an error: ${tokenInfo.error}: ${tokenInfo.error_description}`);
-      } else if (tokenInfo.error !== undefined) {
-        throw new Error(`Reddit returned an error: ${tokenInfo.error}`);
-      }
-      this.scope = tokenInfo.scope.split(' ');
-      return this.accessToken;
     });
+    const tokenInfo = response.data;
+    this.accessToken = tokenInfo.access_token;
+    this.tokenExpiration = Date.now() + (tokenInfo.expires_in * 1000);
+    if (tokenInfo.error === 'invalid_grant') {
+      throw new Error('"Invalid grant" error returned from reddit. (You might have incorrect credentials.)');
+    } else if (tokenInfo.error_description !== undefined) {
+      throw new Error(`Reddit returned an error: ${tokenInfo.error}: ${tokenInfo.error_description}`);
+    } else if (tokenInfo.error !== undefined) {
+      throw new Error(`Reddit returned an error: ${tokenInfo.error}`);
+    }
+    this.scope = tokenInfo.scope.split(' ');
+    return this.accessToken;
   }
   // Otherwise, just return the existing token.
-  return Promise.resolve(this.accessToken);
+  return this.accessToken;
 }
 
 /**
@@ -287,6 +289,4 @@ export function updateAccessToken () {
 *   }
 * }
 */
-export const rawRequest = typeof XMLHttpRequest !== 'undefined'
-  ? require('./xhr')
-  : require('request-promise').defaults({gzip: true});
+export const rawRequest = require('./axios');

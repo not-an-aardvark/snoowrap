@@ -98,7 +98,6 @@ rules:
   promise/catch-or-return: error
   promise/no-return-wrap: error
   promise/param-names: error
-  promise/no-native: error
 
 extends:
   - eslint:recommended

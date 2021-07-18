@@ -8,10 +8,10 @@
   "scripts": {
     "prepublishOnly": "npm run compile",
     "compile": "npm run type-check && npm run build:babel && npm run build:types && node ./scripts/copyTSTypes.js",
-    "lint": "eslint --ignore-path .gitignore . --cache",
+    "lint": "eslint --ignore-path .gitignore . --cache --fix",
     "test": "npm run lint && npm run test:mocha",
     "test:mocha": "npm run compile && mocha --require @babel/register test/snoowrap.spec.js",
-    "test:browser": "npm run compile && browserify --im test/snoowrap.spec.js -o test/_browser.spec.js -t [ babelify ] && open test/run-tests.html",
+    "test:browser": "npm run compile && browserify --im test/snoowrap.spec.js -o test/_browser.spec.js -t [ babelify ] && live-server --open=/test/run-tests.html",
     "smoketest": "npm run test -- -g 'smoketest'",
     "build-docs": "npm run build:docs",
     "build:docs": "scripts/build_docs.sh",
@@ -41,7 +41,9 @@
   },
   "homepage": "https://github.com/not-an-aardvark/snoowrap",
   "dependencies": {
+    "axios": "^0.21.1",
     "bluebird": "^3.5.5",
+    "form-data": "^4.0.0",
     "lodash": "^4.17.15",
     "promise-chains": "^0.3.11",
     "request": "^2.88.2",
@@ -76,6 +78,7 @@
     "ink-docstrap": "^1.2.1",
     "istanbul": "^1.0.0-alpha.2",
     "jsdoc": "^3.6.3",
+    "live-server": "^1.2.1",
     "mocha": "^6.0.0",
     "moment": "^2.14.1",
     "typescript": "^3.5.3",
@@ -88,6 +91,7 @@
     "fs": false,
     "request-promise": false,
     "util": false,
-    "ws": false
+    "ws": false,
+    "form-data": false
   }
 }
