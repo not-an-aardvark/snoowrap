@@ -3,49 +3,61 @@ import axios from 'axios';
 import {stringify as createQueryString} from 'querystring';
 import {isBrowser} from './helpers';
 
-let FormDataInterface;
-if (!isBrowser) {
-  FormDataInterface = require('form-data');
-} else {
-  FormDataInterface = FormData;
-}
+const Form_Data = isBrowser ? FormData : require('form-data');
 
-axios.interceptors.request.use(options => {
-  options.baseURL = options.baseURL || options.baseUrl;
-  options.url = options.url || options.uri;
-  options.params = options.params || options.qs;
-  options.headers = options.headers || {};
+axios.interceptors.request.use(config => {
+  const isSpreadable = val => typeof val !== 'string' && !(val instanceof Array);
+  const has = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop);
 
-  const requestHeaders = {};
-  Object.keys(options.headers)
-    .filter(header => !isBrowser || header.toLowerCase() !== 'user-agent')
-    .forEach(key => requestHeaders[key] = options.headers[key]);
-  options.headers = requestHeaders;
+  config.baseURL = config.baseURL || config.baseUrl;
+  config.url = config.url || config.uri;
+  config.headers = isSpreadable(config.headers) ? {...config.headers} : {};
+  config.params = isSpreadable(config.params) ? {...config.params} : {};
+  config.params = isSpreadable(config.qs) ? {...config.qs, ...config.params} : config.params;
+  config.formData = isSpreadable(config.formData) ? {...config.formData} : {};
+  config.form = isSpreadable(config.form) ? {...config.form} : {};
+
+  if (isBrowser) {
+    const requestHeaders = {};
+    Object.keys(config.headers)
+      .filter(header => header.toLowerCase() !== 'user-agent')
+      .forEach(key => requestHeaders[key] = config.headers[key]);
+    config.headers = requestHeaders;
+  }
 
   let requestBody;
-  if (options.formData) {
-    requestBody = new FormDataInterface();
-    Object.keys(options.formData).forEach(key => requestBody.append(key, options.formData[key]));
-    options.headers['Content-Type'] = 'multipart/form-data';
-  } else if (options.form) {
-    requestBody = createQueryString(options.form);
-    options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+  if (Object.keys(config.formData).length) {
+    requestBody = new Form_Data();
+    Object.keys(config.formData).forEach(key => requestBody.append(key, config.formData[key]));
+    config.headers['Content-Type'] = 'multipart/form-data';
+  } else if (Object.keys(config.form).length) {
+    requestBody = createQueryString(config.form);
+    config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
   } else {
-    requestBody = options.data || options.body;
+    requestBody = config.data || config.body;
   }
-  options.data = requestBody;
+  config.data = requestBody;
 
-  if (options.auth) {
-    if (Object.prototype.hasOwnProperty.call(options.auth, 'bearer')) {
-      options.headers.Authorization = `Bearer ${options.auth.bearer}`;
-    } else if (Object.prototype.hasOwnProperty.call(options.auth, 'user') &&
-      Object.prototype.hasOwnProperty.call(options.auth, 'pass')
-    ) {
-      options.auth.username = options.auth.user;
-      options.auth.password = options.auth.pass;
+  if (config.auth) {
+    if (has(config.auth, 'bearer')) {
+      config.headers.Authorization = `Bearer ${config.auth.bearer}`;
+    } else if (has(config.auth, 'user') && has(config.auth, 'pass')) {
+      config.auth.username = config.auth.user;
+      config.auth.password = config.auth.pass;
     }
   }
-  return options;
+
+  if (config._r) {
+    config._r._debug('Request:', config);
+  }
+  return config;
+});
+
+axios.interceptors.response.use(response => {
+  if (response.config._r) {
+    response.config._r._debug('Response:', response);
+  }
+  return response;
 });
 
 module.exports = axios;

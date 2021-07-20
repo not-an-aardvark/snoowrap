@@ -41,6 +41,7 @@ A few other useful commands:
 npm run lint # runs only the linter
 npm run test:browser # runs the unit tests in your browser
 npm run smoketest # runs two tests and then stops. This is useful to make sure your setup is correct.
+npm run browser # to test and debug snoowrap on browser console manually.
 npm run compile # compiles the source code using babel. This automatically gets run before the tests are run, but it's useful if you want to use `require('.')` in the node REPL.
 npm run build-docs # builds the documentation into a doc/ folder
 ```
@@ -94,20 +95,20 @@ The base class for a snoowrap requester is found in `snoowrap.js`. There are a f
 
 // --> send a GET request to reddit.com/r/snoowrap/about/moderators, and
 // return a Promise for the populated response
-r._get({uri: 'r/snoowrap/about/moderators'})
+r._get({url: 'r/snoowrap/about/moderators'})
 
 // --> send a POST request to reddit.com/api/remove with form data {id: 't3_2np694'}
-r._post({uri: 'api/remove', form: {id: 't3_2np694'}})
+r._post({url: 'api/remove', form: {id: 't3_2np694'}})
 ```
 
-The helper functions are `_get`, `_post`, `_put`, `_delete`, etc., corresponding to all the HTTP verbs. Parameters from these functions are passed directly to [request-promise](https://github.com/request/request-promise), so all of the request options from the [request API](https://www.npmjs.com/package/request) are easily available. Note that `request_handlers.js` already provides the following default options:
+The helper functions are `_get`, `_post`, `_put`, `_delete`, etc., corresponding to all the HTTP verbs. Parameters from these functions are passed directly to [axios](https://www.npmjs.com/package/axios), so all of the request options from the [axios API](https://www.npmjs.com/package/axios) are easily available in addition of snoowrap specific options such as `formData` and `form` (check `snoowrap#rawRequest` for more details). Note that `request_handlers.js` already provides the following default options:
 
 ```js
 {
   auth: {bearer: "(the user's access token)"},
   headers: {'user-agent': "(the user's user-agent string)"},
-  baseUrl: "the user's specified endpoint domain, usually https://oauth.reddit.com",
-  qs: {raw_json: 1} // (prevents reddit from escaping HTML characters),
+  baseURL: "the user's specified endpoint domain, usually https://oauth.reddit.com",
+  params: {raw_json: 1} // (prevents reddit from escaping HTML characters),
   timeout: "(the user's timeout)"
 }
 ```

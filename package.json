@@ -8,11 +8,12 @@
   "scripts": {
     "prepublishOnly": "npm run compile",
     "compile": "npm run type-check && npm run build:babel && npm run build:types && node ./scripts/copyTSTypes.js",
-    "lint": "eslint --ignore-path .gitignore . --cache --fix",
+    "lint": "eslint --ignore-path .gitignore . --cache",
     "test": "npm run lint && npm run test:mocha",
     "test:mocha": "npm run compile && mocha --require @babel/register test/snoowrap.spec.js",
     "test:browser": "npm run compile && browserify --im test/snoowrap.spec.js -o test/_browser.spec.js -t [ babelify ] && live-server --open=/test/run-tests.html",
     "smoketest": "npm run test -- -g 'smoketest'",
+    "browser": "npm run compile && browserify --im browser/index.js -o browser/_index.js -t [ babelify ] && live-server --open=/browser/index.html",
     "build-docs": "npm run build:docs",
     "build:docs": "scripts/build_docs.sh",
     "build:babel": "babel -q -d dist/ src/",
