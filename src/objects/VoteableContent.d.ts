@@ -2,7 +2,7 @@ import RedditUser from './RedditUser';
 import ReplyableContent from './ReplyableContent';
 import Subreddit from './Subreddit';
 
-interface RichTextFlair {
+export interface RichTextFlair {
   /** The string representation of the emoji */
   a?: string;
   /** The type of the flair entry */
