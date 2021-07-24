@@ -47,14 +47,14 @@ axios.interceptors.request.use(config => {
     }
   }
 
-  if (config._r) {
+  if (config._r && config._r._debug) {
     config._r._debug('Request:', config);
   }
   return config;
 });
 
 axios.interceptors.response.use(response => {
-  if (response.config._r) {
+  if (response.config._r && response.config._r._debug) {
     response.config._r._debug('Response:', response);
   }
   return response;

@@ -1,6 +1,4 @@
 /* eslint-env browser */
-"use strict";
-
 const snoowrap = require('..');
 const oauthInfo = require('../oauth_info.json');
 
