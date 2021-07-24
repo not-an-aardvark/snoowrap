@@ -250,7 +250,7 @@ export interface SubredditSettings {
 }
 
 interface ImageUploadOptions {
-  file: string | ReadableStream;
+  file: string | NodeJS.ReadableStream;
   imageType?: string;
 }
 
