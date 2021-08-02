@@ -7,6 +7,7 @@
   "types": "dist/snoowrap.d.ts",
   "scripts": {
     "prepublishOnly": "npm run compile",
+    "prepare": "npm run compile",
     "compile": "npm run type-check && npm run build:babel && npm run build:types && node ./scripts/copyTSTypes.js",
     "lint": "eslint --ignore-path .gitignore . --cache",
     "test": "npm run lint && npm run test:mocha",
