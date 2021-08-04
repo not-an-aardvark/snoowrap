@@ -33,6 +33,7 @@ export type SubredditType =
   | 'public';
 
 export default class VoteableContent<T> extends ReplyableContent<T> {
+  approved?: boolean;
   approved_at_utc: number | null;
   approved_by: RedditUser | null;
   archived: boolean;
@@ -55,6 +56,7 @@ export default class VoteableContent<T> extends ReplyableContent<T> {
   edited: number | boolean;
   gilded: number;
   gildings: Gildings;
+  locked: boolean;
   /** true = upvoted, false = downvoted, null = hasn't voted */
   likes: boolean | null;
   mod_note: string;
