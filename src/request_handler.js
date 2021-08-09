@@ -210,8 +210,6 @@ export async function updateAccessToken () {
         : {grant_type: 'password', username: this.username, password: this.password}
     });
     const tokenInfo = response.data;
-    this.accessToken = tokenInfo.access_token;
-    this.tokenExpiration = Date.now() + (tokenInfo.expires_in * 1000);
     if (tokenInfo.error === 'invalid_grant') {
       throw new Error('"Invalid grant" error returned from reddit. (You might have incorrect credentials.)');
     } else if (tokenInfo.error_description !== undefined) {
@@ -219,6 +217,8 @@ export async function updateAccessToken () {
     } else if (tokenInfo.error !== undefined) {
       throw new Error(`Reddit returned an error: ${tokenInfo.error}`);
     }
+    this.accessToken = tokenInfo.access_token;
+    this.tokenExpiration = Date.now() + (tokenInfo.expires_in * 1000);
     this.scope = tokenInfo.scope.split(' ');
     return this.accessToken;
   }

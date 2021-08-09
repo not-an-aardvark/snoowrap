@@ -40,13 +40,10 @@ export function addEmptyRepliesListing (item) {
   return item;
 }
 
-export function handleJsonErrors (returnValue) {
-  return response => {
-    if (isEmpty(response) || isEmpty(response.json.errors)) {
-      return returnValue;
-    }
+export function handleJsonErrors (response) {
+  if (!isEmpty(response) && !isEmpty(response.json.errors)) {
     throw new Error(response.json.errors[0]);
-  };
+  }
 }
 
 /**

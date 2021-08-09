@@ -105,7 +105,7 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
    */
   reply (body, isAuthorHidden = false, isInternal = false) {
     return this._post({
-      uri: `api/mod/conversations/${this.id}`,
+      url: `api/mod/conversations/${this.id}`,
       form: {
         body,
         isAuthorHidden,
@@ -122,7 +122,7 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
    * r.getNewModmailConversation('75hxt').archive()
    */
   archive () {
-    return this._post({uri: `api/mod/conversations/${this.id}/archive`});
+    return this._post({url: `api/mod/conversations/${this.id}/archive`});
   }
 
   /**
@@ -133,7 +133,7 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
    * r.getNewModmailConversation('75hxt').unarchive()
    */
   unarchive () {
-    return this._post({uri: `api/mod/conversations/${this.id}/unarchive`});
+    return this._post({url: `api/mod/conversations/${this.id}/unarchive`});
   }
 
   /**
@@ -144,7 +144,7 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
    * r.getNewModmailConversation('75hxt').highlight()
    */
   highlight () {
-    return this._post({uri: `api/mod/conversations/${this.id}/highlight`});
+    return this._post({url: `api/mod/conversations/${this.id}/highlight`});
   }
 
   /**
@@ -155,7 +155,7 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
    * r.getNewModmailConversation('75hxt').unhighlight()
    */
   unhighlight () {
-    return this._delete({uri: `api/mod/conversations/${this.id}/highlight`});
+    return this._delete({url: `api/mod/conversations/${this.id}/highlight`});
   }
 
   /**
@@ -166,7 +166,7 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
    * r.getNewModmailConversation('75hxt').mute()
    */
   mute () {
-    return this._post({uri: `api/mod/conversations/${this.id}/mute`});
+    return this._post({url: `api/mod/conversations/${this.id}/mute`});
   }
 
   /**
@@ -177,7 +177,7 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
    * r.getNewModmailConversation('75hxt').unmute()
    */
   unmute () {
-    return this._post({uri: `api/mod/conversations/${this.id}/unmute`});
+    return this._post({url: `api/mod/conversations/${this.id}/unmute`});
   }
 
   /**
@@ -210,11 +210,9 @@ const ModmailConversation = class ModmailConversation extends RedditContent {
    * r.getNewModmailConversation('75hxt').getParticipant().then(console.log)
    * // ModmailConversationAuthor { muteStatus: {...}, name: "SpyTec13", created: '2015-11-22T14:30:38.821292+00:00', ...}
    */
-  getParticipant () {
-    return this._get({uri: `api/mod/conversations/${this.id}/user`})
-      .then(res => {
-        return this._r._newObject('ModmailConversationAuthor', res, true);
-      });
+  async getParticipant () {
+    const res = await this._get({url: `api/mod/conversations/${this.id}/user`});
+    return this._r._newObject('ModmailConversationAuthor', res, true);
   }
 
   /**
