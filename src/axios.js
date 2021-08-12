@@ -1,11 +1,11 @@
-/* eslint-env browser */
+/* eslint-disable require-atomic-updates */
 import axios from 'axios';
 import {stringify as createQueryString} from 'querystring';
 import {isBrowser} from './helpers';
 
-const Form_Data = isBrowser ? FormData : require('form-data');
+const FormData = isBrowser ? global.FormData : require('form-data');
 
-axios.interceptors.request.use(config => {
+axios.interceptors.request.use(async config => {
   const isSpreadable = val => typeof val !== 'string' && !(val instanceof Array);
   const has = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop);
 
@@ -17,22 +17,34 @@ axios.interceptors.request.use(config => {
   config.formData = isSpreadable(config.formData) ? {...config.formData} : {};
   config.form = isSpreadable(config.form) ? {...config.form} : {};
 
-  if (isBrowser) {
-    const requestHeaders = {};
-    Object.keys(config.headers)
-      .filter(header => header.toLowerCase() !== 'user-agent')
-      .forEach(key => requestHeaders[key] = config.headers[key]);
-    config.headers = requestHeaders;
-  }
+  const requestHeaders = {};
+  Object.keys(config.headers).forEach(key => {
+    const newKey = key.toLowerCase();
+    if (!isBrowser || newKey !== 'user-agent') {
+      requestHeaders[newKey] = config.headers[key];
+    }
+  });
+  config.headers = requestHeaders;
 
   let requestBody;
   if (Object.keys(config.formData).length) {
-    requestBody = new Form_Data();
+    requestBody = new FormData();
     Object.keys(config.formData).forEach(key => requestBody.append(key, config.formData[key]));
-    config.headers['Content-Type'] = 'multipart/form-data';
+    if (!isBrowser) {
+      const contentLength = await new Promise((resolve, reject) => {
+        requestBody.getLength((err, length) => {
+          if (err) {
+            reject(err);
+          }
+          resolve(length);
+        });
+      });
+      config.headers['content-length'] = contentLength;
+      config.headers['content-type'] = `multipart/form-data; boundary=${requestBody._boundary}`;
+    }
   } else if (Object.keys(config.form).length) {
     requestBody = createQueryString(config.form);
-    config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+    config.headers['content-type'] = 'application/x-www-form-urlencoded';
   } else {
     requestBody = config.data || config.body;
   }
@@ -40,7 +52,7 @@ axios.interceptors.request.use(config => {
 
   if (config.auth) {
     if (has(config.auth, 'bearer')) {
-      config.headers.Authorization = `Bearer ${config.auth.bearer}`;
+      config.headers.authorization = `Bearer ${config.auth.bearer}`;
     } else if (has(config.auth, 'user') && has(config.auth, 'pass')) {
       config.auth.username = config.auth.user;
       config.auth.password = config.auth.pass;

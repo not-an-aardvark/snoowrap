@@ -47,7 +47,7 @@ export async function oauthRequest (options, attempts = 1) {
     const response = await this.rawRequest(merge({
       baseURL: `https://oauth.${this._config.endpointDomain}`,
       headers: {
-        Authorization: `Bearer ${token}`,
+        authorization: `Bearer ${token}`,
         'user-agent': this.userAgent
       },
       params: {

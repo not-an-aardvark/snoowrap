@@ -19,9 +19,16 @@ export class NoCredentialsError extends Error {
   }
 }
 
+export class MediaPostFailedError extends Error {
+  constructor (message = 'The attempted media upload action has failed. Possible causes include the corruption of media files.') {
+    super(message);
+  }
+}
+
 export class InvalidMethodCallError extends Error {}
 export class RequestError extends Error {}
 export class StatusCodeError extends Error {}
+export class WebSocketError extends Error {}
 
 export function rateLimitWarning (millisecondsUntilReset) {
   return `Warning: ${MODULE_NAME} temporarily stopped sending requests because reddit's ratelimit was exceeded. The request you attempted to send was queued, and will be sent to reddit when the current ratelimit period expires in ${millisecondsUntilReset / 1000} seconds.`;

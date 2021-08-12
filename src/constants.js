@@ -33,6 +33,7 @@ export const KINDS = {
   ModmailConversationAuthor: 'ModmailConversationAuthor'
 };
 export const USERNAME_REGEX = /^[\w-]{1,20}$/;
+export const SUBMISSION_ID_REGEX = /comments\/(.+?)\//;
 export const MODERATOR_PERMISSIONS = ['wiki', 'posts', 'access', 'mail', 'config', 'flair'];
 export const LIVETHREAD_PERMISSIONS = ['update', 'edit', 'manage'];
 export const HTTP_VERBS = ['delete', 'get', 'head', 'patch', 'post', 'put'];
@@ -41,3 +42,11 @@ export const MAX_TOKEN_LATENCY = 10000;
 export const MAX_API_INFO_AMOUNT = 100;
 export const MAX_API_MORECHILDREN_AMOUNT = 20;
 export const MAX_LISTING_ITEMS = 100;
+export const MIME_TYPES = {
+  png: 'image/png',
+  mov: 'video/quicktime',
+  mp4: 'video/mp4',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  gif: 'image/gif'
+};

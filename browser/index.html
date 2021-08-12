@@ -10,6 +10,15 @@
       <li>To access a snoowrap instance authenticated with a refresh token: <b>window.r</b>.</li>
       <li>To access a snoowrap instance authenticated with username/password: <b>window.r2</b>.</li>
     </ol>
+    <p>
+      <b>Use This Button to Import Files From Your Device to the Browser:</b>
+      <button onclick="document.getElementById('file-input').click();">Import File</button>
+      <input id="file-input" type="file" name="name" style="display: none;" />
+    </p>
+    <ol>
+      <li>This is useful if you want to upload something with snoowrap.</li>
+      <li>All imported files can be found here: <b>window.files</b>.</li>
+    </ol>
     <p>Enjoy! &lt;3</b></p>
     <script src="_index.js"></script>
   </body>

@@ -30,3 +30,11 @@ r2.config({
 });
 
 window.r2 = r2;
+
+window.files = {};
+
+const fileinput = document.getElementById('file-input');
+fileinput.onchange = () => {
+  const file = fileinput.files[0];
+  window.files[file.name] = file;
+};
