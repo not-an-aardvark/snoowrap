@@ -4,7 +4,7 @@ import path from 'path';
 import stream from 'stream';
 import {createReadStream} from 'fs';
 import * as requestHandler from './request_handler.js';
-import {HTTP_VERBS, KINDS, MAX_LISTING_ITEMS, MODULE_NAME, USER_KEYS, SUBREDDIT_KEYS, VERSION, MIME_TYPES, SUBMISSION_ID_REGEX} from './constants.js';
+import {HTTP_VERBS, KINDS, MAX_LISTING_ITEMS, MODULE_NAME, USER_KEYS, SUBREDDIT_KEYS, VERSION, MIME_TYPES, SUBMISSION_ID_REGEX, MEDIA_TYPES, PLACEHOLDER_REGEX} from './constants.js';
 import * as errors from './errors.js';
 import {
   addEmptyRepliesListing,
@@ -17,7 +17,11 @@ import {
 } from './helpers.js';
 import createConfig from './create_config.js';
 import * as objects from './objects/index.js';
+/* eslint-disable-next-line import/no-unresolved */
+import MediaFile, {MediaImg, MediaVideo, MediaGif} from './objects/MediaFile';
 
+const fetch = global.fetch;
+const Blob = global.Blob;
 const FormData = isBrowser ? global.FormData : require('form-data');
 const WebSocket = isBrowser ? global.WebSocket : require('ws');
 
@@ -670,24 +674,28 @@ const snoowrap = class snoowrap {
   }
 
   async _submit ({
-    captcha_response, captchaResponse = captcha_response,
-    captcha_iden, captchaIden = captcha_iden,
+    subreddit_name, subredditName = subreddit_name,
     kind,
-    resubmit = true,
-    send_replies = true, sendReplies = send_replies,
-    crosspost_fullname,
-    text,
     title,
     url,
-    subreddit_name, subredditName = subreddit_name,
+    videoPosterUrl,
+    websocketUrl,
+    gallery,
+    text,
+    rtjson,
+    choices,
+    duration,
+    crosspost_fullname, crosspostFullname = crosspost_fullname,
+    resubmit = true,
+    send_replies = true, sendReplies = send_replies,
     nsfw,
     spoiler,
     flairId,
     flairText,
-    collection_id,
-    discussion_type,
-    inline_media,
-    websocketUrl,
+    collectionId,
+    discussionType,
+    captcha_response, captchaResponse = captcha_response,
+    captcha_iden, captchaIden = captcha_iden,
     ...options
   }) {
     let ws;
@@ -699,14 +707,42 @@ const snoowrap = class snoowrap {
       });
       ws.onerror = null;
     }
-    const result = await this._post({
-      url: 'api/submit', form: {
-        api_type, captcha: captchaResponse, iden: captchaIden, sendreplies: sendReplies, sr: subredditName, kind, resubmit,
-        crosspost_fullname, text, title, url, spoiler, nsfw, flair_id: flairId, flair_text: flairText, collection_id,
-        discussion_type, inline_media, ...options
-      }
-    });
+
+    /**
+     * Todo: still unsure if `options.resubmit` is supported on gallery/poll submissions
+     */
+    let result;
+    switch (kind) {
+      case 'gallery':
+        result = await this._post({
+          url: 'api/submit_gallery_post.json', data: {
+            api_type, sr: subredditName, title, items: gallery, resubmit, sendreplies: sendReplies, nsfw, spoiler,
+            flair_id: flairId, flair_text: flairText, collection_id: collectionId, discussion_type: discussionType,
+            captcha: captchaResponse, iden: captchaIden, ...options
+          }
+        });
+        break;
+      case 'poll':
+        result = await this._post({
+          url: 'api/submit_poll_post', data: {
+            api_type, sr: subredditName, title, text, options: choices, duration, resubmit, sendreplies: sendReplies, nsfw,
+            spoiler, flair_id: flairId, flair_text: flairText, collection_id: collectionId, discussion_type: discussionType,
+            captcha: captchaResponse, iden: captchaIden, ...options
+          }
+        });
+        break;
+      default:
+        result = await this._post({
+          url: 'api/submit', form: {
+            api_type, sr: subredditName, kind, title, url, video_poster_url: videoPosterUrl, text, richtext_json: JSON.stringify(rtjson),
+            crosspost_fullname: crosspostFullname, resubmit, sendreplies: sendReplies, nsfw, spoiler, flair_id: flairId, flair_text: flairText,
+            collection_id: collectionId, discussion_type: discussionType, captcha: captchaResponse, iden: captchaIden, ...options
+          }
+        });
+        break;
+    }
     handleJsonErrors(result);
+
     if (ws) {
       if (ws.readyState !== WebSocket.OPEN) {
         throw new errors.WebSocketError('Websocket error. Your post may still have been created.');
@@ -728,31 +764,6 @@ const snoowrap = class snoowrap {
       });
     }
     return result.json.data.id ? this.getSubmission(result.json.data.id) : null;
-  }
-
-  /**
-   * @summary Creates a new selfpost on the given subreddit.
-   * @param {object} options An object containing details about the submission
-   * @param {string} options.subredditName The name of the subreddit that the post should be submitted to
-   * @param {string} options.title The title of the submission
-   * @param {string} [options.text] The selftext of the submission
-   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission
-   * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
-   * requires a captcha to submit posts and comments.
-   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier
-   * @returns {Promise} The newly-created Submission object
-   * @example
-   *
-   * r.submitSelfpost({
-   *   subredditName: 'snoowrap_testing',
-   *   title: 'This is a selfpost',
-   *   text: 'This is the text body of the selfpost'
-   * }).then(console.log)
-   * // => Submission { name: 't3_4abmsz' }
-   * // (new selfpost created on reddit)
-   */
-  submitSelfpost (options) {
-    return this._submit({...options, kind: 'self'});
   }
 
   /**
@@ -779,7 +790,259 @@ const snoowrap = class snoowrap {
    * // (new linkpost created on reddit)
    */
   submitLink (options) {
+    // Todo: Add `options.url` validation.
     return this._submit({...options, kind: 'link'});
+  }
+
+  /**
+   * @summary Submit an image submission to the given subreddit. (Undocumented endpoint).
+   * @desc **NOTE**: This method won't work on browsers that don't support the Fetch API natively since it requires to perform
+   * a 'no-cors' request which is impossible with the XMLHttpRequest API.
+   * @param {object} options An object containing details about the submission.
+   * @param {string} options.subredditName The name of the subreddit that the post should be submitted to.
+   * @param {string} options.title The title of the submission.
+   * @param {string|stream.Readable|Blob|File|MediaImg} options.imageFile The image file that should get uploaded. This should either be the path to
+   * the file you want to upload, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) /
+   * [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob) / [File](https://developer.mozilla.org/en-US/docs/Web/API/File) in environments
+   * (e.g. browsers) where the filesystem is unavailable.
+   * @param {string} options.imageFileName The name that the image file should have. Required when it cannot be diractly extracted from
+   * the provided file (e.g ReadableStream, Blob).
+   * @param {Boolean} [options.noWebsockets=false] Set to `true` to disable use of WebSockets. If `true`, this method will return `null`.
+   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission.
+   * @param {boolean} [options.resubmit=true] If this is false and same link has already been submitted to this subreddit in
+   * the past, reddit will return an error. This could be used to avoid accidental reposts.
+   * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
+   * requires a captcha to submit posts and comments.
+   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier
+   * @returns {Promise} The newly-created Submission object
+   */
+  async submitImage ({
+    imageFile,
+    imageFileName,
+    noWebsockets,
+    ...options
+  }) {
+    let url, websocketUrl;
+    try {
+      const {fileUrl, websocketUrl: wsUrl} = imageFile instanceof MediaImg
+        ? imageFile
+        : await this._uploadMedia({
+          file: imageFile,
+          name: imageFileName,
+          type: 'img'
+        });
+      url = fileUrl;
+      websocketUrl = wsUrl;
+    } catch (err) {
+      throw new Error('An error has occurred with the image file: ' + err.message);
+    }
+    return this._submit({...options, kind: 'image', url, websocketUrl: noWebsockets ? null : websocketUrl});
+  }
+
+  /**
+   * @summary Submit a video or videogif submission to the given subreddit. (Undocumented endpoint).
+   * @desc **NOTE**: This method won't work on browsers that don't support the Fetch API natively since it requires to perform
+   * a 'no-cors' request which is impossible with the XMLHttpRequest API.
+   * @param {object} options An object containing details about the submission.
+   * @param {string} options.subredditName The name of the subreddit that the post should be submitted to.
+   * @param {string} options.title The title of the submission.
+   * @param {string|stream.Readable|Blob|File|MediaVideo} options.videoFile The video file that should get uploaded. This should either be the path to
+   * the file you want to upload, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) /
+   * [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob) / [File](https://developer.mozilla.org/en-US/docs/Web/API/File) in environments
+   * (e.g. browsers) where the filesystem is unavailable.
+   * @param {string} options.videoFileName The name that the video file should have. Required when it cannot be diractly extracted from
+   * the provided file (e.g ReadableStream, Blob).
+   * @param {string|stream.Readable|Blob|File|MediaImg} options.thumbnailFile The image file that should get uploaded and used as a thumbnail for the video. This
+   * should either be the path to the file you want to upload, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) /
+   * [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob) / [File](https://developer.mozilla.org/en-US/docs/Web/API/File) in environments
+   * (e.g. browsers) where the filesystem is unavailable.
+   * @param {string} options.thumbnailFileName The name that the thumbnail file should have. Required when it cannot be diractly extracted from
+   * the provided file (e.g ReadableStream, Blob).
+   * @param {boolean} [options.videogif=false] If `true`, the video is uploaded as a videogif, which is essentially a silent video.
+   * @param {Boolean} [options.noWebsockets=false] Set to `true` to disable use of WebSockets. If `true`, this method will return `null`.
+   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission.
+   * @param {boolean} [options.resubmit=true] If this is false and same link has already been submitted to this subreddit in
+   * the past, reddit will return an error. This could be used to avoid accidental reposts.
+   * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
+   * requires a captcha to submit posts and comments.
+   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier.
+   * @returns {Promise} The newly-created Submission object.
+   */
+  async submitVideo ({
+    videoFile,
+    videoFileName,
+    thumbnailFile,
+    thumbnailFileName,
+    videogif = false,
+    noWebsockets,
+    ...options
+  }) {
+    let url, videoPosterUrl, websocketUrl;
+    const kind = videogif ? 'videogif' : 'video';
+
+    /**
+     * Imagin you just finished uploading a large video, then oops! you faced this error: "An error has occurred with the thumbnail file"!
+     * In this case we should validate the thumbnail parameters first to ensure that no accidental uploads will happen.
+     */
+    if (!(thumbnailFile instanceof MediaImg)) {
+      try {
+        await this._uploadMedia({
+          file: thumbnailFile,
+          name: thumbnailFileName,
+          type: 'img',
+          validateOnly: true
+        });
+      } catch (err) {
+        throw new Error('An error has occurred with the thumbnail file: ' + err.message);
+      }
+    }
+
+    /**
+     * Now we are safe to upload. If the provided video is invalid the error can be easly catched.
+     */
+    try {
+      const {fileUrl, websocketUrl: wsUrl} = videoFile instanceof MediaVideo
+        ? videoFile
+        : await this._uploadMedia({
+          file: videoFile,
+          name: videoFileName,
+          type: videogif ? 'gif' : 'video'
+        });
+      url = fileUrl;
+      websocketUrl = wsUrl;
+    } catch (err) {
+      throw new Error('An error has occurred with the video file: ' + err.message);
+    }
+    try {
+      const {fileUrl} =
+      thumbnailFile instanceof MediaImg
+        ? thumbnailFile
+        : await this._uploadMedia({
+          file: thumbnailFile,
+          name: thumbnailFileName,
+          type: 'img'
+        });
+      videoPosterUrl = fileUrl;
+    } catch (err) {
+      throw new Error('An error occurred with the thumbnail file: ' + err.message);
+    }
+
+    return this._submit({...options, kind, url, videoPosterUrl, websocketUrl: noWebsockets ? null : websocketUrl});
+  }
+
+  async submitGallery ({gallery, ...options}) {
+    /**
+     * Validate every single gallery item to ensure that no accidental uploads will happen.
+     */
+    await Promise.all(gallery.map(async (item, index) => {
+      try {
+        if (item.caption.length > 180) {
+          throw new Error('Caption must be 180 characters or less.');
+        }
+        // Todo: Add outboundUrl validation.
+        if (!(item instanceof MediaImg)) {
+          await this._uploadMedia({
+            file: item.imageFile,
+            name: item.imageFileName,
+            type: 'img',
+            validateOnly: true
+          });
+        }
+      } catch (err) {
+        throw new Error(`An error has occurred with a gallery item at the index ${index}: ` + err.message);
+      }
+    }));
+
+    /**
+     * Now we are safe to upload. It still depends on network conditions tho, that's why it is recommended to pass the gallery items
+     * as ready-to-use `MediaImg`s instead.
+     */
+    gallery = await Promise.all(gallery.map(async (item, index) => {
+      try {
+        if (!(item instanceof MediaImg)) {
+          item = await this._uploadMedia({
+            file: item.imageFile,
+            name: item.imageFileName,
+            type: 'img',
+            caption: item.caption,
+            outboundUrl: item.outboundUrl
+          });
+        }
+      } catch (err) {
+        throw new Error(`An error occurred with a gallery item at the index ${index}: ` + err.message);
+      }
+      return {
+        caption: item.caption,
+        outbound_url: item.outboundUrl,
+        media_id: item.assetId
+      };
+    }));
+
+    return this._submit({...options, kind: 'gallery', gallery});
+  }
+
+  /**
+   * @summary Creates a new selfpost on the given subreddit.
+   * @param {object} options An object containing details about the submission
+   * @param {string} options.subredditName The name of the subreddit that the post should be submitted to
+   * @param {string} options.title The title of the submission
+   * @param {string} [options.text] The selftext of the submission
+   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission
+   * @param {object} [options.inlineMedia]
+   * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
+   * requires a captcha to submit posts and comments.
+   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier
+   * @returns {Promise} The newly-created Submission object
+   * @example
+   *
+   * r.submitSelfpost({
+   *   subredditName: 'snoowrap_testing',
+   *   title: 'This is a selfpost',
+   *   text: 'This is the text body of the selfpost'
+   * }).then(console.log)
+   * // => Submission { name: 't3_4abmsz' }
+   * // (new selfpost created on reddit)
+   */
+  async submitSelfpost ({text, inlineMedia, rtjson, ...options}) {
+    /* eslint-disable require-atomic-updates */
+    if (text && inlineMedia && !rtjson) {
+      const placeholders = Object.keys(inlineMedia);
+
+      // Validate inline media
+      await Promise.all(placeholders.map(async p => {
+        if (!text.includes(`{${p}}`)) {
+          return;
+        }
+        if (!(inlineMedia[p] instanceof MediaFile)) {
+          await this._uploadMedia({
+            ...inlineMedia[p],
+            validateOnly: true
+          });
+        }
+      }));
+
+      // Upload if necessary
+      await Promise.all(placeholders.map(async p => {
+        if (!text.includes(`{${p}}`)) {
+          return;
+        }
+        if (!(inlineMedia[p] instanceof MediaFile)) {
+          inlineMedia[p] = await this._uploadMedia({
+            ...inlineMedia[p]
+          });
+        }
+      }));
+
+      const body = text.replace(PLACEHOLDER_REGEX, (_m, g1) => inlineMedia[g1]);
+      rtjson = await this._convertToFancypants(body);
+      text = null;
+    }
+    return this._submit({...options, kind: 'self', text, rtjson});
+    /* eslint-enable require-atomic-updates */
+  }
+
+  submitPoll (options) {
+    return this._submit({...options, kind: 'poll'});
   }
 
   /**
@@ -799,148 +1062,61 @@ const snoowrap = class snoowrap {
    *
    * await r.submitCrosspost({ title: 'I found an interesting post', originalPost: '6vths0', subredditName: 'snoowrap' })
    */
-  submitCrosspost (options) {
+  submitCrosspost ({originalPost, ...options}) {
     return this._submit({
       ...options,
       kind: 'crosspost',
-      crosspost_fullname: options.originalPost instanceof snoowrap.objects.Submission
-        ? options.originalPost.name
-        : addFullnamePrefix(options.originalPost, 't3_')
+      crosspostFullname: originalPost instanceof snoowrap.objects.Submission
+        ? originalPost.name
+        : addFullnamePrefix(originalPost, 't3_')
     });
-  }
-
-  /**
-   * @summary Submit an image submission to the given subreddit. (Undocumented endpoint).
-   * @desc **NOTE**: This method won't work on browsers that don't support the Fetch API natively since it requires to perform
-   * a 'no-cors' request which is impossible with the XMLHttpRequest API.
-   * @param {object} options An object containing details about the submission
-   * @param {string} options.subredditName The name of the subreddit that the post should be submitted to
-   * @param {string} options.title The title of the submission
-   * @param {string|stream.Readable|Blob} options.imageFile The image file that should get uploaded. This should either be the path to
-   * an image file, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) or a Blob in environments (e.g.
-   * browsers) where the filesystem is unavailable.
-   * @param {string} options.imageFileName The file name that the new image should have. Required when the provided file doesn't have a name.
-   * @param {Boolean} [options.withoutWebsockets=false] Set to `true` to disable use of WebSockets. If `true`, this method will return `null`.
-   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission
-   * @param {boolean} [options.resubmit=true] If this is false and same link has already been submitted to this subreddit in
-   * the past, reddit will return an error. This could be used to avoid accidental reposts.
-   * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
-   * requires a captcha to submit posts and comments.
-   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier
-   * @returns {Promise} The newly-created Submission object
-   */
-  async submitImage ({imageFile, imageFileName, ...options}) {
-    if (!imageFile) {
-      requiredArg('imageFile');
-    }
-    let url, websocketUrl;
-    try {
-      const {fileUrl, websocketUrl: wsUrl} = await this._uploadMedia({
-        file: imageFile,
-        name: imageFileName,
-        expectedMimePrefix: 'image'
-      });
-      url = fileUrl;
-      websocketUrl = wsUrl;
-    } catch (err) {
-      throw new Error('An error occurred while trying to upload the image file: ' + err.message);
-    }
-    return this._submit({...options, url, kind: 'image', websocketUrl: options.withoutWebsockets ? null : websocketUrl});
-  }
-
-  /**
-   * @summary Submit a video or videogif submission to the given subreddit. (Undocumented endpoint).
-   * @desc **NOTE**: This method won't work on browsers that don't support the Fetch API natively since it requires to perform
-   * a 'no-cors' request which is impossible with the XMLHttpRequest API.
-   * @param {object} options An object containing details about the submission.
-   * @param {string} options.subredditName The name of the subreddit that the post should be submitted to.
-   * @param {string} options.title The title of the submission.
-   * @param {string|stream.Readable|Blob} options.videoFile The video file that should get uploaded. This should either be the path to
-   * a video file, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) or a Blob in environments (e.g.
-   * browsers) where the filesystem is unavailable.
-   * @param {string} options.videoFileName The file name that the new video should have. Required when the provided file doesn't have a name.
-   * @param {string|stream.Readable|Blob} options.thumbnailFile The image file that should get uploaded and used as a thumbnail for this video.
-   * This should either be the path to an image file, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable)
-   * or a Blob in environments (e.g. browsers) where the filesystem is unavailable.
-   * @param {string} options.thumbnailFileName The file name that the thumbnail should have. Required when the provided file doesn't have a name.
-   * @param {boolean} [options.videogif=false] If `true`, the video is uploaded as a videogif, which is essentially a silent video.
-   * @param {Boolean} [options.withoutWebsockets=false] Set to `true` to disable use of WebSockets. If `true`, this method will return `null`.
-   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission.
-   * @param {boolean} [options.resubmit=true] If this is false and same link has already been submitted to this subreddit in
-   * the past, reddit will return an error. This could be used to avoid accidental reposts.
-   * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
-   * requires a captcha to submit posts and comments.
-   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier.
-   * @returns {Promise} The newly-created Submission object.
-   */
-  async submitVideo ({videoFile, videoFileName, thumbnailFile, thumbnailFileName, videogif = false, ...options}) {
-    if (!videoFile) {
-      requiredArg('videoFile');
-    }
-    if (!thumbnailFile) {
-      requiredArg('thumbnailFile');
-    }
-    let url, video_poster_url, websocketUrl;
-    const kind = videogif ? 'videogif' : 'video';
-    try {
-      const {fileUrl, websocketUrl: wsUrl} = await this._uploadMedia({
-        file: videoFile,
-        name: videoFileName,
-        expectedMimePrefix: 'video'
-      });
-      url = fileUrl;
-      websocketUrl = wsUrl;
-    } catch (err) {
-      throw new Error('An error occurred while trying to upload the video file: ' + err.message);
-    }
-    try {
-      const {fileUrl} = await this._uploadMedia({
-        file: thumbnailFile,
-        name: thumbnailFileName,
-        expectedMimePrefix: 'image'
-      });
-      video_poster_url = fileUrl;
-    } catch (err) {
-      throw new Error('An error occurred while trying to upload the thumbnail file: ' + err.message);
-    }
-    return this._submit({...options, url, video_poster_url, kind, websocketUrl: options.withoutWebsockets ? null : websocketUrl});
   }
 
   /**
    * @summary Upload media and return its URL, ID and a websocket (Undocumented endpoint).
    * @desc **NOTE**: This method won't work on browsers that don't support the Fetch API natively since it requires to perform
    * a 'no-cors' request which is impossible with the XMLHttpRequest API.
-   * @param {object} options
-   * @param {string|stream.Readable|Blob} options.file The media file that should get uploaded. This should either be the path to the file
-   * you want to upload, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) or a Blob in environments (e.g.
-   * browsers) where the filesystem is unavailable.
-   * @param {string} options.name The name that the new file should have. Required when the provided file doesn't have a name.
-   * @param {string} [options.expectedMimePrefix] If provided, enforce that the media has a mime type that starts with that prefix.
-   * @returns {Promise} A Promise that fulfills with an object containing `fileUrl`, `assetId` and `websocketUrl` for the piece of
-   * media. The websocket URL can be used to determine when media processing is finished.
+   * @param {object} options An object contains the media file to upload.
+   * @param {string|stream.Readable|Blob|File} options.file The media file that should get uploaded. This should either be the path to the file
+   * you want to upload, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) /
+   * [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob) / [File](https://developer.mozilla.org/en-US/docs/Web/API/File) in environments
+   * (e.g. browsers) where the filesystem is unavailable.
+   * @param {string} options.name The name that the file should have. Required when it cannot be diractly extracted from the provided
+   * file (e.g ReadableStream, Blob).
+   * @param {string} [options.type] Determines the media file type. This should be one of `img, video, gif`.
+   * @param {boolean} [options.validateOnly] If true, the file won't get uploaded, and this method will return `null`. Useful if you only want
+   * to validate the parameters before actually uploading the file.
+   * @returns {Promise<MediaFile>} A Promise that fulfills with an object containing `fileUrl`, `assetId` and `websocketUrl` for the piece of
+   * media, or `null` when `options.validateOnly` is set to `true`. The websocket URL can be used to determine when media processing is finished
+   * and to obtain the ID of the new created submission.
    */
-  async _uploadMedia ({file, name, expectedMimePrefix}) {
-    if (isBrowser && typeof global.fetch === 'undefined') {
+  async _uploadMedia ({file, name, type, caption, outboundUrl, validateOnly = false}) {
+    if (isBrowser && typeof fetch === 'undefined') {
       throw new errors.InvalidMethodCallError('Your browser doesn\'t support \'no-cors\' requests');
     }
     if (isBrowser && typeof file === 'string') {
       throw new errors.InvalidMethodCallError('Uploaded file cannot be a string on browser');
     }
-    if (typeof file !== 'string' && !(file instanceof stream.Readable) && !(typeof global.Blob !== 'undefined' && file instanceof global.Blob)) {
-      throw new errors.InvalidMethodCallError('Uploaded file must either be a string, a ReadableStream or a Blob');
+    // `File` is a specific kind of `Blob`, so one check for `Blob` is enough
+    if (typeof file !== 'string' && !(file instanceof stream.Readable) && !(typeof Blob !== 'undefined' && file instanceof Blob)) {
+      throw new errors.InvalidMethodCallError('Uploaded file must either be a string, a ReadableStream, a Blob or a File');
     }
     const parsedFile = typeof file === 'string' ? createReadStream(file) : file;
     const fileName = typeof file === 'string' ? path.basename(file) : file.name || name;
     if (!fileName) {
-      requiredArg(name);
+      requiredArg('name');
     }
-    let fileExt = path.extname(fileName) || 'jpeg'; // default to JPEG
+    let fileExt = path.extname(fileName) || 'jpeg'; // Default to JPEG
     fileExt = fileExt.replace('.', '');
-    const mimetype = typeof global.Blob !== 'undefined' && file instanceof global.Blob && file.type ? file.type : MIME_TYPES[fileExt];
+    const mimetype = typeof Blob !== 'undefined' && file instanceof Blob && file.type ? file.type : MIME_TYPES[fileExt] || '';
+    const expectedMimePrefix = MEDIA_TYPES[type];
     if (expectedMimePrefix && mimetype.split('/')[0] !== expectedMimePrefix) {
       throw new errors.InvalidMethodCallError(`Expected a mimetype for the file '${fileName}' starting with '${expectedMimePrefix}' but got '${mimetype}'`);
     }
-    // Todo: The file size should be validated
+    // Todo: The file size should be checked
+    if (validateOnly) {
+      return null;
+    }
     const uploadResponse = await this._post({
       url: 'api/media/asset.json',
       form: {
@@ -952,14 +1128,16 @@ const snoowrap = class snoowrap {
     const fileInfo = {
       fileUrl: uploadURL + '/' + uploadResponse.args.fields.find(item => item.name === 'key').value,
       assetId: uploadResponse.asset.asset_id,
-      websocketUrl: uploadResponse.asset.websocket_url
+      websocketUrl: uploadResponse.asset.websocket_url,
+      caption,
+      outboundUrl
     };
     const formdata = new FormData();
     uploadResponse.args.fields.forEach(item => formdata.append(item.name, item.value));
     formdata.append('file', parsedFile, fileName);
     let res;
     if (isBrowser) {
-      res = await global.fetch(uploadURL, {
+      res = await fetch(uploadURL, {
         method: 'post',
         mode: 'no-cors',
         body: formdata
@@ -990,7 +1168,33 @@ const snoowrap = class snoowrap {
         _r: this
       });
     }
-    return fileInfo;
+    let media;
+    switch (type) {
+      case 'img':
+        media = new MediaImg(fileInfo);
+        break;
+      case 'video':
+        media = new MediaVideo(fileInfo);
+        break;
+      case 'gif':
+        media = new MediaGif(fileInfo);
+        break;
+      default:
+        media = new MediaFile(fileInfo);
+        break;
+    }
+    return media;
+  }
+
+  async _convertToFancypants (markdown) {
+    const response = await this._post({
+      uri: 'api/convert_rte_body_format',
+      form: {
+        output_mode: 'rtjson',
+        markdown_text: markdown
+      }
+    });
+    return response.output;
   }
 
   _getSortedFrontpage (sortType, subredditName, options = {}) {

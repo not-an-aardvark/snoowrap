@@ -34,6 +34,7 @@ export const KINDS = {
 };
 export const USERNAME_REGEX = /^[\w-]{1,20}$/;
 export const SUBMISSION_ID_REGEX = /comments\/(.+?)\//;
+export const PLACEHOLDER_REGEX = /{(\w+)}/g;
 export const MODERATOR_PERMISSIONS = ['wiki', 'posts', 'access', 'mail', 'config', 'flair'];
 export const LIVETHREAD_PERMISSIONS = ['update', 'edit', 'manage'];
 export const HTTP_VERBS = ['delete', 'get', 'head', 'patch', 'post', 'put'];
@@ -49,4 +50,9 @@ export const MIME_TYPES = {
   jpg: 'image/jpeg',
   jpeg: 'image/jpeg',
   gif: 'image/gif'
+};
+export const MEDIA_TYPES = {
+  img: 'image',
+  video: 'video',
+  gif: 'video'
 };
