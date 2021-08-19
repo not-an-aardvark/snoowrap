@@ -688,8 +688,8 @@ const snoowrap = class snoowrap {
     crosspost_fullname, crosspostFullname = crosspost_fullname,
     resubmit = true,
     send_replies = true, sendReplies = send_replies,
-    nsfw,
-    spoiler,
+    nsfw = false,
+    spoiler = false,
     flairId,
     flairText,
     collectionId,
@@ -768,17 +768,24 @@ const snoowrap = class snoowrap {
 
   /**
    * @summary Creates a new link submission on the given subreddit.
-   * @param {object} options An object containing details about the submission
-   * @param {string} options.subredditName The name of the subreddit that the post should be submitted to
-   * @param {string} options.title The title of the submission
-   * @param {string} options.url The url that the link submission should point to
-   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission
-   * @param {boolean} [options.resubmit=true] If this is false and same link has already been submitted to this subreddit in
-   * the past, reddit will return an error. This could be used to avoid accidental reposts.
+   * @param {object} options An object containing details about the submission.
+   * @param {string} options.subredditName The name of the subreddit that the post should be submitted to.
+   * @param {string} options.title The title of the submission.
+   * @param {string} options.url The url that the link submission should point to.
+   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission.
+   * @param {boolean} [options.resubmit=true] If this is `false` and same link has already been submitted to this subreddit in the past,
+   * reddit will return an error. This could be used to avoid accidental reposts.
+   * @param {boolean} [options.spoiler=false] Whether or not the submission should be marked as a spoiler.
+   * @param {boolean} [options.nsfw=false] Whether or not the submission should be marked NSFW.
+   * @param {string} [options.flairId] The flair template to select.
+   * @param {string} [options.flairText] If a flair template is selected and its property `flair_text_editable` is `true`, this will
+   * customize the flair text.
+   * @param {string} [options.collectionId] The UUID of a collection to add the newly-submitted post to.
+   * @param {string} [options.discussionType] Set to `CHAT` to enable live discussion instead of traditional comments.
    * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
    * requires a captcha to submit posts and comments.
-   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier
-   * @returns {Promise} The newly-created Submission object
+   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier.
+   * @returns {Promise} The newly-created Submission object.
    * @example
    *
    * r.submitLink({
@@ -801,20 +808,39 @@ const snoowrap = class snoowrap {
    * @param {object} options An object containing details about the submission.
    * @param {string} options.subredditName The name of the subreddit that the post should be submitted to.
    * @param {string} options.title The title of the submission.
-   * @param {string|stream.Readable|Blob|File|MediaImg} options.imageFile The image file that should get uploaded. This should either be the path to
-   * the file you want to upload, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) /
+   * @param {string|stream.Readable|Blob|File|MediaImg} options.imageFile The image that should get submitted. This should either be the path to
+   * the image file you want to upload, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) /
    * [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob) / [File](https://developer.mozilla.org/en-US/docs/Web/API/File) in environments
-   * (e.g. browsers) where the filesystem is unavailable.
+   * (e.g. browsers) where the filesystem is unavailable. Alternatively you can diractly pass a ready-to-use {@link MediaImg} instead.
+   * See {@link snoowrap#uploadMedia} for more details.
    * @param {string} options.imageFileName The name that the image file should have. Required when it cannot be diractly extracted from
    * the provided file (e.g ReadableStream, Blob).
-   * @param {Boolean} [options.noWebsockets=false] Set to `true` to disable use of WebSockets. If `true`, this method will return `null`.
+   * @param {boolean} [options.noWebsockets=false] Set to `true` to disable use of WebSockets. If `true`, this method will return `null`.
    * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission.
-   * @param {boolean} [options.resubmit=true] If this is false and same link has already been submitted to this subreddit in
-   * the past, reddit will return an error. This could be used to avoid accidental reposts.
+   * @param {boolean} [options.resubmit=true] If this is `false` and same link has already been submitted to this subreddit in the past,
+   * reddit will return an error. This could be used to avoid accidental reposts.
+   * @param {boolean} [options.spoiler=false] Whether or not the submission should be marked as a spoiler.
+   * @param {boolean} [options.nsfw=false] Whether or not the submission should be marked NSFW.
+   * @param {string} [options.flairId] The flair template to select.
+   * @param {string} [options.flairText] If a flair template is selected and its property `flair_text_editable` is `true`, this will
+   * customize the flair text.
+   * @param {string} [options.collectionId] The UUID of a collection to add the newly-submitted post to.
+   * @param {string} [options.discussionType] Set to `CHAT` to enable live discussion instead of traditional comments.
    * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
    * requires a captcha to submit posts and comments.
-   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier
-   * @returns {Promise} The newly-created Submission object
+   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier.
+   * @returns {Promise} The newly-created Submission object, or `null` if `options.noWebsockets` is `true`.
+   * @example
+   *
+   * const blob = await (await fetch("https://example.com/kittens.jpg")).blob()
+   * r.submitImage({
+   *   subredditName: 'snoowrap_testing',
+   *   title: 'Take a look at those cute kittens <3',
+   *   imageFile: blob, // Usage as a `Blob`.
+   *   imageFileName: 'kittens.jpg'
+   * }).then(console.log)
+   * // => Submission
+   * // (new image submission created on reddit)
    */
   async submitImage ({
     imageFile,
@@ -826,7 +852,7 @@ const snoowrap = class snoowrap {
     try {
       const {fileUrl, websocketUrl: wsUrl} = imageFile instanceof MediaImg
         ? imageFile
-        : await this._uploadMedia({
+        : await this.uploadMedia({
           file: imageFile,
           name: imageFileName,
           type: 'img'
@@ -846,27 +872,51 @@ const snoowrap = class snoowrap {
    * @param {object} options An object containing details about the submission.
    * @param {string} options.subredditName The name of the subreddit that the post should be submitted to.
    * @param {string} options.title The title of the submission.
-   * @param {string|stream.Readable|Blob|File|MediaVideo} options.videoFile The video file that should get uploaded. This should either be the path to
-   * the file you want to upload, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) /
+   * @param {string|stream.Readable|Blob|File|MediaVideo} options.videoFile The video that should get submitted. This should either be the path to
+   * the video file you want to upload, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) /
    * [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob) / [File](https://developer.mozilla.org/en-US/docs/Web/API/File) in environments
-   * (e.g. browsers) where the filesystem is unavailable.
+   * (e.g. browsers) where the filesystem is unavailable. Alternatively you can diractly pass a ready-to-use {@link MediaVideo} instead.
+   * See {@link snoowrap#uploadMedia} for more details.
    * @param {string} options.videoFileName The name that the video file should have. Required when it cannot be diractly extracted from
    * the provided file (e.g ReadableStream, Blob).
-   * @param {string|stream.Readable|Blob|File|MediaImg} options.thumbnailFile The image file that should get uploaded and used as a thumbnail for the video. This
-   * should either be the path to the file you want to upload, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) /
+   * @param {string|stream.Readable|Blob|File|MediaImg} options.thumbnailFile The image that should get uploaded and used as a thumbnail for the video. This
+   * should either be the path to the image file you want to upload, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) /
    * [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob) / [File](https://developer.mozilla.org/en-US/docs/Web/API/File) in environments
-   * (e.g. browsers) where the filesystem is unavailable.
+   * (e.g. browsers) where the filesystem is unavailable. Alternatively you can diractly pass a ready-to-use {@link MediaImg} instead.
+   * See {@link snoowrap#uploadMedia} for more details.
    * @param {string} options.thumbnailFileName The name that the thumbnail file should have. Required when it cannot be diractly extracted from
    * the provided file (e.g ReadableStream, Blob).
-   * @param {boolean} [options.videogif=false] If `true`, the video is uploaded as a videogif, which is essentially a silent video.
-   * @param {Boolean} [options.noWebsockets=false] Set to `true` to disable use of WebSockets. If `true`, this method will return `null`.
+   * @param {boolean} [options.videogif=false] If `true`, the video is submitted as a videogif, which is essentially a silent video.
+   * @param {boolean} [options.noWebsockets=false] Set to `true` to disable use of WebSockets. If `true`, this method will return `null`.
    * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission.
-   * @param {boolean} [options.resubmit=true] If this is false and same link has already been submitted to this subreddit in
-   * the past, reddit will return an error. This could be used to avoid accidental reposts.
+   * @param {boolean} [options.resubmit=true] If this is `false` and same link has already been submitted to this subreddit in the past,
+   * reddit will return an error. This could be used to avoid accidental reposts.
+   * @param {boolean} [options.spoiler=false] Whether or not the submission should be marked as a spoiler.
+   * @param {boolean} [options.nsfw=false] Whether or not the submission should be marked NSFW.
+   * @param {string} [options.flairId] The flair template to select.
+   * @param {string} [options.flairText] If a flair template is selected and its property `flair_text_editable` is `true`, this will
+   * customize the flair text.
+   * @param {string} [options.collectionId] The UUID of a collection to add the newly-submitted post to.
+   * @param {string} [options.discussionType] Set to `CHAT` to enable live discussion instead of traditional comments.
    * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
    * requires a captcha to submit posts and comments.
    * @param {string} [options.captchaResponse] The response to the captcha with the given identifier.
-   * @returns {Promise} The newly-created Submission object.
+   * @returns {Promise} The newly-created Submission object, or `null` if `options.noWebsockets` is `true`.
+   * @example
+   *
+   * const mediaVideo = await r.uploadMedia({
+   *   file: './video.mp4',
+   *   type: 'video'
+   * })
+   * r.submitVideo({
+   *   subredditName: 'snoowrap_testing',
+   *   title: 'This is a video!',
+   *   videoFile: mediaVideo, // Usage as a `MediaVideo`.
+   *   thumbnailFile: fs.createReadStream('./thumbnail.png'), // Usage as a `stream.Readable`.
+   *   thumbnailFileName: 'thumbnail.png'
+   * }).then(console.log)
+   * // => Submission
+   * // (new video submission created on reddit)
    */
   async submitVideo ({
     videoFile,
@@ -886,7 +936,7 @@ const snoowrap = class snoowrap {
      */
     if (!(thumbnailFile instanceof MediaImg)) {
       try {
-        await this._uploadMedia({
+        await this.uploadMedia({
           file: thumbnailFile,
           name: thumbnailFileName,
           type: 'img',
@@ -903,7 +953,7 @@ const snoowrap = class snoowrap {
     try {
       const {fileUrl, websocketUrl: wsUrl} = videoFile instanceof MediaVideo
         ? videoFile
-        : await this._uploadMedia({
+        : await this.uploadMedia({
           file: videoFile,
           name: videoFileName,
           type: videogif ? 'gif' : 'video'
@@ -917,7 +967,7 @@ const snoowrap = class snoowrap {
       const {fileUrl} =
       thumbnailFile instanceof MediaImg
         ? thumbnailFile
-        : await this._uploadMedia({
+        : await this.uploadMedia({
           file: thumbnailFile,
           name: thumbnailFileName,
           type: 'img'
@@ -930,6 +980,55 @@ const snoowrap = class snoowrap {
     return this._submit({...options, kind, url, videoPosterUrl, websocketUrl: noWebsockets ? null : websocketUrl});
   }
 
+  /**
+   * @summary Submit a gallery to the given subreddit. (Undocumented endpoint).
+   * @desc **NOTE**: This method won't work on browsers that don't support the Fetch API natively since it requires to perform
+   * a 'no-cors' request which is impossible with the XMLHttpRequest API.
+   * @param {object} options An object containing details about the submission.
+   * @param {string} options.subredditName The name of the subreddit that the post should be submitted to.
+   * @param {string} options.title The title of the submission.
+   * @param {Array} options.gallery An array containing 2 to 20 gallery items. Currently only images are accepted. A gallery item should
+   * either be a {@link MediaImg}, or an object containing `imageFile` and `imageFileName` (the same as `options.imageFile` and `options.imageFileName`
+   * used in {@link snoowrap#submitImage}) in addition of an optional `caption` with a maximum of 180 characters along with an optional `outboundUrl`
+   * (the same as {@link MediaImg#caption} and {@link MediaImg#outboundUrl}).
+   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission.
+   * @param {boolean} [options.resubmit=true] If this is `false` and same link has already been submitted to this subreddit in the past,
+   * reddit will return an error. This could be used to avoid accidental reposts.
+   * @param {boolean} [options.spoiler=false] Whether or not the submission should be marked as a spoiler.
+   * @param {boolean} [options.nsfw=false] Whether or not the submission should be marked NSFW.
+   * @param {string} [options.flairId] The flair template to select.
+   * @param {string} [options.flairText] If a flair template is selected and its property `flair_text_editable` is `true`, this will
+   * customize the flair text.
+   * @param {string} [options.collectionId] The UUID of a collection to add the newly-submitted post to.
+   * @param {string} [options.discussionType] Set to `CHAT` to enable live discussion instead of traditional comments.
+   * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
+   * requires a captcha to submit posts and comments.
+   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier.
+   * @returns {Promise} The newly-created Submission object, or `null` if `options.noWebsockets` is `true`.
+   * @example
+   *
+   * const fileinput = document.getElementById('file-input')
+   * const files = fileinput.files.map(file => { // Usage as an array of `File`s.
+   *   return {
+   *     imageFile: file,
+   *     caption: file.name
+   *   }
+   * })
+   * const blob = await (await fetch("https://example.com/kittens.jpg")).blob()
+   * const mediaImg = await r.uploadMedia({ // Usage as a `MediaImg`.
+   *   file: blob,
+   *   type: 'img',
+   *   caption: 'cute :3',
+   *   outboundUrl: 'https://example.com/kittens.html'
+   * })
+   * r.submitGallery({
+   *   subredditName: 'snoowrap_testing',
+   *   title: 'This is a gallery!',
+   *   gallery: [mediaImg, ...files]
+   * }).then(console.log)
+   * // => Submission
+   * // (new gallery submission created on reddit)
+   */
   async submitGallery ({gallery, ...options}) {
     /**
      * Validate every single gallery item to ensure that no accidental uploads will happen.
@@ -941,7 +1040,7 @@ const snoowrap = class snoowrap {
         }
         // Todo: Add outboundUrl validation.
         if (!(item instanceof MediaImg)) {
-          await this._uploadMedia({
+          await this.uploadMedia({
             file: item.imageFile,
             name: item.imageFileName,
             type: 'img',
@@ -960,7 +1059,7 @@ const snoowrap = class snoowrap {
     gallery = await Promise.all(gallery.map(async (item, index) => {
       try {
         if (!(item instanceof MediaImg)) {
-          item = await this._uploadMedia({
+          item = await this.uploadMedia({
             file: item.imageFile,
             name: item.imageFileName,
             type: 'img',
@@ -983,29 +1082,57 @@ const snoowrap = class snoowrap {
 
   /**
    * @summary Creates a new selfpost on the given subreddit.
-   * @param {object} options An object containing details about the submission
-   * @param {string} options.subredditName The name of the subreddit that the post should be submitted to
-   * @param {string} options.title The title of the submission
-   * @param {string} [options.text] The selftext of the submission
-   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission
-   * @param {object} [options.inlineMedia]
+   * @param {object} options An object containing details about the submission.
+   * @param {string} options.subredditName The name of the subreddit that the post should be submitted to.
+   * @param {string} options.title The title of the submission.
+   * @param {string} [options.text] The selftext of the submission.
+   * @param {object} [options.inlineMedia] An object containing inctances of `MediaFile` subclasses, or `options` to pass to
+   * {@link snoowrap#uploadMedia} where `options.type` is required. The keys of this object can be used as placeholders in
+   * `options.text` with the format `{key}`.
+   * @param {string} [options.rtjson] The body of the submission in `richtext_json` format. See {@link snoowrap#convertToFancypants}
+   * for more details. This will override `options.text` and `options.inlineMedia`.
+   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission.
+   * @param {boolean} [options.resubmit=true] If this is `false` and same link has already been submitted to this subreddit in the past,
+   * reddit will return an error. This could be used to avoid accidental reposts.
+   * @param {boolean} [options.spoiler=false] Whether or not the submission should be marked as a spoiler.
+   * @param {boolean} [options.nsfw=false] Whether or not the submission should be marked NSFW.
+   * @param {string} [options.flairId] The flair template to select.
+   * @param {string} [options.flairText] If a flair template is selected and its property `flair_text_editable` is `true`, this will
+   * customize the flair text.
+   * @param {string} [options.collectionId] The UUID of a collection to add the newly-submitted post to.
+   * @param {string} [options.discussionType] Set to `CHAT` to enable live discussion instead of traditional comments.
    * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
    * requires a captcha to submit posts and comments.
-   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier
-   * @returns {Promise} The newly-created Submission object
+   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier.
+   * @returns {Promise} The newly-created Submission object.
    * @example
    *
+   * const mediaVideo = await r.uploadMedia({
+   *   file: './video.mp4',
+   *   type: 'video',
+   *   caption: 'Short video!'
+   * })
    * r.submitSelfpost({
    *   subredditName: 'snoowrap_testing',
    *   title: 'This is a selfpost',
-   *   text: 'This is the text body of the selfpost'
+   *   text: 'This is the text body of the selfpost.\n\nAnd This is an inline image {img} And also a video! {vid}',
+   *   inlineMedia: {
+   *     img: {
+   *       file: './animated.gif', // Usage as a file path.
+   *       type: 'img'
+   *     },
+   *     vid: mediaVideo
+   *   }
    * }).then(console.log)
-   * // => Submission { name: 't3_4abmsz' }
+   * // => Submission
    * // (new selfpost created on reddit)
    */
   async submitSelfpost ({text, inlineMedia, rtjson, ...options}) {
     /* eslint-disable require-atomic-updates */
-    if (text && inlineMedia && !rtjson) {
+    if (rtjson) {
+      text = null;
+    }
+    if (text && inlineMedia) {
       const placeholders = Object.keys(inlineMedia);
 
       // Validate inline media
@@ -1014,7 +1141,7 @@ const snoowrap = class snoowrap {
           return;
         }
         if (!(inlineMedia[p] instanceof MediaFile)) {
-          await this._uploadMedia({
+          await this.uploadMedia({
             ...inlineMedia[p],
             validateOnly: true
           });
@@ -1027,20 +1154,54 @@ const snoowrap = class snoowrap {
           return;
         }
         if (!(inlineMedia[p] instanceof MediaFile)) {
-          inlineMedia[p] = await this._uploadMedia({
+          inlineMedia[p] = await this.uploadMedia({
             ...inlineMedia[p]
           });
         }
       }));
 
       const body = text.replace(PLACEHOLDER_REGEX, (_m, g1) => inlineMedia[g1]);
-      rtjson = await this._convertToFancypants(body);
+      rtjson = await this.convertToFancypants(body);
       text = null;
     }
     return this._submit({...options, kind: 'self', text, rtjson});
     /* eslint-enable require-atomic-updates */
   }
 
+  /**
+   * @summary Submit a poll to the given subreddit. (Undocumented endpoint).
+   * @param {object} options An object containing details about the submission.
+   * @param {string} options.subredditName The name of the subreddit that the post should be submitted to.
+   * @param {string} options.title The title of the submission.
+   * @param {string} [options.text] The selftext of the submission.
+   * @param {string[]} options.choices An array of 2 to 6 poll options.
+   * @param {number} options.duration The number of days the poll should accept votes. Valid values are between 1 and 7, inclusive.
+   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission.
+   * @param {boolean} [options.resubmit=true] If this is `false` and same link has already been submitted to this subreddit in the past,
+   * reddit will return an error. This could be used to avoid accidental reposts.
+   * @param {boolean} [options.spoiler=false] Whether or not the submission should be marked as a spoiler.
+   * @param {boolean} [options.nsfw=false] Whether or not the submission should be marked NSFW.
+   * @param {string} [options.flairId] The flair template to select.
+   * @param {string} [options.flairText] If a flair template is selected and its property `flair_text_editable` is `true`, this will
+   * customize the flair text.
+   * @param {string} [options.collectionId] The UUID of a collection to add the newly-submitted post to.
+   * @param {string} [options.discussionType] Set to `CHAT` to enable live discussion instead of traditional comments.
+   * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
+   * requires a captcha to submit posts and comments.
+   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier.
+   * @returns {Promise} The newly-created Submission object.
+   * @example
+   *
+   * r.submitPoll({
+   *   subredditName: 'snoowrap_testing',
+   *   title: 'Survey!',
+   *   text: 'Do you like snoowrap?',
+   *   choices: ['YES!', 'NOPE!'],
+   *   duration: 3
+   * }).then(console.log)
+   * // => Submission
+   * // (new poll submission created on reddit)
+   */
   submitPoll (options) {
     return this._submit({...options, kind: 'poll'});
   }
@@ -1054,13 +1215,29 @@ const snoowrap = class snoowrap {
    * @param {string} options.title The title of the crosspost
    * @param {(string|Submission)} options.originalPost A Submission object or a post ID for the original post which
    * is being crossposted
-   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission
-   * @param {boolean} [options.resubmit=true] If this is false and same link has already been submitted to this subreddit in
-   * the past, reddit will return an error. This could be used to avoid accidental reposts.
+   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission.
+   * @param {boolean} [options.resubmit=true] If this is `false` and same link has already been submitted to this subreddit in the past,
+   * reddit will return an error. This could be used to avoid accidental reposts.
+   * @param {boolean} [options.spoiler=false] Whether or not the submission should be marked as a spoiler.
+   * @param {boolean} [options.nsfw=false] Whether or not the submission should be marked NSFW.
+   * @param {string} [options.flairId] The flair template to select.
+   * @param {string} [options.flairText] If a flair template is selected and its property `flair_text_editable` is `true`, this will
+   * customize the flair text.
+   * @param {string} [options.collectionId] The UUID of a collection to add the newly-submitted post to.
+   * @param {string} [options.discussionType] Set to `CHAT` to enable live discussion instead of traditional comments.
+   * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
+   * requires a captcha to submit posts and comments.
+   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier.
    * @returns {Promise} The newly-created Submission object
    * @example
    *
-   * await r.submitCrosspost({ title: 'I found an interesting post', originalPost: '6vths0', subredditName: 'snoowrap' })
+   * r.submitCrosspost({
+   *  title: 'I found an interesting post',
+   *  originalPost: '6vths0',
+   *  subredditName: 'snoowrap'
+   * }).then(console.log)
+   * // => Submission
+   * // (new crosspost submission created on reddit)
    */
   submitCrosspost ({originalPost, ...options}) {
     return this._submit({
@@ -1086,11 +1263,27 @@ const snoowrap = class snoowrap {
    * @param {string} [options.type] Determines the media file type. This should be one of `img, video, gif`.
    * @param {boolean} [options.validateOnly] If true, the file won't get uploaded, and this method will return `null`. Useful if you only want
    * to validate the parameters before actually uploading the file.
-   * @returns {Promise<MediaFile>} A Promise that fulfills with an object containing `fileUrl`, `assetId` and `websocketUrl` for the piece of
-   * media, or `null` when `options.validateOnly` is set to `true`. The websocket URL can be used to determine when media processing is finished
-   * and to obtain the ID of the new created submission.
+   * @returns {Promise} A Promise that fulfills with an instance of {@link MediaImg} / {@link MediaVideo} / {@link MediaGif} / {@link MediaFile}
+   * depending on the value of `options.type`. Or `null` when `options.validateOnly` is set to `true`.
+   * @example
+   * 
+   * const blob = await (await fetch("https://example.com/video.mp4")).blob()
+   * r.uploadMedia({
+   *   file: blob,
+   *   name: 'video.mp4',
+   *   type: 'gif',
+   *   caption: 'This is a silent video!'
+   * }).then(console.log)
+   * // => MediaGif
+   * 
+   * r.uploadMedia({
+   *   file: './meme.jpg',
+   *   caption: 'Funny!',
+   *   outboundUrl: 'https://example.com'
+   * }).then(console.log)
+   * // => MediaFile
    */
-  async _uploadMedia ({file, name, type, caption, outboundUrl, validateOnly = false}) {
+  async uploadMedia ({file, name, type, caption, outboundUrl, validateOnly = false}) {
     if (isBrowser && typeof fetch === 'undefined') {
       throw new errors.InvalidMethodCallError('Your browser doesn\'t support \'no-cors\' requests');
     }
@@ -1186,7 +1379,17 @@ const snoowrap = class snoowrap {
     return media;
   }
 
-  async _convertToFancypants (markdown) {
+  /**
+   * @summary Convert `markdown` to `richtext_json` format that used on the fancy pants editor. This format allows
+   * to embed inline media in selfposts.
+   * @param {string} markdown The Markdown text to convert.
+   * @returns {Promise} A Promise that fulfills with an object in `richtext_json` format.
+   * @example
+   * 
+   * r.convertToFancypants('Hello **world**!').then(console.log)
+   * // => object {document: Array(1)}
+   */
+  async convertToFancypants (markdown) {
     const response = await this._post({
       uri: 'api/convert_rte_body_format',
       form: {
