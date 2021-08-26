@@ -27,7 +27,8 @@ const WebSocket = isBrowser ? global.WebSocket : require('ws');
 
 const api_type = 'json';
 
-/** The class for a snoowrap requester.
+/** 
+ * The class for a snoowrap requester.
  * A requester is the base object that is used to fetch content from reddit. Each requester contains a single set of OAuth
  * tokens.
  *
@@ -1250,7 +1251,7 @@ const snoowrap = class snoowrap {
   }
 
   /**
-   * @summary Upload media and return its URL, ID and a websocket (Undocumented endpoint).
+   * @summary Upload media to reddit (Undocumented endpoint).
    * @desc **NOTE**: This method won't work on browsers that don't support the Fetch API natively since it requires to perform
    * a 'no-cors' request which is impossible with the XMLHttpRequest API.
    * @param {object} options An object contains the media file to upload.
@@ -1381,7 +1382,7 @@ const snoowrap = class snoowrap {
 
   /**
    * @summary Convert `markdown` to `richtext_json` format that used on the fancy pants editor. This format allows
-   * to embed inline media in selfposts.
+   * to embed inline media on selfposts.
    * @param {string} markdown The Markdown text to convert.
    * @returns {Promise} A Promise that fulfills with an object in `richtext_json` format.
    * @example
