@@ -22,7 +22,7 @@ export default class MediaFile {
      */
     fileUrl: string;
     /**
-     * @summary A unique identifier for the uploaded file. Used to embed the file on selfposts ans galleries.
+     * @summary A unique identifier for the uploaded file. Used to embed the file on selfposts and galleries.
      */
     assetId: string;
     /**

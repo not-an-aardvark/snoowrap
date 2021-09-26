@@ -27,7 +27,7 @@ const WebSocket = isBrowser ? global.WebSocket : require('ws');
 
 const api_type = 'json';
 
-/** 
+/**
  * The class for a snoowrap requester.
  * A requester is the base object that is used to fetch content from reddit. Each requester contains a single set of OAuth
  * tokens.
@@ -437,8 +437,12 @@ const snoowrap = class snoowrap {
    * r.getComment('c0b6xx0').author.name.then(console.log)
    * // => 'Kharos'
    */
-  getComment (commentId) {
-    return this._newObject('Comment', {name: addFullnamePrefix(commentId, 't1_')});
+  getComment (commentId, submissionId, sort) {
+    return this._newObject('Comment', {
+      name: addFullnamePrefix(commentId, 't1_'),
+      link_id: submissionId ? addFullnamePrefix(submissionId, 't3_') : null,
+      _sort: sort
+    });
   }
 
   /**
@@ -467,8 +471,8 @@ const snoowrap = class snoowrap {
    * r.getSubmission('2np694').title.then(console.log)
    * // => 'What tasty food would be distusting if eaten over rice?'
    */
-  getSubmission (submissionId) {
-    return this._newObject('Submission', {name: addFullnamePrefix(submissionId, 't3_')});
+  getSubmission (submissionId, sort) {
+    return this._newObject('Submission', {name: addFullnamePrefix(submissionId, 't3_'), _sort: sort});
   }
 
   /**
@@ -1267,7 +1271,7 @@ const snoowrap = class snoowrap {
    * @returns {Promise} A Promise that fulfills with an instance of {@link MediaImg} / {@link MediaVideo} / {@link MediaGif} / {@link MediaFile}
    * depending on the value of `options.type`. Or `null` when `options.validateOnly` is set to `true`.
    * @example
-   * 
+   *
    * const blob = await (await fetch("https://example.com/video.mp4")).blob()
    * r.uploadMedia({
    *   file: blob,
@@ -1276,7 +1280,7 @@ const snoowrap = class snoowrap {
    *   caption: 'This is a silent video!'
    * }).then(console.log)
    * // => MediaGif
-   * 
+   *
    * r.uploadMedia({
    *   file: './meme.jpg',
    *   caption: 'Funny!',
@@ -1386,7 +1390,7 @@ const snoowrap = class snoowrap {
    * @param {string} markdown The Markdown text to convert.
    * @returns {Promise} A Promise that fulfills with an object in `richtext_json` format.
    * @example
-   * 
+   *
    * r.convertToFancypants('Hello **world**!').then(console.log)
    * // => object {document: Array(1)}
    */
@@ -2499,11 +2503,18 @@ const snoowrap = class snoowrap {
     return this._post({url: `r/${subredditName}/api/flair`, form: {api_type, name, text, link, css_class: cssClass}});
   }
 
-  _populate (responseTree) {
+  _populate (responseTree, children = {}, nested) {
     if (typeof responseTree === 'object' && responseTree !== null) {
       // Map {kind: 't2', data: {name: 'some_username', ... }} to a RedditUser (e.g.) with the same properties
       if (Object.keys(responseTree).length === 2 && responseTree.kind && responseTree.data) {
-        return this._newObject(KINDS[responseTree.kind] || 'RedditContent', this._populate(responseTree.data), true);
+        const populated = this._newObject(KINDS[responseTree.kind] || 'RedditContent', this._populate(responseTree.data, children, true), true);
+        if (!nested && Object.keys(children).length) {
+          populated._children = children;
+        }
+        if (populated instanceof snoowrap.objects.Comment) {
+          children[populated.id] = populated;
+        }
+        return populated;
       }
       const result = (Array.isArray(responseTree) ? map : mapValues)(responseTree, (value, key) => {
         // Maps {author: 'some_username'} to {author: RedditUser { name: 'some_username' } }
@@ -2513,7 +2524,7 @@ const snoowrap = class snoowrap {
         if (value !== null && SUBREDDIT_KEYS.has(key)) {
           return this._newObject('Subreddit', {display_name: value});
         }
-        return this._populate(value);
+        return this._populate(value, children, true);
       });
       if (result.length === 2 && result[0] instanceof snoowrap.objects.Listing
         && result[0][0] instanceof snoowrap.objects.Submission && result[1] instanceof snoowrap.objects.Listing) {
@@ -2521,7 +2532,11 @@ const snoowrap = class snoowrap {
           result[1]._more.link_id = result[0][0].name;
         }
         result[0][0].comments = result[1];
+        result[0][0]._children = children;
         return result[0][0];
+      }
+      if (!nested && Object.keys(children).length) {
+        result._children = children;
       }
       return result;
     }

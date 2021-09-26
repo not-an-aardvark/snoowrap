@@ -1,4 +1,5 @@
-import {getEmptyRepliesListing} from '../helpers.js';
+import {getEmptyRepliesListing, addFullnamePrefix} from '../helpers.js';
+import Comment from './Comment';
 import VoteableContent from './VoteableContent.js';
 
 const api_type = 'json';
@@ -15,12 +16,66 @@ const api_type = 'json';
 const Submission = class Submission extends VoteableContent {
   constructor (data, _r, _hasFetched) {
     super(data, _r, _hasFetched);
+    this._callback = this._callback.bind(this);
+    this._sort = this._sort || null;
+    this._children = {};
     if (_hasFetched) {
       this.comments = this.comments || getEmptyRepliesListing(this);
     }
   }
+  _transformApiResponse (response) {
+    response._sort = this._sort;
+    for (const id in response._children) {
+      const child = response._children[id];
+      child._sort = response._sort;
+      child._cb = response._callback;
+    }
+    return response;
+  }
+  _callback (child) {
+    if (child instanceof Comment) {
+      const parent = child.parent_id.startsWith('t1_') ? this._children[child.parent_id.slice(3)] : this;
+      if (parent) {
+        const listing = parent.replies || parent.comments;
+        const index = listing.findIndex(c => c.id === child.id);
+        if (index !== -1) {
+          listing[index] = child;
+        }
+      }
+      child._children[child.id] = child;
+      this._callback(child);
+    } else {
+      for (const id in child._children) {
+        child._children[id]._sort = this._sort;
+        child._children[id]._cb = this._callback;
+      }
+      Object.assign(this._children, child._children);
+    }
+  }
   get _uri () {
-    return `comments/${this.name.slice(3)}`;
+    return `comments/${this.name.slice(3)}${this._sort ? `?sort=${this._sort}` : ''}`;
+  }
+  getComment (commentId, fetch) {
+    let comment = this._children[commentId] || null;
+    if (fetch) {
+      comment = this._r._newObject('Comment', {
+        name: addFullnamePrefix(commentId, 't1_'),
+        link_id: this.name,
+        _sort: this._sort,
+        _cb: this._callback
+      });
+    }
+    return comment;
+  }
+  async fetchMore (options) {
+    options.append = true;
+    const comments = await this.comments.fetchMore(options);
+    this._callback({_children: comments._children});
+    this.comments = comments;
+    return comments;
+  }
+  fetchAll (options) {
+    return this.fetchMore({...options, amount: Infinity});
   }
   /**
    * @summary Hides this Submission, preventing it from appearing on most Listings.

@@ -192,12 +192,20 @@ const Listing = class Listing extends Array {
    */
   async _fetchMoreComments (options) {
     const moreComments = await this._more.fetchMore(options);
+    const children = moreComments._children;
     const cloned = this._clone();
     if (!options.append) {
       cloned._empty();
     }
-    cloned.push(...moreComments);
-    cloned._more.children = cloned._more.children.slice(options.amount);
+    // Rebuild comments listing since Reddit doesn't return it in the right order sometimes
+    for (const id of cloned._more.children.splice(0, options.amount)) {
+      const comment = children[id];
+      // Ignore comments removed from listing
+      if (comment) {
+        cloned.push(comment);
+      }
+    }
+    cloned._children = children;
     return cloned;
   }
   /**

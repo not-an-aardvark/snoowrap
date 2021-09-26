@@ -1,6 +1,7 @@
 import {addEmptyRepliesListing, getEmptyRepliesListing} from '../helpers.js';
 import Listing from './Listing.js';
 import {emptyChildren as emptyMoreObject} from './More.js';
+import Submission from './Submission.js';
 import VoteableContent from './VoteableContent.js';
 /**
  * A class representing a reddit comment
@@ -35,10 +36,34 @@ const Comment = class Comment extends VoteableContent {
     }
   }
   _transformApiResponse (response) {
+    if (response instanceof Submission) {
+      const children = response._children;
+      response = response.comments[0];
+      delete children[response.id];
+      response._children = children;
+      response._sort = this._sort;
+      response._cb = this._cb;
+      if (this._cb) {
+        this._cb(response);
+      }
+      return response;
+    }
     return addEmptyRepliesListing(response[0]);
   }
   get _uri () {
-    return `api/info?id=${this.name}`;
+    return !this.link_id
+      ? `api/info?id=${this.name}`
+      : `comments/${this.link_id.slice(3)}?comment=${this.name.slice(3)}${this._sort ? `&sort=${this._sort}` : ''}`;
+  }
+  async fetchMore (options) {
+    options.append = true;
+    const comments = await this.replies.fetchMore(options);
+    this._cb({_children: comments._children});
+    this.replies = comments;
+    return comments;
+  }
+  fetchAll (options) {
+    return this.fetchMore({...options, amount: Infinity});
   }
   /**
    * @summary Locks this Comment, preventing new comments from being posted on it.

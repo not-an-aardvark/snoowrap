@@ -1,40 +1,46 @@
 /* eslint-env browser */
+/* eslint-disable no-console */
 const snoowrap = require('..');
-const oauthInfo = require('../oauth_info.json');
 
-const r = new snoowrap({
-  user_agent: oauthInfo.user_agent,
-  client_id: oauthInfo.client_id,
-  client_secret: oauthInfo.client_secret,
-  refresh_token: oauthInfo.refresh_token
-});
+fetch('../oauth_info.json').then(async response => {
+  const oauthInfo = await response.json();
 
-r.config({
-  debug: true,
-  warnings: true
-});
+  const r = new snoowrap({
+    user_agent: oauthInfo.user_agent,
+    client_id: oauthInfo.client_id,
+    client_secret: oauthInfo.client_secret,
+    refresh_token: oauthInfo.refresh_token
+  });
 
-window.r = r;
+  r.config({
+    debug: true,
+    warnings: true
+  });
 
-const r2 = new snoowrap({
-  user_agent: oauthInfo.user_agent,
-  client_id: oauthInfo.client_id,
-  client_secret: oauthInfo.client_secret,
-  username: oauthInfo.username,
-  password: oauthInfo.password
-});
+  window.r = r;
 
-r2.config({
-  debug: true,
-  warnings: true
-});
+  const r2 = new snoowrap({
+    user_agent: oauthInfo.user_agent,
+    client_id: oauthInfo.client_id,
+    client_secret: oauthInfo.client_secret,
+    username: oauthInfo.username,
+    password: oauthInfo.password
+  });
 
-window.r2 = r2;
+  r2.config({
+    debug: true,
+    warnings: true
+  });
+
+  window.r2 = r2;
+}).catch(err => console.error(err));
 
 window.files = {};
 
 const fileinput = document.getElementById('file-input');
 fileinput.onchange = () => {
   const file = fileinput.files[0];
-  window.files[file.name] = file;
+  if (file) {
+    window.files[file.name] = file;
+  }
 };

@@ -45,7 +45,7 @@ const RedditContent = class RedditContent {
    */
   async fetch () {
     if (!this._fetch) {
-      let res = await this._r._get({uri: this._uri});
+      let res = await this._r._get({url: this._uri});
       res = this._transformApiResponse(res);
       this._fetch = res;
     }

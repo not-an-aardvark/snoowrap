@@ -57,7 +57,9 @@ const More = class More {
       params: {api_type, children: ids.join(','), link_id: this.link_id || this.parent_id}
     });
     handleJsonErrors(res);
-    const resultTrees = buildRepliesTree(res.json.data.things.map(addEmptyRepliesListing));
+    let resultTrees = buildRepliesTree(res.json.data.things.map(addEmptyRepliesListing));
+    const _children = {};
+    Object.assign(_children, res._children);
     /**
      * Sometimes, when sending a request to reddit to get multiple comments from a `more` object, reddit decides to only
      * send some of the requested comments, and then stub out the remaining ones in a smaller `more` object. ( ¯\_(ツ)_/¯ )
@@ -65,9 +67,16 @@ const More = class More {
      */
     const childMores = remove(resultTrees, c => c instanceof More);
     forEach(childMores, c => c.link_id = this.link_id || this.parent_id);
-    const expandedTrees = await Promise.all(childMores.map(c => c.fetchTree({...options, amount: Infinity}, 0)));
+    const expandedTrees = await Promise.all(childMores.map(async c => {
+      const expandedTree = await c.fetchTree({...options, amount: Infinity}, 0);
+      Object.assign(_children, expandedTree._children);
+      return expandedTree;
+    }));
     const nexts = await this.fetchMore({...options, amount: options.amount - ids.length}, startIndex + ids.length);
-    return concat(resultTrees, flatten(expandedTrees), nexts);
+    Object.assign(_children, nexts._children);
+    resultTrees = concat(resultTrees, flatten(expandedTrees), nexts);
+    resultTrees._children = _children;
+    return resultTrees;
   }
   _clone () {
     return new More(pick(this, Object.getOwnPropertyNames(this)), this._r);
