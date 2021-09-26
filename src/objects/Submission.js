@@ -43,7 +43,7 @@ const Submission = class Submission extends VoteableContent {
         }
       }
       child._children[child.id] = child;
-      this._callback(child);
+      this._callback({_children: child._children});
     } else {
       for (const id in child._children) {
         child._children[id]._sort = this._sort;
