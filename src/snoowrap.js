@@ -429,12 +429,16 @@ const snoowrap = class snoowrap {
   /**
    * @summary Gets information on a comment with a given id.
    * @param {string} commentId - The base36 id of the comment
+   * @param {string|null} [submissionId] - The id of the submission that the comment belongs to. The replies
+   * tree will only be available when providing this param. However you still can fetch it separately
+   * @param {string} [sort] - Determines how the replies tree should be sorted. One of `confidence,
+   * top, new, controversial, old, random, qa, live`
    * @returns {Comment} An unfetched Comment object for the requested comment
    * @example
    *
-   * r.getComment('c0b6xx0')
-   * // => Comment { name: 't1_c0b6xx0' }
-   * r.getComment('c0b6xx0').author.name.then(console.log)
+   * const comment = r.getComment('c0b6xx0', '92dd8', 'new')
+   * // => Comment { name: 't1_c0b6xx0', link_id: 't3_92dd8', _sort: 'new' }
+   * comment.fetch().then(cmt => console.log(cmt.author.name))
    * // => 'Kharos'
    */
   getComment (commentId, submissionId, sort) {
@@ -463,12 +467,14 @@ const snoowrap = class snoowrap {
   /**
    * @summary Gets information on a given submission.
    * @param {string} submissionId - The base36 id of the submission
+   * @param {string} [sort] - Determines how the comments tree should be sorted. One of `confidence,
+   * top, new, controversial, old, random, qa, live`
    * @returns {Submission} An unfetched Submission object for the requested submission
    * @example
    *
-   * r.getSubmission('2np694')
-   * // => Submission { name: 't3_2np694' }
-   * r.getSubmission('2np694').title.then(console.log)
+   * const submission = r.getSubmission('2np694', 'top')
+   * // => Submission { name: 't3_2np694', _sort: 'top' }
+   * submission.fetch().then(sub => console.log(sub.title))
    * // => 'What tasty food would be distusting if eaten over rice?'
    */
   getSubmission (submissionId, sort) {

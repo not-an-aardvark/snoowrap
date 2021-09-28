@@ -32,6 +32,12 @@ const Submission = class Submission extends VoteableContent {
     }
     return response;
   }
+  /**
+   * A function used to cache children to the `Submission._children` property. By "children" we mean
+   * all nested comments/replies that belong to the submission. `Submission._children` used by
+   * the function `Submission.getComment()` to get children that are in deep chains. We pass this function
+   * to children as `Comment._cb()`.
+   */
   _callback (child) {
     if (child instanceof Comment) {
       const parent = child.parent_id.startsWith('t1_') ? this._children[child.parent_id.slice(3)] : this;
@@ -55,6 +61,21 @@ const Submission = class Submission extends VoteableContent {
   get _uri () {
     return `comments/${this.name.slice(3)}${this._sort ? `?sort=${this._sort}` : ''}`;
   }
+  /**
+   * @summary Pick a comment from the comments tree or fetch it with a given id.
+   * @param {string} commentId - The base36 id of the comment
+   * @param {boolean} [fetch] - If true, this function will return an unfetched Comment object
+   * instead. Calling `.fetch()` will make it replace the one with the same id on the tree if exists.
+   * It will also expose all the children on its replies tree to this function.
+   * @returns {Comment|null} A Comment object for the requested comment, or `null` when it's not available
+   * on the comments tree.
+   * @example
+   *
+   * const og = submission.comments[0].replies[0]
+   * const comment = submission.getComment(og.id)
+   * console.log(comment === og)
+   * // => true
+   */
   getComment (commentId, fetch) {
     let comment = this._children[commentId] || null;
     if (fetch) {
@@ -67,13 +88,28 @@ const Submission = class Submission extends VoteableContent {
     }
     return comment;
   }
+  /**
+   * @summary Fetch more comments and append them automatically to the comments listing. All comments and their
+   * children will be exposed automatically to {@link Submission#getComment}.
+   * @param {object|number} options - Object of fetching options or the number of comments to fetch. see
+   * {@link Listing#fetchMore} for more details.
+   * @returns {Promise} A Promise that fulfills with the comments listing.
+   */
   async fetchMore (options) {
-    options.append = true;
+    if (typeof options !== 'number') {
+      options.append = true;
+    }
     const comments = await this.comments.fetchMore(options);
     this._callback({_children: comments._children});
     this.comments = comments;
     return comments;
   }
+  /**
+   * @summary Fetch all comments and append them automatically to the comments listing. All comments and their
+   * children will be exposed automatically to {@link Submission#getComment}.
+   * @param {object} [options] - Fetching options. see {@link Listing#fetchAll} for more details.
+   * @returns {Promise} A Promise that fulfills with the comments listing.
+   */
   fetchAll (options) {
     return this.fetchMore({...options, amount: Infinity});
   }

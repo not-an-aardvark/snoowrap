@@ -16,6 +16,9 @@ import VoteableContent from './VoteableContent.js';
 const Comment = class Comment extends VoteableContent {
   constructor (options, _r, _hasFetched) {
     super(options, _r, _hasFetched);
+    this._cb = this._cb || null;
+    this._sort = this._sort || null;
+    this._children = {};
     if (_hasFetched) {
       /**
        * If a comment is in a deep comment chain, reddit will send a single `more` object with name `t1__` in place of the
@@ -41,13 +44,14 @@ const Comment = class Comment extends VoteableContent {
       response = response.comments[0];
       delete children[response.id];
       response._children = children;
-      response._sort = this._sort;
-      response._cb = this._cb;
+      response._sort = this._sort || null;
+      response._cb = this._cb || null;
       if (this._cb) {
         this._cb(response);
       }
       return response;
     }
+    response[0]._sort = this._sort || null;
     return addEmptyRepliesListing(response[0]);
   }
   get _uri () {
@@ -55,13 +59,30 @@ const Comment = class Comment extends VoteableContent {
       ? `api/info?id=${this.name}`
       : `comments/${this.link_id.slice(3)}?comment=${this.name.slice(3)}${this._sort ? `&sort=${this._sort}` : ''}`;
   }
+  /**
+   * @summary Fetch more replies and append them automatically to the replies listing. All replies and their
+   * children will be exposed automatically to {@link Submission#getComment}.
+   * @param {object|number} options - Object of fetching options or the number of replies to fetch. see
+   * {@link Listing#fetchMore} for more details.
+   * @returns {Promise} A Promise that fulfills with the replies listing.
+   */
   async fetchMore (options) {
-    options.append = true;
+    if (typeof options !== 'number') {
+      options.append = true;
+    }
     const comments = await this.replies.fetchMore(options);
-    this._cb({_children: comments._children});
+    if (this._cb) {
+      this._cb({_children: comments._children});
+    }
     this.replies = comments;
     return comments;
   }
+  /**
+   * @summary Fetch all replies and append them automatically to the replies listing. All replies and their
+   * children will be exposed automatically to {@link Submission#getComment}.
+   * @param {object} [options] - Fetching options. see {@link Listing#fetchAll} for more details.
+   * @returns {Promise} A Promise that fulfills with the replies listing.
+   */
   fetchAll (options) {
     return this.fetchMore({...options, amount: Infinity});
   }

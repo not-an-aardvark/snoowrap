@@ -94,7 +94,7 @@ const Listing = class Listing extends Array {
   }
   /**
    * @summary Fetches some more items
-   * @param {object} options
+   * @param {object|number} options Object of fetching options or the number of items to fetch.
    * @param {number} options.amount The number of items to fetch.
    * @param {boolean} [options.skipReplies=false] For a Listing that contains comment objects on a Submission, this option can
    * be used to save a few API calls, provided that only top-level comments are being examined. If this is set to `true`, snoowrap
