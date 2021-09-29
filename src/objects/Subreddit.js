@@ -371,65 +371,299 @@ const Subreddit = class Subreddit extends RedditContent {
     return this._setMyFlairVisibility(false);
   }
   /**
-   * @summary Creates a new selfpost on this subreddit.
-   * @param {object} options An object containing details about the submission
-   * @param {string} options.title The title of the submission
-   * @param {string} [options.text] The selftext of the submission
-   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission
+   * @summary Creates a new link submission on this subreddit.
+   * @param {object} options An object containing details about the submission.
+   * @param {string} options.title The title of the submission.
+   * @param {string} options.url The url that the link submission should point to.
+   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission.
+   * @param {boolean} [options.resubmit=true] If this is `false` and same link has already been submitted to this subreddit in the past,
+   * reddit will return an error. This could be used to avoid accidental reposts.
+   * @param {boolean} [options.spoiler=false] Whether or not the submission should be marked as a spoiler.
+   * @param {boolean} [options.nsfw=false] Whether or not the submission should be marked NSFW.
+   * @param {string} [options.flairId] The flair template to select.
+   * @param {string} [options.flairText] If a flair template is selected and its property `flair_text_editable` is `true`, this will
+   * customize the flair text.
+   * @param {string} [options.collectionId] The UUID of a collection to add the newly-submitted post to.
+   * @param {string} [options.discussionType] Set to `CHAT` to enable live discussion instead of traditional comments.
    * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
-   requires a captcha to submit posts and comments.
-   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier
-   * @returns {Promise} The newly-created Submission object
+   * requires a captcha to submit posts and comments.
+   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier.
+   * @returns {Promise} The newly-created Submission object.
    * @example
    *
-   * r.getSubreddit('snoowrap').submitSelfpost({title: 'this is a selfpost', text: "hi, how's it going?"}).then(console.log)
-   * // => Submission { name: 't3_4abmsz' }
+   * subreddit.submitLink({
+   *   title: 'I found a cool website!',
+   *   url: 'https://google.com'
+   * }).then(console.log)
+   * // => Submission { name: 't3_4abnfe' }
+   * // (new linkpost created on reddit)
+   */
+  submitLink (options) {
+    return this._r.submitLink({...options, subredditName: this.display_name});
+  }
+  /**
+   * @summary Submit an image submission to this subreddit. (Undocumented endpoint).
+   * @desc **NOTE**: This method won't work on browsers that don't support the Fetch API natively since it requires to perform
+   * a 'no-cors' request which is impossible with the XMLHttpRequest API.
+   * @param {object} options An object containing details about the submission.
+   * @param {string} options.title The title of the submission.
+   * @param {string|stream.Readable|Blob|File|MediaImg} options.imageFile The image that should get submitted. This should either be the path to
+   * the image file you want to upload, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) /
+   * [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob) / [File](https://developer.mozilla.org/en-US/docs/Web/API/File) in environments
+   * (e.g. browsers) where the filesystem is unavailable. Alternatively you can diractly pass a ready-to-use {@link MediaImg} instead.
+   * See {@link snoowrap#uploadMedia} for more details.
+   * @param {string} options.imageFileName The name that the image file should have. Required when it cannot be diractly extracted from
+   * the provided file (e.g ReadableStream, Blob).
+   * @param {boolean} [options.noWebsockets=false] Set to `true` to disable use of WebSockets. If `true`, this method will return `null`.
+   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission.
+   * @param {boolean} [options.resubmit=true] If this is `false` and same link has already been submitted to this subreddit in the past,
+   * reddit will return an error. This could be used to avoid accidental reposts.
+   * @param {boolean} [options.spoiler=false] Whether or not the submission should be marked as a spoiler.
+   * @param {boolean} [options.nsfw=false] Whether or not the submission should be marked NSFW.
+   * @param {string} [options.flairId] The flair template to select.
+   * @param {string} [options.flairText] If a flair template is selected and its property `flair_text_editable` is `true`, this will
+   * customize the flair text.
+   * @param {string} [options.collectionId] The UUID of a collection to add the newly-submitted post to.
+   * @param {string} [options.discussionType] Set to `CHAT` to enable live discussion instead of traditional comments.
+   * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
+   * requires a captcha to submit posts and comments.
+   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier.
+   * @returns {Promise} The newly-created Submission object, or `null` if `options.noWebsockets` is `true`.
+   * @example
+   *
+   * const blob = await (await fetch("https://example.com/kittens.jpg")).blob()
+   * subreddit.submitImage({
+   *   title: 'Take a look at those cute kittens <3',
+   *   imageFile: blob, // Usage as a `Blob`.
+   *   imageFileName: 'kittens.jpg'
+   * }).then(console.log)
+   * // => Submission
+   * // (new image submission created on reddit)
+   */
+  submitImage (options) {
+    return this._r.submitImage({...options, subredditName: this.display_name});
+  }
+  /**
+   * @summary Submit a video or videogif submission to this subreddit. (Undocumented endpoint).
+   * @desc **NOTE**: This method won't work on browsers that don't support the Fetch API natively since it requires to perform
+   * a 'no-cors' request which is impossible with the XMLHttpRequest API.
+   * @param {object} options An object containing details about the submission.
+   * @param {string} options.title The title of the submission.
+   * @param {string|stream.Readable|Blob|File|MediaVideo} options.videoFile The video that should get submitted. This should either be the path to
+   * the video file you want to upload, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) /
+   * [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob) / [File](https://developer.mozilla.org/en-US/docs/Web/API/File) in environments
+   * (e.g. browsers) where the filesystem is unavailable. Alternatively you can diractly pass a ready-to-use {@link MediaVideo} instead.
+   * See {@link snoowrap#uploadMedia} for more details.
+   * @param {string} options.videoFileName The name that the video file should have. Required when it cannot be diractly extracted from
+   * the provided file (e.g ReadableStream, Blob).
+   * @param {string|stream.Readable|Blob|File|MediaImg} options.thumbnailFile The image that should get uploaded and used as a thumbnail for the video. This
+   * should either be the path to the image file you want to upload, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) /
+   * [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob) / [File](https://developer.mozilla.org/en-US/docs/Web/API/File) in environments
+   * (e.g. browsers) where the filesystem is unavailable. Alternatively you can diractly pass a ready-to-use {@link MediaImg} instead.
+   * See {@link snoowrap#uploadMedia} for more details.
+   * @param {string} options.thumbnailFileName The name that the thumbnail file should have. Required when it cannot be diractly extracted from
+   * the provided file (e.g ReadableStream, Blob).
+   * @param {boolean} [options.videogif=false] If `true`, the video is submitted as a videogif, which is essentially a silent video.
+   * @param {boolean} [options.noWebsockets=false] Set to `true` to disable use of WebSockets. If `true`, this method will return `null`.
+   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission.
+   * @param {boolean} [options.resubmit=true] If this is `false` and same link has already been submitted to this subreddit in the past,
+   * reddit will return an error. This could be used to avoid accidental reposts.
+   * @param {boolean} [options.spoiler=false] Whether or not the submission should be marked as a spoiler.
+   * @param {boolean} [options.nsfw=false] Whether or not the submission should be marked NSFW.
+   * @param {string} [options.flairId] The flair template to select.
+   * @param {string} [options.flairText] If a flair template is selected and its property `flair_text_editable` is `true`, this will
+   * customize the flair text.
+   * @param {string} [options.collectionId] The UUID of a collection to add the newly-submitted post to.
+   * @param {string} [options.discussionType] Set to `CHAT` to enable live discussion instead of traditional comments.
+   * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
+   * requires a captcha to submit posts and comments.
+   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier.
+   * @returns {Promise} The newly-created Submission object, or `null` if `options.noWebsockets` is `true`.
+   * @example
+   *
+   * const mediaVideo = await r.uploadMedia({
+   *   file: './video.mp4',
+   *   type: 'video'
+   * })
+   * subreddit.submitVideo({
+   *   title: 'This is a video!',
+   *   videoFile: mediaVideo, // Usage as a `MediaVideo`.
+   *   thumbnailFile: fs.createReadStream('./thumbnail.png'), // Usage as a `stream.Readable`.
+   *   thumbnailFileName: 'thumbnail.png'
+   * }).then(console.log)
+   * // => Submission
+   * // (new video submission created on reddit)
+   */
+  submitVideo (options) {
+    return this._r.submitVideo({...options, subredditName: this.display_name});
+  }
+  /**
+   * @summary Submit a gallery to this subreddit. (Undocumented endpoint).
+   * @desc **NOTE**: This method won't work on browsers that don't support the Fetch API natively since it requires to perform
+   * a 'no-cors' request which is impossible with the XMLHttpRequest API.
+   * @param {object} options An object containing details about the submission.
+   * @param {string} options.title The title of the submission.
+   * @param {Array} options.gallery An array containing 2 to 20 gallery items. Currently only images are accepted. A gallery item should
+   * either be a {@link MediaImg}, or an object containing `imageFile` and `imageFileName` (the same as `options.imageFile` and `options.imageFileName`
+   * used in {@link snoowrap#submitImage}) in addition of an optional `caption` with a maximum of 180 characters along with an optional `outboundUrl`
+   * (the same as {@link MediaImg#caption} and {@link MediaImg#outboundUrl}).
+   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission.
+   * @param {boolean} [options.resubmit=true] If this is `false` and same link has already been submitted to this subreddit in the past,
+   * reddit will return an error. This could be used to avoid accidental reposts.
+   * @param {boolean} [options.spoiler=false] Whether or not the submission should be marked as a spoiler.
+   * @param {boolean} [options.nsfw=false] Whether or not the submission should be marked NSFW.
+   * @param {string} [options.flairId] The flair template to select.
+   * @param {string} [options.flairText] If a flair template is selected and its property `flair_text_editable` is `true`, this will
+   * customize the flair text.
+   * @param {string} [options.collectionId] The UUID of a collection to add the newly-submitted post to.
+   * @param {string} [options.discussionType] Set to `CHAT` to enable live discussion instead of traditional comments.
+   * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
+   * requires a captcha to submit posts and comments.
+   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier.
+   * @returns {Promise} The newly-created Submission object, or `null` if `options.noWebsockets` is `true`.
+   * @example
+   *
+   * const fileinput = document.getElementById('file-input')
+   * const files = fileinput.files.map(file => { // Usage as an array of `File`s.
+   *   return {
+   *     imageFile: file,
+   *     caption: file.name
+   *   }
+   * })
+   * const blob = await (await fetch("https://example.com/kittens.jpg")).blob()
+   * const mediaImg = await r.uploadMedia({ // Usage as a `MediaImg`.
+   *   file: blob,
+   *   type: 'img',
+   *   caption: 'cute :3',
+   *   outboundUrl: 'https://example.com/kittens.html'
+   * })
+   * subreddit.submitGallery({
+   *   title: 'This is a gallery!',
+   *   gallery: [mediaImg, ...files]
+   * }).then(console.log)
+   * // => Submission
+   * // (new gallery submission created on reddit)
+   */
+  submitGallery (options) {
+    return this._r.submitVideo({...options, subredditName: this.display_name});
+  }
+  /**
+   * @summary Creates a new selfpost on this subreddit.
+   * @param {object} options An object containing details about the submission.
+   * @param {string} options.title The title of the submission.
+   * @param {string} [options.text] The selftext of the submission.
+   * @param {object} [options.inlineMedia] An object containing inctances of `MediaFile` subclasses, or `options` to pass to
+   * {@link snoowrap#uploadMedia} where `options.type` is required. The keys of this object can be used as placeholders in
+   * `options.text` with the format `{key}`.
+   * @param {string} [options.rtjson] The body of the submission in `richtext_json` format. See {@link snoowrap#convertToFancypants}
+   * for more details. This will override `options.text` and `options.inlineMedia`.
+   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission.
+   * @param {boolean} [options.resubmit=true] If this is `false` and same link has already been submitted to this subreddit in the past,
+   * reddit will return an error. This could be used to avoid accidental reposts.
+   * @param {boolean} [options.spoiler=false] Whether or not the submission should be marked as a spoiler.
+   * @param {boolean} [options.nsfw=false] Whether or not the submission should be marked NSFW.
+   * @param {string} [options.flairId] The flair template to select.
+   * @param {string} [options.flairText] If a flair template is selected and its property `flair_text_editable` is `true`, this will
+   * customize the flair text.
+   * @param {string} [options.collectionId] The UUID of a collection to add the newly-submitted post to.
+   * @param {string} [options.discussionType] Set to `CHAT` to enable live discussion instead of traditional comments.
+   * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
+   * requires a captcha to submit posts and comments.
+   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier.
+   * @returns {Promise} The newly-created Submission object.
+   * @example
+   *
+   * const mediaVideo = await r.uploadMedia({
+   *   file: './video.mp4',
+   *   type: 'video',
+   *   caption: 'Short video!'
+   * })
+   * subreddit.submitSelfpost({
+   *   title: 'This is a selfpost',
+   *   text: 'This is the text body of the selfpost.\n\nAnd This is an inline image {img} And also a video! {vid}',
+   *   inlineMedia: {
+   *     img: {
+   *       file: './animated.gif', // Usage as a file path.
+   *       type: 'img'
+   *     },
+   *     vid: mediaVideo
+   *   }
+   * }).then(console.log)
+   * // => Submission
+   * // (new selfpost created on reddit)
    */
   submitSelfpost (options) {
     return this._r.submitSelfpost({...options, subredditName: this.display_name});
   }
   /**
-   * @summary Creates a new link submission on this subreddit.
-   * @param {object} options An object containing details about the submission
-   * @param {string} options.title The title of the submission
-   * @param {string} options.url The url that the link submission should point to
-   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission
-   * @param {boolean} [options.resubmit=true] If this is false and same link has already been submitted to this subreddit in
-   * the past, reddit will return an error. This could be used to avoid accidental reposts.
+   * @summary Submit a poll to this subreddit. (Undocumented endpoint).
+   * @param {object} options An object containing details about the submission.
+   * @param {string} options.title The title of the submission.
+   * @param {string} [options.text] The selftext of the submission.
+   * @param {string[]} options.choices An array of 2 to 6 poll options.
+   * @param {number} options.duration The number of days the poll should accept votes. Valid values are between 1 and 7, inclusive.
+   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission.
+   * @param {boolean} [options.resubmit=true] If this is `false` and same link has already been submitted to this subreddit in the past,
+   * reddit will return an error. This could be used to avoid accidental reposts.
+   * @param {boolean} [options.spoiler=false] Whether or not the submission should be marked as a spoiler.
+   * @param {boolean} [options.nsfw=false] Whether or not the submission should be marked NSFW.
+   * @param {string} [options.flairId] The flair template to select.
+   * @param {string} [options.flairText] If a flair template is selected and its property `flair_text_editable` is `true`, this will
+   * customize the flair text.
+   * @param {string} [options.collectionId] The UUID of a collection to add the newly-submitted post to.
+   * @param {string} [options.discussionType] Set to `CHAT` to enable live discussion instead of traditional comments.
    * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
    * requires a captcha to submit posts and comments.
-   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier
-   * @returns {Promise} The newly-created Submission object
+   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier.
+   * @returns {Promise} The newly-created Submission object.
    * @example
    *
-   * r.getSubreddit('snoowrap').submitLink({title: 'I found a cool website', url: 'https://google.com'}).then(console.log)
-   * // => Submission { name: 't3_4abmsz' }
+   * subreddit.submitPoll({
+   *   title: 'Survey!',
+   *   text: 'Do you like snoowrap?',
+   *   choices: ['YES!', 'NOPE!'],
+   *   duration: 3
+   * }).then(console.log)
+   * // => Submission
+   * // (new poll submission created on reddit)
    */
-  submitLink (options) {
-    return this._r.submitLink({...options, subredditName: this.display_name});
+  submitPoll (options) {
+    return this._r.submitPoll({...options, subredditName: this.display_name});
   }
-
   /**
    * @summary Creates a new crosspost submission on this subreddit
    * @desc **NOTE**: To create a crosspost, the authenticated account must be subscribed to the subreddit where
    * the crosspost is being submitted, and that subreddit be configured to allow crossposts.
    * @param {object} options An object containing details about the submission
    * @param {string} options.title The title of the crosspost
-   * @param {string|Submission} options.originalPost A Submission object or a post ID for the original post which
+   * @param {(string|Submission)} options.originalPost A Submission object or a post ID for the original post which
    * is being crossposted
-   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission
-   * @param {boolean} [options.resubmit=true] If this is false and same link has already been submitted to this subreddit in
-   * the past, reddit will return an error. This could be used to avoid accidental reposts.
+   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission.
+   * @param {boolean} [options.resubmit=true] If this is `false` and same link has already been submitted to this subreddit in the past,
+   * reddit will return an error. This could be used to avoid accidental reposts.
+   * @param {boolean} [options.spoiler=false] Whether or not the submission should be marked as a spoiler.
+   * @param {boolean} [options.nsfw=false] Whether or not the submission should be marked NSFW.
+   * @param {string} [options.flairId] The flair template to select.
+   * @param {string} [options.flairText] If a flair template is selected and its property `flair_text_editable` is `true`, this will
+   * customize the flair text.
+   * @param {string} [options.collectionId] The UUID of a collection to add the newly-submitted post to.
+   * @param {string} [options.discussionType] Set to `CHAT` to enable live discussion instead of traditional comments.
+   * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
+   * requires a captcha to submit posts and comments.
+   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier.
    * @returns {Promise} The newly-created Submission object
    * @example
    *
-   * await r.getSubreddit('snoowrap').submitCrosspost({ title: 'I found an interesting post', originalPost: '6vths0' })
-   * // => Submission { name: 't3_4abmsz' }
+   * subreddit.submitCrosspost({
+   *  title: 'I found an interesting post',
+   *  originalPost: '6vths0'
+   * }).then(console.log)
+   * // => Submission
+   * // (new crosspost submission created on reddit)
    */
   submitCrosspost (options) {
     return this._r.submitCrosspost({...options, subredditName: this.display_name});
   }
-
   /**
    * @summary Gets a Listing of hot posts on this subreddit.
    * @param {object} [options={}] Options for the resulting Listing
