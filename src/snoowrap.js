@@ -454,8 +454,8 @@ const snoowrap = class snoowrap {
    * r.getSubmission('2np694').title.then(console.log)
    * // => 'What tasty food would be distusting if eaten over rice?'
    */
-  getSubmission (submissionId) {
-    return this._newObject('Submission', {name: addFullnamePrefix(submissionId, 't3_')});
+  getSubmission (submissionId, sort = null) {
+    return this._newObject('Submission', {name: addFullnamePrefix(submissionId, 't3_'), sort});
   }
 
   /**
