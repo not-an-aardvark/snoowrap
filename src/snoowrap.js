@@ -446,6 +446,7 @@ const snoowrap = class snoowrap {
   /**
    * @summary Gets information on a given submission.
    * @param {string} submissionId - The base36 id of the submission
+   * @param {string} sort - How to sort the comments
    * @returns {Submission} An unfetched Submission object for the requested submission
    * @example
    *

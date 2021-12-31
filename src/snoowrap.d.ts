@@ -98,7 +98,7 @@ declare class Snoowrap {
   getSavedCategories(): Promise<any[]>;
   getSentMessages(options?: ListingOptions): Promise<_Listing<_PrivateMessage>>;
   getStickiedLivethread(): Promise<_LiveThread | undefined>;
-  getSubmission(submissionId: string): _Submission;
+  getSubmission(submissionId: string, sort?: string): _Submission;
   getSubreddit(displayName: string): _Subreddit;
   getSubscriptions(options?: ListingOptions): _Listing<_Subreddit>;
   getTop(subredditName?: string, options?: SortedListingOptions): Promise<_Listing<_Submission>>;
