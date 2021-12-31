@@ -51,11 +51,12 @@ const RedditContent = class RedditContent {
   */
   fetch () {
     if (!this._fetch) {
+      let getParams = {uri: this._uri}
+      // a submission we want to sort comments with
       if (this.constructor._name === 'Submission' && this.sort) {
-        this._fetch = this._r._promiseWrap(this._r._get({uri: this._uri, qs: { sort: this.sort } }).then(res => this._transformApiResponse(res)));
-      } else {
-        this._fetch = this._r._promiseWrap(this._r._get({uri: this._uri}).then(res => this._transformApiResponse(res)));
+        getParams = {...getParams, qs: { sort: this.sort }}
       }
+      this._fetch = this._r._promiseWrap(this._r._get(getParams).then(res => this._transformApiResponse(res)));
     }
     return this._fetch;
   }
