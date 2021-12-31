@@ -446,6 +446,7 @@ const snoowrap = class snoowrap {
   /**
    * @summary Gets information on a given submission.
    * @param {string} submissionId - The base36 id of the submission
+   * @param {string} sort - How to sort the comments
    * @returns {Submission} An unfetched Submission object for the requested submission
    * @example
    *
@@ -454,8 +455,8 @@ const snoowrap = class snoowrap {
    * r.getSubmission('2np694').title.then(console.log)
    * // => 'What tasty food would be distusting if eaten over rice?'
    */
-  getSubmission (submissionId) {
-    return this._newObject('Submission', {name: addFullnamePrefix(submissionId, 't3_')});
+  getSubmission (submissionId, sort = null) {
+    return this._newObject('Submission', {name: addFullnamePrefix(submissionId, 't3_'), sort});
   }
 
   /**
