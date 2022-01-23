@@ -4,7 +4,6 @@ import Subreddit from './Subreddit';
 import VoteableContent from './VoteableContent';
 
 export default class Comment extends VoteableContent<Comment> {
-  approved: boolean;
   body_html: string;
   body: string;
   collapsed_reason: any; // ?
