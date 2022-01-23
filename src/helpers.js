@@ -143,7 +143,9 @@ of the property.
 */
 export function addSnakeCaseShadowProps (obj) {
   Object.keys(obj).filter(key => !key.startsWith('_') && key !== snakeCase(key)).forEach(key => {
-    Object.defineProperty(obj, snakeCase(key), {get: () => obj[key], set: value => obj[key] = value});
+    Object.defineProperty(obj, snakeCase(key), {get: () => obj[key], set: value => {
+      obj[key] = value;
+    }});
   });
   return obj;
 }
