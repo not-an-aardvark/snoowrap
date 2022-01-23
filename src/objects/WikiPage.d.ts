@@ -29,7 +29,7 @@ interface Settings {
 interface EditOptions {
   text: string;
   reason?: string;
-  perviousRevision?: string;
+  previousRevision?: string;
 }
 
 export interface WikiPageRevision {
