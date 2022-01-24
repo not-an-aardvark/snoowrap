@@ -74,7 +74,6 @@ export default class Submission extends VoteableContent<Submission> {
   link_flair_text: string | null;
   link_flair_text_color: 'dark' | 'light';
   link_flair_type: 'text' | 'richtext';
-  locked: boolean;
   media: Media | null;
   media_embed: MediaEmbed;
   media_only: boolean;
