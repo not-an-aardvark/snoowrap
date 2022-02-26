@@ -1,6 +1,9 @@
 /* eslint-env browser */
 /* eslint-disable no-console */
 const snoowrap = require('..');
+const BaseRequester = require('../dist/BaseRequester');
+
+window.BaseRequester = BaseRequester.default;
 
 fetch('../oauth_info.json').then(async response => {
   const oauthInfo = await response.json();

@@ -1,22 +1,23 @@
+// @ts-nocheck
 import {defaults, forOwn, includes, isEmpty, map, mapValues, omit, omitBy, snakeCase, values} from 'lodash';
 import util from 'util';
 import path from 'path';
 import stream from 'stream';
 import {createReadStream} from 'fs';
 import * as requestHandler from './request_handler.js';
-import {HTTP_VERBS, KINDS, MAX_LISTING_ITEMS, MODULE_NAME, USER_KEYS, SUBREDDIT_KEYS, VERSION, MIME_TYPES, SUBMISSION_ID_REGEX, MEDIA_TYPES, PLACEHOLDER_REGEX} from './constants';
+import {KINDS, MAX_LISTING_ITEMS, MODULE_NAME, USER_KEYS, SUBREDDIT_KEYS, VERSION, MIME_TYPES, SUBMISSION_ID_REGEX, MEDIA_TYPES, PLACEHOLDER_REGEX} from './constants';
 import * as errors from './errors';
 import {
   addEmptyRepliesListing,
   addFullnamePrefix,
-  addSnakeCaseShadowProps,
   defineInspectFunc,
   handleJsonErrors,
   isBrowser,
   requiredArg
 } from './helpers.js';
-import defaultConfig from './defaultConfig';
-import * as objects from './objects/index.js';
+
+import * as objects from './objects/index.js'
+import BaseRequester from './BaseRequester'
 /* eslint-disable-next-line import/no-unresolved */
 import MediaFile, {MediaImg, MediaVideo, MediaGif} from './objects/MediaFile';
 
@@ -39,374 +40,7 @@ const api_type = 'json';
  * [API rules](https://github.com/reddit/reddit/wiki/API).) These properties primarily exist for internal use, but they are
  * exposed since they are useful externally as well.
  */
-const snoowrap = class snoowrap {
-  /**
-   * @summary Constructs a new requester.
-   * @desc You should use the snoowrap constructor if you are able to authorize a reddit account in advance (e.g. for a Node.js
-   * script that always uses the same account). If you aren't able to authorize in advance (e.g. acting through an arbitrary user's
-   * account while running snoowrap in a browser), then you should use {@link snoowrap.getAuthUrl} and
-   * {@link snoowrap.fromAuthCode} instead.
-   *
-   * To edit snoowrap specific settings, see {@link snoowrap#config}.
-   *
-   * snoowrap supports several different options for pre-existing authentication:
-   * 1. *Refresh token*: To authenticate with a refresh token, pass an object with the properties `userAgent`, `clientId`,
-   * `clientSecret`, and `refreshToken` to the snoowrap constructor. You will need to get the refresh token from reddit
-   * beforehand. A script to automatically generate refresh tokens for you can be found
-   * [here](https://github.com/not-an-aardvark/reddit-oauth-helper).
-   * 1. *Username/password*: To authenticate with a username and password, pass an object with the properties `userAgent`,
-   * `clientId`, `clientSecret`, `username`, and `password` to the snoowrap constructor. Note that username/password
-   * authentication is only possible for `script`-type apps.
-   * 1. *Access token*: To authenticate with an access token, pass an object with the properties `userAgent` and `accessToken`
-   * to the snoowrap constructor. Note that all access tokens expire one hour after being generated, so this method is
-   * not recommended for long-term use.
-   * @param {object} options An object containing authentication options. This should always have the property `userAgent`. It
-   * must also contain some combination of credentials (see above)
-   * @param {string} options.userAgent A unique description of what your app does. This argument is not necessary when snoowrap
-   * is running in a browser.
-   * @param {string} [options.clientId] The client ID of your app (assigned by reddit)
-   * @param {string} [options.clientSecret] The client secret of your app (assigned by reddit). If you are using a refresh token
-   * with an installed app (which does not have a client secret), pass an empty string as your `clientSecret`.
-   * @param {string} [options.username] The username of the account to access
-   * @param {string} [options.password] The password of the account to access
-   * @param {string} [options.refreshToken] A refresh token for your app
-   * @param {string} [options.accessToken] An access token for your app
-   */
-  constructor ({
-    /**
-     * The function signature for the constructor is a bit large due to the snake_case aliases. Essentially, it accepts an
-     * object with properties {userAgent, clientId, clientSecret, refreshToken, accessToken, username, password}.
-     * Additionally, if snake_case properties are provided and camelCase properties are not (e.g. `user_agent` is provided but
-     * `userAgent` is not), then the `userAgent` identifier gets set to the provided `user_agent` property. This is needed for
-     * backwards compatibility; snoowrap previously only accepted snake_case props, but now it also accepts camelCase props.
-     */
-    user_agent, userAgent = user_agent,
-    client_id, clientId = client_id,
-    client_secret, clientSecret = client_secret,
-    refresh_token, refreshToken = refresh_token,
-    access_token, accessToken = access_token,
-    username,
-    password
-  } = {}) {
-    if (!userAgent && !isBrowser) {
-      return requiredArg('userAgent');
-    }
-    if ((!accessToken || typeof accessToken !== 'string') &&
-      (clientId === undefined || clientSecret === undefined || typeof refreshToken !== 'string') &&
-      (clientId === undefined || clientSecret === undefined || username === undefined || password === undefined)
-    ) {
-      throw new errors.NoCredentialsError();
-    }
-    if (isBrowser) {
-      this.userAgent = global.navigator.userAgent;
-    }
-    defaults(this, {userAgent, clientId, clientSecret, refreshToken, accessToken, username, password}, {
-      clientId: null,
-      clientSecret: null,
-      refreshToken: null,
-      accessToken: null,
-      username: null,
-      password: null,
-      ratelimitRemaining: null,
-      ratelimitExpiration: null,
-      tokenExpiration: null,
-      scope: null,
-      _config: {...defaultConfig},
-      _nextRequestTimestamp: -Infinity
-    });
-    addSnakeCaseShadowProps(this);
-  }
-
-  /**
-   * @summary Gets an authorization URL, which allows a user to authorize access to their account
-   * @desc This create a URL where a user can authorize an app to act through their account. If the user visits the returned URL
-   * in a web browser, they will see a page that looks like [this](https://i.gyazo.com/0325534f38b78c1dbd4c84d690dda6c2.png). If
-   * the user clicks "Allow", they will be redirected to your `redirectUri`, with a `code` querystring parameter containing an
-   * *authorization code*. If this code is passed to {@link snoowrap.fromAuthCode}, you can create a requester to make
-   * requests on behalf of the user.
-   *
-   * The main use-case here is for running snoowrap in a browser. You can generate a URL, send the user there, and then continue
-   * after the user authenticates on reddit and is redirected back.
-   *
-   * @param {object} options
-   * @param {string} options.clientId The client ID of your app (assigned by reddit). If your code is running clientside in a
-   * browser, using an "Installed" app type is recommended.
-   * @param {string[]} [options.scope=['*']] An array of scopes (permissions on the user's account) to request on the authentication
-   * page. A list of possible scopes can be found [here](https://www.reddit.com/api/v1/scopes). You can also get them on-the-fly
-   * with {@link snoowrap#getOauthScopeList}. Passing an array with a single asterisk `['*']` gives you full scope.
-   * @param {string} options.redirectUri The URL where the user should be redirected after authenticating. This **must** be the
-   * same as the redirect URI that is configured for the reddit app. (If there is a mismatch, the returned URL will display an
-   * error page instead of an authentication form.)
-   * @param {boolean} [options.permanent=true] If `true`, the app will have indefinite access to the user's account. If `false`,
-   * access to the user's account will expire after 1 hour.
-   * @param {string} [options.state] A string that can be used to verify a user after they are redirected back to the site. When
-   * the user is redirected from reddit, to the redirect URI after authenticating, the resulting URI will have this same `state`
-   * value in the querystring. (See [here](http://www.twobotechnologies.com/blog/2014/02/importance-of-state-in-oauth2.html) for
-   * more information on how to use the `state` value.)
-   * @param {string} [options.endpointDomain='reddit.com'] The endpoint domain for the URL. If the user is authenticating on
-   * reddit.com (as opposed to some other site with a reddit-like API), you can omit this value.
-   * @param {boolean} [options.compact=false] If `true`, the mobile version of the authorization URL will be used instead.
-   * @returns {string} A URL where the user can authenticate with the given options
-   * @example
-   *
-   * var authenticationUrl = snoowrap.getAuthUrl({
-   *   clientId: 'foobarbazquuux',
-   *   scope: ['identity', 'wikiread', 'wikiedit'],
-   *   redirectUri: 'https://example.com/reddit_callback',
-   *   permanent: false,
-   *   state: 'fe211bebc52eb3da9bef8db6e63104d3' // a random string, this could be validated when the user is redirected back
-   * });
-   * // --> 'https://www.reddit.com/api/v1/authorize?client_id=foobarbaz&response_type=code&state= ...'
-   *
-   * window.location.href = authenticationUrl; // send the user to the authentication url
-   */
-  static getAuthUrl ({
-    clientId = requiredArg('clientId'),
-    scope = ['*'],
-    redirectUri = requiredArg('redirectUri'),
-    permanent = true,
-    state = '_',
-    endpointDomain = 'reddit.com',
-    compact = false
-  }) {
-    if (!(Array.isArray(scope) && scope.length && scope.every(scopeValue => scopeValue && typeof scopeValue === 'string'))) {
-      throw new TypeError('Missing `scope` argument; a non-empty list of OAuth scopes must be provided');
-    }
-    return `
-      https://www.${endpointDomain}/api/v1/authorize
-      ${compact ? '.compact' : ''}
-      ?client_id=${encodeURIComponent(clientId)}
-      &response_type=code
-      &state=${encodeURIComponent(state)}
-      &redirect_uri=${encodeURIComponent(redirectUri)}
-      &duration=${permanent ? 'permanent' : 'temporary'}
-      &scope=${encodeURIComponent(scope.join(' '))}
-    `.replace(/\s/g, '');
-  }
-
-  /**
-   * @summary Creates a snoowrap requester from an authorization code.
-   * @desc An authorization code is the `code` value that appears in the querystring after a user authenticates with reddit and
-   * is redirected. For more information, see {@link snoowrap.getAuthUrl}.
-   *
-   * The main use-case for this function is for running snoowrap in a browser. You can generate a URL with
-   * {@link snoowrap.getAuthUrl} and send the user to that URL, and then use this function to create a requester when
-   * the user is redirected back with an authorization code.
-   * @param {object} options
-   * @param {string} options.code The authorization code
-   * @param {string} options.userAgent A unique description of what your app does. This argument is not necessary when snoowrap
-   * is running in a browser.
-   * @param {string} options.clientId The client ID of your app (assigned by reddit). If your code is running clientside in a
-   * browser, using an "Installed" app type is recommended.
-   * @param {string} [options.clientSecret] The client secret of your app. If your app has the "Installed" app type, omit
-   * this parameter.
-   * @param {string} options.redirectUri The redirect URI that is configured for the reddit app.
-   * @param {string} [options.endpointDomain='reddit.com'] The endpoint domain that the returned requester should be configured
-   * to use. If the user is authenticating on reddit.com (as opposed to some other site with a reddit-like API), you can omit this
-   * value.
-   * @returns {Promise<snoowrap>} A Promise that fulfills with a `snoowrap` instance
-   * @example
-   *
-   * // Get the `code` querystring param (assuming the user was redirected from reddit)
-   * var code = new URL(window.location.href).searchParams.get('code');
-   *
-   * snoowrap.fromAuthCode({
-   *   code: code,
-   *   userAgent: 'My app',
-   *   clientId: 'foobarbazquuux',
-   *   redirectUri: 'example.com'
-   * }).then(r => {
-   *   // Now we have a requester that can access reddit through the user's account
-   *   return r.getHot().then(posts => {
-   *     // do something with posts from the front page
-   *   });
-   * })
-   */
-  static async fromAuthCode ({
-    code = requiredArg('code'),
-    userAgent = isBrowser ? global.navigator.userAgent : requiredArg('userAgent'),
-    clientId = requiredArg('clientId'),
-    clientSecret,
-    redirectUri = requiredArg('redirectUri'),
-    endpointDomain = 'reddit.com'
-  }) {
-    const response = await this.prototype.credentialedClientRequest.call({
-      userAgent,
-      clientId,
-      clientSecret,
-      // Use `this.prototype.rawRequest` function to allow for custom `rawRequest` method usage in subclasses.
-      rawRequest: this.prototype.rawRequest
-    }, {
-      method: 'post',
-      baseURL: `https://www.${endpointDomain}/`,
-      url: 'api/v1/access_token',
-      form: {grant_type: 'authorization_code', code, redirect_uri: redirectUri}
-    });
-    if (response.data.error) {
-      throw new errors.RequestError(`API Error: ${response.data.error} - ${response.data.error_description}`);
-    }
-    // Use `new this` instead of `new snoowrap` to ensure that subclass instances can be returned
-    const requester = new this({userAgent, clientId, clientSecret, ...response.data});
-    requester.tokenExpiration = Date.now() + (response.data.expires_in * 1000);
-    requester.scope = response.data.scope.split(' ');
-    requester.config({endpointDomain});
-    return requester;
-  }
-
-  /**
-   * @summary Returns the grant types available for app-only authentication
-   * @desc Per the Reddit API OAuth docs, there are two different grant types depending on whether the app is an installed client
-   * or a confidential client such as a web app or string. This getter returns the possible values for the "grant_type" field
-   * in application-only auth.
-   * @returns {object} The enumeration of possible grant_type values
-   */
-  static get grantType () {
-    return {
-      CLIENT_CREDENTIALS: 'client_credentials',
-      INSTALLED_CLIENT: 'https://oauth.reddit.com/grants/installed_client'
-    };
-  }
-  /**
-  * @summary Creates a snoowrap requester from a "user-less" Authorization token
-  * @desc In some cases, 3rd party app clients may wish to make API requests without a user context. App clients can request
-  * a "user-less" Authorization token via either the standard client_credentials grant, or the reddit specific
-  * extension to this grant, https://oauth.reddit.com/grants/installed_client. Which grant type an app uses depends on
-  * the app-type and its use case.
-  * @param {object} options
-  * @param {string} options.userAgent A unique description of what your app does. This argument is not necessary when snoowrap
-  * is running in a browser.
-  * @param {string} options.clientId The client ID of your app (assigned by reddit). If your code is running clientside in a
-  * browser, using an "Installed" app type is recommended.
-  * @param {string} [options.clientSecret] The client secret of your app. Only required for "client_credentials" grant type.
-  * @param {string} [options.deviceId] A unique, per-device ID generated by your client. Only required
-  * for "Installed" grant type, needs to be between 20-30 characters long. From the reddit docs: "reddit *may* choose to use
-  * this ID to generate aggregate data about user counts. Clients that wish to remain anonymous should use the value
-  * DO_NOT_TRACK_THIS_DEVICE."
-  * @param {string} [options.grantType=snoowrap.grantType.INSTALLED_CLIENT] The type of "user-less"
-  * token to use {@link snoowrap.grantType}
-  * @param {boolean} [options.permanent=true] If `true`, the app will have indefinite access. If `false`,
-  * access will expire after 1 hour.
-  * @param {string} [options.endpointDomain='reddit.com'] The endpoint domain that the returned requester should be configured
-  * to use. If the user is authenticating on reddit.com (as opposed to some other site with a reddit-like API), you can omit this
-  * value.
-  * @returns {Promise<snoowrap>} A Promise that fulfills with a `snoowrap` instance
-  * @example
-  *
-  * snoowrap.fromApplicationOnlyAuth({
-  *   userAgent: 'My app',
-  *   clientId: 'foobarbazquuux',
-  *   deviceId: 'unique id between 20-30 chars',
-  *   grantType: snoowrap.grantType.INSTALLED_CLIENT
-  * }).then(r => {
-  *   // Now we have a requester that can access reddit through a "user-less" Auth token
-  *   return r.getHot().then(posts => {
-  *     // do something with posts from the front page
-  *   });
-  * })
-  *
-  * snoowrap.fromApplicationOnlyAuth({
-  *   userAgent: 'My app',
-  *   clientId: 'foobarbazquuux',
-  *   clientSecret: 'your web app secret',
-  *   grantType: snoowrap.grantType.CLIENT_CREDENTIALS
-  * }).then(r => {
-  *   // Now we have a requester that can access reddit through a "user-less" Auth token
-  *   return r.getHot().then(posts => {
-  *     // do something with posts from the front page
-  *   });
-  * })
-  */
-  static async fromApplicationOnlyAuth ({
-    userAgent = isBrowser ? global.navigator.userAgent : requiredArg('userAgent'),
-    clientId = requiredArg('clientId'),
-    clientSecret,
-    deviceId,
-    grantType = snoowrap.grantType.INSTALLED_CLIENT,
-    permanent = true,
-    endpointDomain = 'reddit.com'
-  }) {
-    const response = await this.prototype.credentialedClientRequest.call({
-      clientId,
-      clientSecret,
-      // Use `this.prototype.rawRequest` function to allow for custom `rawRequest` method usage in subclasses.
-      rawRequest: this.prototype.rawRequest
-    }, {
-      method: 'post',
-      baseURL: `https://www.${endpointDomain}/`,
-      url: 'api/v1/access_token',
-      form: {grant_type: grantType, device_id: deviceId, duration: permanent ? 'permanent' : 'temporary'}
-    });
-    if (response.data.error) {
-      throw new errors.RequestError(`API Error: ${response.data.error} - ${response.data.error_description}`);
-    }
-    // Use `new this` instead of `new snoowrap` to ensure that subclass instances can be returned
-    const requester = new this({userAgent, clientId, clientSecret, ...response.data});
-    requester.tokenExpiration = Date.now() + (response.data.expires_in * 1000);
-    requester.scope = response.data.scope.split(' ');
-    requester.config({endpointDomain});
-    return requester;
-  }
-
-  /**
-   * @summary Retrieves or modifies the configuration options for this snoowrap instance.
-   * @param {object} [options] A map of `{[config property name]: value}`. Note that any omitted config properties will simply
-   * retain whatever value they had previously. (In other words, if you only want to change one property, you only need to put
-   * that one property in this parameter. To get the current configuration without modifying anything, simply omit this
-   * parameter.)
-   * @param {string} [options.endpointDomain='reddit.com'] The endpoint where requests should be sent
-   * @param {Number} [options.requestDelay=0] A minimum delay, in milliseconds, to enforce between API calls. If multiple
-   * api calls are requested during this timespan, they will be queued and sent one at a time. Setting this to more than 1000 will
-   * ensure that reddit's ratelimit is never reached, but it will make things run slower than necessary if only a few requests
-   * are being sent. If this is set to zero, snoowrap will not enforce any delay between individual requests. However, it will
-   * still refuse to continue if reddit's enforced ratelimit (600 requests per 10 minutes) is exceeded.
-   * @param {Number} [options.requestTimeout=30000] A timeout for all OAuth requests, in milliseconds. If the reddit server
-   * fails to return a response within this amount of time, the Promise will be rejected with a timeout error.
-   * @param {boolean} [options.continueAfterRatelimitError=false] Determines whether snoowrap should queue API calls if
-   * reddit's ratelimit is exceeded. If set to `true` when the ratelimit is exceeded, snoowrap will queue all further requests,
-   * and will attempt to send them again after the current ratelimit period expires (which happens every 10 minutes). If set
-   * to `false`, snoowrap will simply throw an error when reddit's ratelimit is exceeded.
-   * @param {Number[]} [options.retryErrorCodes=[502, 503, 504, 522]] If reddit responds to an idempotent request with one of
-   * these error codes, snoowrap will retry the request, up to a maximum of `max_retry_attempts` requests in total. (These
-   * errors usually indicate that there was an temporary issue on reddit's end, and retrying the request has a decent chance of
-   * success.) This behavior can be disabled by simply setting this property to an empty array.
-   * @param {Number} [options.maxRetryAttempts=3] See `retryErrorCodes`.
-   * @param {boolean} [options.warnings=true] snoowrap may occasionally log warnings, such as deprecation notices, to the
-   * console. These can be disabled by setting this to `false`.
-   * @param {boolean} [options.debug=false] If set to true, snoowrap will print out potentially-useful information for debugging
-   * purposes as it runs.
-   * @param {object} [options.logger=console] By default, snoowrap will log any warnings and debug output to the console.
-   * A custom logger object may be supplied via this option; it must expose `warn`, `info`, `debug`, and `trace` functions.
-   * @param {boolean} [options.proxies=true] Setting this to `false` disables snoowrap's method-chaining feature. This causes
-   * the syntax for using snoowrap to become a bit heavier, but allows for consistency between environments that support the ES6
-   * `Proxy` object and environments that don't. This option is a no-op in environments that don't support the `Proxy` object,
-   * since method chaining is always disabled in those environments. Note, changing this setting must be done before making
-   * any requests.
-   * @returns {object} An updated Object containing all of the configuration values
-   * @example
-   *
-   * r.config({requestDelay: 1000, warnings: false});
-   * // sets the request delay to 1000 milliseconds, and suppresses warnings.
-   */
-  config (options = {}) {
-    const invalidKey = Object.keys(options).find(key => !(key in this._config));
-    if (invalidKey) {
-      throw new TypeError(`Invalid config option '${invalidKey}'`);
-    }
-    return Object.assign(this._config, options);
-  }
-
-  _warn (...args) {
-    if (this._config.warnings) {
-      this._config.logger.warn(...args);
-    }
-  }
-
-  _debug (...args) {
-    if (this._config.debug) {
-      this._config.logger.debug(...args);
-    }
-  }
-
+const snoowrap = class snoowrap extends BaseRequester {
   _newObject (objectType, content, _hasFetched = false) {
     return Array.isArray(content) ? content : new snoowrap.objects[objectType](content, this, _hasFetched);
   }
@@ -2611,19 +2245,6 @@ const classFuncDescriptors = {configurable: true, writable: true};
  */
 Object.defineProperties(snoowrap.prototype, mapValues(requestHandler, func => ({value: func, ...classFuncDescriptors})));
 
-HTTP_VERBS.forEach(method => {
-  /**
-   * Define method shortcuts for each of the HTTP verbs. i.e. `snoowrap.prototype._post` is the same as `oauth_request` except
-   * that the HTTP method defaults to `post`, and the result is promise-wrapped. Use Object.defineProperty to ensure that the
-   * properties are non-enumerable.
-   */
-  Object.defineProperty(snoowrap.prototype, `_${method}`, {
-    value (options) {
-      return this.oauthRequest({...options, method});
-    }, ...classFuncDescriptors
-  });
-});
-
 /**
  * `objects` will be an object containing getters for each content type, due to the way objects are exported from
  * objects/index.js. To unwrap these getters into direct properties, use lodash.mapValues with an identity function.
@@ -2651,4 +2272,4 @@ if (!module.parent && isBrowser) { // check if the code is being run in a browse
   global[MODULE_NAME] = snoowrap;
 }
 
-module.exports = snoowrap;
+export default snoowrap

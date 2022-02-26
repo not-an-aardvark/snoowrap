@@ -1,7 +1,7 @@
 import {cloneDeep, mapValues, pick} from 'lodash';
 import util from 'util';
 import {defineInspectFunc} from '../helpers.js';
-import {HTTP_VERBS, USER_KEYS, SUBREDDIT_KEYS} from '../constants.js';
+import {HTTP_VERBS, USER_KEYS, SUBREDDIT_KEYS} from '../constants';
 import Listing from './Listing.js';
 
 /**

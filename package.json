@@ -1,6 +1,6 @@
 {
   "name": "snoowrap",
-  "version": "1.23.0",
+  "version": "2.0.0",
   "license": "MIT",
   "description": "A JavaScript wrapper for the reddit API",
   "main": "dist/snoowrap.js",
@@ -79,7 +79,7 @@
     "jsdoc": "^3.6.7",
     "mocha": "^6.0.0",
     "moment": "^2.14.1",
-    "typescript": "^3.5.3",
+    "typescript": "^4.5.5",
     "uglify-js": "git://github.com/mishoo/UglifyJS2.git#1db50c3b169ee4195e1935013d6721628eb5b4bd"
   },
   "engines": {

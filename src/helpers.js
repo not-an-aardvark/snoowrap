@@ -1,6 +1,6 @@
 import util from 'util';
 import {find, includes, isEmpty, keyBy, omit, partial, property, remove, snakeCase} from 'lodash';
-import {MODERATOR_PERMISSIONS, LIVETHREAD_PERMISSIONS} from './constants.js';
+import {MODERATOR_PERMISSIONS, LIVETHREAD_PERMISSIONS} from './constants';
 import {emptyChildren as emptyMoreObject} from './objects/More.js';
 
 /**

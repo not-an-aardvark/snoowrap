@@ -1,7 +1,6 @@
 import {concat, flatten, forEach, pick, remove} from 'lodash';
-import Promise from '../Promise.js';
 import {addEmptyRepliesListing, buildRepliesTree, handleJsonErrors} from '../helpers.js';
-import {MAX_API_INFO_AMOUNT, MAX_API_MORECHILDREN_AMOUNT} from '../constants.js';
+import {MAX_API_INFO_AMOUNT, MAX_API_MORECHILDREN_AMOUNT} from '../constants';
 
 const api_type = 'json';
 

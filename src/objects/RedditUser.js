@@ -1,5 +1,5 @@
-import {USERNAME_REGEX} from '../constants.js';
-import {InvalidMethodCallError, InvalidUserError} from '../errors.js';
+import {USERNAME_REGEX} from '../constants';
+import {InvalidMethodCallError, InvalidUserError} from '../errors';
 import RedditContent from './RedditContent.js';
 
 /**

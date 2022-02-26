@@ -1,11 +1,13 @@
 {
 	"compilerOptions": {
         "module": "commonjs",
-        "target": "es6",
+        "target": "es5",
         "lib": [
             "es2017",
             "dom"
         ],
+        "moduleResolution": "node",
+        "esModuleInterop": true,
         "noImplicitAny": true,
         "noImplicitThis": true,
         "strict": true,

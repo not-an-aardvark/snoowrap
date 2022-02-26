@@ -2,7 +2,7 @@ import {clone, defaults, defaultsDeep, isEmpty, omitBy, pick} from 'lodash';
 import util from 'util';
 import {parse as urlParse} from 'url';
 import {defineInspectFunc} from '../helpers.js';
-import {InvalidMethodCallError} from '../errors.js';
+import {InvalidMethodCallError} from '../errors';
 import {default as More, emptyChildren} from './More.js';
 
 const INTERNAL_DEFAULTS = {

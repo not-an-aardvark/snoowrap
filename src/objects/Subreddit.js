@@ -2,7 +2,7 @@ import {chunk, flatten, map, omit} from 'lodash';
 import {Readable} from 'stream';
 import {createReadStream} from 'fs';
 import {formatModPermissions, handleJsonErrors, renameKey} from '../helpers.js';
-import {InvalidMethodCallError} from '../errors.js';
+import {InvalidMethodCallError} from '../errors';
 import RedditContent from './RedditContent.js';
 
 const api_type = 'json';

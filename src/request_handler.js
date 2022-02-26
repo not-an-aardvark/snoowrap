@@ -1,6 +1,6 @@
 import {includes, merge} from 'lodash';
-import {IDEMPOTENT_HTTP_VERBS, MAX_TOKEN_LATENCY} from './constants.js';
-import {rateLimitWarning, RateLimitError} from './errors.js';
+import {IDEMPOTENT_HTTP_VERBS, MAX_TOKEN_LATENCY} from './constants';
+import {rateLimitWarning, RateLimitError} from './errors';
 
 /**
 * @summary Sends an oauth-authenticated request to the reddit server, and returns the server's response.
