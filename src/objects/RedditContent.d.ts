@@ -1,6 +1,6 @@
 import * as Snoowrap from '../snoowrap';
 
-export default class RedditContent<T> extends Promise<T> {
+export default class RedditContent<T=any> {
   created_utc: number;
   created: number;
   id: string;
@@ -13,4 +13,5 @@ export default class RedditContent<T> extends Promise<T> {
   fetch(): Promise<T>;
   refresh(): Promise<T>;
   toJSON(): T;
+  _clone(): T;
 }

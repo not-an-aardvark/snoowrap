@@ -31,17 +31,7 @@ export interface CodeAuth extends Common {
   redirect_uri: string
 }
 
-export interface All extends Common {
-  client_id?: string
-  client_secret?: string
-  refresh_token?: string
-  access_token?: string
-  username?: string
-  password?: string
-  two_factor_code?: number | string
-  code?: string
-  redirect_uri?: string
-}
+export interface All extends Common, Partial<AppAuth>, Partial<ScriptAuth>, Partial<CodeAuth> {}
 
 export interface credentialsResponse {
   access_token: string

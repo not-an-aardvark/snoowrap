@@ -1,32 +1,82 @@
-// @ts-nocheck
-import {defaults, forOwn, includes, isEmpty, map, mapValues, omit, omitBy, snakeCase, values} from 'lodash';
-import util from 'util';
+// @ ts-nocheck
+import {defaults, isEmpty, omit, omitBy} from 'lodash'
 import path from 'path';
 import stream from 'stream';
 import {createReadStream} from 'fs';
-import * as requestHandler from './request_handler.js';
-import {KINDS, MAX_LISTING_ITEMS, MODULE_NAME, USER_KEYS, SUBREDDIT_KEYS, VERSION, MIME_TYPES, SUBMISSION_ID_REGEX, MEDIA_TYPES, PLACEHOLDER_REGEX} from './constants';
-import * as errors from './errors';
+import {KINDS, MAX_LISTING_ITEMS, MODULE_NAME, USER_KEYS, SUBREDDIT_KEYS, VERSION, MIME_TYPES, SUBMISSION_ID_REGEX, MEDIA_TYPES, PLACEHOLDER_REGEX} from './constants'
+import * as errors from './errors'
 import {
   addEmptyRepliesListing,
   addFullnamePrefix,
-  defineInspectFunc,
   handleJsonErrors,
   isBrowser,
   requiredArg
-} from './helpers.js';
+} from './helpers.js'
 
 import * as objects from './objects/index.js'
 import BaseRequester from './BaseRequester'
-/* eslint-disable-next-line import/no-unresolved */
-import MediaFile, {MediaImg, MediaVideo, MediaGif} from './objects/MediaFile';
+import {AxiosResponse} from './axios'
+import MediaFile, {MediaImg, MediaVideo, MediaGif} from './objects/MediaFile'
 
-const fetch = global.fetch;
-const Blob = global.Blob;
-const FormData = isBrowser ? global.FormData : require('form-data');
-const WebSocket = isBrowser ? global.WebSocket : require('ws');
+const fetch = self.fetch
+const Blob = self.Blob
+const FormData = isBrowser ? self.FormData : require('form-data');
+const WebSocket = isBrowser ? self.WebSocket : require('ws');
 
-const api_type = 'json';
+const api_type = 'json'
+
+
+const isAxiosResponse = (obj: any) => {
+  if (
+    obj.data &&
+    obj.status &&
+    obj.statusText &&
+    obj.headers &&
+    obj.config
+  ) {
+    return true
+  }
+  return false
+}
+
+interface ContentTree {
+  kind: keyof typeof KINDS
+  data: any
+}
+
+const isContentTree = (obj: any) => {
+  if (
+    Object.keys(obj).length === 2 &&
+    obj.kind &&
+    obj.data
+  ) {
+    return true
+  }
+  return false
+}
+
+interface SubmissionTree {
+  0: objects.Listing<objects.Submission>,
+  1: objects.Listing<objects.Comment>
+}
+
+const isSubmissionTree = (obj: any) => {
+  if (
+    Array.isArray(obj) &&
+    obj.length === 2 &&
+    obj[0] instanceof snoowrap.objects.Listing &&
+    obj[0][0] instanceof snoowrap.objects.Submission &&
+    obj[1] instanceof snoowrap.objects.Listing
+  ) {
+    return true
+  }
+  return false
+}
+
+interface Children {
+  [key: string]: objects.Comment
+}
+
 
 /**
  * The class for a snoowrap requester.
@@ -40,9 +90,79 @@ const api_type = 'json';
  * [API rules](https://github.com/reddit/reddit/wiki/API).) These properties primarily exist for internal use, but they are
  * exposed since they are useful externally as well.
  */
-const snoowrap = class snoowrap extends BaseRequester {
-  _newObject (objectType, content, _hasFetched = false) {
-    return Array.isArray(content) ? content : new snoowrap.objects[objectType](content, this, _hasFetched);
+class snoowrap extends BaseRequester {
+  static errors = errors
+  static version = VERSION
+  static objects = {...objects}
+
+  _newObject (
+    objectType: typeof KINDS[keyof typeof KINDS] | 'RedditContent',
+    content: any,
+    _hasFetched = false
+  ) {
+    if (Array.isArray(content)) return content
+    let object = snoowrap.objects[objectType as keyof typeof snoowrap.objects]
+    if (!object) object = snoowrap.objects.RedditContent
+    return new object(content, this, _hasFetched)
+  }
+
+  _populate (responseTree: any, children: Children = {}): any {
+    let nested = true
+
+    if (isAxiosResponse(responseTree)) {
+      const axiosResponse: AxiosResponse = responseTree
+      responseTree = axiosResponse.data
+      nested = false
+    }
+
+    if (typeof responseTree !== 'object' || responseTree === null) {
+      return responseTree
+    }
+
+    // Map {kind: 't2', data: {name: 'some_username', ... }} to a RedditUser (e.g.) with the same properties
+    if (isContentTree(responseTree)) {
+      const contentTree: ContentTree = responseTree
+      const populated = this._newObject(
+        KINDS[contentTree.kind] || 'RedditContent',
+        this._populate(contentTree.data, children),
+        true
+      )
+      if (populated instanceof snoowrap.objects.Comment) {
+        children[populated.id] = populated
+      }
+      if (!nested && Object.keys(children).length) {
+        populated._children = children
+      }
+      return populated
+    }
+
+    Object.keys(responseTree).forEach(key => {
+      const value = responseTree[key]
+      // Maps {author: 'some_username'} to {author: RedditUser { name: 'some_username' } }
+      if (value !== null && USER_KEYS.has(key)) {
+        responseTree[key] = this._newObject('RedditUser', {name: value})
+      }
+      if (value !== null && SUBREDDIT_KEYS.has(key)) {
+        responseTree[key] = this._newObject('Subreddit', {display_name: value})
+      }
+      responseTree[key] = this._populate(value, children)
+    })
+
+    if (isSubmissionTree(responseTree)) {
+      const submissionTree: SubmissionTree = responseTree
+      if (submissionTree[1]._more && !submissionTree[1]._more.link_id) {
+        submissionTree[1]._more.link_id = submissionTree[0][0].name
+      }
+      submissionTree[0][0].comments = submissionTree[1]
+      submissionTree[0][0]._children = children
+      return submissionTree[0][0]
+    }
+
+    if (!nested && Object.keys(children).length) {
+      responseTree._children = children
+    }
+
+    return responseTree
   }
 
   /**
@@ -56,7 +176,7 @@ const snoowrap = class snoowrap extends BaseRequester {
    * r.getUser('not_an_aardvark').link_karma.then(console.log)
    * // => 6
    */
-  getUser (name) {
+  getUser (name: string) {
     return this._newObject('RedditUser', {name: (name + '').replace(/^\/?u\//, '')});
   }
 
@@ -2096,42 +2216,6 @@ const snoowrap = class snoowrap extends BaseRequester {
     });
   }
 
-  _revokeToken (token) {
-    return this.credentialedClientRequest({url: 'api/v1/revoke_token', form: {token}, method: 'post'});
-  }
-
-  /**
-   * @summary Invalidates the current access token.
-   * @returns {Promise} A Promise that fulfills when this request is complete
-   * @desc **Note**: This can only be used if the current requester was supplied with a `client_id` and `client_secret`. If the
-   * current requester was supplied with a refresh token, it will automatically create a new access token if any more requests
-   * are made after this one.
-   * @example r.revokeAccessToken();
-   */
-  async revokeAccessToken () {
-    await this._revokeToken(this.accessToken);
-    this.accessToken = null;
-    this.tokenExpiration = null;
-    this.scope = null;
-  }
-
-  /**
-   * @summary Invalidates the current refresh token.
-   * @returns {Promise} A Promise that fulfills when this request is complete
-   * @desc **Note**: This can only be used if the current requester was supplied with a `client_id` and `client_secret`. All
-   * access tokens generated by this refresh token will also be invalidated. This effectively de-authenticates the requester and
-   * prevents it from making any more valid requests. This should only be used in a few cases, e.g. if this token has
-   * been accidentally leaked to a third party.
-   * @example r.revokeRefreshToken();
-   */
-  async revokeRefreshToken () {
-    await this._revokeToken(this.refreshToken);
-    this.refreshToken = null;
-    this.accessToken = null; // Revoking a refresh token also revokes any associated access tokens.
-    this.tokenExpiration = null;
-    this.scope = null;
-  }
-
   async _selectFlair ({flair_template_id, link, name, text, subredditName}) {
     if (!flair_template_id) {
       throw new errors.InvalidMethodCallError('No flair template ID provided');
@@ -2141,46 +2225,6 @@ const snoowrap = class snoowrap extends BaseRequester {
 
   async _assignFlair ({css_class, cssClass = css_class, link, name, text, subreddit_name, subredditName = subreddit_name}) {
     return this._post({url: `r/${subredditName}/api/flair`, form: {api_type, name, text, link, css_class: cssClass}});
-  }
-
-  _populate (responseTree, children = {}, nested) {
-    if (typeof responseTree === 'object' && responseTree !== null) {
-      // Map {kind: 't2', data: {name: 'some_username', ... }} to a RedditUser (e.g.) with the same properties
-      if (Object.keys(responseTree).length === 2 && responseTree.kind && responseTree.data) {
-        const populated = this._newObject(KINDS[responseTree.kind] || 'RedditContent', this._populate(responseTree.data, children, true), true);
-        if (!nested && Object.keys(children).length) {
-          populated._children = children;
-        }
-        if (populated instanceof snoowrap.objects.Comment) {
-          children[populated.id] = populated;
-        }
-        return populated;
-      }
-      const result = (Array.isArray(responseTree) ? map : mapValues)(responseTree, (value, key) => {
-        // Maps {author: 'some_username'} to {author: RedditUser { name: 'some_username' } }
-        if (value !== null && USER_KEYS.has(key)) {
-          return this._newObject('RedditUser', {name: value});
-        }
-        if (value !== null && SUBREDDIT_KEYS.has(key)) {
-          return this._newObject('Subreddit', {display_name: value});
-        }
-        return this._populate(value, children, true);
-      });
-      if (result.length === 2 && result[0] instanceof snoowrap.objects.Listing
-        && result[0][0] instanceof snoowrap.objects.Submission && result[1] instanceof snoowrap.objects.Listing) {
-        if (result[1]._more && !result[1]._more.link_id) {
-          result[1]._more.link_id = result[0][0].name;
-        }
-        result[0][0].comments = result[1];
-        result[0][0]._children = children;
-        return result[0][0];
-      }
-      if (!nested && Object.keys(children).length) {
-        result._children = children;
-      }
-      return result;
-    }
-    return responseTree;
   }
 
   _getListing ({uri, qs = {}, ...options}) {
@@ -2222,54 +2266,11 @@ const snoowrap = class snoowrap extends BaseRequester {
     }
     return this;
   }
-};
-
-function identity (value) {
-  return value;
 }
 
-defineInspectFunc(snoowrap.prototype, function () {
-  // Hide confidential information (tokens, client IDs, etc.), as well as private properties, from the console.log output.
-  const keysForHiddenValues = ['clientSecret', 'refreshToken', 'accessToken', 'password'];
-  const formatted = mapValues(omitBy(this, (value, key) => typeof key === 'string' && key.startsWith('_')), (value, key) => {
-    return includes(keysForHiddenValues, key) ? value && '(redacted)' : value;
-  });
-  return `${MODULE_NAME} ${util.inspect(formatted)}`;
-});
-
-const classFuncDescriptors = {configurable: true, writable: true};
-
-/**
- * Add the request_handler functions (oauth_request, credentialed_client_request, etc.) to the snoowrap prototype. Use
- * Object.defineProperties to ensure that the properties are non-enumerable.
- */
-Object.defineProperties(snoowrap.prototype, mapValues(requestHandler, func => ({value: func, ...classFuncDescriptors})));
-
-/**
- * `objects` will be an object containing getters for each content type, due to the way objects are exported from
- * objects/index.js. To unwrap these getters into direct properties, use lodash.mapValues with an identity function.
- */
-snoowrap.objects = mapValues(objects, identity);
-
-forOwn(KINDS, value => {
-  snoowrap.objects[value] = snoowrap.objects[value] || class extends objects.RedditContent {
-  };
-  Object.defineProperty(snoowrap.objects[value], '_name', {value, configurable: true});
-});
-
-// Alias all functions on snoowrap's prototype and snoowrap's object prototypes in snake_case.
-values(snoowrap.objects).concat(snoowrap).map(func => func.prototype).forEach(funcProto => {
-  Object.getOwnPropertyNames(funcProto)
-    .filter(name => !name.startsWith('_') && name !== snakeCase(name) && typeof funcProto[name] === 'function')
-    .forEach(name => Object.defineProperty(funcProto, snakeCase(name), {value: funcProto[name], ...classFuncDescriptors}));
-});
-
-snoowrap.errors = errors;
-snoowrap.version = VERSION;
-
 if (!module.parent && isBrowser) { // check if the code is being run in a browser through browserify, etc.
-  snoowrap._previousSnoowrap = global[MODULE_NAME];
-  global[MODULE_NAME] = snoowrap;
+  snoowrap._previousSnoowrap = global[MODULE_NAME]
+  global[MODULE_NAME] = snoowrap
 }
 
 export default snoowrap

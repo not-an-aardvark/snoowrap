@@ -108,6 +108,7 @@ export default class Submission extends VoteableContent<Submission> {
   visited: boolean;
   whitelist_status: string;
   wls: number;
+  _children: any;
 
   assignFlair(options: { text: string; cssClass: string; }): Promise<this>;
   disableContestMode(): Promise<this>;

@@ -9,7 +9,7 @@ export {default as PrivateMessage} from './PrivateMessage.js';
 export {default as Subreddit} from './Subreddit.js';
 export {default as MultiReddit} from './MultiReddit.js';
 export {default as WikiPage} from './WikiPage.js';
-export {default as Listing} from './Listing.js';
+export {default as Listing} from './Listing';
 export {default as More} from './More.js';
 export {default as UserList} from './UserList.js';
 export {default as ModmailConversation} from './ModmailConversation.js';

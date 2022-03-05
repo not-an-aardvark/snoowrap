@@ -33,14 +33,14 @@ export const KINDS = {
   LabeledMulti: 'MultiReddit',
   ModmailConversation: 'ModmailConversation',
   ModmailConversationAuthor: 'ModmailConversationAuthor'
-}
+} as const
 export const USERNAME_REGEX = /^[\w-]{1,20}$/
 export const SUBMISSION_ID_REGEX = /comments\/(.+?)\//
 export const PLACEHOLDER_REGEX = /{(\w+)}/g
 export const MODERATOR_PERMISSIONS = ['wiki', 'posts', 'access', 'mail', 'config', 'flair']
 export const LIVETHREAD_PERMISSIONS = ['update', 'edit', 'manage']
-export const HTTP_VERBS = ['delete', 'get', 'head', 'patch', 'post', 'put']
-export const IDEMPOTENT_HTTP_VERBS = ['delete', 'get', 'head', 'put']
+export const HTTP_VERBS = ['delete', 'get', 'head', 'patch', 'post', 'put'] as const
+export const IDEMPOTENT_HTTP_VERBS = ['delete', 'get', 'head', 'put'] as const
 export const MAX_TOKEN_LATENCY = 10000
 export const MAX_API_INFO_AMOUNT = 100
 export const MAX_API_MORECHILDREN_AMOUNT = 20

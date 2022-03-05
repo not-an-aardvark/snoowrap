@@ -14,8 +14,8 @@ import {rateLimitWarning, RateLimitError} from './errors'
  * This class neither contains API methods nor transforms API responses into populated objects.
  * Use {@link snoowrap} instead.
  */
-export default interface BaseRequester extends All {}
-export default class BaseRequester {
+interface BaseRequester extends All {}
+class BaseRequester {
   scope?: string[]
   tokenExpiration = Infinity
   ratelimitRemaining = Infinity
@@ -46,7 +46,7 @@ export default class BaseRequester {
     this.redirect_uri = options.redirect_uri
     this.user_agent = isBrowser ? self.navigator.userAgent : options.user_agent || requiredArg('user_agent')
     this.device_id = options.device_id || DEVICE_ID
-    this.grant_type = options.grant_type || this.grantTypes.INSTALLED_CLIENT
+    this.grant_type = options.grant_type || BaseRequester.grantTypes.INSTALLED_CLIENT
     this.scope = undefined
     this.tokenExpiration = Infinity
     this.ratelimitRemaining = Infinity
@@ -62,7 +62,7 @@ export default class BaseRequester {
    * @summary Returns the grant types available for authentication
    * @returns The enumeration of possible grant_type values
    */
-  get grantTypes() {
+  static get grantTypes() {
     return { ...GRANT_TYPES }
   }
 
@@ -189,7 +189,7 @@ export default class BaseRequester {
    * // equivalent to:
    * r.getTop({time: 'all'})
    */
-  async oauthRequest(config: AxiosRequestConfig, attempts = 1): Promise<AxiosResponse> {
+  async oauthRequest(config: AxiosRequestConfig, attempts = 1): Promise<any> {
     try {
       await this._awaitRatelimit()
       await this._awaitRequestDelay()
@@ -353,19 +353,19 @@ export default class BaseRequester {
 
       if (this.refresh_token) {
         form = {
-          grant_type: this.grantTypes.REFRESH_TOKEN,
+          grant_type: BaseRequester.grantTypes.REFRESH_TOKEN,
           refresh_token: this.refresh_token
         }
       } else if (this.username && this.password) {
         const password = this.two_factor_code ? `${this.password}:${this.two_factor_code}` : this.password
         form = {
-          grant_type: this.grantTypes.PASSWORD,
+          grant_type: BaseRequester.grantTypes.PASSWORD,
           username: this.username,
           password
         }
       } else if (this.code && this.redirect_uri) {
         form = {
-          grant_type: this.grantTypes.AUTHORIZATION_CODE,
+          grant_type: BaseRequester.grantTypes.AUTHORIZATION_CODE,
           code: this.code,
           redirect_uri: this.redirect_uri
         }
@@ -482,3 +482,5 @@ export default class BaseRequester {
   axiosCreate = axiosCreate
   rawRequest = this.axiosCreate()
 }
+
+export default BaseRequester

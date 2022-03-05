@@ -62,6 +62,7 @@
     "@babel/plugin-transform-template-literals": "^7.0.0",
     "@babel/plugin-transform-typescript": "^7.0.0",
     "@babel/register": "^7.5.5",
+    "@types/lodash": "^4.14.179",
     "@types/request": "^2.48.2",
     "@typescript-eslint/eslint-plugin": "^1.13.0",
     "@typescript-eslint/parser": "^1.13.0",
