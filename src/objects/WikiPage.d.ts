@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Listing, { ListingOptions } from './Listing';
 import RedditContent from './RedditContent';
 import RedditUser from './RedditUser';

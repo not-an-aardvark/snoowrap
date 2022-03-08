@@ -1,4 +1,3 @@
-// @ ts-nocheck
 import {defaults, isEmpty, omit, omitBy} from 'lodash'
 import path from 'path';
 import stream from 'stream';

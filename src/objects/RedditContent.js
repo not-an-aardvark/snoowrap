@@ -2,7 +2,7 @@ import {cloneDeep, mapValues, pick} from 'lodash';
 import util from 'util';
 import {defineInspectFunc} from '../helpers.js';
 import {HTTP_VERBS, USER_KEYS, SUBREDDIT_KEYS} from '../constants';
-import Listing from './Listing.js';
+import Listing from './Listing';
 
 /**
  * A base class for content from reddit. With the expection of Listings, all content types extend this class.

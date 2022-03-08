@@ -93,18 +93,25 @@ tree so that replies are threaded properly.
 * @api private
 */
 export function buildRepliesTree (childList) {
-  const childMap = keyBy(childList, 'name');
-  childList.forEach(addEmptyRepliesListing);
-  childList.filter(child => child.constructor._name === 'Comment').forEach(child => child.replies._more = emptyMoreObject);
-  remove(childList, child => childMap[child.parent_id]).forEach(child => {
-    if (child.constructor._name === 'More') {
-      childMap[child.parent_id].replies._setMore(child);
-      child.link_id = childMap[child.parent_id].link_id;
-    } else {
-      childMap[child.parent_id].replies.push(child);
+  const childMap = {}
+  childList.forEach(child => {
+    childMap[child.name] = child
+    if (child.constructor._name !== 'More') addEmptyRepliesListing(child)
+    if (child.constructor._name === 'Comment') child.replies._more = emptyMoreObject()
+  })
+  const childItems = childList.filter(child => {
+    if (childMap[child.parent_id]) {
+      if (child.constructor._name === 'More') {
+        childMap[child.parent_id].replies._setMore(child)
+        child.link_id = childMap[child.parent_id].link_id
+      } else {
+        childMap[child.parent_id].replies.push(child)
+      }
+      return false
     }
-  });
-  return childList;
+    return true
+  })
+  return childItems
 }
 
 /**

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Sort } from '../snoowrap';
 import Comment from './Comment';
 import Listing, { ListingOptions } from './Listing';

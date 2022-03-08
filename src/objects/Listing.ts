@@ -1,33 +1,34 @@
 import util from 'util'
-import URL from '../helpers/URL'
+// @ts-ignore
 import {defineInspectFunc} from '../helpers'
-import {InvalidMethodCallError} from '../errors'
+import URL from '../helpers/URL'
+import snoowrap from '../snoowrap'
 import More, {emptyChildren} from './More'
 import RedditContent from './RedditContent'
 import Comment from './Comment'
-import snoowrap from '../snoowrap'
+import {InvalidMethodCallError} from '../errors'
 import {HTTP_VERBS} from '../constants'
 
-export interface ListingProps<T extends RedditContent> {
+export interface ListingProps {
   _query: {
     after?: string|null
     before?: string|null
     [key: string]: any
   },
-  _transform: (value: Listing<T>) => Listing<T>,
+  _transform: (value: Listing<any>) => Listing<any>,
   _method: typeof HTTP_VERBS[number],
   _isCommentList: boolean,
   _link_id?: string,
   _uri?: string,
   _more?: More,
-  _cachedLookahead: T[]
+  _cachedLookahead: Comment[]
   _children: {[id: string]: Comment}
 }
 
-export interface Options<T extends RedditContent> extends Partial<ListingProps<T>> {
+export interface Options extends Partial<ListingProps> {
   after: string|null
   before: string|null
-  children: T[]
+  children: any[]
   dist: number
   geo_filter: string|null
   modhash: string|null
@@ -76,8 +77,8 @@ export interface SortedListingOptions extends ListingOptions {
  * <style> #Listing {display: none} </style>
  * @extends Array
  */
-interface Listing<T> extends ListingProps<T> {}
-class Listing<T extends RedditContent> extends Array<T> {
+interface Listing<T> extends ListingProps {}
+class Listing<T extends RedditContent<T>> extends Array<T> {
   _r: snoowrap
 
   constructor (
@@ -89,7 +90,7 @@ class Listing<T extends RedditContent> extends Array<T> {
       _children = {},
       children = [],
       ...options
-    } : Partial<Options<T>> = {},
+    } : Partial<Options>,
     _r: snoowrap
   ) {
     super()
@@ -119,7 +120,7 @@ class Listing<T extends RedditContent> extends Array<T> {
     this._children = _children
 
     if (children && children[children.length - 1] instanceof More) {
-      this._setMore(this.pop())
+      this._setMore(children.pop())
     }
   }
 
@@ -169,15 +170,15 @@ class Listing<T extends RedditContent> extends Array<T> {
    * @summary Fetches some more items
    * @param options Object of fetching options or the number of items to fetch.
    * @param options.amount The number of items to fetch.
-   * @param options.skipReplies For a Listing that contains comment objects on a Submission, this option can
+   * @param {boolean} [options.append=true] If `true`, the resulting Listing will contain the existing elements in addition to
+   * the newly-fetched elements. If `false`, the resulting Listing will only contain the newly-fetched elements.
+   * @param {boolean} [options.skipReplies=false] For a Listing that contains comment objects on a Submission, this option can
    * be used to save a few API calls, provided that only top-level comments are being examined. If this is set to `true`, snoowrap
    * is able to fetch 100 Comments per API call rather than 20, but all returned Comments will have no fetched replies by default.
    *
    * Internal details: When `skipReplies` is set to `true`, snoowrap uses reddit's `api/info` endpoint to fetch Comments. When
    * `skipReplies` is set to `false`, snoowrap uses reddit's `api/morechildren` endpoint. It's worth noting that reddit does
    * not allow concurrent requests to the `api/morechildren` endpoint by the same account.
-   * @param options.append If `true`, the resulting Listing will contain the existing elements in addition to
-   * the newly-fetched elements. If `false`, the resulting Listing will only contain the newly-fetched elements.
    * @returns A new Listing containing the newly-fetched elements. If `options.append` is `true`, the new Listing will
    * also contain all elements that were in the original Listing. Under most circumstances, the newly-fetched elements will appear
    * at the end of the new Listing. However, if reverse pagination is enabled (i.e. if this Listing was created with a `before`
@@ -205,7 +206,7 @@ class Listing<T extends RedditContent> extends Array<T> {
     }
     if (this._cachedLookahead) {
       const cloned = this._clone()
-      cloned.push(...cloned._cachedLookahead.splice(0, amount))
+      cloned.push(...<unknown>cloned._cachedLookahead.splice(0, amount) as T[])
       return cloned.fetchMore(amount - cloned.length + this.length)
     }
     const parsedOptions = {amount, append, skipReplies}
@@ -227,7 +228,7 @@ class Listing<T extends RedditContent> extends Array<T> {
   }
 
   async _fetchMoreRegular (options: FetchMoreOptions) {
-    const query: ListingProps<T>['_query'] = {}
+    const query: ListingProps['_query'] = {}
     for (const key of Object.keys(this._query)) {
       const value = this._query[key]
       if (value !== null && value !== undefined) query[key] = value
@@ -270,9 +271,9 @@ class Listing<T extends RedditContent> extends Array<T> {
       cloned._query.after = response._query.after
     }
     if (this._isCommentList) {
-      cloned._more = cloned._more || response._more || emptyChildren
+      cloned._more = cloned._more || response._more || emptyChildren(this._r)
       if (response.length > options.amount) {
-        cloned._cachedLookahead = Array.from(cloned.splice(options.amount))
+        cloned._cachedLookahead = <unknown>Array.from(cloned.splice(options.amount)) as Comment[]
       }
     }
     cloned._children = {...cloned._children, ...response._children}
@@ -285,23 +286,24 @@ class Listing<T extends RedditContent> extends Array<T> {
    * in the thread.
    */
   async _fetchMoreComments (options: FetchMoreOptions) {
+    if (!this._more) throw new InvalidMethodCallError('Failed to fetch more comments. (More object is missing)')
     const moreComments = await this._more.fetchMore(options)
     const children = moreComments._children
     const cloned = this._clone()
     if (!options.append) cloned._empty()
     // Rebuild comments listing since Reddit doesn't return it in the right order sometimes
-    for (const id of cloned._more.children.splice(0, options.amount)) {
+    for (const id of cloned._more!.children.splice(0, options.amount)) {
       const comment = children[id]
       // Ignore comments removed from listing
-      if (comment) cloned.push(comment)
+      if (comment) cloned.push(<unknown>comment as T)
     }
     cloned._children = {...cloned._children, ...children}
-    cloned._more.children = cloned._more.children.slice(options.amount)
+    cloned._more!.children = cloned._more!.children.slice(options.amount)
     return cloned
   }
 
   _clone ({deep = false} = {}): Listing<T> {
-    const properties: Partial<Options<T>> = {
+    const properties: Partial<Options> = {
       _query: {...this._query},
       _transform: this._transform,
       _method: this._method,
@@ -316,8 +318,8 @@ class Listing<T extends RedditContent> extends Array<T> {
       properties.children = Array.from(this)
       return new Listing(properties, this._r)
     }
-    const children: Listing<T> = this._r._populate(this.toJSON())
-    properties._children = children._children
+    properties._children = {}
+    const children: Listing<T> = this._r._populate(this.toJSON(), properties._children)
     properties.children = children
     return new Listing(properties, this._r)
   }
