@@ -206,6 +206,7 @@ const Listing = class Listing extends Array {
       }
     }
     cloned._children = children;
+    cloned._more.children = cloned._more.children.slice(options.amount);
     return cloned;
   }
   /**
