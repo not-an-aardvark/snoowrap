@@ -1,5 +1,4 @@
 import util from 'util'
-// @ts-ignore
 import {defineInspectFunc} from '../helpers'
 import URL from '../helpers/URL'
 import snoowrap from '../snoowrap'
@@ -8,6 +7,7 @@ import RedditContent from './RedditContent'
 import Comment from './Comment'
 import {InvalidMethodCallError} from '../errors'
 import {HTTP_VERBS} from '../constants'
+import {Children} from '../interfaces'
 
 export interface ListingProps {
   _query: {
@@ -77,8 +77,11 @@ export interface SortedListingOptions extends ListingOptions {
  * <style> #Listing {display: none} </style>
  * @extends Array
  */
-interface Listing<T> extends ListingProps {}
+interface Listing<T extends RedditContent<T>> extends ListingProps {}
 class Listing<T extends RedditContent<T>> extends Array<T> {
+  ['constructor']: typeof Listing
+  static _name = 'Listing' as const
+
   _r: snoowrap
 
   constructor (
@@ -302,7 +305,12 @@ class Listing<T extends RedditContent<T>> extends Array<T> {
     return cloned
   }
 
-  _clone ({deep = false} = {}): Listing<T> {
+  _empty () {
+    this.splice(0, this.length)
+    return this
+  }
+
+  _clone (deep = false, _children: Children = {}) {
     const properties: Partial<Options> = {
       _query: {...this._query},
       _transform: this._transform,
@@ -318,15 +326,9 @@ class Listing<T extends RedditContent<T>> extends Array<T> {
       properties.children = Array.from(this)
       return new Listing(properties, this._r)
     }
-    properties._children = {}
-    const children: Listing<T> = this._r._populate(this.toJSON(), properties._children)
-    properties.children = children
+    properties._children = _children
+    properties.children = Array.from(this).map(item => item && item._clone ? item._clone(deep, _children) : item)
     return new Listing(properties, this._r)
-  }
-
-  _empty () {
-    this.splice(0, this.length)
-    return this
   }
 
   toJSON () {
@@ -334,8 +336,7 @@ class Listing<T extends RedditContent<T>> extends Array<T> {
   }
 }
 
-defineInspectFunc(Listing.prototype, function () {
-  // @ts-ignore
+defineInspectFunc(Listing.prototype, function (this: Listing<any>) { // Fake param
   return `Listing ${util.inspect(Array.from(this))}`
 })
 

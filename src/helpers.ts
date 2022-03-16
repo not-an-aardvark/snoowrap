@@ -1,7 +1,7 @@
 import util from 'util';
-import {find, includes, isEmpty, keyBy, omit, partial, property, remove, snakeCase} from 'lodash';
+import {find, includes, isEmpty, omit, partial, property, snakeCase} from 'lodash';
 import {MODERATOR_PERMISSIONS, LIVETHREAD_PERMISSIONS} from './constants';
-import {emptyChildren as emptyMoreObject} from './objects/More.js';
+import {emptyChildren as emptyMoreObject} from './objects/More';
 
 /**
 * @summary Returns an unfetched empty replies Listing for an item.
@@ -94,11 +94,11 @@ tree so that replies are threaded properly.
 */
 export function buildRepliesTree (childList) {
   const childMap = {}
-  childList.forEach(child => {
+  for (const child of childList) {
     childMap[child.name] = child
     if (child.constructor._name !== 'More') addEmptyRepliesListing(child)
     if (child.constructor._name === 'Comment') child.replies._more = emptyMoreObject()
-  })
+  }
   const childItems = childList.filter(child => {
     if (childMap[child.parent_id]) {
       if (child.constructor._name === 'More') {

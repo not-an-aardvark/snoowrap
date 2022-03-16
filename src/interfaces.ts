@@ -1,39 +1,6 @@
-import defaultConfig from './defaultConfig'
+import {Comment} from './objects'
 
-export interface Common {
-  redirect_uri?: string
-  user_agent?: string
-  device_id?: string
-  grant_type?: string
-  config?: typeof defaultConfig
-}
-
-export interface AppAuth extends Common {
-  client_id: string
-  client_secret?: string
-  refresh_token?: string
-  access_token?: string
-}
-
-export interface ScriptAuth extends Common {
-  client_id: string
-  client_secret: string
-  username: string
-  password: string
-  two_factor_code?: number | string
-  access_token?: string
-}
-
-export interface CodeAuth extends Common {
-  client_id: string
-  client_secret?: string
-  code: string
-  redirect_uri: string
-}
-
-export interface All extends Common, Partial<AppAuth>, Partial<ScriptAuth>, Partial<CodeAuth> {}
-
-export interface credentialsResponse {
+export interface CredentialsResponse {
   access_token: string
   expires_in: number
   refresh_token: string
@@ -41,4 +8,8 @@ export interface credentialsResponse {
   token_type: string,
   error: string
   error_description: string
+}
+
+export interface Children {
+  [key: string]: Comment
 }

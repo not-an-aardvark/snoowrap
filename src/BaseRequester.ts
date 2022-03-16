@@ -1,16 +1,49 @@
-import {Common, AppAuth, ScriptAuth, CodeAuth, All, credentialsResponse} from './interfaces'
-import axiosCreate, {AxiosRequestConfig, AxiosResponse, AxiosError} from './axios'
+import {CredentialsResponse} from './interfaces'
+import axiosCreate, {AxiosRequestConfig, AxiosResponse, AxiosError} from './axiosCreate'
 import isBrowser from './helpers/isBrowser'
 import requiredArg from './helpers/requiredArg'
 import defaultConfig from './defaultConfig'
 import {GRANT_TYPES, DEVICE_ID, IDEMPOTENT_HTTP_VERBS, MAX_TOKEN_LATENCY} from './constants'
 import {rateLimitWarning, RateLimitError} from './errors'
 
+interface Common {
+  redirect_uri?: string
+  user_agent?: string
+  device_id?: string
+  grant_type?: string
+  config?: typeof defaultConfig
+}
+
+interface AppAuth extends Common {
+  client_id: string
+  client_secret?: string
+  refresh_token?: string
+  access_token?: string
+}
+
+interface ScriptAuth extends Common {
+  client_id: string
+  client_secret: string
+  username: string
+  password: string
+  two_factor_code?: number | string
+  access_token?: string
+}
+
+interface CodeAuth extends Common {
+  client_id: string
+  client_secret?: string
+  code: string
+  redirect_uri: string
+}
+
+interface All extends Common, Partial<AppAuth>, Partial<ScriptAuth>, Partial<CodeAuth> {}
+
 /**
  * The BaseRequester class.
  * This is an internal class that is responsible for authentication stuff, sending API requests to Reddit,
  * and other basic functionalities needed by snoowrap.
- * 
+ *
  * This class neither contains API methods nor transforms API responses into populated objects.
  * Use {@link snoowrap} instead.
  */
@@ -21,20 +54,20 @@ class BaseRequester {
   ratelimitRemaining = Infinity
   ratelimitExpiration = Infinity
   _nextRequestTimestamp = -Infinity
-  _config = { ...defaultConfig }
+  _config = {...defaultConfig}
 
-  constructor(options?: AppAuth)
-  constructor(options?: ScriptAuth)
-  constructor(options?: CodeAuth)
-  constructor(options?: Common)
-  constructor(options: All = {}) {
+  constructor (options?: AppAuth)
+  constructor (options?: ScriptAuth)
+  constructor (options?: CodeAuth)
+  constructor (options?: Common)
+  constructor (options: All = {}) {
     this.setOptions(options)
   }
 
   /**
    * @summary A method use to set/update requester options
    */
-  setOptions(options: All) {
+  setOptions (options: All) {
     this.client_id = options.client_id
     this.client_secret = options.client_secret || ''
     this.refresh_token = options.refresh_token
@@ -62,14 +95,14 @@ class BaseRequester {
    * @summary Returns the grant types available for authentication
    * @returns The enumeration of possible grant_type values
    */
-  static get grantTypes() {
-    return { ...GRANT_TYPES }
+  static get grantTypes () {
+    return {...GRANT_TYPES}
   }
 
   /**
    * @summary An internal method to objectify reddit api responses
    */
-  _populate(response: AxiosResponse) {
+  _populate (response: AxiosResponse) {
     return response
   }
 
@@ -145,11 +178,11 @@ class BaseRequester {
       `https://www.${this._config.endpointDomain}/api/v1/authorize`,
       `${compact ? '.compact' : ''}`,
       `?client_id=${encodeURIComponent(client_id)}`,
-      `&response_type=code`,
+      '&response_type=code',
       `&state=${encodeURIComponent(state)}`,
       `&redirect_uri=${encodeURIComponent(redirect_uri)}`,
       `&duration=${permanent ? 'permanent' : 'temporary'}`,
-      `&scope=${encodeURIComponent(scope.join(' '))}`,
+      `&scope=${encodeURIComponent(scope.join(' '))}`
     ].join('')
   }
 
@@ -189,7 +222,7 @@ class BaseRequester {
    * // equivalent to:
    * r.getTop({time: 'all'})
    */
-  async oauthRequest(config: AxiosRequestConfig, attempts = 1): Promise<any> {
+  async oauthRequest (config: AxiosRequestConfig, attempts = 1): Promise<any> {
     try {
       await this._awaitRatelimit()
       await this._awaitRequestDelay()
@@ -221,7 +254,7 @@ class BaseRequester {
       )
 
       return this._populate(response)
-    } catch(e) {
+    } catch (e) {
       const err = <AxiosError>e
       this._debug('Error:', {err})
 
@@ -259,7 +292,7 @@ class BaseRequester {
     }
   }
 
-  _awaitRatelimit() {
+  _awaitRatelimit () {
     if (this.ratelimitRemaining < 1 && Date.now() < this.ratelimitExpiration) {
       // If the ratelimit has been exceeded, delay or abort the request depending on the user's config.
       if (this._config.continueAfterRatelimitError) {
@@ -277,14 +310,14 @@ class BaseRequester {
     // If the ratelimit hasn't been exceeded, no delay is necessary.
   }
 
-  _awaitRequestDelay() {
+  _awaitRequestDelay () {
     const now = Date.now()
     const waitTime = this._nextRequestTimestamp - now
     this._nextRequestTimestamp = Math.max(now, this._nextRequestTimestamp) + this._config.requestDelay
     return new Promise(resolve => setTimeout(resolve, waitTime))
   }
 
-  _awaitExponentialBackoff(attempts: number) {
+  _awaitExponentialBackoff (attempts: number) {
     if (attempts === 1) {
       return
     }
@@ -319,7 +352,7 @@ class BaseRequester {
    * @memberof snoowrap
    * @instance
    */
-  credentialedClientRequest(config: AxiosRequestConfig) {
+  credentialedClientRequest (config: AxiosRequestConfig) {
     if (!this.client_id) {
       throw new Error('Missing access_token')
     }
@@ -347,7 +380,7 @@ class BaseRequester {
    * @instance
    * @example r.updateAccessToken()
    */
-  async updateAccessToken() {
+  async updateAccessToken () {
     if (!this.access_token || Date.now() > this.tokenExpiration) {
       let form: AxiosRequestConfig['form']
 
@@ -389,7 +422,7 @@ class BaseRequester {
         scope,
         error,
         error_description
-      }: credentialsResponse = response.data
+      }: CredentialsResponse = response.data
 
       if (error) throw new Error(error_description ? `${error} - ${error_description}` : error)
 
@@ -454,7 +487,7 @@ class BaseRequester {
    * @memberof snoowrap
    * @instance
    */
-  unauthenticatedRequest(config: AxiosRequestConfig) {
+  unauthenticatedRequest (config: AxiosRequestConfig) {
     return this.axiosCreate({
       baseURL: 'https://www.reddit.com',
       headers: {
@@ -468,19 +501,38 @@ class BaseRequester {
     })(config)
   }
 
-  get request() {
+  get request () {
     return this.client_id || this.access_token ? this.oauthRequest : this.unauthenticatedRequest
   }
 
-  _get(config: AxiosRequestConfig) { config.method = "GET"; return this.request(config) }
-  _post(config: AxiosRequestConfig) { config.method = "POST"; return this.request(config) }
-  _put(config: AxiosRequestConfig) { config.method = "PUT"; return this.request(config) }
-  _delete(config: AxiosRequestConfig) { config.method = "DELETE"; return this.request(config) }
-  _head(config: AxiosRequestConfig) { config.method = "HEAD"; return this.request(config) }
-  _patch(config: AxiosRequestConfig) { config.method = "PATCH"; return this.request(config) }
+  _get (config: AxiosRequestConfig) {
+    config.method = 'GET'
+    return this.request(config)
+  }
+  _post (config: AxiosRequestConfig) {
+    config.method = 'POST'
+    return this.request(config)
+  }
+  _put (config: AxiosRequestConfig) {
+    config.method = 'PUT'
+    return this.request(config)
+  }
+  _delete (config: AxiosRequestConfig) {
+    config.method = 'DELETE'
+    return this.request(config)
+  }
+  _head (config: AxiosRequestConfig) {
+    config.method = 'HEAD'
+    return this.request(config)
+  }
+  _patch (config: AxiosRequestConfig) {
+    config.method = 'PATCH'
+    return this.request(config)
+  }
 
   axiosCreate = axiosCreate
   rawRequest = this.axiosCreate()
 }
 
 export default BaseRequester
+export {Common, AppAuth, ScriptAuth, CodeAuth, All}

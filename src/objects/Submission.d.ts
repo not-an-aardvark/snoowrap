@@ -1,9 +1,9 @@
 // @ts-nocheck
-import { Sort } from '../snoowrap';
+import {Sort} from '../snoowrap';
 import Comment from './Comment';
-import Listing, { ListingOptions } from './Listing';
-import { FlairTemplate } from './Subreddit';
-import VoteableContent, { RichTextFlair } from './VoteableContent';
+import Listing, {ListingOptions} from './Listing';
+import {FlairTemplate} from './Subreddit';
+import VoteableContent, {RichTextFlair} from './VoteableContent';
 
 interface Media {
   oembed?: {

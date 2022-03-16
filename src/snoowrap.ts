@@ -1,81 +1,27 @@
 import {defaults, isEmpty, omit, omitBy} from 'lodash'
-import path from 'path';
-import stream from 'stream';
-import {createReadStream} from 'fs';
-import {KINDS, MAX_LISTING_ITEMS, MODULE_NAME, USER_KEYS, SUBREDDIT_KEYS, VERSION, MIME_TYPES, SUBMISSION_ID_REGEX, MEDIA_TYPES, PLACEHOLDER_REGEX} from './constants'
+import path from 'path'
+import stream from 'stream'
+import {createReadStream} from 'fs'
+import BaseRequester, {Common, AppAuth, ScriptAuth, CodeAuth, All} from './BaseRequester'
+import {AxiosResponse} from './axiosCreate'
+import defaultObjects from './defaultObjects'
+import * as objects from './objects'
 import * as errors from './errors'
-import {
-  addEmptyRepliesListing,
-  addFullnamePrefix,
-  handleJsonErrors,
-  isBrowser,
-  requiredArg
-} from './helpers.js'
-
-import * as objects from './objects/index.js'
-import BaseRequester from './BaseRequester'
-import {AxiosResponse} from './axios'
+import {KINDS, MAX_LISTING_ITEMS, MODULE_NAME, USER_KEYS, SUBREDDIT_KEYS, VERSION, MIME_TYPES, SUBMISSION_ID_REGEX, MEDIA_TYPES, PLACEHOLDER_REGEX} from './constants'
+import {addEmptyRepliesListing, addFullnamePrefix, handleJsonErrors} from './helpers'
+import isBrowser from './helpers/isBrowser'
+import requiredArg from './helpers/requiredArg'
+import isAxiosResponse from './helpers/isAxiosResponse'
+import isContentTree, {ContentTree} from './helpers/isContentTree'
+import isSubmissionTree, {SubmissionTree} from './helpers/isSubmissionTree'
+import FormData from './helpers/FormData'
+import WebSocket from './helpers/WebSocket'
+import {Children} from './interfaces'
 import MediaFile, {MediaImg, MediaVideo, MediaGif} from './objects/MediaFile'
 
 const fetch = self.fetch
 const Blob = self.Blob
-const FormData = isBrowser ? self.FormData : require('form-data');
-const WebSocket = isBrowser ? self.WebSocket : require('ws');
-
 const api_type = 'json'
-
-
-const isAxiosResponse = (obj: any) => {
-  if (
-    obj.data &&
-    obj.status &&
-    obj.statusText &&
-    obj.headers &&
-    obj.config
-  ) {
-    return true
-  }
-  return false
-}
-
-interface ContentTree {
-  kind: keyof typeof KINDS
-  data: any
-}
-
-const isContentTree = (obj: any) => {
-  if (
-    Object.keys(obj).length === 2 &&
-    obj.kind &&
-    obj.data
-  ) {
-    return true
-  }
-  return false
-}
-
-interface SubmissionTree {
-  0: objects.Listing<objects.Submission>,
-  1: objects.Listing<objects.Comment>
-}
-
-const isSubmissionTree = (obj: any) => {
-  if (
-    Array.isArray(obj) &&
-    obj.length === 2 &&
-    obj[0] instanceof snoowrap.objects.Listing &&
-    obj[0][0] instanceof snoowrap.objects.Submission &&
-    obj[1] instanceof snoowrap.objects.Listing
-  ) {
-    return true
-  }
-  return false
-}
-
-interface Children {
-  [key: string]: objects.Comment
-}
-
 
 /**
  * The class for a snoowrap requester.
@@ -90,18 +36,18 @@ interface Children {
  * exposed since they are useful externally as well.
  */
 class snoowrap extends BaseRequester {
+  static _previousSnoowrap: typeof snoowrap
   static errors = errors
   static version = VERSION
-  static objects = {...objects}
+  static objects = {...defaultObjects, ...objects}
 
   _newObject (
-    objectType: typeof KINDS[keyof typeof KINDS] | 'RedditContent',
+    objectType: keyof typeof snoowrap.objects,
     content: any,
     _hasFetched = false
   ) {
     if (Array.isArray(content)) return content
-    let object = snoowrap.objects[objectType as keyof typeof snoowrap.objects]
-    if (!object) object = snoowrap.objects.RedditContent
+    const object: any = snoowrap.objects[objectType] || snoowrap.objects.RedditContent
     return new object(content, this, _hasFetched)
   }
 
@@ -135,7 +81,7 @@ class snoowrap extends BaseRequester {
       return populated
     }
 
-    Object.keys(responseTree).forEach(key => {
+    for (const key of Object.keys(responseTree)) {
       const value = responseTree[key]
       // Maps {author: 'some_username'} to {author: RedditUser { name: 'some_username' } }
       if (value !== null && USER_KEYS.has(key)) {
@@ -145,7 +91,7 @@ class snoowrap extends BaseRequester {
         responseTree[key] = this._newObject('Subreddit', {display_name: value})
       }
       responseTree[key] = this._populate(value, children)
-    })
+    }
 
     if (isSubmissionTree(responseTree)) {
       const submissionTree: SubmissionTree = responseTree
@@ -2260,16 +2206,15 @@ class snoowrap extends BaseRequester {
    * @example var snoowrap = window.snoowrap.noConflict();
    */
   static noConflict () {
-    if (isBrowser) {
-      global[MODULE_NAME] = this._previousSnoowrap;
-    }
-    return this;
+    if (isBrowser) (self as any)[MODULE_NAME] = this._previousSnoowrap
+    return snoowrap
   }
 }
 
 if (!module.parent && isBrowser) { // check if the code is being run in a browser through browserify, etc.
-  snoowrap._previousSnoowrap = global[MODULE_NAME]
-  global[MODULE_NAME] = snoowrap
+  snoowrap._previousSnoowrap = (self as any)[MODULE_NAME]
+  ;(self as any)[MODULE_NAME] = snoowrap
 }
 
 export default snoowrap
+export {Common, AppAuth, ScriptAuth, CodeAuth, All}

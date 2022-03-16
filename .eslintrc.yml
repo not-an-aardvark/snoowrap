@@ -29,7 +29,7 @@ rules:
   no-eval: error
   no-extra-bind: error
   no-extra-label: error
-  no-extra-parens: [error, all, {nestedBinaryExpressions: false}]
+  no-extra-parens: off
   no-floating-decimal: error
   no-global-assign: error
   no-implied-eval: error
@@ -45,6 +45,7 @@ rules:
   no-octal-escape: error
   no-proto: error
   no-prototype-builtins: error
+  no-redeclare: off
   no-restricted-properties: [error, {object: describe, property: only}, {object: it, property: only}]
   no-script-url: error
   no-self-compare: error
@@ -53,6 +54,7 @@ rules:
   no-tabs: error
   no-template-curly-in-string: error
   no-trailing-spaces: error
+  no-undef: off # TypeScript will handle this
   no-unneeded-ternary: error
   no-unsafe-negation: error
   no-unused-expressions: error
@@ -98,6 +100,8 @@ rules:
   promise/catch-or-return: error
   promise/no-return-wrap: error
   promise/param-names: error
+  '@typescript-eslint/no-extra-parens': [error, all, {nestedBinaryExpressions: false}]
+  '@typescript-eslint/no-redeclare': error
   '@typescript-eslint/no-unused-vars': error
 
 extends:
@@ -105,6 +109,7 @@ extends:
   - plugin:import/errors
   - plugin:import/warnings
   - plugin:import/typescript
+
 plugins:
   - import
   - promise

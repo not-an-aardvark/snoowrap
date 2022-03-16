@@ -1,8 +1,12 @@
-import {cloneDeep, mapValues, pick} from 'lodash';
-import util from 'util';
-import {defineInspectFunc} from '../helpers.js';
-import {HTTP_VERBS, USER_KEYS, SUBREDDIT_KEYS} from '../constants';
-import Listing from './Listing';
+import util from 'util'
+import {defineInspectFunc} from '../helpers'
+import {USER_KEYS, SUBREDDIT_KEYS} from '../constants'
+import snoowrap from '../snoowrap'
+import Listing from './Listing'
+import Comment from './Comment'
+import RedditUser from './RedditUser'
+import Subreddit from './Subreddit.js'
+import {Children} from '../interfaces'
 
 /**
  * A base class for content from reddit. With the expection of Listings, all content types extend this class.
@@ -10,14 +14,27 @@ import Listing from './Listing';
  * instantiate it directly.
  * <style> #RedditContent {display: none} </style>
  */
-const RedditContent = class RedditContent {
-  constructor (options, _r, _hasFetched) {
+class RedditContent<T> {
+  ['constructor']: typeof RedditContent
+  static _name = 'RedditContent'
+
+  _r: snoowrap
+  _hasFetched: boolean
+  _fetch?: T
+  _uri?: string
+  [key: string]: any
+  created_utc: number = 0
+  created: number = 0
+  id: string = ''
+  name: string = ''
+
+  constructor (options: any, _r: snoowrap, _hasFetched = false) {
     // _r refers to the snoowrap requester that is used to fetch this content.
-    this._r = _r;
-    this._fetch = null;
-    this._hasFetched = !!_hasFetched;
-    Object.assign(this, options);
+    this._r = _r
+    this._hasFetched = _hasFetched
+    Object.assign(this, options)
   }
+
   /**
    * @summary Fetches this content from reddit.
    * @desc This will not mutate the original content object; all Promise properties will remain as Promises after the content has
@@ -45,12 +62,13 @@ const RedditContent = class RedditContent {
    */
   async fetch () {
     if (!this._fetch) {
-      let res = await this._r._get({url: this._uri});
-      res = this._transformApiResponse(res);
-      this._fetch = res;
+      let res = await this._r._get({url: this._uri})
+      res = this._transformApiResponse(res)
+      this._fetch = res
     }
-    return this._fetch;
+    return this._fetch
   }
+
   /**
    * @summary Refreshes this content.
    * @returns {Promise} A newly-fetched version of this content
@@ -68,9 +86,35 @@ const RedditContent = class RedditContent {
    * }, 10000);
    */
   refresh () {
-    this._fetch = null;
-    return this.fetch();
+    this._fetch = undefined
+    return this.fetch()
   }
+
+  _clone (deep = false, _children: Children = {}): T {
+    const clonedProps = this._cloneProps(deep, _children)
+    const name = this.constructor._name as keyof typeof snoowrap.objects
+    return this._r._newObject(name, clonedProps, this._hasFetched)
+  }
+
+  _cloneProps (deep = false, _children: Children = {}) {
+    const clonedProps: {[key: string]: any} = {}
+    for (const key of Object.keys(this)) {
+      let value = this[key]
+      if (deep) {
+        value = value instanceof RedditContent || value instanceof Listing
+          ? value._clone(deep, _children)
+          : typeof value === 'object' && value !== null
+            ? this._cloneProps.call(value, deep, _children)
+            : value
+      }
+      if (value instanceof Comment) {
+        _children[value.id] = value
+      }
+      clonedProps[key] = value
+    }
+    return clonedProps
+  }
+
   /**
    * @summary Returns a stringifyable version of this object.
    * @desc It is usually not necessary to call this method directly; simply running JSON.stringify(some_object) will strip the
@@ -82,46 +126,49 @@ const RedditContent = class RedditContent {
    * JSON.stringify(user) // => '{"name":"not_an_aardvark"}'
    */
   toJSON () {
-    return mapValues(this._stripPrivateProps(), (value, key) => {
+    const object: {[key: string]: any} = {}
+    for (const key of Object.keys(this)) {
+      if (key.startsWith('_')) continue
+      let value = this[key]
       if (value instanceof RedditContent && !value._hasFetched) {
-        if (value.constructor._name === 'RedditUser' && USER_KEYS.has(key)) {
-          return value.name;
-        }
-        if (value.constructor._name === 'Subreddit' && SUBREDDIT_KEYS.has(key)) {
-          return value.display_name;
-        }
+        if (value instanceof RedditUser && USER_KEYS.has(key)) value = value.name
+        if (value instanceof Subreddit && SUBREDDIT_KEYS.has(key)) value = value.display_name
       }
-      return value && value.toJSON ? value.toJSON() : value;
-    });
+      object[key] = value && value.toJSON ? value.toJSON() : value
+    }
+    return object
   }
-  _stripPrivateProps () {
-    return pick(this, Object.keys(this).filter(key => !key.startsWith('_')));
-  }
-  _transformApiResponse (response) {
-    return response;
-  }
-  _clone ({deep = false} = {}) {
-    const clonedProps = mapValues(this, value => {
-      if (deep) {
-        return value instanceof RedditContent || value instanceof Listing ? value._clone({deep}) : cloneDeep(value);
-      }
-      return value;
-    });
-    return this._r._newObject(this.constructor._name, clonedProps, this._hasFetched);
-  }
-  _getListing (...args) {
-    return this._r._getListing(...args);
-  }
-};
 
-defineInspectFunc(RedditContent.prototype, function () {
-  return `${this.constructor._name} ${util.inspect(this._stripPrivateProps())}`;
-});
+  _transformApiResponse (response: any) {
+    return response
+  }
 
-HTTP_VERBS.forEach(method => {
-  Object.defineProperty(RedditContent.prototype, `_${method}`, {value (...args) {
-    return this._r[`_${method}`](...args);
-  }, configurable: true, writable: true});
-});
+  get _getListing () {
+    return this._r._getListing
+  }
 
-export default RedditContent;
+  get _get () {
+    return this._r._get
+  }
+  get _post () {
+    return this._r._post
+  }
+  get _put () {
+    return this._r._put
+  }
+  get _delete () {
+    return this._r._delete
+  }
+  get _head () {
+    return this._r._head
+  }
+  get _patch () {
+    return this._r._patch
+  }
+}
+
+defineInspectFunc(RedditContent.prototype, function (this: RedditContent<any>) { // Fake param
+  return `${this.constructor._name} ${util.inspect(this)}`
+})
+
+export default RedditContent

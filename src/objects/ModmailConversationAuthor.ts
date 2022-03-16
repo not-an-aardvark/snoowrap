@@ -83,4 +83,4 @@ export default class ModmailConversationAuthor extends RedditContent<ModmailConv
   getUser (): Promise<RedditUser> {
     return this._r.getUser(this.name);
   }
-};
+}

@@ -1,4 +1,3 @@
-// @ts-ignore
 import {buildRepliesTree, handleJsonErrors} from '../helpers'
 import {MAX_API_INFO_AMOUNT, MAX_API_MORECHILDREN_AMOUNT} from '../constants'
 import Listing, {FetchMoreOptions} from './Listing'
