@@ -1,73 +1,76 @@
-import {USERNAME_REGEX} from '../constants';
-import {InvalidMethodCallError, InvalidUserError} from '../errors';
-import RedditContent from './RedditContent.js';
+import {USERNAME_REGEX} from '../constants'
+import {InvalidMethodCallError, InvalidUserError} from '../errors'
+import {RedditContent} from './'
 
 /**
  * A class representing a reddit user
  * <style> #RedditUser {display: none} </style>
- * @extends ReplyableContent
  * @example
  *
  * // Get a user with the given username
  * r.getUser('spez')
  */
-const RedditUser = class RedditUser extends RedditContent {
+class RedditUser extends RedditContent<RedditUser> {
   get _uri () {
     if (typeof this.name !== 'string' || !USERNAME_REGEX.test(this.name)) {
-      throw new InvalidUserError(this.name);
+      throw new InvalidUserError(this.name)
     }
-    return `user/${this.name}/about`;
+    return `user/${this.name}/about`
   }
+
   /**
    * @summary Gives reddit gold to a user
-   * @param {number} months The number of months of gold to give. This must be a number between 1 and 36.
-   * @returns {Promise} A Promise that fulfills when the request is complete
+   * @param months The number of months of gold to give. This must be a number between 1 and 36.
+   * @returns A Promise that fulfills when the request is complete
    * @example r.getUser('not_an_aardvark').giveGold(12)
    */
-  giveGold (months) {
+  giveGold (months: number) {
     /**
      * Ideally this would allow for more than 36 months by sending multiple requests, but I don't have the resources to test
      * that code, and it's probably better that such a big investment be deliberate anyway.
      */
     if (typeof months !== 'number' || months < 1 || months > 36) {
-      throw new InvalidMethodCallError('Invalid argument to RedditUser#giveGold; `months` must be between 1 and 36.');
+      throw new InvalidMethodCallError('Invalid argument to RedditUser#giveGold; `months` must be between 1 and 36.')
     }
-    return this._post({url: `api/v1/gold/give/${this.name}`, form: {months}});
+    return this._post({url: `api/v1/gold/give/${this.name}`, form: {months: months + ''}})
   }
+
   /**
    * Assigns flair to this user on a given subreddit (as a moderator).
    * @param {object} options
    * @param {string} options.subredditName The subreddit that flair should be assigned on
    * @param {string} [options.text=''] The text that the user's flair should have
    * @param {string} [options.cssClass=''] The CSS class that the user's flair should have
-   * @returns {Promise} A Promise that fulfills with the current user after the request is complete
+   * @returns A Promise that fulfills with the current user after the request is complete
    * @example r.getUser('not_an_aardvark').assignFlair({subredditName: 'snoowrap', text: "Isn't an aardvark"})
    */
-  async assignFlair (options) {
-    await this._r._assignFlair({...options, name: this.name});
-    return this;
+  async assignFlair (options: any) {
+    await this._r._assignFlair({...options, name: this.name})
+    return this
   }
+
   /**
    * @summary Adds this user as a friend, or modifies their friend note.
    * @desc **Note:** reddit.com only permits "notes" to be added on friends if the authenticated account has a subscription to
    * reddit gold.
-   * @param {object} options
-   * @param {string} [options.note] An optional note to add on the user (300 characters max)
-   * @returns {Promise} A Promise that fulfills when this request is complete
+   * @param note An optional note to add on the user (300 characters max)
+   * @returns A Promise that fulfills when this request is complete
    * @example r.getUser('actually_an_aardvark').friend({note: 'Is an aardvark'})
    */
-  async friend ({note} = {}) {
-    await this._put({url: `api/v1/me/friends/${this.name}`, data: {user: this.name, note}});
-    return this;
+  async friend (note?: string) {
+    await this._put({url: `api/v1/me/friends/${this.name}`, data: {user: this.name, note}})
+    return this
   }
+
   /**
    * @summary Removes this user from the requester's friend list.
    * @returns {Promise} A Promise that fulfills with this user when the request is complete
    * @example r.getUser('actually_an_aardvark').unfriend()
    */
   unfriend () {
-    return this._delete({url: `api/v1/me/friends/${this.name}`});
+    return this._delete({url: `api/v1/me/friends/${this.name}`})
   }
+
   /**
    * @summary Gets information on this user related to their presence on the friend list.
    * @returns {Promise} A Promise that fulfills with an object containing friend information
@@ -77,8 +80,9 @@ const RedditUser = class RedditUser extends RedditContent {
    * // => { date: 1460318190, note: 'Is an aardvark', name: 'actually_an_aardvark', id: 't2_q3519' }
    */
   getFriendInformation () {
-    return this._get({url: `api/v1/me/friends/${this.name}`});
+    return this._get({url: `api/v1/me/friends/${this.name}`})
   }
+
   /**
    * @summary Gets a list of this user's trophies.
    * @returns {Promise} A TrophyList containing this user's trophies
@@ -92,8 +96,9 @@ const RedditUser = class RedditUser extends RedditContent {
    * // ] }
    */
   getTrophies () {
-    return this._get({url: `api/v1/user/${this.name}/trophies`});
+    return this._get({url: `api/v1/user/${this.name}/trophies`})
   }
+
   /**
    * @summary Gets a Listing of the content this user has submitted.
    * @param {object} [options] Options for the resulting Listing
@@ -108,9 +113,10 @@ const RedditUser = class RedditUser extends RedditContent {
    * //  ...
    * // ]
    */
-  getOverview (options) {
-    return this._getListing({uri: `user/${this.name}/overview`, qs: options});
+  getOverview (options: any) {
+    return this._getListing({uri: `user/${this.name}/overview`, qs: options})
   }
+
   /**
    * @summary Gets a Listing of this user's submissions.
    * @param {object} [options] Options for the resulting Listing
@@ -125,9 +131,10 @@ const RedditUser = class RedditUser extends RedditContent {
    * //  ...
    * // ]
    */
-  getSubmissions (options) {
-    return this._getListing({uri: `user/${this.name}/submitted`, qs: options});
+  getSubmissions (options: any) {
+    return this._getListing({uri: `user/${this.name}/submitted`, qs: options})
   }
+
   /**
    * @summary Gets a Listing of this user's comments.
    * @param {object} [options] Options for the resulting Listing
@@ -142,9 +149,10 @@ const RedditUser = class RedditUser extends RedditContent {
    * //  ...
    * // ]
    */
-  getComments (options) {
-    return this._getListing({uri: `user/${this.name}/comments`, qs: options});
+  getComments (options: any) {
+    return this._getListing({uri: `user/${this.name}/comments`, qs: options})
   }
+
   /**
    * @summary Gets a Listing of the content that this user has upvoted.
    * @desc **Note**: This can only be used to view one's own upvoted content, unless the user in question has chosen to
@@ -161,9 +169,10 @@ const RedditUser = class RedditUser extends RedditContent {
    * //  ...
    * // ]
    */
-  getUpvotedContent (options) {
-    return this._getListing({uri: `user/${this.name}/upvoted`, qs: options});
+  getUpvotedContent (options: any) {
+    return this._getListing({uri: `user/${this.name}/upvoted`, qs: options})
   }
+
   /**
    * @summary Gets a Listing of the content that this user has downvoted.
    * @desc **Note**: This can only be used to view one's own downvoted content, unless the user in question has chosen to
@@ -180,9 +189,10 @@ const RedditUser = class RedditUser extends RedditContent {
    * //  ...
    * // ]
    */
-  getDownvotedContent (options) {
-    return this._getListing({uri: `user/${this.name}/downvoted`, qs: options});
+  getDownvotedContent (options: any) {
+    return this._getListing({uri: `user/${this.name}/downvoted`, qs: options})
   }
+
   /**
    * @summary Gets a Listing of the submissions that this user has hidden.
    * @desc **Note**: This can only be used to view one's own set of hidden posts, as reddit will return a 403 error when
@@ -199,9 +209,10 @@ const RedditUser = class RedditUser extends RedditContent {
    * //  ...
    * // ]
    */
-  getHiddenContent (options) {
-    return this._getListing({uri: `user/${this.name}/hidden`, qs: options});
+  getHiddenContent (options: any) {
+    return this._getListing({uri: `user/${this.name}/hidden`, qs: options})
   }
+
   /**
    * @summary Gets a Listing of the content that this user has saved.
    * @desc **Note**: This can only be used to view one's own set of saved content, as reddit will return a 403 error when
@@ -218,9 +229,10 @@ const RedditUser = class RedditUser extends RedditContent {
    * //  ...
    * // ]
    */
-  getSavedContent (options) {
-    return this._getListing({uri: `user/${this.name}/saved`, qs: options});
+  getSavedContent (options: any) {
+    return this._getListing({uri: `user/${this.name}/saved`, qs: options})
   }
+
   /**
    * @summary Gets a Listing of this user's content which has been gilded.
    * @param {object} [options] Options for the resulting Listing
@@ -235,9 +247,10 @@ const RedditUser = class RedditUser extends RedditContent {
    * //  ...
    * // ]
    */
-  getGildedContent (options) {
-    return this._getListing({uri: `user/${this.name}/gilded`, qs: options});
+  getGildedContent (options: any) {
+    return this._getListing({uri: `user/${this.name}/gilded`, qs: options})
   }
+
   /**
    * @summary Gets a multireddit belonging to this user.
    * @param {string} name The name of the multireddit
@@ -251,9 +264,10 @@ const RedditUser = class RedditUser extends RedditContent {
    * //  path: '/user/multi-mod/m/coding_languages'
    * // }
    */
-  getMultireddit (name) {
-    return this._r._newObject('MultiReddit', {name, curator: this});
+  getMultireddit (name: any) {
+    return this._r._newObject('MultiReddit', {name, curator: this})
   }
+
   /**
    * @summary Gets an Array of all of this user's MultiReddits.
    * @returns {Promise} A Promise that fulfills with an Array containing MultiReddits.
@@ -269,8 +283,8 @@ const RedditUser = class RedditUser extends RedditContent {
    * ]
    */
   getMultireddits () {
-    return this._get({url: `api/multi/user/${this.name}`, params: {expand_srs: true}});
+    return this._get({url: `api/multi/user/${this.name}`, params: {expand_srs: true}})
   }
-};
+}
 
-export default RedditUser;
+export default RedditUser

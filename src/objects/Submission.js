@@ -1,4 +1,4 @@
-import {getEmptyRepliesListing, addFullnamePrefix} from '../helpers.js';
+import {getEmptyRepliesListing, addFullnamePrefix} from '../helpers';
 import Comment from './Comment';
 import VoteableContent from './VoteableContent.js';
 

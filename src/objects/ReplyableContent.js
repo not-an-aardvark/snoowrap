@@ -1,4 +1,4 @@
-import {handleJsonErrors} from '../helpers.js';
+import {handleJsonErrors} from '../helpers';
 import RedditContent from './RedditContent.js';
 
 const api_type = 'json';

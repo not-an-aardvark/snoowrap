@@ -66,3 +66,4 @@ export const GRANT_TYPES = {
   AUTHORIZATION_CODE: 'authorization_code'
 }
 export const DEVICE_ID = 'DO_NOT_TRACK_THIS_DEVICE'
+export const COMMENT_SORTS = ['confidence', 'top', 'new', 'controversial', 'old', 'random', 'qa', 'live'] as const

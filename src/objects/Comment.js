@@ -1,4 +1,4 @@
-import {addEmptyRepliesListing, getEmptyRepliesListing} from '../helpers.js';
+import {addEmptyRepliesListing, getEmptyRepliesListing} from '../helpers';
 import Listing from './Listing.js';
 import {emptyChildren as emptyMoreObject} from './More.js';
 import Submission from './Submission.js';

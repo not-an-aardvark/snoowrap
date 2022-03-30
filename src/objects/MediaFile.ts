@@ -1,7 +1,7 @@
 /**
  * @summary An Interface representing parameters to pass to the {@link MediaFile} constructor.
  */
-export interface FileInfo {
+export interface FileDetails {
  /**
    * @summary A direct URL to the uploaded file. Used to embed the file on image/video submissions.
    */
@@ -9,7 +9,7 @@ export interface FileInfo {
   /**
    * @summary A unique identifier for the uploaded file. Used to embed the file on selfposts and galleries.
    */
-  assetId: string
+  mediaId: string
   /**
    * @summary The websocket URL can be used to determine when media processing is finished and to obtain the newly created submission ID.
    */
@@ -28,7 +28,7 @@ export interface FileInfo {
 /**
  * A class representing media files uploaded to reddit to be embedded on submissions. See {@link snoowrap#uploadMedia} for more details.
  */
-interface MediaFile extends FileInfo {}
+interface MediaFile extends FileDetails {}
 class MediaFile {
   /**
    * @summary The media type. Only available on {@link MediaImg}, {@link MediaVideo} and {@link MediaGif}.
@@ -37,11 +37,11 @@ class MediaFile {
 
   /**
    * @summary Constructs a new media file. In most cases you should call {@link snoowrap#uploadMedia} instead.
-   * @param options An object containing `fileUrl`, `assetId` along with optional `websocketUrl`, `caption` and `outboundUrl`.
+   * @param options An object containing `fileUrl`, `mediaId` along with optional `websocketUrl`, `caption` and `outboundUrl`.
    */
-  constructor ({fileUrl, assetId, websocketUrl = '', caption = '', outboundUrl = ''}: FileInfo) {
+  constructor ({fileUrl, mediaId, websocketUrl, caption, outboundUrl}: FileDetails) {
     this.fileUrl = fileUrl
-    this.assetId = assetId
+    this.mediaId = mediaId
     this.websocketUrl = websocketUrl
     this.caption = caption
     this.outboundUrl = outboundUrl
@@ -64,7 +64,7 @@ class MediaFile {
    * => "This is an inline image: \n\n![img](qwertyuiop \"optional caption\")\n\n Cool huh?"
    */
   toString (): string {
-    return this.type ? `\n\n![${this.type}](${this.assetId} "${this.caption ? this.caption : ''}")\n\n` : ''
+    return this.type ? `\n\n![${this.type}](${this.mediaId} "${this.caption ? this.caption : ''}")\n\n` : ''
   }
 }
 

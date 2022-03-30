@@ -12,3 +12,4 @@ const isAxiosResponse = (obj: any) => {
 }
 
 export default isAxiosResponse
+export {AxiosResponse} from '../axiosCreate'

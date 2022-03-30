@@ -1,3 +1,4 @@
+// @ts-nocheck
 import util from 'util';
 import {find, includes, isEmpty, omit, partial, property, snakeCase} from 'lodash';
 import {MODERATOR_PERMISSIONS, LIVETHREAD_PERMISSIONS} from './constants';

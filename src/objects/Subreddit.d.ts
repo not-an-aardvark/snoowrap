@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {BaseSearchOptions, ModAction, Sort, SubmitLinkOptions, SubmitSelfPostOptions} from '../snoowrap';
 import Comment from './Comment';
 import Listing, {ListingOptions} from './Listing';

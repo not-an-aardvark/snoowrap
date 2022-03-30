@@ -1,20 +1,26 @@
-import util from 'util'
-import {defineInspectFunc} from '../helpers'
+// import util from 'util'
+// import {defineInspectFunc} from '../helper'
 import URL from '../helpers/URL'
 import snoowrap from '../snoowrap'
+import {RedditContent, Comment} from './'
 import More, {emptyChildren} from './More'
-import RedditContent from './RedditContent'
-import Comment from './Comment'
 import {InvalidMethodCallError} from '../errors'
 import {HTTP_VERBS} from '../constants'
 import {Children} from '../interfaces'
 
-export interface ListingProps {
-  _query: {
-    after?: string|null
-    before?: string|null
-    [key: string]: any
-  },
+interface ListingQuery {
+  after?: string|null
+  before?: string|null
+  limit?: number
+  show?: string
+  count?: number
+  t?: 'all' | 'hour' | 'day' | 'week' | 'month' | 'year'
+  time?: 'all' | 'hour' | 'day' | 'week' | 'month' | 'year'
+  [key: string]: any
+}
+
+interface ListingProps {
+  _query: ListingQuery,
   _transform: (value: Listing<any>) => Listing<any>,
   _method: typeof HTTP_VERBS[number],
   _isCommentList: boolean,
@@ -25,7 +31,7 @@ export interface ListingProps {
   _children: {[id: string]: Comment}
 }
 
-export interface Options extends Partial<ListingProps> {
+interface Options extends Partial<ListingProps> {
   after: string|null
   before: string|null
   children: any[]
@@ -34,27 +40,15 @@ export interface Options extends Partial<ListingProps> {
   modhash: string|null
 }
 
-export interface FetchMoreOptions {
+interface FetchMoreOptions {
   amount: number
   skipReplies: boolean
   append: boolean
 }
 
-export interface FetchAllOptions {
+interface FetchAllOptions {
   skipReplies?: boolean
   append?: boolean
-}
-
-export interface ListingOptions {
-  limit?: number
-  after?: string
-  before?: string
-  show?: string
-  count?: number
-}
-
-export interface SortedListingOptions extends ListingOptions {
-  time?: 'all' | 'hour' | 'day' | 'week' | 'month' | 'year'
 }
 
 /**
@@ -336,8 +330,9 @@ class Listing<T extends RedditContent<T>> extends Array<T> {
   }
 }
 
-defineInspectFunc(Listing.prototype, function (this: Listing<any>) { // Fake param
+/*defineInspectFunc(Listing.prototype, function (this: Listing<any>) { // Fake param
   return `Listing ${util.inspect(Array.from(this))}`
-})
+})*/
 
 export default Listing
+export {ListingProps, Options, FetchMoreOptions, FetchAllOptions, ListingQuery}

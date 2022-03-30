@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Thanks to these people for type definitions:
 //  Vito Samson <https://github.com/vitosamson>
 //  TheAppleFreak <https://github.com/TheAppleFreak>

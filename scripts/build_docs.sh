@@ -16,7 +16,7 @@ mkdir -p doc
 npm run compile
 
 # List all the files explicitly rather than globbing to ensure that the classes appear in the right order in the docs
-node_modules/.bin/jsdoc -c jsdoc.conf.json dist/snoowrap.js dist/request_handler.js dist/objects/RedditContent.js dist/objects/ReplyableContent.js dist/objects/VoteableContent.js dist/objects/Comment.js dist/objects/RedditUser.js dist/objects/Submission.js dist/objects/LiveThread.js dist/objects/PrivateMessage.js dist/objects/Subreddit.js dist/objects/MultiReddit.js dist/objects/ModmailConversation.js dist/objects/ModmailConversationAuthor.js dist/objects/WikiPage.js dist/objects/Listing.js
+node_modules/.bin/jsdoc -c jsdoc.conf.json dist/snoowrap.js dist/objects/RedditContent.js dist/objects/ReplyableContent.js dist/objects/VoteableContent.js dist/objects/Comment.js dist/objects/RedditUser.js dist/objects/Submission.js dist/objects/LiveThread.js dist/objects/PrivateMessage.js dist/objects/Subreddit.js dist/objects/MultiReddit.js dist/objects/ModmailConversation.js dist/objects/ModmailConversationAuthor.js dist/objects/WikiPage.js dist/objects/Listing.js
 # Create the bundle files, e.g. 'snoowrap-v1.2.3.js' and 'snoowrap-v1.2.3.min.js'
 node_modules/.bin/browserify dist/snoowrap.js -o "doc/snoowrap-$FULL_VERSION.js"
 # Exclude snoowrap's class names from mangling.

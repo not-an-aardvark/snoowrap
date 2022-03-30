@@ -8,8 +8,8 @@ export class RateLimitError extends Error {
 }
 
 export class InvalidUserError extends Error {
-  constructor () {
-    super('Cannot fetch information on the given user. Please be sure you have the right username.')
+  constructor (name: string) {
+    super(`Cannot fetch information on the given user: ${name}. Please be sure you have the right username.`)
   }
 }
 

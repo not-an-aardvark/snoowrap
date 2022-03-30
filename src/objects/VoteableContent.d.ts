@@ -1,3 +1,4 @@
+// @ts-nocheck
 import RedditUser from './RedditUser';
 import ReplyableContent from './ReplyableContent';
 import Subreddit from './Subreddit';

@@ -1,5 +1,5 @@
 import util from 'util'
-import {defineInspectFunc} from '../helpers'
+import {defineInspectFunc} from '../helper'
 import {USER_KEYS, SUBREDDIT_KEYS} from '../constants'
 import snoowrap from '../snoowrap'
 import Listing from './Listing'
@@ -21,7 +21,13 @@ class RedditContent<T> {
   _r: snoowrap
   _hasFetched: boolean
   _fetch?: T
-  _uri?: string
+  __uri?: string
+  get _uri () {
+    return this.__uri
+  }
+  set _uri (uri) {
+    this.__uri = uri
+  }
   [key: string]: any
   created_utc: number = 0
   created: number = 0

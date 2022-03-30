@@ -1,4 +1,4 @@
-import {buildRepliesTree, findMessageInTree} from '../helpers.js';
+import {buildRepliesTree, findMessageInTree} from '../helpers';
 import ReplyableContent from './ReplyableContent.js';
 
 /**

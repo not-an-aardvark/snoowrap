@@ -1,8 +1,9 @@
-import {buildRepliesTree, handleJsonErrors} from '../helpers'
+import {buildRepliesTree, handleJsonErrors} from '../helper'
 import {MAX_API_INFO_AMOUNT, MAX_API_MORECHILDREN_AMOUNT} from '../constants'
-import Listing, {FetchMoreOptions} from './Listing'
-import Comment from './Comment'
 import snoowrap from '../snoowrap'
+import {Comment} from './'
+import Listing, {FetchMoreOptions} from './Listing'
+import {JSONResponse} from '../interfaces'
 
 export interface Options {
   children: string[]
@@ -12,16 +13,6 @@ export interface Options {
   name: string
   parent_id: string
   link_id?: string
-}
-
-export interface JSONResponse<T> {
-  json: {
-    data?: {
-      things: T[]
-    },
-    error: string[]
-  },
-  _children: {[id: string]: Comment}
 }
 
 /**

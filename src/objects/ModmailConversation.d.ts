@@ -54,6 +54,7 @@ export interface ObjId {
 export default class ModmailConversation extends RedditContent<ModmailConversation> {
   static conversationStates: conversationStates;
   static modActionStats: modActionStates;
+  static _getConversationObjects(conversation, response): any
 
   isAuto: boolean;
   objIds: ObjId[];

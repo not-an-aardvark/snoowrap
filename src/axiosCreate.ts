@@ -1,7 +1,7 @@
 declare module 'axios' {
   export interface AxiosRequestConfig {
     form?: {
-      [key: string]: string
+      [key: string]: any
     }
     formData?: {
       [key: string]: any
