@@ -1,9 +1,9 @@
 /* eslint-env browser */
 /* eslint-disable no-console */
-const snoowrap = require('..');
-const BaseRequester = require('../dist/BaseRequester');
+import snoowrap from '../src/snoowrap'
+//import BaseRequester from '../src/BaseRequester'
 
-window.BaseRequester = BaseRequester.default;
+//window.BaseRequester = BaseRequester.default;
 
 fetch('../oauth_info.json').then(async response => {
   const oauthInfo = await response.json();
@@ -12,12 +12,11 @@ fetch('../oauth_info.json').then(async response => {
     user_agent: oauthInfo.user_agent,
     client_id: oauthInfo.client_id,
     client_secret: oauthInfo.client_secret,
-    refresh_token: oauthInfo.refresh_token
-  });
-
-  r.config({
-    debug: true,
-    warnings: true
+    refresh_token: oauthInfo.refresh_token,
+    config: {
+      debug: true,
+      warnings: true
+    }
   });
 
   window.r = r;
@@ -27,12 +26,11 @@ fetch('../oauth_info.json').then(async response => {
     client_id: oauthInfo.client_id,
     client_secret: oauthInfo.client_secret,
     username: oauthInfo.username,
-    password: oauthInfo.password
-  });
-
-  r2.config({
-    debug: true,
-    warnings: true
+    password: oauthInfo.password,
+    config: {
+      debug: true,
+      warnings: true
+    }
   });
 
   window.r2 = r2;

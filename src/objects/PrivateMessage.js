@@ -1,5 +1,5 @@
-import {buildRepliesTree, findMessageInTree} from '../helpers';
-import ReplyableContent from './ReplyableContent.js';
+import {buildRepliesTree, findMessageInTree} from '../helper';
+import ReplyableContent from './ReplyableContent';
 
 /**
  * A class representing a private message or a modmail.

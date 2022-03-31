@@ -1,4 +1,4 @@
-import {RedditContent} from './objects'
+import RedditContent from './objects/RedditContent'
 import {KINDS} from './constants'
 
 const extendRedditContent = (name: string) => {

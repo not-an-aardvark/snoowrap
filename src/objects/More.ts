@@ -1,7 +1,7 @@
 import {buildRepliesTree, handleJsonErrors} from '../helper'
 import {MAX_API_INFO_AMOUNT, MAX_API_MORECHILDREN_AMOUNT} from '../constants'
 import snoowrap from '../snoowrap'
-import {Comment} from './'
+import type Comment from './Comment'
 import Listing, {FetchMoreOptions} from './Listing'
 import {JSONResponse} from '../interfaces'
 

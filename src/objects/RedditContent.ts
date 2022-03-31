@@ -1,11 +1,7 @@
 import util from 'util'
 import {defineInspectFunc} from '../helper'
 import {USER_KEYS, SUBREDDIT_KEYS} from '../constants'
-import snoowrap from '../snoowrap'
-import Listing from './Listing'
-import Comment from './Comment'
-import RedditUser from './RedditUser'
-import Subreddit from './Subreddit.js'
+import type snoowrap from '../snoowrap'
 import {Children} from '../interfaces'
 
 /**
@@ -107,13 +103,13 @@ class RedditContent<T> {
     for (const key of Object.keys(this)) {
       let value = this[key]
       if (deep) {
-        value = value instanceof RedditContent || value instanceof Listing
+        value = value instanceof RedditContent || value.constructor._name === 'Listing'
           ? value._clone(deep, _children)
           : typeof value === 'object' && value !== null
             ? this._cloneProps.call(value, deep, _children)
             : value
       }
-      if (value instanceof Comment) {
+      if (value.constructor._name === 'Comment') {
         _children[value.id] = value
       }
       clonedProps[key] = value
@@ -137,8 +133,8 @@ class RedditContent<T> {
       if (key.startsWith('_')) continue
       let value = this[key]
       if (value instanceof RedditContent && !value._hasFetched) {
-        if (value instanceof RedditUser && USER_KEYS.has(key)) value = value.name
-        if (value instanceof Subreddit && SUBREDDIT_KEYS.has(key)) value = value.display_name
+        if (value.constructor._name === 'RedditUser' && USER_KEYS.has(key)) value = value.name
+        if (value.constructor._name === 'Subreddit' && SUBREDDIT_KEYS.has(key)) value = value.display_name
       }
       object[key] = value && value.toJSON ? value.toJSON() : value
     }

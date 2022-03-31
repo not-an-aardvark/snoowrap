@@ -26,10 +26,57 @@ export interface JSONResponse<T> {
   json: {
     data?: {
       things: T[]
+      drafts_count: number
+      id: string
+      name: string
+      url: string
+      [key: string]: any
     },
-    error: string[]
+    error: string[][]
   },
+  /** Custom */
   _children: {[id: string]: Comment}
+}
+
+export interface Fancypants {
+  assets: {
+    caption: string|null
+    id: string
+    obfuscation_descriptor: any[]
+    obfuscation_reason: string|null
+  }[],
+  output: {
+    document: {
+      c: string|Fancypants['output']['document'],
+      e: string,
+      f: number[][],
+      id: string
+      t: string
+    }[]
+  },
+  /** @example 'rtjson' */
+  output_mode: string
+}
+
+export interface UploadResponse {
+  args: {
+    /** @example '//reddit-uploaded-video.s3-accelerate.amazonaws.com' */
+    action: string,
+    /** Headers */
+    fields: {
+      name: string,
+      value: string
+    }[]
+  },
+  asset: {
+    asset_id: string,
+    payload: {
+      filepath: string
+    },
+    processing_state: string,
+    /** @example 'wss://ws-0ffbcc476ebd6c972.wss.redditmedia.com/<asset_id>?m=<random-base64-string>' */
+    websocket_url: string
+  }
 }
 
 export interface ListingOptions extends Partial<Options> {

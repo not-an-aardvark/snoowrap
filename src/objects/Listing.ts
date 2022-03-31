@@ -2,7 +2,8 @@
 // import {defineInspectFunc} from '../helper'
 import URL from '../helpers/URL'
 import snoowrap from '../snoowrap'
-import {RedditContent, Comment} from './'
+import type RedditContent from './RedditContent'
+import type Comment from './Comment'
 import More, {emptyChildren} from './More'
 import {InvalidMethodCallError} from '../errors'
 import {HTTP_VERBS} from '../constants'
@@ -87,7 +88,7 @@ class Listing<T extends RedditContent<T>> extends Array<T> {
       _children = {},
       children = [],
       ...options
-    } : Partial<Options>,
+    } : Partial<Options> = {},
     _r: snoowrap
   ) {
     super()
@@ -133,7 +134,7 @@ class Listing<T extends RedditContent<T>> extends Array<T> {
       // Why not just overriding all of them?
       if (this._query[key] === undefined) this._query[key] = value
     })
-    if (this._query.before) {
+    if (parsedUri.searchParams.get('before')) {
       this._query.after = null
     } else {
       this._query.before = null
@@ -201,7 +202,7 @@ class Listing<T extends RedditContent<T>> extends Array<T> {
     if (amount <= 0 || this.isFinished) {
       return append ? this._clone() : this._clone()._empty()
     }
-    if (this._cachedLookahead) {
+    if (this._cachedLookahead.length) {
       const cloned = this._clone()
       cloned.push(...<unknown>cloned._cachedLookahead.splice(0, amount) as T[])
       return cloned.fetchMore(amount - cloned.length + this.length)

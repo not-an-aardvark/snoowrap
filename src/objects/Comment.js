@@ -1,8 +1,6 @@
-import {addEmptyRepliesListing, getEmptyRepliesListing} from '../helpers';
-import Listing from './Listing.js';
-import {emptyChildren as emptyMoreObject} from './More.js';
-import Submission from './Submission.js';
-import VoteableContent from './VoteableContent.js';
+import {addEmptyRepliesListing, getEmptyRepliesListing} from '../helper';
+import {emptyChildren as emptyMoreObject} from './More';
+import VoteableContent from './VoteableContent';
 /**
  * A class representing a reddit comment
  * <style> #Comment {display: none} </style>
@@ -25,7 +23,7 @@ const Comment = class Comment extends VoteableContent {
        * comment's replies. This is the equivalent of seeing a 'Continue this thread' link on the HTML site, and it indicates that
        * replies should be fetched by sending another request to view the deep comment alone, and parsing the replies from that.
        */
-      if (this.replies instanceof Listing && !this.replies.length && this.replies._more && this.replies._more.name === 't1__') {
+      if (this.replies.constructor._name === 'Listing' && !this.replies.length && this.replies._more && this.replies._more.name === 't1__') {
         this.replies = getEmptyRepliesListing(this);
       } else if (this.replies === '') {
         /**
@@ -39,7 +37,7 @@ const Comment = class Comment extends VoteableContent {
     }
   }
   _transformApiResponse (response) {
-    if (response instanceof Submission) {
+    if (response.constructor._name = 'Submission') {
       const children = response._children;
       response = response.comments[0];
       delete children[response.id];

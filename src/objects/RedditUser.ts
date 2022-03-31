@@ -1,6 +1,6 @@
 import {USERNAME_REGEX} from '../constants'
 import {InvalidMethodCallError, InvalidUserError} from '../errors'
-import {RedditContent} from './'
+import RedditContent from './RedditContent'
 
 /**
  * A class representing a reddit user

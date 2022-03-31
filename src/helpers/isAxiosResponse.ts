@@ -1,10 +1,12 @@
 const isAxiosResponse = (obj: any) => {
   if (
-    obj.data &&
-    obj.status &&
-    obj.statusText &&
-    obj.headers &&
-    obj.config
+    obj &&
+    typeof obj === 'object' &&
+    'data' in obj &&
+    'status' in obj &&
+    'statusText' in obj &&
+    'headers' in obj &&
+    'config' in obj
   ) {
     return true
   }
@@ -12,4 +14,4 @@ const isAxiosResponse = (obj: any) => {
 }
 
 export default isAxiosResponse
-export {AxiosResponse} from '../axiosCreate'
+export type {AxiosResponse} from '../axiosCreate'

@@ -1,5 +1,5 @@
-import {handleJsonErrors} from '../helpers';
-import ReplyableContent from './ReplyableContent.js';
+import {handleJsonErrors} from '../helper';
+import ReplyableContent from './ReplyableContent';
 
 const api_type = 'json';
 

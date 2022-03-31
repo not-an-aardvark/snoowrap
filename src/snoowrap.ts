@@ -1,13 +1,15 @@
-import {defaults, omit} from 'lodash'
 import path from 'path'
 import stream from 'stream'
 import {createReadStream} from 'fs'
+import {defaults, omit} from 'lodash'
 
-import BaseRequester, {Common, AppAuth, ScriptAuth, CodeAuth, All} from './BaseRequester'
-
-import defaultObjects from './defaultObjects'
 import * as objects from './objects'
+
+
 import * as errors from './errors'
+
+import BaseRequester from './BaseRequester'
+import type {Common, AppAuth, ScriptAuth, CodeAuth, All} from './BaseRequester'
 
 import {
   KINDS, MAX_LISTING_ITEMS, MODULE_NAME, USER_KEYS, SUBREDDIT_KEYS, VERSION, MIME_TYPES,
@@ -20,8 +22,11 @@ import isAxiosResponse, {AxiosResponse} from './helpers/isAxiosResponse'
 import isContentTree, {ContentTree} from './helpers/isContentTree'
 import isSubmissionTree, {SubmissionTree} from './helpers/isSubmissionTree'
 
+import defaultObjects from './defaultObjects'
+
+
 import {
-  Children, ListingOptions, SubredditOptions, InboxFilter, UploadMediaOptions, UploadInlineMediaOptions,
+  Children, Fancypants, UploadResponse, ListingOptions, SubredditOptions, InboxFilter, UploadMediaOptions, UploadInlineMediaOptions,
   MediaType, SubmitOptions, SubmitLinkOptions, SubmitImageOptions, SubmitVideoOptions, SubmitGalleryOptions,
   SubmitSelfpostOptions, SubmitPollOptions, SubmitCrosspostOptions
 } from './interfaces'
@@ -86,7 +91,7 @@ class snoowrap extends BaseRequester {
 
     if (isAxiosResponse(responseTree)) {
       const axiosResponse: AxiosResponse = responseTree
-      url = axiosResponse.config.url!
+      url = `${axiosResponse.config.baseURL}/${axiosResponse.config.url}`
       responseTree = axiosResponse.data
       nested = false
     }
@@ -1563,7 +1568,7 @@ class snoowrap extends BaseRequester {
   // #region _submit
 
   /**
-   * @summary Convert `markdown` to `richtext_json` format that used on the fancy pants editor. This format allows
+   * @summary Convert `markdown` to `richtext_json` format that used on the fancypants editor. This format allows
    * to embed inline media on selfposts.
    * @param {string} markdown The Markdown text to convert.
    * @returns {Promise} A Promise that fulfills with an object in `richtext_json` format.
@@ -1573,14 +1578,14 @@ class snoowrap extends BaseRequester {
    * // => object {document: Array(1)}
    */
   async convertToFancypants(markdown: string) {
-    const response = await this._post({
+    const response: Fancypants = await this._post({
       url: 'api/convert_rte_body_format',
       form: {
         output_mode: 'rtjson',
         markdown_text: markdown
       }
     })
-    return response.output
+    return response
   }
 
   /**
@@ -1633,7 +1638,7 @@ class snoowrap extends BaseRequester {
     }
     // Todo: The file size should be checked
     if (validateOnly) return null
-    const uploadResponse = await this._post({
+    const uploadResponse: UploadResponse = await this._post({
       url: 'api/media/asset.json',
       form: {
         filepath: fileName,
@@ -1642,14 +1647,14 @@ class snoowrap extends BaseRequester {
     })
     const uploadURL = 'https:' + uploadResponse.args.action
     const fileDetails = {
-      fileUrl: uploadURL + '/' + uploadResponse.args.fields.find((item: any) => item.name === 'key').value,
+      fileUrl: uploadURL + '/' + uploadResponse.asset.asset_id,
       mediaId: uploadResponse.asset.asset_id,
       websocketUrl: uploadResponse.asset.websocket_url,
       caption,
       outboundUrl
     }
     const formdata = new FormData()
-    uploadResponse.args.fields.forEach((item: any) => formdata.append(item.name, item.value))
+    uploadResponse.args.fields.forEach(item => formdata.append(item.name, item.value))
     formdata.append('file', parsedFile, fileName)
     let res
     if (isBrowser) {
@@ -2080,7 +2085,7 @@ class snoowrap extends BaseRequester {
       }))
 
       const body = text.replace(PLACEHOLDER_REGEX, (_m, g1: string) => inlineMedia[g1].toString())
-      richtext_json = await this.convertToFancypants(body)
+      richtext_json = (await this.convertToFancypants(body)).output
       text = undefined
     }
     return this._submit({...opts, kind: 'self', text, richtext_json})
@@ -2135,7 +2140,7 @@ class snoowrap extends BaseRequester {
   // #endregion
 }
 
-if (!module.parent && isBrowser) { // check if the code is being run in a browser through browserify, etc.
+if ((typeof module === 'undefined' || !module.parent) && isBrowser) { // check if the code is being run in a browser through browserify, etc.
   snoowrap._previousSnoowrap = (self as any)[MODULE_NAME]
   ;(self as any)[MODULE_NAME] = snoowrap
 }

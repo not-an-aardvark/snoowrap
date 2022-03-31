@@ -10,7 +10,8 @@ declare module 'axios' {
   }
 }
 
-import axios, {AxiosRequestConfig, AxiosResponse, AxiosError} from 'axios'
+import axios from 'axios'
+import type {AxiosRequestConfig, AxiosResponse, AxiosError} from 'axios'
 import URLSearchParams from './helpers/URLSearchParams'
 import FormData from './helpers/FormData'
 import isBrowser from './helpers/isBrowser'
@@ -21,7 +22,10 @@ function axiosCreate (baseConfig?: AxiosRequestConfig) {
   instance.interceptors.request.use(async config => {
     if (config.formData) {
       const requestBody = new FormData()
-      for (const key of Object.keys(config.formData)) requestBody.append(key, config.formData[key])
+      for (const key of Object.keys(config.formData)) {
+        const value = config.formData[key]
+        if (value !== undefined) requestBody.append(key, config.formData[key])
+      }
       if (!isBrowser) {
         const contentLength: number = await new Promise((resolve, reject) => {
           requestBody.getLength((err, length) => {
@@ -35,7 +39,10 @@ function axiosCreate (baseConfig?: AxiosRequestConfig) {
       config.data! = requestBody
     } else if (config.form) {
       const requestBody = new URLSearchParams()
-      for (const key of Object.keys(config.form)) requestBody.append(key, config.form[key])
+      for (const key of Object.keys(config.form)) {
+        const value = config.form[key]
+        if (value !== undefined) requestBody.append(key, value)
+      }
       config.data = requestBody.toString()
       config.headers['content-type'] = 'application/x-www-form-urlencoded'
     }

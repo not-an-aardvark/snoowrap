@@ -1,6 +1,6 @@
-import {getEmptyRepliesListing, addFullnamePrefix} from '../helpers';
+import {getEmptyRepliesListing, addFullnamePrefix} from '../helper';
 import Comment from './Comment';
-import VoteableContent from './VoteableContent.js';
+import VoteableContent from './VoteableContent';
 
 const api_type = 'json';
 

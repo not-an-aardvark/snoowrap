@@ -1,4 +1,6 @@
-import {Listing, Submission, Comment} from '../objects'
+import Listing from '../objects/Listing'
+import Submission from '../objects/Submission'
+import Comment from '../objects/Comment'
 
 interface SubmissionTree {
   0: Listing<Submission>,

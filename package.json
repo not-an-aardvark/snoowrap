@@ -22,7 +22,8 @@
     "bundle-size": "npm run build-docs && gzip -c doc/snoowrap-v$(npm info . version).min.js | wc -c | xargs",
     "coverage": "istanbul cover _mocha -- --require @babel/register test/snoowrap.spec.js",
     "type-check": "tsc -p tsconfig.typecheck.json",
-    "docs": "typedoc --out docs --entryPointStrategy expand src --sort source-order"
+    "docs": "typedoc --out docs --entryPointStrategy expand src --sort source-order",
+    "snowpack:dev": "snowpack dev --config snowpack.config.js --polyfill-node"
   },
   "files": [
     "dist/"
@@ -47,6 +48,7 @@
     "axios": "^0.21.1",
     "form-data": "^4.0.0",
     "lodash": "^4.17.15",
+    "path": "^0.12.7",
     "ws": "^8.5.0"
   },
   "devDependencies": {
@@ -63,6 +65,7 @@
     "@babel/plugin-transform-template-literals": "^7.0.0",
     "@babel/plugin-transform-typescript": "^7.0.0",
     "@babel/register": "^7.5.5",
+    "@snowpack/plugin-typescript": "^1.2.1",
     "@types/lodash": "^4.14.179",
     "@types/request": "^2.48.2",
     "@types/ws": "^8.5.3",
@@ -82,6 +85,8 @@
     "jsdoc": "^3.6.7",
     "mocha": "^6.0.0",
     "moment": "^2.14.1",
+    "rollup-plugin-node-polyfills": "^0.2.1",
+    "snowpack": "^3.8.8",
     "typedoc": "^0.22.13",
     "typescript": "^4.6.2",
     "uglify-js": "git://github.com/mishoo/UglifyJS2.git#1db50c3b169ee4195e1935013d6721628eb5b4bd"

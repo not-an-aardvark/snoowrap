@@ -1,4 +1,4 @@
-import RedditContent from './RedditContent.js';
+import RedditContent from './RedditContent';
 
 /**
  * @summary A class representing a multireddit.

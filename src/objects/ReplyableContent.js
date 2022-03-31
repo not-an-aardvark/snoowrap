@@ -1,5 +1,5 @@
-import {handleJsonErrors} from '../helpers';
-import RedditContent from './RedditContent.js';
+import RedditContent from './RedditContent';
+import {handleJsonErrors} from '../helper';
 
 const api_type = 'json';
 
@@ -8,7 +8,7 @@ const api_type = 'json';
  * <style> #ReplyableContent {display: none} </style>
  * @extends RedditContent
  */
-const ReplyableContent = class ReplyableContent extends RedditContent {
+class ReplyableContent extends RedditContent {
   /**
    * @summary Removes this Comment, Submission or PrivateMessage from public listings.
    * @desc This requires the authenticated user to be a moderator of the subreddit with the `posts` permission.

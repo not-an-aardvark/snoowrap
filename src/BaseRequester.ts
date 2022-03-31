@@ -1,7 +1,6 @@
 import {CredentialsResponse} from './interfaces'
 import axiosCreate, {AxiosRequestConfig, AxiosResponse, AxiosError} from './axiosCreate'
-import isBrowser from './helpers/isBrowser'
-import requiredArg from './helpers/requiredArg'
+import {isBrowser, requiredArg} from './helpers'
 import defaultConfig from './defaultConfig'
 import {GRANT_TYPES, DEVICE_ID, IDEMPOTENT_HTTP_VERBS, MAX_TOKEN_LATENCY} from './constants'
 import {rateLimitWarning, RateLimitError} from './errors'
