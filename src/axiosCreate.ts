@@ -12,9 +12,7 @@ declare module 'axios' {
 
 import axios from 'axios'
 import type {AxiosRequestConfig, AxiosResponse, AxiosError} from 'axios'
-import URLSearchParams from './helpers/URLSearchParams'
-import FormData from './helpers/FormData'
-import isBrowser from './helpers/isBrowser'
+import {URLSearchParams, FormData, isBrowser} from './helpers'
 
 function axiosCreate (baseConfig?: AxiosRequestConfig) {
   const instance = axios.create(baseConfig)

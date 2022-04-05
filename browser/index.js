@@ -1,14 +1,13 @@
-/* eslint-env browser */
 /* eslint-disable no-console */
 import snoowrap from '../src/snoowrap'
-//import BaseRequester from '../src/BaseRequester'
+import BaseRequester from '../src/BaseRequester'
 
-//window.BaseRequester = BaseRequester.default;
+window.BaseRequester = BaseRequester.default
 
 fetch('../oauth_info.json').then(async response => {
-  const oauthInfo = await response.json();
+  const oauthInfo = await response.json()
 
-  const r = new snoowrap({
+  window.r = new snoowrap({
     user_agent: oauthInfo.user_agent,
     client_id: oauthInfo.client_id,
     client_secret: oauthInfo.client_secret,
@@ -17,11 +16,9 @@ fetch('../oauth_info.json').then(async response => {
       debug: true,
       warnings: true
     }
-  });
+  })
 
-  window.r = r;
-
-  const r2 = new snoowrap({
+  window.r2 = new snoowrap({
     user_agent: oauthInfo.user_agent,
     client_id: oauthInfo.client_id,
     client_secret: oauthInfo.client_secret,
@@ -31,17 +28,13 @@ fetch('../oauth_info.json').then(async response => {
       debug: true,
       warnings: true
     }
-  });
+  })
+}).catch(err => console.error(err))
 
-  window.r2 = r2;
-}).catch(err => console.error(err));
+window.files = {}
 
-window.files = {};
-
-const fileinput = document.getElementById('file-input');
+const fileinput = document.getElementById('file-input')
 fileinput.onchange = () => {
-  const file = fileinput.files[0];
-  if (file) {
-    window.files[file.name] = file;
-  }
-};
+  const file = fileinput.files[0]
+  if (file) window.files[file.name] = file
+}

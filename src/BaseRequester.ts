@@ -49,10 +49,10 @@ interface All extends Common, Partial<AppAuth>, Partial<ScriptAuth>, Partial<Cod
 interface BaseRequester extends All {}
 class BaseRequester {
   scope?: string[]
-  tokenExpiration = Infinity
-  ratelimitRemaining = Infinity
-  ratelimitExpiration = Infinity
-  _nextRequestTimestamp = -Infinity
+  tokenExpiration!: number
+  ratelimitRemaining!: number
+  ratelimitExpiration!: number
+  _nextRequestTimestamp!: number
   _config = {...defaultConfig}
 
   constructor (options?: AppAuth)

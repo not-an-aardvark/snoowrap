@@ -1,5 +1,2 @@
-export default {
-    Readable: class {}
-}
-export const Readable = class {}
-export const createReadStream = {}
+/** A fallback for builtin node modules on browser */
+export default undefined

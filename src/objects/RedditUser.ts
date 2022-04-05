@@ -1,5 +1,6 @@
 import {USERNAME_REGEX} from '../constants'
 import {InvalidMethodCallError, InvalidUserError} from '../errors'
+import type {ListingQuery} from './Listing'
 import RedditContent from './RedditContent'
 
 /**
@@ -113,7 +114,7 @@ class RedditUser extends RedditContent<RedditUser> {
    * //  ...
    * // ]
    */
-  getOverview (options: any) {
+  getOverview (options: ListingQuery) {
     return this._getListing({uri: `user/${this.name}/overview`, qs: options})
   }
 
@@ -131,7 +132,7 @@ class RedditUser extends RedditContent<RedditUser> {
    * //  ...
    * // ]
    */
-  getSubmissions (options: any) {
+  getSubmissions (options: ListingQuery) {
     return this._getListing({uri: `user/${this.name}/submitted`, qs: options})
   }
 
@@ -149,7 +150,7 @@ class RedditUser extends RedditContent<RedditUser> {
    * //  ...
    * // ]
    */
-  getComments (options: any) {
+  getComments (options: ListingQuery) {
     return this._getListing({uri: `user/${this.name}/comments`, qs: options})
   }
 
@@ -169,7 +170,7 @@ class RedditUser extends RedditContent<RedditUser> {
    * //  ...
    * // ]
    */
-  getUpvotedContent (options: any) {
+  getUpvotedContent (options: ListingQuery) {
     return this._getListing({uri: `user/${this.name}/upvoted`, qs: options})
   }
 
@@ -189,7 +190,7 @@ class RedditUser extends RedditContent<RedditUser> {
    * //  ...
    * // ]
    */
-  getDownvotedContent (options: any) {
+  getDownvotedContent (options: ListingQuery) {
     return this._getListing({uri: `user/${this.name}/downvoted`, qs: options})
   }
 
@@ -209,7 +210,7 @@ class RedditUser extends RedditContent<RedditUser> {
    * //  ...
    * // ]
    */
-  getHiddenContent (options: any) {
+  getHiddenContent (options: ListingQuery) {
     return this._getListing({uri: `user/${this.name}/hidden`, qs: options})
   }
 
@@ -229,7 +230,7 @@ class RedditUser extends RedditContent<RedditUser> {
    * //  ...
    * // ]
    */
-  getSavedContent (options: any) {
+  getSavedContent (options: ListingQuery) {
     return this._getListing({uri: `user/${this.name}/saved`, qs: options})
   }
 
@@ -247,7 +248,7 @@ class RedditUser extends RedditContent<RedditUser> {
    * //  ...
    * // ]
    */
-  getGildedContent (options: any) {
+  getGildedContent (options: ListingQuery) {
     return this._getListing({uri: `user/${this.name}/gilded`, qs: options})
   }
 
@@ -264,7 +265,7 @@ class RedditUser extends RedditContent<RedditUser> {
    * //  path: '/user/multi-mod/m/coding_languages'
    * // }
    */
-  getMultireddit (name: any) {
+  getMultireddit (name: string) {
     return this._r._newObject('MultiReddit', {name, curator: this})
   }
 

@@ -1,13 +1,13 @@
-// import util from 'util'
-// import {defineInspectFunc} from '../helper'
-import URL from '../helpers/URL'
-import snoowrap from '../snoowrap'
-import type RedditContent from './RedditContent'
-import type Comment from './Comment'
-import More, {emptyChildren} from './More'
+import util from 'util'
+import {defineInspectFunc} from '../helper'
+import {isBrowser, URL} from '../helpers'
 import {InvalidMethodCallError} from '../errors'
-import {HTTP_VERBS} from '../constants'
-import {Children} from '../interfaces'
+import More, {emptyChildren} from './More'
+import type snoowrap from '../snoowrap'
+import type {RedditContent, Comment} from './'
+import type {HTTP_VERBS} from '../constants'
+import type {Children} from '../interfaces'
+
 
 interface ListingQuery {
   after?: string|null
@@ -15,14 +15,14 @@ interface ListingQuery {
   limit?: number
   show?: string
   count?: number
-  t?: 'all' | 'hour' | 'day' | 'week' | 'month' | 'year'
-  time?: 'all' | 'hour' | 'day' | 'week' | 'month' | 'year'
+  t?: 'all'|'hour'|'day'|'week'|'month'|'year'
+  time?: 'all'|'hour'|'day'|'week'|'month' |'year'
   [key: string]: any
 }
 
 interface ListingProps {
   _query: ListingQuery,
-  _transform: (value: Listing<any>) => Listing<any>,
+  _transform: (value: any) => any,
   _method: typeof HTTP_VERBS[number],
   _isCommentList: boolean,
   _link_id?: string,
@@ -72,12 +72,12 @@ interface FetchAllOptions {
  * <style> #Listing {display: none} </style>
  * @extends Array
  */
-interface Listing<T extends RedditContent<T>> extends ListingProps {}
-class Listing<T extends RedditContent<T>> extends Array<T> {
+interface Listing extends ListingProps {}
+class Listing<T extends RedditContent|{[key: string]: any} = RedditContent> extends Array<T> {
   ['constructor']: typeof Listing
-  static _name = 'Listing' as const
+  static _name = 'Listing'
 
-  _r: snoowrap
+  _r!: snoowrap
 
   constructor (
     {
@@ -89,7 +89,8 @@ class Listing<T extends RedditContent<T>> extends Array<T> {
       children = [],
       ...options
     } : Partial<Options> = {},
-    _r: snoowrap
+    _r?: snoowrap,
+    public _hasFetched?: boolean
   ) {
     super()
     if (!(this instanceof Listing)) {
@@ -102,7 +103,7 @@ class Listing<T extends RedditContent<T>> extends Array<T> {
       Object.setPrototypeOf(this, Listing.prototype)
     }
     this.push(...children || [])
-    this._r = _r
+    this._r = _r!
 
     this._query = {...options._query}
     if (options.after !== undefined) this._query.after = options.after
@@ -190,14 +191,14 @@ class Listing<T extends RedditContent<T>> extends Array<T> {
    *   })
    * })
    */
-  async fetchMore (options: Partial<FetchMoreOptions>|FetchMoreOptions['amount']): Promise<Listing<any>> {
+  async fetchMore (options: Partial<FetchMoreOptions>|FetchMoreOptions['amount']): Promise<Listing<T>> {
     const {
       amount,
       append = true,
       skipReplies = false
     } = typeof options === 'number' ? {amount: options} : options
     if (typeof amount !== 'number' || Number.isNaN(amount)) {
-      throw new InvalidMethodCallError('Failed to fetch Listing. (`amount` parameter was missing or invalid)')
+      throw new InvalidMethodCallError('Failed to fetch Listing. (\'amount\' parameter was missing or invalid)')
     }
     if (amount <= 0 || this.isFinished) {
       return append ? this._clone() : this._clone()._empty()
@@ -269,7 +270,7 @@ class Listing<T extends RedditContent<T>> extends Array<T> {
       cloned._query.after = response._query.after
     }
     if (this._isCommentList) {
-      cloned._more = cloned._more || response._more || emptyChildren(this._r)
+      cloned._more = cloned._more || response._more || emptyChildren()
       if (response.length > options.amount) {
         cloned._cachedLookahead = <unknown>Array.from(cloned.splice(options.amount)) as Comment[]
       }
@@ -319,11 +320,11 @@ class Listing<T extends RedditContent<T>> extends Array<T> {
     if (!deep) {
       properties._children = this._children
       properties.children = Array.from(this)
-      return new Listing(properties, this._r)
+      return new Listing<T>(properties, this._r)
     }
     properties._children = _children
     properties.children = Array.from(this).map(item => item && item._clone ? item._clone(deep, _children) : item)
-    return new Listing(properties, this._r)
+    return new Listing<T>(properties, this._r)
   }
 
   toJSON () {
@@ -331,9 +332,11 @@ class Listing<T extends RedditContent<T>> extends Array<T> {
   }
 }
 
-/*defineInspectFunc(Listing.prototype, function (this: Listing<any>) { // Fake param
-  return `Listing ${util.inspect(Array.from(this))}`
-})*/
+if (!isBrowser) {
+  defineInspectFunc(Listing.prototype, function (this: Listing) { // Fake param
+    return `Listing ${util.inspect(Array.from(this))}`
+  })
+}
 
 export default Listing
 export {ListingProps, Options, FetchMoreOptions, FetchAllOptions, ListingQuery}

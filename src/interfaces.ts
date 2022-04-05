@@ -1,8 +1,8 @@
-import stream from 'stream'
-import snoowrap from './snoowrap'
-import {Comment} from './objects'
-import {Options, ListingQuery} from './objects/Listing'
-import {MediaImg, MediaVideo, MediaGif} from './objects/MediaFile'
+import type stream from 'stream'
+import type snoowrap from './snoowrap'
+import type {Comment} from './objects'
+import type {Options, ListingQuery} from './objects/Listing'
+import type {MediaImg, MediaVideo, MediaGif} from './objects/MediaFile'
 
 export type OmitProps<T, K extends PropertyKey> = {
   [P in keyof T as Exclude<P, K>]: T[P]
@@ -47,11 +47,11 @@ export interface Fancypants {
   }[],
   output: {
     document: {
-      c: string|Fancypants['output']['document'],
-      e: string,
-      f: number[][],
-      id: string
-      t: string
+      c?: string|Fancypants['output']['document'],
+      e?: string,
+      f?: number[][],
+      id?: string
+      t?: string
     }[]
   },
   /** @example 'rtjson' */
@@ -83,6 +83,36 @@ export interface ListingOptions extends Partial<Options> {
   qs: Options['_query']
   uri: Options['_uri'],
 }
+
+export interface RichTextFlair {
+  /** The string representation of the emoji */
+  a?: string
+  /** The type of the flair entry */
+  e: 'text' | 'emoji'
+  /** URL of the emoji image */
+  u?: string
+  /** The text content of a text flair */
+  t?: string
+}
+
+export interface Gildings {
+  /** Number of Reddit Silver awarded */
+  gid_1: number
+  /** Number of Reddit Gold awarded */
+  gid_2: number
+  /** Number of Reddit Platinum awarded */
+  gid_3: number
+}
+
+export type SubredditType =
+  | 'gold_restricted'
+  | 'archived'
+  | 'restricted'
+  | 'employees_only'
+  | 'gold_only'
+  | 'private'
+  | 'user'
+  | 'public'
 
 export interface SubredditOptions {
   name: string,

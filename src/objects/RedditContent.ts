@@ -1,8 +1,9 @@
 import util from 'util'
 import {defineInspectFunc} from '../helper'
 import {USER_KEYS, SUBREDDIT_KEYS} from '../constants'
+import {isBrowser} from '../helpers'
 import type snoowrap from '../snoowrap'
-import {Children} from '../interfaces'
+import type {Children} from '../interfaces'
 
 /**
  * A base class for content from reddit. With the expection of Listings, all content types extend this class.
@@ -10,7 +11,7 @@ import {Children} from '../interfaces'
  * instantiate it directly.
  * <style> #RedditContent {display: none} </style>
  */
-class RedditContent<T> {
+class RedditContent<T extends RedditContent = RedditContent<any>> {
   ['constructor']: typeof RedditContent
   static _name = 'RedditContent'
 
@@ -24,13 +25,15 @@ class RedditContent<T> {
   set _uri (uri) {
     this.__uri = uri
   }
+  /*
+  created_utc!: number
+  created!: number
+  id!: string
+  name!: string
+  */
   [key: string]: any
-  created_utc: number = 0
-  created: number = 0
-  id: string = ''
-  name: string = ''
 
-  constructor (options: any, _r: snoowrap, _hasFetched = false) {
+  constructor (options: {[key: string]: any}, _r: snoowrap, _hasFetched = false) {
     // _r refers to the snoowrap requester that is used to fetch this content.
     this._r = _r
     this._hasFetched = _hasFetched
@@ -45,7 +48,7 @@ class RedditContent<T> {
    *
    * If snoowrap is running in an environment that supports ES2015 Proxies (e.g. Chrome 49+), then `fetch()` will get
    * automatically called when an unknown property is accessed on an unfetched content object.
-   * @returns {Promise} A version of this object with all of its fetched properties from reddit. This will not mutate the
+   * @returns A version of this object with all of its fetched properties from reddit. This will not mutate the
    * object. Once an object has been fetched once, its properties will be cached, so they might end up out-of-date if this
    * function is called again. To refresh an object, use refresh().
    * @example
@@ -73,7 +76,7 @@ class RedditContent<T> {
 
   /**
    * @summary Refreshes this content.
-   * @returns {Promise} A newly-fetched version of this content
+   * @returns A newly-fetched version of this content
    * @example
    *
    * var someComment = r.getComment('cmfkyus');
@@ -169,8 +172,10 @@ class RedditContent<T> {
   }
 }
 
-defineInspectFunc(RedditContent.prototype, function (this: RedditContent<any>) { // Fake param
-  return `${this.constructor._name} ${util.inspect(this)}`
-})
+if (!isBrowser) {
+  defineInspectFunc(RedditContent.prototype, function (this: RedditContent) { // Fake param
+    return `${this.constructor._name} ${util.inspect(this)}`
+  })
+}
 
 export default RedditContent

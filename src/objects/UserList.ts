@@ -1,7 +1,8 @@
-import snoowrap from '../snoowrap'
+import type snoowrap from '../snoowrap'
 
-interface Options {
-  children: any[]
+export interface Options {
+  children: {[key: string]: any}[]
+  [key: string]: any
 }
 
 export default class UserList {

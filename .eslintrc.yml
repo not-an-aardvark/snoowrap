@@ -24,7 +24,8 @@ rules:
   no-caller: error
   no-catch-shadow: error
   no-console: error
-  no-duplicate-imports: error
+  no-dupe-class-members: off
+  no-duplicate-imports: off
   no-else-return: error
   no-eval: error
   no-extra-bind: error
@@ -100,6 +101,9 @@ rules:
   promise/catch-or-return: error
   promise/no-return-wrap: error
   promise/param-names: error
+  '@typescript-eslint/consistent-type-imports': error
+  '@typescript-eslint/no-dupe-class-members': error
+  '@typescript-eslint/no-duplicate-imports': error
   '@typescript-eslint/no-extra-parens': [error, all, {nestedBinaryExpressions: false}]
   '@typescript-eslint/no-redeclare': error
   '@typescript-eslint/no-unused-vars': error

@@ -161,12 +161,10 @@ export function addSnakeCaseShadowProps (obj) {
 export const isBrowser = typeof self === 'object';
 
 export function defineInspectFunc (obj, inspectFunc) {
-  if (isBrowser) {
-    return;
-  }
+  if (isBrowser) return
   // Use the util.inspect.custom symbol if available (Node 6.6.0+)
-  const inspectKey = util.inspect && typeof util.inspect.custom === 'symbol' ? util.inspect.custom : 'inspect';
-  Object.defineProperty(obj, inspectKey, {writable: true, enumerable: false, value: inspectFunc});
+  const inspectKey = util.inspect && typeof util.inspect.custom === 'symbol' ? util.inspect.custom : 'inspect'
+  Object.defineProperty(obj, inspectKey, {writable: true, enumerable: false, value: inspectFunc})
 }
 
 export function requiredArg (argName) {

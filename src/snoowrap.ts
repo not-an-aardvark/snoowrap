@@ -1,37 +1,32 @@
-import path from 'path'
 import stream from 'stream'
-import {createReadStream} from 'fs'
+import fs from 'fs'
 import {defaults, omit} from 'lodash'
-
-import * as objects from './objects'
-
-
-import * as errors from './errors'
 
 import BaseRequester from './BaseRequester'
 import type {Common, AppAuth, ScriptAuth, CodeAuth, All} from './BaseRequester'
 
+import defaultObjects from './defaultObjects'
+import * as objects from './objects'
+import * as errors from './errors'
 import {
-  KINDS, MAX_LISTING_ITEMS, MODULE_NAME, USER_KEYS, SUBREDDIT_KEYS, VERSION, MIME_TYPES,
-  SUBMISSION_ID_REGEX, MEDIA_TYPES, PLACEHOLDER_REGEX, COMMENT_SORTS
+  KINDS, MAX_LISTING_ITEMS, MODULE_NAME, USER_KEYS, SUBREDDIT_KEYS, VERSION, MIME_TYPES, SUBMISSION_ID_REGEX,
+  MEDIA_TYPES, PLACEHOLDER_REGEX, type COMMENT_SORTS
 } from './constants'
 
 import {addEmptyRepliesListing, addFullnamePrefix, handleJsonErrors} from './helper'
-import {isBrowser, requiredArg, FormData, WebSocket} from './helpers'
-import isAxiosResponse, {AxiosResponse} from './helpers/isAxiosResponse'
-import isContentTree, {ContentTree} from './helpers/isContentTree'
-import isSubmissionTree, {SubmissionTree} from './helpers/isSubmissionTree'
+import {isBrowser, path, requiredArg, FormData, WebSocket} from './helpers'
+import isAxiosResponse, {type AxiosResponse} from './helpers/isAxiosResponse'
+import isContentTree, {type ContentTree} from './helpers/isContentTree'
+import isSubmissionTree, {type SubmissionTree} from './helpers/isSubmissionTree'
 
-import defaultObjects from './defaultObjects'
-
-
-import {
-  Children, Fancypants, UploadResponse, ListingOptions, SubredditOptions, InboxFilter, UploadMediaOptions, UploadInlineMediaOptions,
-  MediaType, SubmitOptions, SubmitLinkOptions, SubmitImageOptions, SubmitVideoOptions, SubmitGalleryOptions,
-  SubmitSelfpostOptions, SubmitPollOptions, SubmitCrosspostOptions
+import type {
+  Children, Fancypants, UploadResponse, ListingOptions, SubredditOptions, InboxFilter, UploadMediaOptions,
+  UploadInlineMediaOptions, MediaType, SubmitOptions, SubmitLinkOptions, SubmitImageOptions, SubmitVideoOptions,
+  SubmitGalleryOptions, SubmitSelfpostOptions, SubmitPollOptions, SubmitCrosspostOptions
 } from './interfaces'
-import Listing, {ListingQuery} from './objects/Listing'
-import {RedditUser, Submission} from './objects'
+
+import type {Listing, RedditUser, Submission} from './objects'
+import type {ListingQuery} from './objects/Listing'
 import MediaFile, {MediaImg, MediaVideo, MediaGif} from './objects/MediaFile'
 
 const fetch = self.fetch
@@ -64,20 +59,20 @@ class snoowrap extends BaseRequester {
    * @returns This instance of the snoowrap constructor
    * @example var snoowrap = window.snoowrap.noConflict();
    */
-  static noConflict() {
+  static noConflict () {
     if (isBrowser) (self as any)[MODULE_NAME] = this._previousSnoowrap
     return snoowrap
   }
 
-  _newObject<ObjectType extends keyof typeof snoowrap.objects>(
+  _newObject<ObjectType extends keyof typeof snoowrap.objects> (
     objectType: ObjectType, content: any[], _hasFetched?: boolean
   ): any[]
 
-  _newObject<ObjectType extends keyof typeof snoowrap.objects>(
+  _newObject<ObjectType extends keyof typeof snoowrap.objects> (
     objectType: ObjectType, content: any, _hasFetched?: boolean
   ): InstanceType<typeof snoowrap.objects[typeof objectType]>
 
-  _newObject<ObjectType extends keyof typeof snoowrap.objects>(
+  _newObject<ObjectType extends keyof typeof snoowrap.objects> (
     objectType: ObjectType, content: any[]|any, _hasFetched = false
   ) {
     if (Array.isArray(content)) return content
@@ -86,7 +81,7 @@ class snoowrap extends BaseRequester {
     return new object(content, this, _hasFetched)
   }
 
-  _populate(responseTree: any, children: Children = {}): any {
+  _populate (responseTree: any, children: Children = {}): any {
     let nested = true, url: string
 
     if (isAxiosResponse(responseTree)) {
@@ -150,7 +145,7 @@ class snoowrap extends BaseRequester {
     return responseTree
   }
 
-  async _getListing({uri = '', qs = {}, ...options}: ListingOptions) {
+  async _getListing ({uri = '', qs = {}, ...options}: ListingOptions) {
     /**
      * When the response type is expected to be a Listing, add a `count` parameter with a very high number.
      * This ensures that reddit returns a `before` property in the resulting Listing to enable pagination.
@@ -178,13 +173,13 @@ class snoowrap extends BaseRequester {
     return listing
   }
 
-  _getSortedFrontpage(sortType: string, subredditName?: string, options: ListingQuery = {}) {
-    options.t = options.t || options.time 
+  _getSortedFrontpage (sortType: string, subredditName?: string, options: ListingQuery = {}) {
+    options.t = options.t || options.time
     delete options.time
     return this._getListing({uri: (subredditName ? `r/${subredditName}/` : '') + sortType, qs: options})
   }
 
-  async _assignFlair({
+  async _assignFlair ({
     css_class,
     link,
     name,
@@ -200,7 +195,7 @@ class snoowrap extends BaseRequester {
     return this._post({url: `r/${subredditName}/api/flair`, form: {api_type, name, text, link, css_class}})
   }
 
-  async _selectFlair({
+  async _selectFlair ({
     flair_template_id,
     link,
     name,
@@ -219,7 +214,7 @@ class snoowrap extends BaseRequester {
     return this._post({url: `r/${subredditName}/api/selectflair`, form: {api_type, flair_template_id, link, name, text}})
   }
 
-  //#region _getListing
+  // #region _getListing
 
   /**
    * @summary Gets a list of subreddits in which the currently-authenticated user is an approved submitter.
@@ -237,7 +232,7 @@ class snoowrap extends BaseRequester {
    * // ]
    *
    */
-  getContributorSubreddits(options: ListingQuery) {
+  getContributorSubreddits (options: ListingQuery) {
     return this._getListing({uri: 'subreddits/mine/contributor', qs: options})
   }
 
@@ -250,7 +245,7 @@ class snoowrap extends BaseRequester {
    * r.getDefaultSubreddits().then(console.log)
    * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
    */
-  getDefaultSubreddits(options: ListingQuery) {
+  getDefaultSubreddits (options: ListingQuery) {
     return this._getListing({uri: 'subreddits/default', qs: options})
   }
 
@@ -263,7 +258,7 @@ class snoowrap extends BaseRequester {
    * r.getGoldSubreddits().then(console.log)
    * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
    */
-  getGoldSubreddits(options: ListingQuery) {
+  getGoldSubreddits (options: ListingQuery) {
     return this._getListing({uri: 'subreddits/gold', qs: options})
   }
 
@@ -282,7 +277,7 @@ class snoowrap extends BaseRequester {
    * //  Comment { body: 'this is a reply', link_title: 'Yay, a selfpost!', was_comment: true, ... }
    * // ]
    */
-  getInbox({filter, ...options}: InboxFilter) {
+  getInbox ({filter, ...options}: InboxFilter) {
     return this._getListing({uri: `message/${filter || 'inbox'}`, qs: options})
   }
 
@@ -301,7 +296,7 @@ class snoowrap extends BaseRequester {
    * //  }
    * // ]
    */
-  getModeratedSubreddits(options: ListingQuery) {
+  getModeratedSubreddits (options: ListingQuery) {
     return this._getListing({uri: 'subreddits/mine/moderator', qs: options})
   }
 
@@ -317,7 +312,7 @@ class snoowrap extends BaseRequester {
    * //  PrivateMessage { body: '/u/not_an_aardvark has been invited by /u/actually_an_aardvark to ...', ... }
    * // ]
    */
-  getModmail(options: ListingQuery = {}) {
+  getModmail (options: ListingQuery = {}) {
     return this._getListing({uri: 'message/moderator', qs: options})
   }
 
@@ -333,7 +328,7 @@ class snoowrap extends BaseRequester {
    * //  ModmailConversation { messages: [...], objIds: [...], subject: 'test subject', ... }
    * // ]
    */
-  getNewModmailConversations(options: ListingQuery = {}) {
+  getNewModmailConversations (options: ListingQuery = {}) {
     return this._getListing({
       uri: 'api/mod/conversations',
       qs: options,
@@ -370,7 +365,7 @@ class snoowrap extends BaseRequester {
    * r.getNewSubreddits().then(console.log)
    * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
    */
-  getNewSubreddits(options: ListingQuery) {
+  getNewSubreddits (options: ListingQuery) {
     return this._getListing({uri: 'subreddits/new', qs: options})
   }
 
@@ -383,7 +378,7 @@ class snoowrap extends BaseRequester {
    * r.getPopularSubreddits().then(console.log)
    * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
    */
-  getPopularSubreddits(options: ListingQuery) {
+  getPopularSubreddits (options: ListingQuery) {
     return this._getListing({uri: 'subreddits/popular', qs: options})
   }
 
@@ -399,7 +394,7 @@ class snoowrap extends BaseRequester {
    * //  PrivateMessage { body: 'you have been banned from posting to ...' ... }
    * // ]
    */
-  getSentMessages(options: ListingQuery = {}) {
+  getSentMessages (options: ListingQuery = {}) {
     return this._getListing({uri: 'message/sent', qs: options})
   }
 
@@ -423,7 +418,7 @@ class snoowrap extends BaseRequester {
    * //  }
    * // ]
    */
-  getSubscriptions(options: ListingQuery) {
+  getSubscriptions (options: ListingQuery) {
     return this._getListing({uri: 'subreddits/mine/subscriber', qs: options})
   }
 
@@ -439,7 +434,7 @@ class snoowrap extends BaseRequester {
    * //  Comment { body: 'this is a reply', link_title: 'Yay, a selfpost!', was_comment: true, ... }
    * // ]
    */
-  getUnreadMessages(options: ListingQuery = {}) {
+  getUnreadMessages (options: ListingQuery = {}) {
     return this._getListing({uri: 'message/unread', qs: options})
   }
 
@@ -467,7 +462,7 @@ class snoowrap extends BaseRequester {
    * //  ...
    * // ]
    */
-   search(options: any) {
+  search (options: any) {
     if (options.subreddit instanceof snoowrap.objects.Subreddit) {
       options.subreddit = options.subreddit.display_name;
     }
@@ -489,14 +484,14 @@ class snoowrap extends BaseRequester {
    * r.searchSubreddits({query: 'cookies'}).then(console.log)
    * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
    */
-  searchSubreddits(options: any) {
+  searchSubreddits (options: any) {
     options.q = options.query;
     return this._getListing({uri: 'subreddits/search', qs: omit(options, 'query')});
   }
 
-  //#endregion
+  // #endregion
 
-  //#region _getSortedFrontpage
+  // #region _getSortedFrontpage
 
   /**
    * @summary Gets a Listing of best posts.
@@ -516,7 +511,7 @@ class snoowrap extends BaseRequester {
    * //   Submission { domain: 'self.redditdev', banned_by: null, subreddit: Subreddit { display_name: 'redditdev' }, ...}
    * // ]
    */
-  getBest(options: ListingQuery) {
+  getBest (options: ListingQuery) {
     return this._getSortedFrontpage('best', undefined, options);
   }
 
@@ -536,7 +531,7 @@ class snoowrap extends BaseRequester {
    * //  Submission { domain: 'pcmag.com', banned_by: null, subreddit: Subreddit { display_name: 'technology' }, ... }
    * // ]
    */
-  getControversial(subredditName: string, options: ListingQuery) {
+  getControversial (subredditName: string, options: ListingQuery) {
     return this._getSortedFrontpage('controversial', subredditName, options)
   }
 
@@ -567,7 +562,7 @@ class snoowrap extends BaseRequester {
    * //   Submission { domain: 'self.redditdev', banned_by: null, subreddit: Subreddit { display_name: 'redditdev' }, ...}
    * // ]
    */
-  getHot(subredditName: string, options: ListingQuery) {
+  getHot (subredditName: string, options: ListingQuery) {
     return this._getSortedFrontpage('hot', subredditName, options)
   }
 
@@ -587,7 +582,7 @@ class snoowrap extends BaseRequester {
    * // ]
    *
    */
-  getNew(subredditName: string, options: ListingQuery) {
+  getNew (subredditName: string, options: ListingQuery) {
     return this._getSortedFrontpage('new', subredditName, options)
   }
 
@@ -605,7 +600,7 @@ class snoowrap extends BaseRequester {
    * //  Submission { domain: 'pcmag.com', banned_by: null, subreddit: Subreddit { display_name: 'technology' }, ... }
    * // ]
    */
-  getRising(subredditName: string, options: ListingQuery) {
+  getRising (subredditName: string, options: ListingQuery) {
     return this._getSortedFrontpage('rising', subredditName, options)
   }
 
@@ -633,7 +628,7 @@ class snoowrap extends BaseRequester {
    * //  ...
    * // ]
    */
-  getTop(subredditName: string, options: ListingQuery) {
+  getTop (subredditName: string, options: ListingQuery) {
     return this._getSortedFrontpage('top', subredditName, options)
   }
 
@@ -651,13 +646,13 @@ class snoowrap extends BaseRequester {
    * //  Comment { link_title: 'How far back in time could you go and still understand English?', ... }
    * // ]
    */
-  getNewComments(subredditName: string, options: ListingQuery) {
+  getNewComments (subredditName: string, options: ListingQuery) {
     return this._getSortedFrontpage('comments', subredditName, options)
   }
 
-  //#endregion
+  // #endregion
 
-  //#region _newObject
+  // #region _newObject
 
   /**
    * @summary Mark Modmail conversations as read given the subreddit(s) and state.
@@ -678,7 +673,7 @@ class snoowrap extends BaseRequester {
    * //  ModmailConversation { id: '75hxg' }
    * // ]
    */
-  async bulkReadNewModmail(
+  async bulkReadNewModmail (
     subreddits: (InstanceType<typeof snoowrap.objects.Subreddit>)[]|string[],
     state: 'archived'|'appeals'|'highlighted'|'notifications'|'join_requests'|'new'|'inprogress'|'mod'|'all'
   ) {
@@ -710,7 +705,7 @@ class snoowrap extends BaseRequester {
    * }).then(console.log)
    * // ModmailConversation { messages: [...], objIds: [...], subject: 'test subject', ... }
    */
-  async createModmailDiscussion({
+  async createModmailDiscussion ({
     body,
     subject,
     srName
@@ -745,7 +740,7 @@ class snoowrap extends BaseRequester {
    * comment.fetch().then(cmt => console.log(cmt.author.name))
    * // => 'Kharos'
    */
-  getComment(commentId: string, submissionId: string, sort: typeof COMMENT_SORTS[number]) {
+  getComment (commentId: string, submissionId: string, sort: typeof COMMENT_SORTS[number]) {
     return this._newObject('Comment', {
       name: addFullnamePrefix(commentId, 't1_'),
       link_id: submissionId ? addFullnamePrefix(submissionId, 't3_') : null,
@@ -764,7 +759,7 @@ class snoowrap extends BaseRequester {
    * r.getLivethread('whrdxo8dg9n0').nsfw.then(console.log)
    * // => false
    */
-  getLivethread(threadId: string) {
+  getLivethread (threadId: string) {
     return this._newObject('LiveThread', {id: addFullnamePrefix(threadId, 'LiveUpdateEvent_').slice(16)})
   }
 
@@ -776,13 +771,13 @@ class snoowrap extends BaseRequester {
    * r.getMe().then(console.log);
    * // => RedditUser { is_employee: false, has_mail: false, name: 'snoowrap_testing', ... }
    */
-  async getMe() {
+  async getMe () {
     const result = await this._get({url: 'api/v1/me'})
     this._ownUserInfo = this._newObject('RedditUser', result, true)
     return this._ownUserInfo!
   }
 
-  async _getMyName() {
+  async _getMyName () {
     return this._ownUserInfo ? this._ownUserInfo.name : (await this.getMe()).name
   }
 
@@ -798,7 +793,7 @@ class snoowrap extends BaseRequester {
    * // => 'Example'
    * // See here for a screenshot of the PM in question https://i.gyazo.com/24f3b97e55b6ff8e3a74cb026a58b167.png
    */
-  getMessage(messageId: string) {
+  getMessage (messageId: string) {
     return this._newObject('PrivateMessage', {name: addFullnamePrefix(messageId, 't4_')})
   }
 
@@ -811,7 +806,7 @@ class snoowrap extends BaseRequester {
    * r.getNewModmailConversation('75hxt').then(console.log)
    * // ModmailConversation { messages: [...], objIds: [...], ... }
    */
-  getNewModmailConversation(id: string) {
+  getNewModmailConversation (id: string) {
     return this._newObject('ModmailConversation', {id})
   }
 
@@ -826,7 +821,7 @@ class snoowrap extends BaseRequester {
    * //  Subreddit { display_name: 'EarthPorn', ... },
    * // ]
    */
-  async getNewModmailSubreddits() {
+  async getNewModmailSubreddits () {
     const response = await this._get({url: 'api/mod/conversations/subreddits'})
     return Object.values(response.subreddits).map(s => this._newObject('Subreddit', s))
   }
@@ -844,7 +839,7 @@ class snoowrap extends BaseRequester {
    * submission.fetch().then(sub => console.log(sub.title))
    * // => 'What tasty food would be distusting if eaten over rice?'
    */
-  getSubmission(submissionId: string, sort?: typeof COMMENT_SORTS[number]) {
+  getSubmission (submissionId: string, sort?: typeof COMMENT_SORTS[number]) {
     return this._newObject('Submission', {name: addFullnamePrefix(submissionId, 't3_'), _sort: sort})
   }
 
@@ -859,7 +854,7 @@ class snoowrap extends BaseRequester {
    * r.getSubreddit('AskReddit').created_utc.then(console.log)
    * // => 1201233135
    */
-  getSubreddit(displayName: string) {
+  getSubreddit (displayName: string) {
     return this._newObject('Subreddit', {display_name: displayName.replace(/^\/?r\//, '')})
   }
 
@@ -874,13 +869,13 @@ class snoowrap extends BaseRequester {
    * r.getUser('not_an_aardvark').link_karma.then(console.log)
    * // => 6
    */
-  getUser(name: string) {
+  getUser (name: string) {
     return this._newObject('RedditUser', {name: (name + '').replace(/^\/?u\//, '')})
   }
 
-  //#endregion
-  
-  //#region rest
+  // #endregion
+
+  // #region rest
 
   /**
    * @summary Determines whether the currently-authenticated user needs to fill out a captcha in order to submit content.
@@ -890,7 +885,7 @@ class snoowrap extends BaseRequester {
    * r.checkCaptchaRequirement().then(console.log)
    * // => false
    */
-   checkCaptchaRequirement () {
+  checkCaptchaRequirement () {
     return this._get({url: 'api/needs_captcha'})
   }
 
@@ -933,7 +928,7 @@ class snoowrap extends BaseRequester {
    * r.checkUsernameAvailability('eqwZAr9qunx7IHqzWVeF').then(console.log)
    * // => true
    */
-  checkUsernameAvailability(name: string) {
+  checkUsernameAvailability (name: string) {
     // The oauth endpoint listed in reddit's documentation doesn't actually work, so just send an unauthenticated request.
     return this.unauthenticatedRequest({url: 'api/username_available.json', params: {user: name}})
   }
@@ -959,7 +954,7 @@ class snoowrap extends BaseRequester {
    * })
    * // (message created on reddit)
    */
-  async composeMessage({
+  async composeMessage ({
     to,
     subject,
     text,
@@ -1008,7 +1003,7 @@ class snoowrap extends BaseRequester {
    * r.createLivethread({title: 'My livethread'}).then(console.log)
    * // => LiveThread { id: 'wpimncm1f01j' }
    */
-  async createLivethread({
+  async createLivethread ({
     title,
     description,
     resources,
@@ -1050,7 +1045,7 @@ class snoowrap extends BaseRequester {
    * }).then(console.log)
    * => MultiReddit { display_name: 'myMulti', ... }
    */
-  createMultireddit({
+  createMultireddit ({
     name,
     description,
     subreddits,
@@ -1082,7 +1077,7 @@ class snoowrap extends BaseRequester {
     })
   }
 
-  async _createOrEditSubreddit({
+  async _createOrEditSubreddit ({
     name,
     title,
     public_description,
@@ -1194,7 +1189,7 @@ class snoowrap extends BaseRequester {
    * // => Subreddit { display_name: 'snoowrap_testing2' }
    * // (/r/snoowrap_testing2 created on reddit)
    */
-  createSubreddit(options: SubredditOptions) {
+  createSubreddit (options: SubredditOptions) {
     return this._createOrEditSubreddit(options)
   }
 
@@ -1207,7 +1202,7 @@ class snoowrap extends BaseRequester {
    * r.getBlockedUsers().then(console.log)
    * // => [ RedditUser { date: 1457928120, name: 'actually_an_aardvark', id: 't2_q3519' } ]
    */
-  getBlockedUsers() {
+  getBlockedUsers () {
     return this._get({url: 'prefs/blocked'})
   }
 
@@ -1230,7 +1225,7 @@ class snoowrap extends BaseRequester {
    * //  Submission { approved_at_utc: null, ... }
    * // ]
   */
-  getContentByIds(ids: (string|Submission|Comment)[]) {
+  getContentByIds (ids: (string|Submission|Comment)[]) {
     if (!Array.isArray(ids)) {
       throw new TypeError('Invalid argument: Argument needs to be an array.')
     }
@@ -1258,7 +1253,7 @@ class snoowrap extends BaseRequester {
    * r.getFriends().then(console.log)
    * // => [ [ RedditUser { date: 1457927963, name: 'not_an_aardvark', id: 't2_k83md' } ], [] ]
    */
-  getFriends() {
+  getFriends () {
     return this._get({url: 'prefs/friends'})
   }
 
@@ -1274,7 +1269,7 @@ class snoowrap extends BaseRequester {
    * //  ...
    * // ]
    */
-  getKarma() {
+  getKarma () {
     return this._get({url: 'api/v1/me/karma'})
   }
 
@@ -1288,7 +1283,7 @@ class snoowrap extends BaseRequester {
    * r.getMyMultireddits().then(console.log)
    * => [ MultiReddit { ... }, MultiReddit { ... }, ... ]
    */
-  getMyMultireddits() {
+  getMyMultireddits () {
     return this._get({url: 'api/multi/mine', params: {expand_srs: true}})
   }
 
@@ -1309,7 +1304,7 @@ class snoowrap extends BaseRequester {
    * //   }
    * // ] }
    */
-  getMyTrophies() {
+  getMyTrophies () {
     return this._get({url: 'api/v1/me/trophies'})
   }
 
@@ -1334,7 +1329,7 @@ class snoowrap extends BaseRequester {
    * //  ...
    * // }
    */
-  getOauthScopeList() {
+  getOauthScopeList () {
     return this._get({url: 'api/v1/scopes'})
   }
 
@@ -1346,7 +1341,7 @@ class snoowrap extends BaseRequester {
    * r.getPreferences().then(console.log)
    * // => { default_theme_sr: null, threaded_messages: true, hide_downs: false, ... }
    */
-  getPreferences() {
+  getPreferences () {
     return this._get({url: 'api/v1/me/prefs'})
   }
 
@@ -1364,7 +1359,7 @@ class snoowrap extends BaseRequester {
    * r.getRandomSubmission('aww').then(console.log)
    * // => Submission { domain: 'i.imgur.com', banned_by: null, subreddit: Subreddit { display_name: 'aww' }, ... }
    */
-  async getRandomSubmission(subredditName: string) {
+  async getRandomSubmission (subredditName: string) {
     const res = await this._get({url: `${subredditName ? `r/${subredditName}/` : ''}random`})
     return res instanceof snoowrap.objects.Submission ? res : null
   }
@@ -1377,7 +1372,7 @@ class snoowrap extends BaseRequester {
    * r.getSavedCategories().then(console.log)
    * // => [ { category: 'cute cat pictures' }, { category: 'interesting articles' } ]
    */
-  async getSavedCategories() {
+  async getSavedCategories () {
     const res = await this._get({url: 'api/saved_categories'})
     return res.categories
   }
@@ -1389,7 +1384,7 @@ class snoowrap extends BaseRequester {
    * otherwise.
    * @example r.getCurrentEventsLivethread().then(thread => thread.stream.on('update', console.log))
    */
-  getStickiedLivethread() {
+  getStickiedLivethread () {
     return this._get({url: 'api/live/happening_now'})
   }
 
@@ -1422,8 +1417,8 @@ class snoowrap extends BaseRequester {
    * //  mod: 1,
    * // }
    */
-  getUnreadNewModmailConversationsCount() {
-    return this._get({url: 'api/mod/conversations/unread/count'});
+  getUnreadNewModmailConversationsCount () {
+    return this._get({url: 'api/mod/conversations/unread/count'})
   }
 
   /**
@@ -1437,7 +1432,7 @@ class snoowrap extends BaseRequester {
    * r.markAsVisited(submissions)
    * // (the links will now appear purple on reddit)
    */
-  markAsVisited(submission: Submission[]) {
+  markAsVisited (submission: Submission[]) {
     return this._post({url: 'api/store_visits', form: {links: submission.map(sub => sub.name).join(',')}})
   }
 
@@ -1458,7 +1453,7 @@ class snoowrap extends BaseRequester {
    * // Alternatively, just pass in a comment object directly.
    * r.markMessagesAsRead([r.getMessage('51shsd'), r.getComment('d3zhb5k')])
    */
-  markMessagesAsRead(messages: InstanceType<typeof snoowrap.objects.PrivateMessage>[]|string[]) {
+  markMessagesAsRead (messages: InstanceType<typeof snoowrap.objects.PrivateMessage>[]|string[]) {
     const messageIds = messages.map(message => addFullnamePrefix(message, 't4_'))
     return this._post({url: 'api/read_message', form: {id: messageIds.join(',')}})
   }
@@ -1480,7 +1475,7 @@ class snoowrap extends BaseRequester {
    * // Alternatively, just pass in a comment object directly.
    * r.markMessagesAsRead([r.getMessage('51shsd'), r.getComment('d3zhb5k')])
    */
-  markMessagesAsUnread(messages: InstanceType<typeof snoowrap.objects.PrivateMessage>[]|string[]) {
+  markMessagesAsUnread (messages: InstanceType<typeof snoowrap.objects.PrivateMessage>[]|string[]) {
     const messageIds = messages.map(message => addFullnamePrefix(message, 't4_'));
     return this._post({url: 'api/unread_message', form: {id: messageIds.join(',')}});
   }
@@ -1492,7 +1487,7 @@ class snoowrap extends BaseRequester {
    *
    * r.markNewModmailConversationsAsRead(['pics', 'sweden'])
    */
-  markNewModmailConversationsAsRead(conversations: InstanceType<typeof snoowrap.objects.ModmailConversation>[]|string[]) {
+  markNewModmailConversationsAsRead (conversations: InstanceType<typeof snoowrap.objects.ModmailConversation>[]|string[]) {
     const conversationIds = conversations.map(message => addFullnamePrefix(message, ''));
     return this._post({url: 'api/mod/conversations/read', form: {conversationIds: conversationIds.join(',')}});
   }
@@ -1504,7 +1499,7 @@ class snoowrap extends BaseRequester {
    *
    * r.markNewModmailConversationsAsUnread(['pics', 'sweden'])
    */
-  markNewModmailConversationsAsUnread(conversations: InstanceType<typeof snoowrap.objects.ModmailConversation>[]|string[]) {
+  markNewModmailConversationsAsUnread (conversations: InstanceType<typeof snoowrap.objects.ModmailConversation>[]|string[]) {
     const conversationIds = conversations.map(message => addFullnamePrefix(message, ''));
     return this._post({url: 'api/mod/conversations/unread', form: {conversationIds: conversationIds.join(',')}});
   }
@@ -1522,7 +1517,7 @@ class snoowrap extends BaseRequester {
    * // => Listing []
    * // (messages marked as 'read' on reddit)
    */
-  readAllMessages() {
+  readAllMessages () {
     return this._post({url: 'api/read_all_messages'});
   }
 
@@ -1543,7 +1538,7 @@ class snoowrap extends BaseRequester {
    * //  ...
    * // ]
    */
-  async searchSubredditNames({exact = false, include_nsfw = true, query = ''}) {
+  async searchSubredditNames ({exact = false, include_nsfw = true, query = ''}) {
     const res = await this._post({url: 'api/search_reddit_names', params: {exact, include_over_18: include_nsfw, query}});
     return res.names;
   }
@@ -1559,11 +1554,11 @@ class snoowrap extends BaseRequester {
    * // => { default_theme_sr: null, threaded_messages: false, hide_downs: true, ... }
    * // (preferences updated on reddit)
    */
-  updatePreferences(updatedPreferences: any) {
+  updatePreferences (updatedPreferences: any) {
     return this._patch({url: 'api/v1/me/prefs', data: updatedPreferences})
   }
 
-  //#endregion
+  // #endregion
 
   // #region _submit
 
@@ -1577,7 +1572,7 @@ class snoowrap extends BaseRequester {
    * r.convertToFancypants('Hello **world**!').then(console.log)
    * // => object {document: Array(1)}
    */
-  async convertToFancypants(markdown: string) {
+  async convertToFancypants (markdown: string) {
     const response: Fancypants = await this._post({
       url: 'api/convert_rte_body_format',
       form: {
@@ -1616,7 +1611,7 @@ class snoowrap extends BaseRequester {
   async uploadMedia<T extends UploadMediaOptions & {validateOnly: true}>(options: T): Promise<null>
   async uploadMedia<T extends UploadMediaOptions & {type?: undefined}>(options: T): Promise<MediaFile>
   async uploadMedia<T extends UploadMediaOptions>(options: T): Promise<MediaType[Exclude<T['type'], undefined>]>
-  async uploadMedia({file, name, type, caption, outboundUrl, validateOnly = false}: UploadMediaOptions) {
+  async uploadMedia ({file, name, type, caption, outboundUrl, validateOnly = false}: UploadMediaOptions) {
     if (isBrowser && !fetch) {
       throw new errors.InvalidMethodCallError('Your browser doesn\'t support \'no-cors\' requests')
     }
@@ -1624,14 +1619,14 @@ class snoowrap extends BaseRequester {
       throw new errors.InvalidMethodCallError('\'options.file\' cannot be a \'string\' on browser')
     }
     // `File` is an instance of `Blob`, so one check for `Blob` is enough
-    if (typeof file !== 'string' && !(file instanceof stream.Readable) && !(Blob && file instanceof Blob)) {
+    if (typeof file !== 'string' && !(stream && file instanceof stream.Readable) && !(Blob && file instanceof Blob)) {
       throw new errors.InvalidMethodCallError('\'options.file\' must be one of: \'string\', \'stream.Readable\', \'Blob\', or a \'File\'')
     }
-    const parsedFile = typeof file === 'string' ? createReadStream(file) : file
+    const parsedFile = typeof file === 'string' ? fs && fs.createReadStream(file) : file
     const fileName = typeof file === 'string' ? path.basename(file) : (file as {name?: string}).name || name
     if (!fileName) requiredArg('options.name')
-    let fileExt = path.extname(fileName!).replace('.', '') || 'jpeg' // Default to JPEG
-    const mimetype = Blob && file instanceof Blob && file.type || MIME_TYPES[fileExt as keyof typeof MIME_TYPES] || ''
+    const fileExt = path.extname(fileName!).replace('.', '') || 'jpeg' // Default to JPEG
+    const mimetype = Blob && file instanceof Blob ? file.type || MIME_TYPES[fileExt as keyof typeof MIME_TYPES] : ''
     const expectedPrefix = MEDIA_TYPES[type!]
     if (expectedPrefix && mimetype.split('/')[0] !== expectedPrefix) {
       throw new errors.InvalidMethodCallError(`Expected a MIMETYPE for the file '${fileName}' starting with '${expectedPrefix}' but got '${mimetype}'`)
@@ -1705,7 +1700,7 @@ class snoowrap extends BaseRequester {
     return media
   }
 
-  async _submit({
+  async _submit ({
     sr,
     kind,
     title,
@@ -1789,7 +1784,7 @@ class snoowrap extends BaseRequester {
             const submissionUrl = data.payload.redirect
             const submissionId = SUBMISSION_ID_REGEX.exec(submissionUrl)![1]
             resolve(this.getSubmission(submissionId))
-          } catch(err) {
+          } catch (err) {
             reject(err)
           }
         }
@@ -1817,7 +1812,7 @@ class snoowrap extends BaseRequester {
    * // => Submission { name: 't3_4abnfe' }
    * // (new linkpost created on reddit)
    */
-  submitLink(options: SubmitLinkOptions) {
+  submitLink (options: SubmitLinkOptions) {
     // Todo: Add `options.url` validation.
     return this._submit({...options, kind: 'link'})
   }
@@ -1840,16 +1835,16 @@ class snoowrap extends BaseRequester {
    * // => Submission
    * // (new image submission created on reddit)
    */
-  async submitImage({imageFile, imageFileName, noWebsockets, ...opts}: SubmitImageOptions) {
+  async submitImage ({imageFile, imageFileName, noWebsockets, ...opts}: SubmitImageOptions) {
     let url, websocketUrl
     try {
       const image = imageFile instanceof MediaImg
         ? imageFile
         : await this.uploadMedia({
-            file: imageFile,
-            name: imageFileName,
-            type: 'img'
-          })
+          file: imageFile,
+          name: imageFileName,
+          type: 'img'
+        })
       url = image.fileUrl
       websocketUrl = image.websocketUrl
     } catch (err) {
@@ -1880,7 +1875,7 @@ class snoowrap extends BaseRequester {
    * // => Submission
    * // (new video submission created on reddit)
    */
-  async submitVideo({
+  async submitVideo ({
     videoFile,
     videoFileName,
     thumbnailFile,
@@ -1972,7 +1967,7 @@ class snoowrap extends BaseRequester {
    * // => Submission
    * // (new gallery submission created on reddit)
    */
-  async submitGallery({gallery, ...opts}: SubmitGalleryOptions) {
+  async submitGallery ({gallery, ...opts}: SubmitGalleryOptions) {
     /**
      * Validate every single gallery item to ensure that no accidental uploads will happen.
      */
@@ -2051,7 +2046,7 @@ class snoowrap extends BaseRequester {
    * // => Submission
    * // (new selfpost created on reddit)
    */
-  async submitSelfpost({text, inlineMedia, richtext_json, ...opts}: SubmitSelfpostOptions) {
+  async submitSelfpost ({text, inlineMedia, richtext_json, ...opts}: SubmitSelfpostOptions) {
     /* eslint-disable require-atomic-updates */
     if (richtext_json) {
       text = undefined
@@ -2094,7 +2089,7 @@ class snoowrap extends BaseRequester {
 
   /**
    * @summary Submit a poll to the given subreddit. (Undocumented endpoint).
-   * @param options An object containing details about the submission.  
+   * @param options An object containing details about the submission.
    * @returns The newly-created Submission object.
    * @example
    *
@@ -2108,7 +2103,7 @@ class snoowrap extends BaseRequester {
    * // => Submission
    * // (new poll submission created on reddit)
    */
-  submitPoll(options: SubmitPollOptions) {
+  submitPoll (options: SubmitPollOptions) {
     return this._submit({...options, kind: 'poll'})
   }
 
@@ -2128,12 +2123,12 @@ class snoowrap extends BaseRequester {
    * // => Submission
    * // (new crosspost submission created on reddit)
    */
-  submitCrosspost({originalPost, ...opts}: SubmitCrosspostOptions) {
+  submitCrosspost ({originalPost, ...opts}: SubmitCrosspostOptions) {
     const crosspost_fullname = originalPost instanceof snoowrap.objects.Submission
       ? originalPost.name
       : originalPost
-      ? addFullnamePrefix(originalPost, 't3_')
-      : opts.crosspost_fullname
+        ? addFullnamePrefix(originalPost, 't3_')
+        : opts.crosspost_fullname
     if (!crosspost_fullname) requiredArg('options.originalPost')
     return this._submit({...opts, kind: 'crosspost', crosspost_fullname})
   }

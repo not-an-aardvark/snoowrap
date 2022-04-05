@@ -1,17 +1,18 @@
 import {buildRepliesTree, handleJsonErrors} from '../helper'
 import {MAX_API_INFO_AMOUNT, MAX_API_MORECHILDREN_AMOUNT} from '../constants'
-import snoowrap from '../snoowrap'
+import Listing, {type FetchMoreOptions} from './Listing'
+import type snoowrap from '../snoowrap'
 import type Comment from './Comment'
-import Listing, {FetchMoreOptions} from './Listing'
-import {JSONResponse} from '../interfaces'
+import type {JSONResponse} from '../interfaces'
 
-export interface Options {
+interface Options {
   children: string[]
   count: number
   depth: number
   id: string
   name: string
   parent_id: string
+  /** Custom */
   link_id?: string
 }
 
@@ -32,10 +33,17 @@ export interface Options {
  */
 interface More extends Partial<Options> {}
 class More {
-  children: string[]
-  _r: snoowrap
+  ['constructor']: typeof More
+  static _name = 'More'
 
-  constructor ({children = [], ...options}: Partial<Options>, _r: snoowrap) {
+  children: string[]
+  _r!: snoowrap
+
+  constructor (
+    {children = [], ...options}: Partial<Options> = {},
+    _r?: snoowrap,
+    public _hasFetched?: boolean
+  ) {
     this.children = children
     this.count = options.count
     this.depth = options.depth
@@ -43,7 +51,7 @@ class More {
     this.name = options.name
     this.parent_id = options.parent_id
     this.link_id = options.link_id
-    this._r = _r
+    this._r = _r!
   }
 
   /**
@@ -147,5 +155,7 @@ class More {
   }
 }
 
-export const emptyChildren = (r: snoowrap) => new More({}, r)
+const emptyChildren = () => new More()
+
 export default More
+export {Options, emptyChildren}

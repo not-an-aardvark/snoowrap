@@ -10,7 +10,7 @@ import {RichTextFlair} from './VoteableContent';
 import WikiPage, {WikiPageRevision} from './WikiPage';
 import ModmailConversation from './ModmailConversation';
 
-export default class Subreddit<T> extends RedditContent<T> {
+export default class Subreddit<T = any> extends RedditContent<T> {
   accounts_active_is_fuzzed: boolean;
   accounts_active: number;
   active_user_count: number;
