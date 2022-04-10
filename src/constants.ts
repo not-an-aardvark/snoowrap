@@ -66,4 +66,6 @@ export const GRANT_TYPES = {
   AUTHORIZATION_CODE: 'authorization_code'
 }
 export const DEVICE_ID = 'DO_NOT_TRACK_THIS_DEVICE'
+export const SUBMISSION_SORTS = ['hot', 'new', 'top', 'rising', 'controversial'] as const
+export const FRONTPAGE_SORTS = ['best', ...SUBMISSION_SORTS] as const
 export const COMMENT_SORTS = ['confidence', 'top', 'new', 'controversial', 'old', 'random', 'qa', 'live'] as const

@@ -1,4 +1,4 @@
-const path = require('path')
+var path = require('path')
 var noop = path.resolve('./noop.js')
 
 /** @type {import('vite').UserConfig} */

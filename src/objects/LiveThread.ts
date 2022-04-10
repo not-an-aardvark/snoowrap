@@ -1,7 +1,7 @@
 import {EventEmitter} from 'events';
 import {formatLivethreadPermissions, handleJsonErrors, isBrowser} from '../helper';
 import RedditContent from './RedditContent';
-
+//
 const WebSocket = isBrowser ? self.WebSocket : require('ws');
 
 const api_type = 'json';

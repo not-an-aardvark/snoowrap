@@ -1,9 +1,11 @@
-import {CredentialsResponse} from './interfaces'
-import axiosCreate, {AxiosRequestConfig, AxiosResponse, AxiosError} from './axiosCreate'
+import axiosCreate from './axiosCreate'
 import {isBrowser, requiredArg} from './helpers'
 import defaultConfig from './defaultConfig'
 import {GRANT_TYPES, DEVICE_ID, IDEMPOTENT_HTTP_VERBS, MAX_TOKEN_LATENCY} from './constants'
 import {rateLimitWarning, RateLimitError} from './errors'
+import type {AxiosRequestConfig, AxiosResponse, AxiosError} from './axiosCreate'
+import type {CredentialsResponse} from './interfaces'
+
 
 interface Common {
   redirect_uri?: string
@@ -163,9 +165,9 @@ class BaseRequester {
    * window.location.href = authenticationUrl; // send the user to the authentication url
    */
   getAuthUrl ({
-    client_id = this.client_id || requiredArg('client_id'),
+    client_id = (this.client_id || requiredArg('client_id')) as string,
     scope = ['*'],
-    redirect_uri = this.redirect_uri || requiredArg('redirect_uri'),
+    redirect_uri = (this.redirect_uri || requiredArg('redirect_uri')) as string,
     permanent = true,
     state = '_',
     compact = false

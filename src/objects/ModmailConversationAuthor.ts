@@ -2,7 +2,7 @@
 import RedditContent from './RedditContent';
 import RedditUser from './RedditUser';
 import snoowrap from '../snoowrap';
-
+//
 export interface BanStatus {
   endDate?: string | null;
   reason: string;

@@ -25,8 +25,8 @@ interface VoteableContent {
   banned_by: RedditUser|null
   can_gild: boolean
   can_mod_post: boolean
-  created_utc: number
   created: number
+  created_utc: number
   distinguished: 'admin'|'moderator'|null
   downs: number
   edited: number|boolean
@@ -58,7 +58,6 @@ interface VoteableContent {
   ups: number
   user_reports: string[]
   delete(): Promise<this>
-  [key: string]: any
 }
 
 /**

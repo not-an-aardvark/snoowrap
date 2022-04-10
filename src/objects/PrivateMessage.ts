@@ -3,7 +3,7 @@ import ReplyableContent from './ReplyableContent'
 import type Listing from './Listing'
 import type RedditUser from './RedditUser'
 import type Subreddit from './Subreddit'
-
+//
 
 interface PrivateMessage {
   author: RedditUser
@@ -24,7 +24,6 @@ interface PrivateMessage {
   subreddit_name_prefixed: string
   subreddit: Subreddit
   was_comment: boolean
-  [key: string]: any
 }
 
 /**

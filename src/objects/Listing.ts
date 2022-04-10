@@ -10,14 +10,22 @@ import type {Children} from '../interfaces'
 
 
 interface ListingQuery {
+  /** fullname of a thing */
   after?: string|null
+  /** fullname of a thing */
   before?: string|null
+  /** The maximum number of items desired */
   limit?: number
+  /** The string 'all' */
   show?: string
+  /** A positive integer */
   count?: number
-  t?: 'all'|'hour'|'day'|'week'|'month'|'year'
-  time?: 'all'|'hour'|'day'|'week'|'month' |'year'
   [key: string]: any
+}
+
+interface SortedListingQuery extends ListingQuery {
+  /** Describes the timespan that posts should be retrieved from */
+  t?: 'all'|'hour'|'day'|'week'|'month'|'year'
 }
 
 interface ListingProps {
@@ -39,17 +47,20 @@ interface Options extends Partial<ListingProps> {
   dist: number
   geo_filter: string|null
   modhash: string|null
+  [key: string]: any
 }
 
 interface FetchMoreOptions {
   amount: number
   skipReplies: boolean
   append: boolean
+  [key: string]: any
 }
 
 interface FetchAllOptions {
   skipReplies?: boolean
   append?: boolean
+  [key: string]: any
 }
 
 /**
@@ -191,7 +202,7 @@ class Listing<T extends RedditContent|{[key: string]: any} = RedditContent> exte
    *   })
    * })
    */
-  async fetchMore (options: Partial<FetchMoreOptions>|FetchMoreOptions['amount']): Promise<Listing<T>> {
+  async fetchMore (options: Partial<FetchMoreOptions>|number): Promise<Listing<T>> {
     const {
       amount,
       append = true,
@@ -339,4 +350,4 @@ if (!isBrowser) {
 }
 
 export default Listing
-export {ListingProps, Options, FetchMoreOptions, FetchAllOptions, ListingQuery}
+export {ListingProps, Options, FetchMoreOptions, FetchAllOptions, ListingQuery, SortedListingQuery}

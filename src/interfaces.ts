@@ -18,10 +18,6 @@ export interface CredentialsResponse {
   error_description: string
 }
 
-export interface Children {
-  [key: string]: Comment
-}
-
 export interface JSONResponse<T> {
   json: {
     data?: {
@@ -79,82 +75,6 @@ export interface UploadResponse {
   }
 }
 
-export interface ListingOptions extends Partial<Options> {
-  qs: Options['_query']
-  uri: Options['_uri'],
-}
-
-export interface RichTextFlair {
-  /** The string representation of the emoji */
-  a?: string
-  /** The type of the flair entry */
-  e: 'text' | 'emoji'
-  /** URL of the emoji image */
-  u?: string
-  /** The text content of a text flair */
-  t?: string
-}
-
-export interface Gildings {
-  /** Number of Reddit Silver awarded */
-  gid_1: number
-  /** Number of Reddit Gold awarded */
-  gid_2: number
-  /** Number of Reddit Platinum awarded */
-  gid_3: number
-}
-
-export type SubredditType =
-  | 'gold_restricted'
-  | 'archived'
-  | 'restricted'
-  | 'employees_only'
-  | 'gold_only'
-  | 'private'
-  | 'user'
-  | 'public'
-
-export interface SubredditOptions {
-  name: string,
-  title: string,
-  public_description: string,
-  description: string,
-  allow_images: boolean,
-  allow_top: boolean,
-  captcha: string,
-  captcha_iden: string,
-  collapse_deleted_comments: boolean,
-  comment_score_hide_mins: number,
-  exclude_banned_modqueue: boolean,
-  'header-title': string,
-  hide_ads: boolean,
-  lang: string,
-  link_type: string,
-  over_18: boolean,
-  public_traffic: boolean,
-  show_media: boolean,
-  show_media_preview: boolean,
-  spam_comments: string,
-  spam_links: string,
-  spam_selfposts: string,
-  spoilers_enabled: boolean,
-  sr: string,
-  submit_link_label: string,
-  submit_text_label: string,
-  submit_text: string,
-  suggested_comment_sort: string,
-  type: string,
-  wiki_edit_age: number,
-  wiki_edit_karma: number,
-  wikimode: string,
-  [key: string]: any
-}
-
-export interface InboxFilter extends ListingQuery {
-  filter: 'inbox'|'unread'|'messages'|'comments'|'selfreply'|'mentions'
-}
-
-/** UploadMediaOptions */
 export interface UploadMediaOptions {
   /**
    * The media file to upload. This should either be the path to the file (as a `string`),
@@ -195,7 +115,6 @@ export interface MediaType {
   readonly gif: MediaGif
 }
 
-/** SubmitOptions */
 export interface SubmitOptions {
   /** The name of the subreddit where to submit the post. */
   sr: string,
@@ -260,13 +179,11 @@ export interface SubmitOptions {
   [key: string]: any
 }
 
-/** SubmitOptions */
 export interface SubmitLinkOptions extends OmitProps<
   SubmitOptions,
   'kind'|'video_poster_url'|'websocketUrl'|'items'|'text'|'richtext_json'|'options'|'duration'|'crosspost_fullname'
 > {}
 
-/** SubmitOptions */
 export interface SubmitImageOptions extends OmitProps<
   SubmitOptions,
   'kind'|'url'|'video_poster_url'|'websocketUrl'|'items'|'text'|'richtext_json'|'options'|'duration'|'crosspost_fullname'
@@ -291,7 +208,6 @@ export interface SubmitImageOptions extends OmitProps<
   noWebsockets: boolean
 }
 
-/** SubmitOptions */
 export interface SubmitVideoOptions extends OmitProps<
   SubmitOptions,
   'kind'|'url'|'video_poster_url'|'websocketUrl'|'items'|'text'|'richtext_json'|'options'|'duration'|'crosspost_fullname'
@@ -334,7 +250,6 @@ export interface SubmitVideoOptions extends OmitProps<
   noWebsockets: boolean
 }
 
-/** SubmitOptions */
 export interface SubmitGalleryOptions extends OmitProps<
   SubmitOptions,
   'kind'|'url'|'video_poster_url'|'websocketUrl'|'text'|'richtext_json'|'options'|'duration'|'crosspost_fullname'
@@ -347,7 +262,6 @@ export interface SubmitGalleryOptions extends OmitProps<
   gallery: Array<MediaImg|UploadMediaOptions>
 }
 
-/** SubmitOptions */
 export interface SubmitSelfpostOptions extends OmitProps<
   SubmitOptions,
   'kind'|'url'|'video_poster_url'|'websocketUrl'|'items'|'options'|'duration'|'crosspost_fullname'
@@ -360,13 +274,11 @@ export interface SubmitSelfpostOptions extends OmitProps<
   inlineMedia: {[key: string]: MediaImg|MediaVideo|MediaGif|UploadInlineMediaOptions}
 }
 
-/** SubmitOptions */
 export interface SubmitPollOptions extends OmitProps<
   SubmitOptions,
   'kind'|'url'|'video_poster_url'|'websocketUrl'|'items'|'text'|'richtext_json'|'crosspost_fullname'
 > {}
 
-/** SubmitOptions */
 export interface SubmitCrosspostOptions extends OmitProps<
   SubmitOptions,
   'kind'|'url'|'video_poster_url'|'websocketUrl'|'items'|'text'|'richtext_json'|'options'|'duration'
@@ -374,3 +286,189 @@ export interface SubmitCrosspostOptions extends OmitProps<
   /* A Submission object or a post ID for the original post which is being crossposted **/
   originalPost: InstanceType<typeof snoowrap.objects.Submission>|string
 }
+
+export interface Children {
+  [key: string]: Comment
+}
+
+export interface SubredditOptions {
+  name: string,
+  title: string,
+  public_description: string,
+  description: string,
+  allow_images: boolean,
+  allow_top: boolean,
+  captcha: string,
+  captcha_iden: string,
+  collapse_deleted_comments: boolean,
+  comment_score_hide_mins: number,
+  exclude_banned_modqueue: boolean,
+  'header-title': string,
+  hide_ads: boolean,
+  lang: string,
+  link_type: string,
+  over_18: boolean,
+  public_traffic: boolean,
+  show_media: boolean,
+  show_media_preview: boolean,
+  spam_comments: string,
+  spam_links: string,
+  spam_selfposts: string,
+  spoilers_enabled: boolean,
+  sr: string,
+  submit_link_label: string,
+  submit_text_label: string,
+  submit_text: string,
+  suggested_comment_sort: string,
+  type: string,
+  wiki_edit_age: number,
+  wiki_edit_karma: number,
+  wikimode: string,
+  [key: string]: any
+}
+
+export interface RichTextFlair {
+  /** The string representation of the emoji */
+  a?: string
+  /** The type of the flair entry */
+  e: 'text' | 'emoji'
+  /** URL of the emoji image */
+  u?: string
+  /** The text content of a text flair */
+  t?: string
+}
+
+export interface Gildings {
+  /** Number of Reddit Silver awarded */
+  gid_1: number
+  /** Number of Reddit Gold awarded */
+  gid_2: number
+  /** Number of Reddit Platinum awarded */
+  gid_3: number
+}
+
+export type SubredditType = 'gold_restricted'|'archived'|'restricted'|'employees_only'|'gold_only'|'private'|'user'|'public'
+
+export interface Media {
+  oembed?: {
+    /** The username of the uploader of the source media */
+    author_name?: string
+    /** URL to the author's profile on the source website */
+    author_url?: string
+    description?: string
+    height: number
+    html: string
+    /** Name of the source website, e.g. "gfycat", "YouTube" */
+    provider_name: string
+    /** URL of the source website, e.g. "https://www.youtube.com" */
+    provider_url: string
+    thumbnail_height: number
+    thumbnail_url: string
+    thumbnail_width: number
+    /** Name of the media on the content site, e.g. YouTube video title */
+    title: string
+    type: 'video'|'rich'
+    version: string
+    width: number
+  }
+  reddit_video?: {
+    dash_url: string
+    duration: number
+    fallback_url: string
+    height: number
+    hls_url: string
+    is_gif: boolean
+    scrubber_media_url: string
+    transcoding_status: string
+  }
+  type?: string
+}
+
+export interface MediaEmbed {
+  /** HTML string of the media, usually an iframe */
+  content?: string
+  height?: number
+  scrolling?: boolean
+  width?: number
+}
+
+export interface SecureMediaEmbed extends MediaEmbed {
+  media_domain_url?: string
+}
+
+export interface ImagePreviewSource {
+  url: string
+  width: number
+  height: number
+}
+
+export interface ImagePreview {
+  source: ImagePreviewSource
+  resolutions: ImagePreviewSource[]
+  variants: any // ?
+  id: string
+}
+
+export interface AssignFlairOptions {
+  /** The text that the flair should have */
+  text?: string
+  /** The CSS class that the user's flair should have */
+  css_class?: string
+  /** The name of the user that flair should be assigned to */
+  name?: string
+  /** The name of the submission that flair should be assigned to */
+  link?: string
+  /** The subreddit that flair should be assigned on */
+  subredditName: string
+  [key: string]: any
+}
+
+export interface SelectFlairOptions {
+  /**
+   * The text that the flair should have. (This is only necessary/useful if the given flair
+   * template has the `text_editable` property set to `true`.)
+   */
+  text?: string
+  /**
+   * A flair template ID to use. (This should be obtained beforehand using
+   * {@link Subreddit#getUserFlairTemplates}.)
+   */
+  flair_template_id: string
+  /** The name of the user that flair should be assigned to */
+  name?: string
+  /** The name of the submission that flair should be assigned to */
+  link?: string
+  /** The subreddit that flair should be assigned on */
+  subredditName: string
+  [key: string]: any
+}
+
+export interface CreateFlairOptions {
+  /** The text that the flair should have */
+  text: string
+  /** The CSS class that the user's flair should have */
+  css_class?: string
+  /** The type that the flair should have */
+  flair_type: 'USER_FLAIR'|'LINK_FLAIR'
+  /**
+   * Determines whether users should be able to edit their flair text
+   * when it has this template
+   */
+  text_editable?: boolean
+  [key: string]: any
+}
+
+export interface FlairSelectorOptions {
+  name?: string
+  link?: string
+  is_newlink?: boolean
+}
+
+export type FlairCSVOptions = {
+  /** The text that the flair should have */
+  text?: string
+  /** The CSS class that the user's flair should have */
+  css_class?: string
+  /** The name of the user that flair should be assigned to */
+  name: string
+}[]

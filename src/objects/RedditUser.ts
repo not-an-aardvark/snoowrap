@@ -1,7 +1,9 @@
 import {USERNAME_REGEX} from '../constants'
 import {InvalidMethodCallError, InvalidUserError} from '../errors'
-import type {ListingQuery} from './Listing'
 import RedditContent from './RedditContent'
+import type {AssignFlairOptions, OmitProps} from '../interfaces'
+import type {ListingQuery} from './Listing'
+
 
 /**
  * A class representing a reddit user
@@ -39,13 +41,10 @@ class RedditUser extends RedditContent<RedditUser> {
   /**
    * Assigns flair to this user on a given subreddit (as a moderator).
    * @param {object} options
-   * @param {string} options.subredditName The subreddit that flair should be assigned on
-   * @param {string} [options.text=''] The text that the user's flair should have
-   * @param {string} [options.cssClass=''] The CSS class that the user's flair should have
    * @returns A Promise that fulfills with the current user after the request is complete
    * @example r.getUser('not_an_aardvark').assignFlair({subredditName: 'snoowrap', text: "Isn't an aardvark"})
    */
-  async assignFlair (options: any) {
+  async assignFlair (options: OmitProps<AssignFlairOptions, 'link'|'name'>) {
     await this._r._assignFlair({...options, name: this.name})
     return this
   }

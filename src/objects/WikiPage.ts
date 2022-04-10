@@ -49,7 +49,6 @@ interface WikiPage {
   revision_by: RedditUser
   revision_date: number
   revision_id: string
-  [key: string]: any
 }
 
 /**

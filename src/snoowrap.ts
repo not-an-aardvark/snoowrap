@@ -1,6 +1,6 @@
 import stream from 'stream'
 import fs from 'fs'
-import {defaults, omit} from 'lodash'
+import {omit} from 'lodash'
 
 import BaseRequester from './BaseRequester'
 import type {Common, AppAuth, ScriptAuth, CodeAuth, All} from './BaseRequester'
@@ -10,7 +10,7 @@ import * as objects from './objects'
 import * as errors from './errors'
 import {
   KINDS, MAX_LISTING_ITEMS, MODULE_NAME, USER_KEYS, SUBREDDIT_KEYS, VERSION, MIME_TYPES, SUBMISSION_ID_REGEX,
-  MEDIA_TYPES, PLACEHOLDER_REGEX, type COMMENT_SORTS
+  MEDIA_TYPES, PLACEHOLDER_REGEX, type COMMENT_SORTS, type FRONTPAGE_SORTS, type SUBMISSION_SORTS
 } from './constants'
 
 import {addEmptyRepliesListing, addFullnamePrefix, handleJsonErrors} from './helper'
@@ -20,18 +20,58 @@ import isContentTree, {type ContentTree} from './helpers/isContentTree'
 import isSubmissionTree, {type SubmissionTree} from './helpers/isSubmissionTree'
 
 import type {
-  Children, Fancypants, UploadResponse, ListingOptions, SubredditOptions, InboxFilter, UploadMediaOptions,
+  Children, Fancypants, UploadResponse, SubredditOptions, UploadMediaOptions,
   UploadInlineMediaOptions, MediaType, SubmitOptions, SubmitLinkOptions, SubmitImageOptions, SubmitVideoOptions,
-  SubmitGalleryOptions, SubmitSelfpostOptions, SubmitPollOptions, SubmitCrosspostOptions
+  SubmitGalleryOptions, SubmitSelfpostOptions, SubmitPollOptions, SubmitCrosspostOptions, AssignFlairOptions, SelectFlairOptions
 } from './interfaces'
 
-import type {Listing, RedditUser, Submission} from './objects'
-import type {ListingQuery} from './objects/Listing'
+import type {Listing, RedditUser, Submission, Subreddit, ModmailConversation, PrivateMessage} from './objects'
+import type {ListingQuery, SortedListingQuery, Options} from './objects/Listing'
 import MediaFile, {MediaImg, MediaVideo, MediaGif} from './objects/MediaFile'
 
 const fetch = self.fetch
 const Blob = self.Blob
 const api_type = 'json'
+
+
+export interface ListingOptions extends Partial<Options> {
+  qs: Options['_query']
+  uri: Options['_uri']
+}
+
+export interface InboxFilterQuery extends ListingQuery {
+  /**
+   * A filter for the inbox items. If provided, it should be one of `unread`, (unread
+   * items), `messages` (i.e. PMs), `comments` (comment replies), `selfreply` (selfpost replies),
+   * or `mentions` (username mentions).
+   */
+  filter?: 'inbox'|'unread'|'messages'|'comments'|'selfreply'|'mentions'
+}
+
+export interface SearchOptions extends SortedListingQuery {
+  /** The subreddit to conduct the search on. (Custom)*/
+  subreddit?: Subreddit|string
+  /** The query string to search for. A string no longer than 512 characters. */
+  q: string
+  /** Determines how the results should be sorted. */
+  sort?: typeof SUBMISSION_SORTS[number]|'relevance'|'comments'
+  /** Specifies a syntax for the search. */
+  syntax?: 'cloudsearch'|'lucene'|'plain'
+  /** Restricts search results to the given subreddit */
+  restrict_sr?: boolean
+  /** A string no longer than 5 characters */
+  category?: string
+  include_facets?: boolean
+  /** Expand subreddits */
+  sr_detail?: string
+  /** Comma-delimited list of result types (sr, link, user) */
+  type?: string
+}
+
+type ObjectType = keyof typeof snoowrap['objects']
+type Objects = {
+  [Key in ObjectType]: InstanceType<typeof snoowrap['objects'][Key]>
+}
 
 /**
  * The class for a snoowrap requester.
@@ -64,17 +104,9 @@ class snoowrap extends BaseRequester {
     return snoowrap
   }
 
-  _newObject<ObjectType extends keyof typeof snoowrap.objects> (
-    objectType: ObjectType, content: any[], _hasFetched?: boolean
-  ): any[]
-
-  _newObject<ObjectType extends keyof typeof snoowrap.objects> (
-    objectType: ObjectType, content: any, _hasFetched?: boolean
-  ): InstanceType<typeof snoowrap.objects[typeof objectType]>
-
-  _newObject<ObjectType extends keyof typeof snoowrap.objects> (
-    objectType: ObjectType, content: any[]|any, _hasFetched = false
-  ) {
+  _newObject<T extends ObjectType> (objectType: T, content: any[], _hasFetched?: boolean): any[]
+  _newObject<T extends ObjectType> (objectType: T, content: any, _hasFetched?: boolean): Objects[T]
+  _newObject<T extends ObjectType> (objectType: T, content: any[]|any, _hasFetched = false) {
     if (Array.isArray(content)) return content
     const object = snoowrap.objects[objectType] || snoowrap.objects.RedditContent
     // @ts-ignore
@@ -145,15 +177,48 @@ class snoowrap extends BaseRequester {
     return responseTree
   }
 
-  async _getListing ({uri = '', qs = {}, ...options}: ListingOptions) {
+  async _assignFlair ({
+    text,
+    css_class,
+    name,
+    link,
+    subredditName,
+    ...opts
+  }: AssignFlairOptions) {
+    if (!name && !link) {
+      throw new errors.InvalidMethodCallError('Either `name` or `link` should be provided')
+    }
+    return this._post({url: `r/${subredditName}/api/flair`, form: {...opts, api_type, text, css_class, link, name}})
+  }
+
+  async _selectFlair ({
+    text,
+    flair_template_id,
+    name,
+    link,
+    subredditName,
+    ...opts
+  }: SelectFlairOptions) {
+    if (!flair_template_id) {
+      throw new errors.InvalidMethodCallError('No flair template ID provided')
+    }
+    if (!name && !link) {
+      throw new errors.InvalidMethodCallError('Either `name` or `link` should be provided')
+    }
+    return this._post({url: `r/${subredditName}/api/selectflair`, form: {...opts, api_type, text, flair_template_id, link, name}})
+  }
+
+  // #region _getListing
+
+  async _getListing ({uri = '', qs = {}, ...opts}: ListingOptions) {
     /**
      * When the response type is expected to be a Listing, add a `count` parameter with a very high number.
      * This ensures that reddit returns a `before` property in the resulting Listing to enable pagination.
      * (Aside from the additional parameter, this function is equivalent to snoowrap.prototype._get)
      */
-    const mergedQuery = {count: 9999, ...qs}
-    if (qs.limit || Object.keys(options).length) {
-      const listing = this._newObject('Listing', {_query: mergedQuery, _uri: uri, ...options})
+    const query = {count: 9999, ...qs}
+    if (qs.limit || Object.keys(opts).length) {
+      const listing: Listing<any> = this._newObject('Listing', {_query: query, _uri: uri, ...opts})
       return listing.fetchMore(qs.limit || MAX_LISTING_ITEMS)
     }
     /**
@@ -166,60 +231,17 @@ class snoowrap extends BaseRequester {
      * (predicting upstream changes can only go so far). More importantly, in the limited cases where it's used, the fallback
      * should have no effect on the returned results
      */
-    const listing: Listing<any> = await this._get({url: uri, params: mergedQuery})
+    const listing: Listing<any> = await this._get({url: uri, params: query})
     if (Array.isArray(listing)) {
       listing.filter(item => item instanceof snoowrap.objects.Comment).forEach(addEmptyRepliesListing)
     }
     return listing
   }
 
-  _getSortedFrontpage (sortType: string, subredditName?: string, options: ListingQuery = {}) {
-    options.t = options.t || options.time
-    delete options.time
-    return this._getListing({uri: (subredditName ? `r/${subredditName}/` : '') + sortType, qs: options})
-  }
-
-  async _assignFlair ({
-    css_class,
-    link,
-    name,
-    text,
-    subredditName
-  }: {
-    css_class: string,
-    link: string,
-    name: string,
-    text: string,
-    subredditName: string
-  }) {
-    return this._post({url: `r/${subredditName}/api/flair`, form: {api_type, name, text, link, css_class}})
-  }
-
-  async _selectFlair ({
-    flair_template_id,
-    link,
-    name,
-    text,
-    subredditName
-  }: {
-    flair_template_id: string,
-    link: string,
-    name: string,
-    text: string,
-    subredditName: string
-  }) {
-    if (!flair_template_id) {
-      throw new errors.InvalidMethodCallError('No flair template ID provided')
-    }
-    return this._post({url: `r/${subredditName}/api/selectflair`, form: {api_type, flair_template_id, link, name, text}})
-  }
-
-  // #region _getListing
-
   /**
    * @summary Gets a list of subreddits in which the currently-authenticated user is an approved submitter.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing Subreddits
+   * @returns A Listing containing Subreddits
    * @example
    *
    * r.getContributorSubreddits().then(console.log)
@@ -232,43 +254,40 @@ class snoowrap extends BaseRequester {
    * // ]
    *
    */
-  getContributorSubreddits (options: ListingQuery) {
+  getContributorSubreddits (options: ListingQuery): Promise<Listing<Subreddit>> {
     return this._getListing({uri: 'subreddits/mine/contributor', qs: options})
   }
 
   /**
    * @summary Gets a list of default subreddits.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing Subreddits
+   * @returns A Listing containing Subreddits
    * @example
    *
    * r.getDefaultSubreddits().then(console.log)
    * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
    */
-  getDefaultSubreddits (options: ListingQuery) {
+  getDefaultSubreddits (options: ListingQuery): Promise<Listing<Subreddit>> {
     return this._getListing({uri: 'subreddits/default', qs: options})
   }
 
   /**
    * @summary Gets a list of gold-exclusive subreddits.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing Subreddits
+   * @returns A Listing containing Subreddits
    * @example
    *
    * r.getGoldSubreddits().then(console.log)
    * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
    */
-  getGoldSubreddits (options: ListingQuery) {
+  getGoldSubreddits (options: ListingQuery): Promise<Listing<Subreddit>> {
     return this._getListing({uri: 'subreddits/gold', qs: options})
   }
 
   /**
    * @summary Gets the items in the authenticated user's inbox.
-   * @param {object} [options={}] Filter options. Can also contain options for the resulting Listing.
-   * @param {string} [options.filter] A filter for the inbox items. If provided, it should be one of `unread`, (unread
-   * items), `messages` (i.e. PMs), `comments` (comment replies), `selfreply` (selfpost replies), or `mentions` (username
-   * mentions).
-   * @returns {Promise} A Listing containing items in the user's inbox
+   * @param {object} [options] Filter options. Can also contain options for the resulting Listing.
+   * @returns A Listing containing items in the user's inbox
    * @example
    *
    * r.getInbox().then(console.log)
@@ -277,14 +296,14 @@ class snoowrap extends BaseRequester {
    * //  Comment { body: 'this is a reply', link_title: 'Yay, a selfpost!', was_comment: true, ... }
    * // ]
    */
-  getInbox ({filter, ...options}: InboxFilter) {
+  getInbox ({filter, ...options}: InboxFilterQuery) {
     return this._getListing({uri: `message/${filter || 'inbox'}`, qs: options})
   }
 
   /**
    * @summary Gets a list of subreddits in which the currently-authenticated user is a moderator.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing Subreddits
+   * @returns A Listing containing Subreddits
    * @example
    *
    * r.getModeratedSubreddits().then(console.log)
@@ -296,14 +315,14 @@ class snoowrap extends BaseRequester {
    * //  }
    * // ]
    */
-  getModeratedSubreddits (options: ListingQuery) {
+  getModeratedSubreddits (options: ListingQuery): Promise<Listing<Subreddit>> {
     return this._getListing({uri: 'subreddits/mine/moderator', qs: options})
   }
 
   /**
    * @summary Gets the authenticated user's modmail.
-   * @param {object} [options={}] Options for the resulting Listing
-   * @returns {Promise} A Listing of the user's modmail
+   * @param {object} [options] Options for the resulting Listing
+   * @returns A Listing of the user's modmail
    * @example
    *
    * r.getModmail({limit: 2}).then(console.log)
@@ -312,14 +331,14 @@ class snoowrap extends BaseRequester {
    * //  PrivateMessage { body: '/u/not_an_aardvark has been invited by /u/actually_an_aardvark to ...', ... }
    * // ]
    */
-  getModmail (options: ListingQuery = {}) {
+  getModmail (options: ListingQuery): Promise<Listing<PrivateMessage>> {
     return this._getListing({uri: 'message/moderator', qs: options})
   }
 
   /**
    * @summary Gets a list of ModmailConversations from the authenticated user's subreddits.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise<Listing<ModmailConversation>>} A Listing containing Subreddits
+   * @returns A Listing containing Subreddits
    * @example
    *
    * r.getNewModmailConversations({limit: 2}).then(console.log)
@@ -328,64 +347,64 @@ class snoowrap extends BaseRequester {
    * //  ModmailConversation { messages: [...], objIds: [...], subject: 'test subject', ... }
    * // ]
    */
-  getNewModmailConversations (options: ListingQuery = {}) {
+  getNewModmailConversations (options: ListingQuery): Promise<Listing<ModmailConversation>> {
     return this._getListing({
       uri: 'api/mod/conversations',
       qs: options,
       _transform: (response: any) => {
-        response.after = null;
-        response.before = null;
-        response.children = [];
+        response.after = null
+        response.before = null
+        response.children = []
 
         for (const conversation of response.conversationIds) {
           response.conversations[conversation].participant = this._newObject('ModmailConversationAuthor', {
             ...response.conversations[conversation].participant
-          });
+          })
           const conversationObjects = objects.ModmailConversation._getConversationObjects(
             response.conversations[conversation],
             response
-          );
+          )
           const data = {
             ...conversationObjects,
             ...response.conversations[conversation]
-          };
-          response.children.push(this._newObject('ModmailConversation', data));
+          }
+          response.children.push(this._newObject('ModmailConversation', data))
         }
-        return this._newObject('Listing', response);
+        return this._newObject('Listing', response)
       }
-    });
+    })
   }
 
   /**
    * @summary Gets a list of subreddits, arranged by age.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing Subreddits
+   * @returns A Listing containing Subreddits
    * @example
    *
    * r.getNewSubreddits().then(console.log)
    * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
    */
-  getNewSubreddits (options: ListingQuery) {
+  getNewSubreddits (options: ListingQuery): Promise<Listing<Subreddit>> {
     return this._getListing({uri: 'subreddits/new', qs: options})
   }
 
   /**
    * @summary Gets a list of subreddits, arranged by popularity.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing Subreddits
+   * @returns A Listing containing Subreddits
    * @example
    *
    * r.getPopularSubreddits().then(console.log)
    * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
    */
-  getPopularSubreddits (options: ListingQuery) {
+  getPopularSubreddits (options: ListingQuery): Promise<Listing<Subreddit>> {
     return this._getListing({uri: 'subreddits/popular', qs: options})
   }
 
   /**
    * @summary Gets the user's sent messages.
-   * @param {object} [options={}] options for the resulting Listing
-   * @returns {Promise} A Listing of the user's sent messages
+   * @param {object} [options] options for the resulting Listing
+   * @returns A Listing of the user's sent messages
    * @example
    *
    * r.getSentMessages().then(console.log)
@@ -394,14 +413,14 @@ class snoowrap extends BaseRequester {
    * //  PrivateMessage { body: 'you have been banned from posting to ...' ... }
    * // ]
    */
-  getSentMessages (options: ListingQuery = {}) {
+  getSentMessages (options?: ListingQuery): Promise<Listing<PrivateMessage>> {
     return this._getListing({uri: 'message/sent', qs: options})
   }
 
   /**
    * @summary Gets a list of subreddits that the currently-authenticated user is subscribed to.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing Subreddits
+   * @returns A Listing containing Subreddits
    * @example
    *
    * r.getSubscriptions({limit: 2}).then(console.log)
@@ -418,14 +437,14 @@ class snoowrap extends BaseRequester {
    * //  }
    * // ]
    */
-  getSubscriptions (options: ListingQuery) {
+  getSubscriptions (options: ListingQuery): Promise<Listing<Subreddit>> {
     return this._getListing({uri: 'subreddits/mine/subscriber', qs: options})
   }
 
   /**
    * @summary Gets the authenticated user's unread messages.
-   * @param {object} [options={}] Options for the resulting Listing
-   * @returns {Promise} A Listing containing unread items in the user's inbox
+   * @param {object} [options] Options for the resulting Listing
+   * @returns A Listing containing unread items in the user's inbox
    * @example
    *
    * r.getUnreadMessages().then(console.log)
@@ -434,25 +453,18 @@ class snoowrap extends BaseRequester {
    * //  Comment { body: 'this is a reply', link_title: 'Yay, a selfpost!', was_comment: true, ... }
    * // ]
    */
-  getUnreadMessages (options: ListingQuery = {}) {
+  getUnreadMessages (options?: ListingQuery) {
     return this._getListing({uri: 'message/unread', qs: options})
   }
 
   /**
    * @summary Conducts a search of reddit submissions.
    * @param {object} options Search options. Can also contain options for the resulting Listing.
-   * @param {string} options.query The search query
-   * @param {string} [options.time] Describes the timespan that posts should be retrieved from. One of
-   * `hour, day, week, month, year, all`
-   * @param {Subreddit|string} [options.subreddit] The subreddit to conduct the search on.
-   * @param {boolean} [options.restrictSr=true] Restricts search results to the given subreddit
-   * @param {string} [options.sort] Determines how the results should be sorted. One of `relevance, hot, top, new, comments`
-   * @param {string} [options.syntax='plain'] Specifies a syntax for the search. One of `cloudsearch, lucene, plain`
-   * @returns {Promise} A Listing containing the search results.
+   * @returns A Listing containing the search results.
    * @example
    *
    * r.search({
-   *   query: 'Cute kittens',
+   *   q: 'Cute kittens',
    *   subreddit: 'aww',
    *   sort: 'top'
    * }).then(console.log)
@@ -462,41 +474,46 @@ class snoowrap extends BaseRequester {
    * //  ...
    * // ]
    */
-  search (options: any) {
-    if (options.subreddit instanceof snoowrap.objects.Subreddit) {
-      options.subreddit = options.subreddit.display_name;
-    }
-    defaults(options, {restrictSr: true, syntax: 'plain'});
-    const parsedQuery = omit(
-      {...options, t: options.time, q: options.query, restrict_sr: options.restrictSr},
-      ['time', 'query']
-    );
-    return this._getListing({uri: `${options.subreddit ? `r/${options.subreddit}/` : ''}search`, qs: parsedQuery});
+  search (options: SearchOptions) {
+    const subreddit = options.subreddit instanceof snoowrap.objects.Subreddit
+      ? options.subreddit.display_name
+      : options.subreddit
+    delete options.subreddit
+    const qs = {restrict_sr: true, syntax: 'plain', ...options}
+    return this._getListing({uri: `${subreddit ? `r/${subreddit}/` : ''}search`, qs})
   }
 
   /**
    * @summary Searches subreddits by title and description.
    * @param {object} options Options for the search. May also contain Listing parameters.
    * @param {string} options.query The search query
-   * @returns {Promise} A Listing containing Subreddits
+   * @returns A Listing containing Subreddits
    * @example
    *
    * r.searchSubreddits({query: 'cookies'}).then(console.log)
    * // => Listing [ Subreddit { ... }, Subreddit { ... }, ...]
    */
   searchSubreddits (options: any) {
-    options.q = options.query;
-    return this._getListing({uri: 'subreddits/search', qs: omit(options, 'query')});
+    options.q = options.query
+    return this._getListing({uri: 'subreddits/search', qs: omit(options, 'query')})
   }
 
   // #endregion
 
   // #region _getSortedFrontpage
 
+  _getSortedFrontpage (
+    sortType: typeof FRONTPAGE_SORTS[number]|'comments',
+    subredditName?: string,
+    options: SortedListingQuery = {}
+  ) {
+    return this._getListing({uri: (subredditName ? `r/${subredditName}/` : '') + sortType, qs: options})
+  }
+
   /**
    * @summary Gets a Listing of best posts.
-   * @param {object} [options={}] Options for the resulting Listing
-   * @returns {Promise<Listing>} A Listing containing the retrieved submissions
+   * @param {object} [options] Options for the resulting Listing
+   * @returns A Listing containing the retrieved submissions
    * @example
    *
    * r.getBest().then(console.log)
@@ -511,18 +528,16 @@ class snoowrap extends BaseRequester {
    * //   Submission { domain: 'self.redditdev', banned_by: null, subreddit: Subreddit { display_name: 'redditdev' }, ...}
    * // ]
    */
-  getBest (options: ListingQuery) {
-    return this._getSortedFrontpage('best', undefined, options);
+  getBest (options?: ListingQuery): Promise<Listing<Submission>> {
+    return this._getSortedFrontpage('best', undefined, options)
   }
 
   /**
    * @summary Gets a Listing of controversial posts.
    * @param {string} [subredditName] The subreddit to get posts from. If not provided, posts are fetched from
    * the front page of reddit.
-   * @param {object} [options={}] Options for the resulting Listing
-   * @param {string} [options.time] Describes the timespan that posts should be retrieved from. Should be one of
-   * `hour, day, week, month, year, all`
-   * @returns {Promise} A Listing containing the retrieved submissions
+   * @param {object} [options] Options for the resulting Listing
+   * @returns A Listing containing the retrieved submissions
    * @example
    *
    * r.getControversial('technology').then(console.log)
@@ -531,7 +546,7 @@ class snoowrap extends BaseRequester {
    * //  Submission { domain: 'pcmag.com', banned_by: null, subreddit: Subreddit { display_name: 'technology' }, ... }
    * // ]
    */
-  getControversial (subredditName: string, options: ListingQuery) {
+  getControversial (subredditName?: string, options?: SortedListingQuery): Promise<Listing<Submission>> {
     return this._getSortedFrontpage('controversial', subredditName, options)
   }
 
@@ -539,8 +554,8 @@ class snoowrap extends BaseRequester {
    * @summary Gets a Listing of hot posts.
    * @param {string} [subredditName] The subreddit to get posts from. If not provided, posts are fetched from
    * the front page of reddit.
-   * @param {object} [options={}] Options for the resulting Listing
-   * @returns {Promise} A Listing containing the retrieved submissions
+   * @param {object} [options] Options for the resulting Listing
+   * @returns A Listing containing the retrieved submissions
    * @example
    *
    * r.getHot().then(console.log)
@@ -562,7 +577,7 @@ class snoowrap extends BaseRequester {
    * //   Submission { domain: 'self.redditdev', banned_by: null, subreddit: Subreddit { display_name: 'redditdev' }, ...}
    * // ]
    */
-  getHot (subredditName: string, options: ListingQuery) {
+  getHot (subredditName?: string, options?: ListingQuery): Promise<Listing<Submission>> {
     return this._getSortedFrontpage('hot', subredditName, options)
   }
 
@@ -570,8 +585,8 @@ class snoowrap extends BaseRequester {
    * @summary Gets a Listing of new posts.
    * @param {string} [subredditName] The subreddit to get posts from. If not provided, posts are fetched from
    * the front page of reddit.
-   * @param {object} [options={}] Options for the resulting Listing
-   * @returns {Promise} A Listing containing the retrieved submissions
+   * @param {object} [options] Options for the resulting Listing
+   * @returns A Listing containing the retrieved submissions
    * @example
    *
    * r.getNew().then(console.log)
@@ -582,16 +597,16 @@ class snoowrap extends BaseRequester {
    * // ]
    *
    */
-  getNew (subredditName: string, options: ListingQuery) {
+  getNew (subredditName?: string, options?: ListingQuery): Promise<Listing<Submission>> {
     return this._getSortedFrontpage('new', subredditName, options)
   }
 
   /**
-   * @summary Gets a Listing of controversial posts.
+   * @summary Gets a Listing of rising posts.
    * @param {string} [subredditName] The subreddit to get posts from. If not provided, posts are fetched from
    * the front page of reddit.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing the retrieved submissions
+   * @returns A Listing containing the retrieved submissions
    * @example
    *
    * r.getRising('technology').then(console.log)
@@ -600,7 +615,7 @@ class snoowrap extends BaseRequester {
    * //  Submission { domain: 'pcmag.com', banned_by: null, subreddit: Subreddit { display_name: 'technology' }, ... }
    * // ]
    */
-  getRising (subredditName: string, options: ListingQuery) {
+  getRising (subredditName?: string, options?: ListingQuery): Promise<Listing<Submission>> {
     return this._getSortedFrontpage('rising', subredditName, options)
   }
 
@@ -608,13 +623,11 @@ class snoowrap extends BaseRequester {
    * @summary Gets a Listing of top posts.
    * @param {string} [subredditName] The subreddit to get posts from. If not provided, posts are fetched from
    * the front page of reddit.
-   * @param {object} [options={}] Options for the resulting Listing
-   * @param {string} [options.time] Describes the timespan that posts should be retrieved from. Should be one of
-   * `hour, day, week, month, year, all`
-   * @returns {Promise} A Listing containing the retrieved submissions
+   * @param {object} [options] Options for the resulting Listing
+   * @returns A Listing containing the retrieved submissions
    * @example
    *
-   * r.getTop({time: 'all', limit: 2}).then(console.log)
+   * r.getTop({t: 'all', limit: 2}).then(console.log)
    * // => Listing [
    * //  Submission { domain: 'self.AskReddit', banned_by: null, subreddit: Subreddit { display_name: 'AskReddit' }, ... },
    * //  Submission { domain: 'imgur.com', banned_by: null, subreddit: Subreddit { display_name: 'funny' }, ... }
@@ -628,7 +641,7 @@ class snoowrap extends BaseRequester {
    * //  ...
    * // ]
    */
-  getTop (subredditName: string, options: ListingQuery) {
+  getTop (subredditName?: string, options?: SortedListingQuery): Promise<Listing<Submission>> {
     return this._getSortedFrontpage('top', subredditName, options)
   }
 
@@ -636,8 +649,8 @@ class snoowrap extends BaseRequester {
    * @summary Gets a Listing of new comments.
    * @param {string} [subredditName] The subreddit to get comments from. If not provided, posts are fetched from
    * the front page of reddit.
-   * @param {object} [options={}] Options for the resulting Listing
-   * @returns {Promise} A Listing containing the retrieved comments
+   * @param {object} [options] Options for the resulting Listing
+   * @returns A Listing containing the retrieved comments
    * @example
    *
    * r.getNewComments().then(console.log)
@@ -646,7 +659,7 @@ class snoowrap extends BaseRequester {
    * //  Comment { link_title: 'How far back in time could you go and still understand English?', ... }
    * // ]
    */
-  getNewComments (subredditName: string, options: ListingQuery) {
+  getNewComments (subredditName?: string, options?: ListingQuery): Promise<Listing<Comment>> {
     return this._getSortedFrontpage('comments', subredditName, options)
   }
 
@@ -879,7 +892,7 @@ class snoowrap extends BaseRequester {
 
   /**
    * @summary Determines whether the currently-authenticated user needs to fill out a captcha in order to submit content.
-   * @returns {Promise} A Promise that resolves with a boolean value
+   * @returns A Promise that resolves with a boolean value
    * @example
    *
    * r.checkCaptchaRequirement().then(console.log)
@@ -891,7 +904,7 @@ class snoowrap extends BaseRequester {
 
   /**
    * @summary Gets the identifier (a hex string) for a new captcha image.
-   * @returns {Promise} A Promise that resolves with a string
+   * @returns A Promise that resolves with a string
    * @example
    *
    * r.getNewCaptchaIdentifier().then(console.log)
@@ -905,7 +918,7 @@ class snoowrap extends BaseRequester {
   /**
    * @summary Gets an image for a given captcha identifier.
    * @param {string} identifier The captcha identifier.
-   * @returns {Promise} A string containing raw image data in PNG format
+   * @returns A string containing raw image data in PNG format
    * @example
    *
    * r.getCaptchaImage('o5M18uy4mk0IW4hs0fu2GNPdXb1Dxe9d').then(console.log)
@@ -920,7 +933,7 @@ class snoowrap extends BaseRequester {
    * @desc **Note:** This function will not work when snoowrap is running in a browser, due to an issue with reddit's CORS
    * settings.
    * @param {string} name The username in question
-   * @returns {Promise} A Promise that fulfills with a Boolean (`true` or `false`)
+   * @returns A Promise that fulfills with a Boolean (`true` or `false`)
    * @example
    *
    * r.checkUsernameAvailability('not_an_aardvark').then(console.log)
@@ -944,7 +957,7 @@ class snoowrap extends BaseRequester {
    * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
    * requires a captcha to submit posts and comments.
    * @param {string} [options.captchaResponse] The response to the captcha with the given identifier
-   * @returns {Promise} A Promise that fulfills when the request is complete
+   * @returns A Promise that fulfills when the request is complete
    * @example
    *
    * r.composeMessage({
@@ -997,7 +1010,7 @@ class snoowrap extends BaseRequester {
    * @param {string} [options.description] A descriptions of the thread. 120 characters max
    * @param {string} [options.resources] Information and useful links related to the thread. 120 characters max
    * @param {boolean} [options.nsfw=false] Determines whether the thread is Not Safe For Work
-   * @returns {Promise} A Promise that fulfills with the new LiveThread when the request is complete
+   * @returns A Promise that fulfills with the new LiveThread when the request is complete
    * @example
    *
    * r.createLivethread({title: 'My livethread'}).then(console.log)
@@ -1035,7 +1048,7 @@ class snoowrap extends BaseRequester {
    * `travel`, `unusual stories`, `video`, `None`
    * @param {string} [options.key_color='#000000'] A six-digit RGB hex color, preceded by '#'
    * @param {string} [options.weighting_scheme='classic'] One of `classic`, `fresh`
-   * @returns {Promise} A Promise for the newly-created MultiReddit object
+   * @returns A Promise for the newly-created MultiReddit object
    * @example
    *
    * r.createMultireddit({
@@ -1173,10 +1186,10 @@ class snoowrap extends BaseRequester {
    * @param {boolean} [options.collapse_deleted_comments=false] Determines whether deleted and removed comments should be
    * collapsed by default
    * @param {string} [options.suggested_comment_sort=undefined] The suggested comment sort for the subreddit. This should be
-   * one of `confidence, top, new, controversial, old, random, qa`.If left blank, there will be no suggested sort,
+   * one of `confidence, top, new, controversial, old, random, qa`. If left blank, there will be no suggested sort,
    * which means that users will see the sort method that is set in their own preferences (usually `confidence`.)
    * @param {boolean} [options.spoilers_enabled=false] Determines whether users can mark their posts as spoilers
-   * @returns {Promise} A Promise for the newly-created subreddit object.
+   * @returns A Promise for the newly-created subreddit object.
    * @example
    *
    * r.createSubreddit({
@@ -1196,7 +1209,7 @@ class snoowrap extends BaseRequester {
 
   /**
    * @summary Gets the list of people that the currently-authenticated user has blocked.
-   * @returns {Promise} A Promise that resolves with a list of blocked users
+   * @returns A Promise that resolves with a list of blocked users
    * @example
    *
    * r.getBlockedUsers().then(console.log)
@@ -1247,7 +1260,7 @@ class snoowrap extends BaseRequester {
 
   /**
    * @summary Gets the list of the currently-authenticated user's friends.
-   * @returns {Promise} A Promise that resolves with a list of friends
+   * @returns A Promise that resolves with a list of friends
    * @example
    *
    * r.getFriends().then(console.log)
@@ -1259,7 +1272,7 @@ class snoowrap extends BaseRequester {
 
   /**
    * @summary Gets a distribution of the requester's own karma distribution by subreddit.
-   * @returns {Promise} A Promise for an object with karma information
+   * @returns A Promise for an object with karma information
    * @example
    *
    * r.getKarma().then(console.log)
@@ -1277,7 +1290,7 @@ class snoowrap extends BaseRequester {
 
   /**
    * @summary Gets the user's own multireddits.
-   * @returns {Promise} A Promise for an Array containing the requester's MultiReddits.
+   * @returns A Promise for an Array containing the requester's MultiReddits.
    * @example
    *
    * r.getMyMultireddits().then(console.log)
@@ -1289,7 +1302,7 @@ class snoowrap extends BaseRequester {
 
   /**
    * @summary Gets the currently-authenticated user's trophies.
-   * @returns {Promise} A TrophyList containing the user's trophies
+   * @returns A TrophyList containing the user's trophies
    * @example
    *
    * r.getMyTrophies().then(console.log)
@@ -1311,7 +1324,7 @@ class snoowrap extends BaseRequester {
   /**
    * @summary Gets a list of all oauth scopes supported by the reddit API.
    * @desc **Note**: This lists every single oauth scope. To get the scope of this requester, use the `scope` property instead.
-   * @returns {Promise} An object containing oauth scopes.
+   * @returns An object containing oauth scopes.
    * @example
    *
    * r.getOauthScopeList().then(console.log)
@@ -1335,7 +1348,7 @@ class snoowrap extends BaseRequester {
 
   /**
    * @summary Gets information on the user's current preferences.
-   * @returns {Promise} A promise for an object containing the user's current preferences
+   * @returns A promise for an object containing the user's current preferences
    * @example
    *
    * r.getPreferences().then(console.log)
@@ -1366,7 +1379,7 @@ class snoowrap extends BaseRequester {
 
   /**
    * @summary Gets an array of categories that items can be saved in. (Requires reddit gold)
-   * @returns {Promise} An array of categories
+   * @returns An array of categories
    * @example
    *
    * r.getSavedCategories().then(console.log)
@@ -1380,7 +1393,7 @@ class snoowrap extends BaseRequester {
   /**
    * @summary Gets the "happening now" LiveThread, if it exists
    * @desc This is the LiveThread that is occasionally linked at the top of reddit.com, relating to current events.
-   * @returns {Promise} A Promise that fulfills with the "happening now" LiveThread if it exists, or rejects with a 404 error
+   * @returns A Promise that fulfills with the "happening now" LiveThread if it exists, or rejects with a 404 error
    * otherwise.
    * @example r.getCurrentEventsLivethread().then(thread => thread.stream.on('update', console.log))
    */
@@ -1425,7 +1438,7 @@ class snoowrap extends BaseRequester {
    * @summary Marks a list of submissions as 'visited'.
    * @desc **Note**: This endpoint only works if the authenticated user is subscribed to reddit gold.
    * @param {Submission[]} submission A list of Submission objects to mark
-   * @returns {Promise} A Promise that fulfills when the request is complete
+   * @returns A Promise that fulfills when the request is complete
    * @example
    *
    * var submissions = [r.getSubmission('4a9u54'), r.getSubmission('4a95nb')]
@@ -1441,7 +1454,7 @@ class snoowrap extends BaseRequester {
    * @param {PrivateMessage[]|String[]} messages An Array of PrivateMessage or Comment objects. Can also contain strings
    * representing message or comment IDs. If strings are provided, they are assumed to represent PrivateMessages unless a fullname
    * prefix such as `t1_` is specified.
-   * @returns {Promise} A Promise that fulfills when the request is complete
+   * @returns A Promise that fulfills when the request is complete
    * @example
    *
    * r.markMessagesAsRead(['51shsd', '51shxv'])
@@ -1463,7 +1476,7 @@ class snoowrap extends BaseRequester {
    * @param {PrivateMessage[]|String[]} messages An Array of PrivateMessage or Comment objects. Can also contain strings
    * representing message IDs. If strings are provided, they are assumed to represent PrivateMessages unless a fullname prefix such
    * as `t1_` is included.
-   * @returns {Promise} A Promise that fulfills when the request is complete
+   * @returns A Promise that fulfills when the request is complete
    * @example
    *
    * r.markMessagesAsUnread(['51shsd', '51shxv'])
@@ -1508,7 +1521,7 @@ class snoowrap extends BaseRequester {
    * @summary Marks all of the user's messages as read.
    * @desc **Note:** The reddit.com site imposes a ratelimit of approximately 1 request every 10 minutes on this endpoint.
    * Further requests will cause the API to return a 429 error.
-   * @returns {Promise} A Promise that resolves when the request is complete
+   * @returns A Promise that resolves when the request is complete
    * @example
    *
    * r.readAllMessages().then(function () {
@@ -1527,7 +1540,7 @@ class snoowrap extends BaseRequester {
    * @param {string} options.query A search query (50 characters max)
    * @param {boolean} [options.exact=false] Determines whether the results shouldbe limited to exact matches.
    * @param {boolean} [options.includeNsfw=true] Determines whether the results should include NSFW subreddits.
-   * @returns {Promise} An Array containing subreddit names
+   * @returns An Array containing subreddit names
    * @example
    *
    * r.searchSubredditNames({query: 'programming'}).then(console.log)
@@ -1547,7 +1560,7 @@ class snoowrap extends BaseRequester {
    * @summary Updates the user's current preferences.
    * @param {object} updatedPreferences An object of the form {[some preference name]: 'some value', ...}. Any preference
    * not included in this object will simply retain its current value.
-   * @returns {Promise} A Promise that fulfills when the request is complete
+   * @returns A Promise that fulfills when the request is complete
    * @example
    *
    * r.updatePreferences({threaded_messages: false, hide_downs: true})
@@ -1566,7 +1579,7 @@ class snoowrap extends BaseRequester {
    * @summary Convert `markdown` to `richtext_json` format that used on the fancypants editor. This format allows
    * to embed inline media on selfposts.
    * @param {string} markdown The Markdown text to convert.
-   * @returns {Promise} A Promise that fulfills with an object in `richtext_json` format.
+   * @returns A Promise that fulfills with an object in `richtext_json` format.
    * @example
    *
    * r.convertToFancypants('Hello **world**!').then(console.log)

@@ -1,107 +1,153 @@
-import {chunk, flatten, map, omit} from 'lodash'
+import {chunk, flatten, map} from 'lodash'
 import stream from 'stream'
 import fs from 'fs'
 import {formatModPermissions, handleJsonErrors, renameKey} from '../helper'
 import {InvalidMethodCallError} from '../errors'
 import RedditContent from './RedditContent'
+import type {
+  CreateFlairOptions, FlairCSVOptions, FlairSelectorOptions, OmitProps, SelectFlairOptions, SubmitLinkOptions,
+  SubmitImageOptions, SubmitVideoOptions, SubmitGalleryOptions, SubmitSelfpostOptions, SubmitPollOptions,
+  SubmitCrosspostOptions
+} from '../interfaces'
+import type {ListingQuery} from './Listing'
+//
+const api_type = 'json'
 
-const api_type = 'json';
+
+interface FlairListingQuery extends ListingQuery {
+  /** A specific username to jump to */
+  name?: string
+}
+
+interface FlairSettings {
+  /** Determines whether user flair should be enabled */
+  flair_enabled: boolean
+  /**
+   * Determines the orientation of user flair relative to a given username. This
+   * should be either the string 'left' or the string 'right'.
+   */
+  flair_position: 'left'|'right'
+  /** Determines whether users should be able to edit their own flair */
+  flair_self_assign_enabled: boolean
+  /**
+   * Determines the orientation of link flair relative to a link title. This should
+   * be either 'left' or 'right'.
+   */
+  link_flair_position: 'left'|'right'
+  /** Determines whether users should be able to edit the flair of their */
+  link_flair_self_assign_enabled: boolean
+  [key: string]: any
+}
+
+interface ModerationLogQuery extends ListingQuery {
+  /** An array of moderator names that the results should be restricted to */
+  mods?: string[]
+  /** A string of comma-separated moderator names */
+  mod?: string
+  /** Restricts the results to the specified type. */
+  type?: 'banuser'|'unbanuser'|'removelink'|'approvelink'|'removecomment'|'approvecomment'
+    |'addmoderator'|'invitemoderator'|'uninvitemoderator'|'acceptmoderatorinvite'|'removemoderator'
+    |'addcontributor'|'removecontributor'|'editsettings'|'editflair'|'distinguish'|'marknsfw'
+    |'wikibanned'|'wikicontributor'|'wikiunbanned'|'wikipagelisted'|'removewikicontributor'
+    |'wikirevise'|'wikipermlevel'|'ignorereports'|'unignorereports'|'setpermissions'
+    |'setsuggestedsort'|'sticky'|'unsticky'|'setcontestmode'|'unsetcontestmode'|'lock'|'unlock'
+    |'muteuser'|'unmuteuser'|'createrule'|'editrule'|'deleterule'|'spoiler'|'unspoiler'
+}
+
+interface FilterableListingQuery extends ListingQuery {
+  /** Restricts the Listing to the specified type of item */
+  only?: 'links'|'comments'
+}
 
 /**
  * A class representing a subreddit
- * <style> #Subreddit {display: none} </style>
- * @extends RedditContent
  * @example
  *
  * // Get a subreddit by name
  * r.getSubreddit('AskReddit')
  */
-class Subreddit extends RedditContent {
+class Subreddit extends RedditContent<Subreddit> {
   get _uri () {
-    return `r/${this.display_name}/about`;
+    return `r/${this.display_name}/about`
   }
-  _transformApiResponse (response) {
+  _transformApiResponse (response: Subreddit) {
     if (!(response instanceof Subreddit)) {
-      throw new TypeError(`The subreddit /r/${this.display_name} does not exist.`);
+      throw new TypeError(`The subreddit /r/${this.display_name} does not exist.`)
     }
-    return response;
+    return response
   }
-  async _deleteFlairTemplates ({flair_type}) {
-    await this._post({url: `r/${this.display_name}/api/clearflairtemplates`, form: {api_type, flair_type}});
-    return this;
+  async _deleteFlairTemplates (flair_type: string) {
+    await this._post({url: `r/${this.display_name}/api/clearflairtemplates`, form: {api_type, flair_type}})
+    return this
   }
   /**
    * @summary Deletes all of this subreddit's user flair templates
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').deleteAllUserFlairTemplates()
    */
   deleteAllUserFlairTemplates () {
-    return this._deleteFlairTemplates({flair_type: 'USER_FLAIR'});
+    return this._deleteFlairTemplates('USER_FLAIR')
   }
   /**
    * @summary Deletes all of this subreddit's link flair templates
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').deleteAllLinkFlairTemplates()
    */
   deleteAllLinkFlairTemplates () {
-    return this._deleteFlairTemplates({flair_type: 'LINK_FLAIR'});
+    return this._deleteFlairTemplates('LINK_FLAIR')
   }
   /**
    * @summary Deletes one of this subreddit's flair templates
    * @param {object} options
    * @param {string} options.flair_template_id The ID of the template that should be deleted
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').deleteFlairTemplate({flair_template_id: 'fdfd8532-c91e-11e5-b4d4-0e082084d721'})
    */
-  async deleteFlairTemplate ({flair_template_id}) {
+  async deleteFlairTemplate (flair_template_id: string) {
     await this._post({
       url: `r/${this.display_name}/api/deleteflairtemplate`,
       form: {api_type, flair_template_id}
-    });
-    return this;
+    })
+    return this
   }
   async _createFlairTemplate ({
-    text, css_class, cssClass = css_class, flair_type, text_editable = false, textEditable = text_editable
-  }) {
+    text,
+    css_class,
+    flair_type,
+    text_editable = false,
+    ...opts
+  }: CreateFlairOptions) {
     await this._post({
       url: `r/${this.display_name}/api/flairtemplate`,
-      form: {api_type, text, css_class: cssClass, flair_type, text_editable: textEditable}
-    });
-    return this;
+      form: {...opts, api_type, text, css_class, flair_type, text_editable}
+    })
+    return this
   }
   /**
    * @summary Creates a new user flair template for this subreddit
    * @param {object} options
-   * @param {string} options.text The flair text for this template
-   * @param {string} [options.cssClass=''] The CSS class for this template
-   * @param {boolean} [options.textEditable=false] Determines whether users should be able to edit their flair text
-   * when it has this template
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
+   * @returns A Promise that fulfills with this Subreddit when the request is complete.
    * @example r.getSubreddit('snoowrap').createUserFlairTemplate({text: 'Some Flair Text', cssClass: 'some-css-class'})
    */
-  createUserFlairTemplate (options) {
-    return this._createFlairTemplate({...options, flair_type: 'USER_FLAIR'});
+  createUserFlairTemplate (options: OmitProps<CreateFlairOptions, 'flair_type'>) {
+    return this._createFlairTemplate({...options, flair_type: 'USER_FLAIR'})
   }
   /**
    * @summary Creates a new link flair template for this subreddit
    * @param {object} options
-   * @param {string} options.text The flair text for this template
-   * @param {string} [options.cssClass=''] The CSS class for this template
-   * @param {boolean} [options.textEditable=false] Determines whether users should be able to edit the flair text of their
-   * links when it has this template
-   * @returns {Promise} A Promise that fulfills with this Subredit when the request is complete.
+   * @returns A Promise that fulfills with this Subredit when the request is complete.
    * @example r.getSubreddit('snoowrap').createLinkFlairTemplate({text: 'Some Flair Text', cssClass: 'some-css-class'})
    */
-  createLinkFlairTemplate (options) {
-    return this._createFlairTemplate({...options, flair_type: 'LINK_FLAIR'});
+  createLinkFlairTemplate (options: OmitProps<CreateFlairOptions, 'flair_type'>) {
+    return this._createFlairTemplate({...options, flair_type: 'LINK_FLAIR'})
   }
-  _getFlairOptions ({name, link, is_newlink} = {}) { // TODO: Add shortcuts for this on RedditUser and Submission
-    return this._post({url: `r/${this.display_name}/api/flairselector`, form: {name, link, is_newlink}});
+  _getFlairOptions ({name, link, is_newlink}: FlairSelectorOptions = {}) { // TODO: Add shortcuts for this on RedditUser and Submission
+    return this._post({url: `r/${this.display_name}/api/flairselector`, form: {name, link, is_newlink}})
   }
   /**
    * @summary Gets the flair templates for the subreddit or a given link.
    * @param {string} [linkId] The link's base36 ID
-   * @returns {Promise} An Array of flair template options
+   * @returns An Array of flair template options
    * @example
    *
    * r.getSubreddit('snoowrap').getLinkFlairTemplates('4fp36y').then(console.log)
@@ -118,14 +164,14 @@ class Subreddit extends RedditContent {
    * //  ...
    * // ]
    */
-  async getLinkFlairTemplates (linkId = null) {
-    const options = linkId ? {link: linkId} : {is_newlink: true};
-    const res = await this._getFlairOptions(options);
-    return res.choices;
+  async getLinkFlairTemplates (link: string) {
+    const options = link ? {link} : {is_newlink: true}
+    const res = await this._getFlairOptions(options)
+    return res.choices
   }
   /**
    * @summary Gets the list of user flair templates on this subreddit.
-   * @returns {Promise} An Array of user flair templates
+   * @returns An Array of user flair templates
    * @example
    *
    * r.getSubreddit('snoowrap').getUserFlairTemplates().then(console.log)
@@ -143,23 +189,23 @@ class Subreddit extends RedditContent {
    * // ]
    */
   async getUserFlairTemplates () {
-    const res = await this._getFlairOptions();
-    return res.choices;
+    const res = await this._getFlairOptions()
+    return res.choices
   }
   /**
    * @summary Clears a user's flair on this subreddit.
-   * @param {string} name The user's name
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @param name The user's name
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').deleteUserFlair('actually_an_aardvark')
    */
-  async deleteUserFlair (name) {
-    await this._post({url: `r/${this.display_name}/api/deleteflair`, form: {api_type, name}});
-    return this;
+  async deleteUserFlair (name: string) {
+    await this._post({url: `r/${this.display_name}/api/deleteflair`, form: {api_type, name}})
+    return this
   }
   /**
    * @summary Gets a user's flair on this subreddit.
-   * @param {string} name The user's name
-   * @returns {Promise} An object representing the user's flair
+   * @param name The user's name
+   * @returns An object representing the user's flair
    * @example
    *
    * r.getSubreddit('snoowrap').getUserFlair('actually_an_aardvark').then(console.log)
@@ -169,9 +215,9 @@ class Subreddit extends RedditContent {
    * //  flair_position: 'right'
    * // }
    */
-  async getUserFlair (name) {
-    const res = await this._getFlairOptions({name});
-    return res.current;
+  async getUserFlair (name: string) {
+    const res = await this._getFlairOptions({name})
+    return res.current
   }
   /**
    * @summary Sets multiple user flairs at the same time
@@ -180,21 +226,18 @@ class Subreddit extends RedditContent {
    * occurs, the Promise returned by snoowrap will be rejected, and the rejection reason will be an array containing the 'error'
    * responses from reddit.
    * @param {object[]} flairArray
-   * @param {string} flairArray[].name A user's name
-   * @param {string} flairArray[].text The flair text to assign to this user
-   * @param {string} flairArray[].cssClass The flair CSS class to assign to this user
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example
    * r.getSubreddit('snoowrap').setMultipleUserFlairs([
-   *   {name: 'actually_an_aardvark', text: "this is /u/actually_an_aardvark's flair text", cssClass: 'some-css-class'},
-   *   {name: 'snoowrap_testing', text: "this is /u/snoowrap_testing's flair text", cssClass: 'some-css-class'}
+   *   {name: 'actually_an_aardvark', text: "this is /u/actually_an_aardvark's flair text", css_class: 'some-css-class'},
+   *   {name: 'snoowrap_testing', text: "this is /u/snoowrap_testing's flair text", css_class: 'some-css-class'}
    * ]);
    * // the above request gets completed successfully
    *
    * r.getSubreddit('snoowrap').setMultipleUserFlairs([
-   *   {name: 'actually_an_aardvark', text: 'foo', cssClass: 'valid-css-class'},
-   *   {name: 'snoowrap_testing', text: 'bar', cssClass: "this isn't a valid css class"},
-   *   {name: 'not_an_aardvark', text: 'baz', cssClass: "this also isn't a valid css class"}
+   *   {name: 'actually_an_aardvark', text: 'foo', css_class: 'valid-css-class'},
+   *   {name: 'snoowrap_testing', text: 'bar', css_class: "this isn't a valid css class"},
+   *   {name: 'not_an_aardvark', text: 'baz', css_class: "this also isn't a valid css class"}
    * ])
    * // the Promise from the above request gets rejected, with the following rejection reason:
    * [
@@ -213,12 +256,13 @@ class Subreddit extends RedditContent {
    * ]
    * // note that /u/actually_an_aardvark's flair still got set by the request, even though the other two flairs caused errors.
    */
-  async setMultipleUserFlairs (flairArray) {
+  async setMultipleUserFlairs (flairArray: FlairCSVOptions) {
     const csvLines = flairArray.map(item => {
       // reddit expects to receive valid CSV data, which each line having the form `username,flair_text,css_class`.
       return [
-        item.name, item.text || item.flairText || item.flair_text || '',
-        item.cssClass || item.css_class || item.flairCssClass || item.flair_css_class || ''
+        item.name,
+        item.text || '',
+        item.css_class || ''
       ].map(str => {
         /**
          * To escape special characters in the lines (e.g. if the flair text itself contains a comma), surround each
@@ -226,28 +270,27 @@ class Subreddit extends RedditContent {
          * characters are usually escaped in CSV). If double quotes are themselves part of the flair text, replace them with a
          * pair of consecutive double quotes.
          */
-        return `"${str.replace(/"/g, '""')}"`;
-      }).join(',');
-    });
+        return `"${str.replace(/"/g, '""')}"`
+      }).join(',')
+    })
     /**
      * Due to an API limitation, this endpoint can only set the flair of 100 users at a time.
      * Send multiple requests if necessary to ensure that all users in the array are accounted for.
      */
     const flairChunks = await Promise.all(chunk(csvLines, 100).map(flairChunk => {
-      return this._post({url: `r/${this.display_name}/api/flaircsv`, form: {flair_csv: flairChunk.join('\n')}});
-    }));
-    const results = flatten(flairChunks);
-    const errorRows = results.filter(row => !row.ok);
+      return this._post({url: `r/${this.display_name}/api/flaircsv`, form: {flair_csv: flairChunk.join('\n')}})
+    }))
+    const results = flatten(flairChunks)
+    const errorRows = results.filter(row => !row.ok)
     if (errorRows.length) {
-      throw errorRows;
+      throw errorRows
     }
-    return this;
+    return this
   }
   /**
    * @summary Gets a list of all user flairs on this subreddit.
    * @param {object} options
-   * @param {string} [options.name] A specific username to jump to
-   * @returns {Promise} A Listing containing user flairs
+   * @returns A Listing containing user flairs
    * @example
    *
    * r.getSubreddit('snoowrap').getUserFlairList().then(console.log)
@@ -263,7 +306,7 @@ class Subreddit extends RedditContent {
    * //    flair_text: 'this is /u/snoowrap_testing\'s flair text' }
    * // ]
    */
-  getUserFlairList (options = {}) {
+  getUserFlairList (options: FlairListingQuery = {}) {
     return this._getListing({uri: `r/${this.display_name}/api/flairlist`, qs: options, _transform: response => {
       /**
        * For unknown reasons, responses from the api/flairlist endpoint are formatted differently than responses from all other
@@ -273,52 +316,46 @@ class Subreddit extends RedditContent {
        * Listing's children, and `next` and `prev` properties corresponding to the `after` and `before` querystring parameters. As
        * far as I can tell, there's no actual reason for this difference. >_>
        */
-      response.after = response.next || null;
-      response.before = response.prev || null;
-      response.children = response.users;
-      return this._r._newObject('Listing', response);
-    }});
+      response.after = response.next || null
+      response.before = response.prev || null
+      response.children = response.users
+      return this._r._newObject('Listing', response)
+    }})
   }
   /**
    * @summary Configures the flair settings for this subreddit.
    * @param {object} options
-   * @param {boolean} options.userFlairEnabled Determines whether user flair should be enabled
-   * @param {string} options.userFlairPosition Determines the orientation of user flair relative to a given username. This
-   * should be either the string 'left' or the string 'right'.
-   * @param {boolean} options.userFlairSelfAssignEnabled Determines whether users should be able to edit their own flair
-   * @param {string} options.linkFlairPosition Determines the orientation of link flair relative to a link title. This should
-   * be either 'left' or 'right'.
-   * @param {boolean} options.linkFlairSelfAssignEnabled Determines whether users should be able to edit the flair of their
-   * submissions.
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').configure_flair({
-   *   userFlairEnabled: true,
-   *   userFlairPosition: 'left',
-   *   userFlairSelfAssignEnabled: false,
-   *   linkFlairPosition: 'right',
-   *   linkFlairSelfAssignEnabled: false
+   *   flair_enabled: true,
+   *   flair_position: 'left',
+   *   flair_self_assign_enabled: false,
+   *   link_flair_position: 'right',
+   *   link_flair_self_assign_enabled: false
    * })
    */
   async configureFlair ({
-    user_flair_enabled, userFlairEnabled = user_flair_enabled,
-    user_flair_position, userFlairPosition = user_flair_position,
-    user_flair_self_assign_enabled, userFlairSelfAssignEnabled = user_flair_self_assign_enabled,
-    link_flair_position, linkFlairPosition = link_flair_position,
-    link_flair_self_assign_enabled, linkFlairSelfAssignEnabled = link_flair_self_assign_enabled
-  }) {
+    flair_enabled,
+    flair_position,
+    flair_self_assign_enabled,
+    link_flair_position,
+    link_flair_self_assign_enabled,
+    ...opts
+  }: FlairSettings) {
     await this._post({url: `r/${this.display_name}/api/flairconfig`, form: {
+      ...opts,
       api_type,
-      flair_enabled: userFlairEnabled,
-      flair_position: userFlairPosition,
-      flair_self_assign_enabled: userFlairSelfAssignEnabled,
-      link_flair_position: linkFlairPosition,
-      link_flair_self_assign_enabled: linkFlairSelfAssignEnabled
-    }});
-    return this;
+      flair_enabled,
+      flair_position,
+      flair_self_assign_enabled,
+      link_flair_position,
+      link_flair_self_assign_enabled
+    }})
+    return this
   }
   /**
    * @summary Gets the requester's flair on this subreddit.
-   * @returns {Promise} An object representing the requester's current flair
+   * @returns An object representing the requester's current flair
    * @example
    *
    * r.getSubreddit('snoowrap').getMyFlair().then(console.log)
@@ -329,66 +366,47 @@ class Subreddit extends RedditContent {
    * // }
    */
   async getMyFlair () {
-    return (await this._getFlairOptions()).current;
+    return (await this._getFlairOptions()).current
   }
   /**
    * @summary Sets the requester's flair on this subreddit.
-   * @param {object} options
-   * @param {string} options.flair_template_id A flair template ID to use. (This should be obtained beforehand using
-   * {@link getUserFlairTemplates}.)
-   * @param {string} [options.text] The flair text to use. (This is only necessary/useful if the given flair
-   * template has the `text_editable` property set to `true`.)
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @param options
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').selectMyFlair({flair_template_id: 'fdfd8532-c91e-11e5-b4d4-0e082084d721'})
    */
-  async selectMyFlair (options) {
+  async selectMyFlair (options: OmitProps<SelectFlairOptions, 'name'|'link'|'subredditName'>) {
     /**
      * NOTE: This requires `identity` scope in addition to `flair` scope, since the reddit api needs to be passed a username.
      * I'm not sure if there's a way to do this without requiring additional scope.
      */
-    const name = await this._r._getMyName();
-    await this._r._selectFlair({...options, subredditName: this.display_name, name});
-    return this;
+    const name = await this._r._getMyName()
+    await this._r._selectFlair({...options, name, subredditName: this.display_name})
+    return this
   }
-  async _setMyFlairVisibility (flair_enabled) {
-    await this._post({url: `r/${this.display_name}/api/setflairenabled`, form: {api_type, flair_enabled}});
-    return this;
+  async _setMyFlairVisibility (flair_enabled: boolean) {
+    await this._post({url: `r/${this.display_name}/api/setflairenabled`, form: {api_type, flair_enabled}})
+    return this
   }
   /**
    * @summary Makes the requester's flair visible on this subreddit.
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').showMyFlair()
    */
   showMyFlair () {
-    return this._setMyFlairVisibility(true);
+    return this._setMyFlairVisibility(true)
   }
   /**
    * @summary Makes the requester's flair invisible on this subreddit.
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').hideMyFlair()
    */
   hideMyFlair () {
-    return this._setMyFlairVisibility(false);
+    return this._setMyFlairVisibility(false)
   }
   /**
    * @summary Creates a new link submission on this subreddit.
    * @param {object} options An object containing details about the submission.
-   * @param {string} options.title The title of the submission.
-   * @param {string} options.url The url that the link submission should point to.
-   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission.
-   * @param {boolean} [options.resubmit=true] If this is `false` and same link has already been submitted to this subreddit in the past,
-   * reddit will return an error. This could be used to avoid accidental reposts.
-   * @param {boolean} [options.spoiler=false] Whether or not the submission should be marked as a spoiler.
-   * @param {boolean} [options.nsfw=false] Whether or not the submission should be marked NSFW.
-   * @param {string} [options.flairId] The flair template to select.
-   * @param {string} [options.flairText] If a flair template is selected and its property `flair_text_editable` is `true`, this will
-   * customize the flair text.
-   * @param {string} [options.collectionId] The UUID of a collection to add the newly-submitted post to.
-   * @param {string} [options.discussionType] Set to `CHAT` to enable live discussion instead of traditional comments.
-   * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
-   * requires a captcha to submit posts and comments.
-   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier.
-   * @returns {Promise} The newly-created Submission object.
+   * @returns The newly-created Submission object.
    * @example
    *
    * subreddit.submitLink({
@@ -398,37 +416,15 @@ class Subreddit extends RedditContent {
    * // => Submission { name: 't3_4abnfe' }
    * // (new linkpost created on reddit)
    */
-  submitLink (options) {
-    return this._r.submitLink({...options, subredditName: this.display_name});
+  submitLink (options: OmitProps<SubmitLinkOptions, 'sr'>) {
+    return this._r.submitLink({...options, sr: this.display_name});
   }
   /**
    * @summary Submit an image submission to this subreddit. (Undocumented endpoint).
    * @desc **NOTE**: This method won't work on browsers that don't support the Fetch API natively since it requires to perform
    * a 'no-cors' request which is impossible with the XMLHttpRequest API.
    * @param {object} options An object containing details about the submission.
-   * @param {string} options.title The title of the submission.
-   * @param {string|stream.Readable|Blob|File|MediaImg} options.imageFile The image that should get submitted. This should either be the path to
-   * the image file you want to upload, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) /
-   * [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob) / [File](https://developer.mozilla.org/en-US/docs/Web/API/File) in environments
-   * (e.g. browsers) where the filesystem is unavailable. Alternatively you can diractly pass a ready-to-use {@link MediaImg} instead.
-   * See {@link snoowrap#uploadMedia} for more details.
-   * @param {string} options.imageFileName The name that the image file should have. Required when it cannot be diractly extracted from
-   * the provided file (e.g ReadableStream, Blob).
-   * @param {boolean} [options.noWebsockets=false] Set to `true` to disable use of WebSockets. If `true`, this method will return `null`.
-   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission.
-   * @param {boolean} [options.resubmit=true] If this is `false` and same link has already been submitted to this subreddit in the past,
-   * reddit will return an error. This could be used to avoid accidental reposts.
-   * @param {boolean} [options.spoiler=false] Whether or not the submission should be marked as a spoiler.
-   * @param {boolean} [options.nsfw=false] Whether or not the submission should be marked NSFW.
-   * @param {string} [options.flairId] The flair template to select.
-   * @param {string} [options.flairText] If a flair template is selected and its property `flair_text_editable` is `true`, this will
-   * customize the flair text.
-   * @param {string} [options.collectionId] The UUID of a collection to add the newly-submitted post to.
-   * @param {string} [options.discussionType] Set to `CHAT` to enable live discussion instead of traditional comments.
-   * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
-   * requires a captcha to submit posts and comments.
-   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier.
-   * @returns {Promise} The newly-created Submission object, or `null` if `options.noWebsockets` is `true`.
+   * @returns The newly-created Submission object, or `null` if `options.noWebsockets` is `true`.
    * @example
    *
    * const blob = await (await fetch("https://example.com/kittens.jpg")).blob()
@@ -440,45 +436,15 @@ class Subreddit extends RedditContent {
    * // => Submission
    * // (new image submission created on reddit)
    */
-  submitImage (options) {
-    return this._r.submitImage({...options, subredditName: this.display_name});
+  submitImage (options: OmitProps<SubmitImageOptions, 'sr'>) {
+    return this._r.submitImage({...options, sr: this.display_name})
   }
   /**
    * @summary Submit a video or videogif submission to this subreddit. (Undocumented endpoint).
    * @desc **NOTE**: This method won't work on browsers that don't support the Fetch API natively since it requires to perform
    * a 'no-cors' request which is impossible with the XMLHttpRequest API.
    * @param {object} options An object containing details about the submission.
-   * @param {string} options.title The title of the submission.
-   * @param {string|stream.Readable|Blob|File|MediaVideo} options.videoFile The video that should get submitted. This should either be the path to
-   * the video file you want to upload, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) /
-   * [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob) / [File](https://developer.mozilla.org/en-US/docs/Web/API/File) in environments
-   * (e.g. browsers) where the filesystem is unavailable. Alternatively you can diractly pass a ready-to-use {@link MediaVideo} instead.
-   * See {@link snoowrap#uploadMedia} for more details.
-   * @param {string} options.videoFileName The name that the video file should have. Required when it cannot be diractly extracted from
-   * the provided file (e.g ReadableStream, Blob).
-   * @param {string|stream.Readable|Blob|File|MediaImg} options.thumbnailFile The image that should get uploaded and used as a thumbnail for the video. This
-   * should either be the path to the image file you want to upload, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) /
-   * [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob) / [File](https://developer.mozilla.org/en-US/docs/Web/API/File) in environments
-   * (e.g. browsers) where the filesystem is unavailable. Alternatively you can diractly pass a ready-to-use {@link MediaImg} instead.
-   * See {@link snoowrap#uploadMedia} for more details.
-   * @param {string} options.thumbnailFileName The name that the thumbnail file should have. Required when it cannot be diractly extracted from
-   * the provided file (e.g ReadableStream, Blob).
-   * @param {boolean} [options.videogif=false] If `true`, the video is submitted as a videogif, which is essentially a silent video.
-   * @param {boolean} [options.noWebsockets=false] Set to `true` to disable use of WebSockets. If `true`, this method will return `null`.
-   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission.
-   * @param {boolean} [options.resubmit=true] If this is `false` and same link has already been submitted to this subreddit in the past,
-   * reddit will return an error. This could be used to avoid accidental reposts.
-   * @param {boolean} [options.spoiler=false] Whether or not the submission should be marked as a spoiler.
-   * @param {boolean} [options.nsfw=false] Whether or not the submission should be marked NSFW.
-   * @param {string} [options.flairId] The flair template to select.
-   * @param {string} [options.flairText] If a flair template is selected and its property `flair_text_editable` is `true`, this will
-   * customize the flair text.
-   * @param {string} [options.collectionId] The UUID of a collection to add the newly-submitted post to.
-   * @param {string} [options.discussionType] Set to `CHAT` to enable live discussion instead of traditional comments.
-   * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
-   * requires a captcha to submit posts and comments.
-   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier.
-   * @returns {Promise} The newly-created Submission object, or `null` if `options.noWebsockets` is `true`.
+   * @returns The newly-created Submission object, or `null` if `options.noWebsockets` is `true`.
    * @example
    *
    * const mediaVideo = await r.uploadMedia({
@@ -494,33 +460,15 @@ class Subreddit extends RedditContent {
    * // => Submission
    * // (new video submission created on reddit)
    */
-  submitVideo (options) {
-    return this._r.submitVideo({...options, subredditName: this.display_name});
+  submitVideo (options: OmitProps<SubmitVideoOptions, 'sr'>) {
+    return this._r.submitVideo({...options, sr: this.display_name})
   }
   /**
    * @summary Submit a gallery to this subreddit. (Undocumented endpoint).
    * @desc **NOTE**: This method won't work on browsers that don't support the Fetch API natively since it requires to perform
    * a 'no-cors' request which is impossible with the XMLHttpRequest API.
    * @param {object} options An object containing details about the submission.
-   * @param {string} options.title The title of the submission.
-   * @param {Array} options.gallery An array containing 2 to 20 gallery items. Currently only images are accepted. A gallery item should
-   * either be a {@link MediaImg}, or an object containing `imageFile` and `imageFileName` (the same as `options.imageFile` and `options.imageFileName`
-   * used in {@link snoowrap#submitImage}) in addition of an optional `caption` with a maximum of 180 characters along with an optional `outboundUrl`
-   * (the same as {@link MediaImg#caption} and {@link MediaImg#outboundUrl}).
-   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission.
-   * @param {boolean} [options.resubmit=true] If this is `false` and same link has already been submitted to this subreddit in the past,
-   * reddit will return an error. This could be used to avoid accidental reposts.
-   * @param {boolean} [options.spoiler=false] Whether or not the submission should be marked as a spoiler.
-   * @param {boolean} [options.nsfw=false] Whether or not the submission should be marked NSFW.
-   * @param {string} [options.flairId] The flair template to select.
-   * @param {string} [options.flairText] If a flair template is selected and its property `flair_text_editable` is `true`, this will
-   * customize the flair text.
-   * @param {string} [options.collectionId] The UUID of a collection to add the newly-submitted post to.
-   * @param {string} [options.discussionType] Set to `CHAT` to enable live discussion instead of traditional comments.
-   * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
-   * requires a captcha to submit posts and comments.
-   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier.
-   * @returns {Promise} The newly-created Submission object, or `null` if `options.noWebsockets` is `true`.
+   * @returns The newly-created Submission object, or `null` if `options.noWebsockets` is `true`.
    * @example
    *
    * const fileinput = document.getElementById('file-input')
@@ -544,33 +492,13 @@ class Subreddit extends RedditContent {
    * // => Submission
    * // (new gallery submission created on reddit)
    */
-  submitGallery (options) {
-    return this._r.submitVideo({...options, subredditName: this.display_name});
+  submitGallery (options: OmitProps<SubmitGalleryOptions, 'sr'>) {
+    return this._r.submitGallery({...options, sr: this.display_name})
   }
   /**
    * @summary Creates a new selfpost on this subreddit.
    * @param {object} options An object containing details about the submission.
-   * @param {string} options.title The title of the submission.
-   * @param {string} [options.text] The selftext of the submission.
-   * @param {object} [options.inlineMedia] An object containing inctances of `MediaFile` subclasses, or `options` to pass to
-   * {@link snoowrap#uploadMedia} where `options.type` is required. The keys of this object can be used as placeholders in
-   * `options.text` with the format `{key}`.
-   * @param {string} [options.rtjson] The body of the submission in `richtext_json` format. See {@link snoowrap#convertToFancypants}
-   * for more details. This will override `options.text` and `options.inlineMedia`.
-   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission.
-   * @param {boolean} [options.resubmit=true] If this is `false` and same link has already been submitted to this subreddit in the past,
-   * reddit will return an error. This could be used to avoid accidental reposts.
-   * @param {boolean} [options.spoiler=false] Whether or not the submission should be marked as a spoiler.
-   * @param {boolean} [options.nsfw=false] Whether or not the submission should be marked NSFW.
-   * @param {string} [options.flairId] The flair template to select.
-   * @param {string} [options.flairText] If a flair template is selected and its property `flair_text_editable` is `true`, this will
-   * customize the flair text.
-   * @param {string} [options.collectionId] The UUID of a collection to add the newly-submitted post to.
-   * @param {string} [options.discussionType] Set to `CHAT` to enable live discussion instead of traditional comments.
-   * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
-   * requires a captcha to submit posts and comments.
-   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier.
-   * @returns {Promise} The newly-created Submission object.
+   * @returns The newly-created Submission object.
    * @example
    *
    * const mediaVideo = await r.uploadMedia({
@@ -592,30 +520,13 @@ class Subreddit extends RedditContent {
    * // => Submission
    * // (new selfpost created on reddit)
    */
-  submitSelfpost (options) {
-    return this._r.submitSelfpost({...options, subredditName: this.display_name});
+  submitSelfpost (options: OmitProps<SubmitSelfpostOptions, 'sr'>) {
+    return this._r.submitSelfpost({...options, sr: this.display_name})
   }
   /**
    * @summary Submit a poll to this subreddit. (Undocumented endpoint).
    * @param {object} options An object containing details about the submission.
-   * @param {string} options.title The title of the submission.
-   * @param {string} [options.text] The selftext of the submission.
-   * @param {string[]} options.choices An array of 2 to 6 poll options.
-   * @param {number} options.duration The number of days the poll should accept votes. Valid values are between 1 and 7, inclusive.
-   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission.
-   * @param {boolean} [options.resubmit=true] If this is `false` and same link has already been submitted to this subreddit in the past,
-   * reddit will return an error. This could be used to avoid accidental reposts.
-   * @param {boolean} [options.spoiler=false] Whether or not the submission should be marked as a spoiler.
-   * @param {boolean} [options.nsfw=false] Whether or not the submission should be marked NSFW.
-   * @param {string} [options.flairId] The flair template to select.
-   * @param {string} [options.flairText] If a flair template is selected and its property `flair_text_editable` is `true`, this will
-   * customize the flair text.
-   * @param {string} [options.collectionId] The UUID of a collection to add the newly-submitted post to.
-   * @param {string} [options.discussionType] Set to `CHAT` to enable live discussion instead of traditional comments.
-   * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
-   * requires a captcha to submit posts and comments.
-   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier.
-   * @returns {Promise} The newly-created Submission object.
+   * @returns The newly-created Submission object.
    * @example
    *
    * subreddit.submitPoll({
@@ -627,31 +538,15 @@ class Subreddit extends RedditContent {
    * // => Submission
    * // (new poll submission created on reddit)
    */
-  submitPoll (options) {
-    return this._r.submitPoll({...options, subredditName: this.display_name});
+  submitPoll (options: OmitProps<SubmitPollOptions, 'sr'>) {
+    return this._r.submitPoll({...options, sr: this.display_name})
   }
   /**
    * @summary Creates a new crosspost submission on this subreddit
    * @desc **NOTE**: To create a crosspost, the authenticated account must be subscribed to the subreddit where
    * the crosspost is being submitted, and that subreddit be configured to allow crossposts.
    * @param {object} options An object containing details about the submission
-   * @param {string} options.title The title of the crosspost
-   * @param {(string|Submission)} options.originalPost A Submission object or a post ID for the original post which
-   * is being crossposted
-   * @param {boolean} [options.sendReplies=true] Determines whether inbox replies should be enabled for this submission.
-   * @param {boolean} [options.resubmit=true] If this is `false` and same link has already been submitted to this subreddit in the past,
-   * reddit will return an error. This could be used to avoid accidental reposts.
-   * @param {boolean} [options.spoiler=false] Whether or not the submission should be marked as a spoiler.
-   * @param {boolean} [options.nsfw=false] Whether or not the submission should be marked NSFW.
-   * @param {string} [options.flairId] The flair template to select.
-   * @param {string} [options.flairText] If a flair template is selected and its property `flair_text_editable` is `true`, this will
-   * customize the flair text.
-   * @param {string} [options.collectionId] The UUID of a collection to add the newly-submitted post to.
-   * @param {string} [options.discussionType] Set to `CHAT` to enable live discussion instead of traditional comments.
-   * @param {string} [options.captchaIden] A captcha identifier. This is only necessary if the authenticated account
-   * requires a captcha to submit posts and comments.
-   * @param {string} [options.captchaResponse] The response to the captcha with the given identifier.
-   * @returns {Promise} The newly-created Submission object
+   * @returns The newly-created Submission object
    * @example
    *
    * subreddit.submitCrosspost({
@@ -661,13 +556,13 @@ class Subreddit extends RedditContent {
    * // => Submission
    * // (new crosspost submission created on reddit)
    */
-  submitCrosspost (options) {
-    return this._r.submitCrosspost({...options, subredditName: this.display_name});
+  submitCrosspost (options: OmitProps<SubmitCrosspostOptions, 'sr'>) {
+    return this._r.submitCrosspost({...options, sr: this.display_name})
   }
   /**
    * @summary Gets a Listing of hot posts on this subreddit.
-   * @param {object} [options={}] Options for the resulting Listing
-   * @returns {Promise} A Listing containing the retrieved submissions
+   * @param {object} [options] Options for the resulting Listing
+   * @returns A Listing containing the retrieved submissions
    * @example
    *
    * r.getSubreddit('snoowrap').getHot().then(console.log)
@@ -677,13 +572,13 @@ class Subreddit extends RedditContent {
    * //  ...
    * // ]
    */
-  getHot (options) {
-    return this._r.getHot(this.display_name, options);
+  getHot (options?: ListingQuery) {
+    return this._r.getHot(this.display_name, options)
   }
   /**
    * @summary Gets a Listing of new posts on this subreddit.
-   * @param {object} [options={}] Options for the resulting Listing
-   * @returns {Promise} A Listing containing the retrieved submissions
+   * @param {object} [options] Options for the resulting Listing
+   * @returns A Listing containing the retrieved submissions
    * @example
    *
    * r.getSubreddit('snoowrap').getNew().then(console.log)
@@ -694,13 +589,13 @@ class Subreddit extends RedditContent {
    * // ]
    *
    */
-  getNew (options) {
-    return this._r.getNew(this.display_name, options);
+  getNew (options?: ListingQuery) {
+    return this._r.getNew(this.display_name, options)
   }
   /**
    * @summary Gets a Listing of new comments on this subreddit.
-   * @param {object} [options={}] Options for the resulting Listing
-   * @returns {Promise} A Listing containing the retrieved comments
+   * @param {object} [options] Options for the resulting Listing
+   * @returns A Listing containing the retrieved comments
    * @example
    *
    * r.getSubreddit('snoowrap').getNewComments().then(console.log)
@@ -710,28 +605,26 @@ class Subreddit extends RedditContent {
    * //  ...
    * // ]
    */
-  getNewComments (options) {
-    return this._r.getNewComments(this.display_name, options);
+  getNewComments (options?: ListingQuery) {
+    return this._r.getNewComments(this.display_name, options)
   }
   /**
    * @summary Gets a single random Submission from this subreddit.
    * @desc **Note**: This function will not work when snoowrap is running in a browser, because the reddit server sends a
    * redirect which cannot be followed by a CORS request.
-   * @returns {Promise} The retrieved Submission object
+   * @returns The retrieved Submission object
    * @example
    *
    * r.getSubreddit('snoowrap').getRandomSubmission().then(console.log)
    * // => Submission { ... }
    */
   getRandomSubmission () {
-    return this._r.getRandomSubmission(this.display_name);
+    return this._r.getRandomSubmission(this.display_name)
   }
   /**
    * @summary Gets a Listing of top posts on this subreddit.
-   * @param {object} [options={}] Options for the resulting Listing
-   * @param {string} [options.time] Describes the timespan that posts should be retrieved from. Should be one of
-   * `hour, day, week, month, year, all`
-   * @returns {Promise} A Listing containing the retrieved submissions
+   * @param {object} [option] Options for the resulting Listing
+   * @returns A Listing containing the retrieved submissions
    * @example
    *
    * r.getSubreddit('snoowrap').getTop({time: 'all'}).then(console.log)
@@ -741,15 +634,13 @@ class Subreddit extends RedditContent {
    * //  ...
    * // ]
    */
-  getTop (options) {
-    return this._r.getTop(this.display_name, options);
+  getTop (options?: ListingQuery) {
+    return this._r.getTop(this.display_name, options)
   }
   /**
    * @summary Gets a Listing of controversial posts on this subreddit.
-   * @param {object} [options={}] Options for the resulting Listing
-   * @param {string} [options.time] Describes the timespan that posts should be retrieved from. Should be one of
-   * `hour, day, week, month, year, all`
-   * @returns {Promise} A Listing containing the retrieved submissions
+   * @param {object} [options] Options for the resulting Listing
+   * @returns A Listing containing the retrieved submissions
    * @example
    *
    * r.getSubreddit('snoowrap').getControversial({time: 'week'}).then(console.log)
@@ -759,13 +650,13 @@ class Subreddit extends RedditContent {
    * //  ...
    * // ]
    */
-  getControversial (options) {
-    return this._r.getControversial(this.display_name, options);
+  getControversial (options?: ListingQuery) {
+    return this._r.getControversial(this.display_name, options)
   }
   /**
    * @summary Gets a Listing of top posts on this subreddit.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing the retrieved submissions
+   * @returns A Listing containing the retrieved submissions
    * @example
    *
    * r.getSubreddit('snoowrap').getRising().then(console.log)
@@ -775,22 +666,22 @@ class Subreddit extends RedditContent {
    * //  ...
    * // ]
    */
-  getRising (options) {
-    return this._r.getRising(this.display_name, options);
+  getRising (options?: ListingQuery) {
+    return this._r.getRising(this.display_name, options)
   }
   /**
    * @summary Gets the moderator mail for this subreddit.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing PrivateMessage objects
+   * @returns A Listing containing PrivateMessage objects
    * @example r.getSubreddit('snoowrap').getModmail().then(console.log)
    */
-  getModmail (options) {
-    return this._getListing({uri: `r/${this.display_name}/about/message/moderator`, qs: options});
+  getModmail (options?: ListingQuery) {
+    return this._getListing({uri: `r/${this.display_name}/about/message/moderator`, qs: options})
   }
   /**
    * @summary Gets a list of ModmailConversations from the subreddit.
-   * @param {object} [options={}] Options for the resulting Listing
-   * @returns {Promise<Listing<ModmailConversation>>} A Listing containing Subreddits
+   * @param {object} [options] Options for the resulting Listing
+   * @returns A Listing containing Subreddits
    * @example
    *
    * r.getSubreddit('snoowrap').getNewModmailConversations({limit: 2}).then(console.log)
@@ -799,20 +690,13 @@ class Subreddit extends RedditContent {
    * //  ModmailConversation { messages: [...], objIds: [...], subject: 'test subject', ... }
    * // ]
    */
-  getNewModmailConversations (options = {}) {
-    return this._r.getNewModmailConversations({...options, entity: this.display_name});
+  getNewModmailConversations (options?: ListingQuery) {
+    return this._r.getNewModmailConversations({...options, entity: this.display_name})
   }
   /**
    * @summary Gets the moderation log for this subreddit.
    * @param {object} [options={}] Options for the resulting Listing
-   * @param {string[]} [options.mods] An array of moderator names that the results should be restricted to
-   * @param {string} [options.type] Restricts the results to the specified type. This should be one of `banuser, unbanuser,
-   * removelink, approvelink, removecomment, approvecomment, addmoderator, invitemoderator, uninvitemoderator,
-   * acceptmoderatorinvite, removemoderator, addcontributor, removecontributor, editsettings, editflair, distinguish, marknsfw,
-   * wikibanned, wikicontributor, wikiunbanned, wikipagelisted, removewikicontributor, wikirevise, wikipermlevel,
-   * ignorereports, unignorereports, setpermissions, setsuggestedsort, sticky, unsticky, setcontestmode, unsetcontestmode,
-   * lock, unlock, muteuser, unmuteuser, createrule, editrule, deleterule, spoiler, unspoiler`
-   * @returns {Promise} A Listing containing moderation actions
+   * @returns A Listing containing moderation actions
    * @example
    *
    * r.getSubreddit('snoowrap').getModerationLog().then(console.log)
@@ -823,15 +707,15 @@ class Subreddit extends RedditContent {
    * //  ModAction { description: null, mod: 'snoowrap_testing', action: 'createrule', ... }
    * // ]
    */
-  getModerationLog (options = {}) {
-    const parsedOptions = omit({...options, mod: options.mods && options.mods.join(',')}, 'mods');
-    return this._getListing({uri: `r/${this.display_name}/about/log`, qs: parsedOptions});
+  getModerationLog (options: ModerationLogQuery = {}) {
+    if (options.mods && !options.mod) options.mod = options.mods.join(',')
+    delete options.mods
+    return this._getListing({uri: `r/${this.display_name}/about/log`, qs: options})
   }
   /**
    * @summary Gets a list of reported items on this subreddit.
    * @param {object} [options={}] Options for the resulting Listing
-   * @param {string} [options.only] Restricts the Listing to the specified type of item. One of `links, comments`
-   * @returns {Promise} A Listing containing reported items
+   * @returns A Listing containing reported items
    * @example
    *
    * r.getSubreddit('snoowrap').getReports().then(console.log)
@@ -842,14 +726,13 @@ class Subreddit extends RedditContent {
    * //  ...
    * // ]
    */
-  getReports (options = {}) {
-    return this._getListing({uri: `r/${this.display_name}/about/reports`, qs: options});
+  getReports (options: FilterableListingQuery = {}) {
+    return this._getListing({uri: `r/${this.display_name}/about/reports`, qs: options})
   }
   /**
    * @summary Gets a list of removed items on this subreddit.
    * @param {object} [options={}] Options for the resulting Listing
-   * @param {string} [options.only] Restricts the Listing to the specified type of item. One of `links, comments`
-   * @returns {Promise} A Listing containing removed items
+   * @returns A Listing containing removed items
    * @example
    *
    * r.getSubreddit('snoowrap').getSpam().then(console.log)
@@ -860,14 +743,13 @@ class Subreddit extends RedditContent {
    * //  ...
    * // ]
    */
-  getSpam (options = {}) {
-    return this._getListing({uri: `r/${this.display_name}/about/spam`, qs: options});
+  getSpam (options: FilterableListingQuery = {}) {
+    return this._getListing({uri: `r/${this.display_name}/about/spam`, qs: options})
   }
   /**
    * @summary Gets a list of items on the modqueue on this subreddit.
    * @param {object} [options={}] Options for the resulting Listing
-   * @param {string} [options.only] Restricts the Listing to the specified type of item. One of `links, comments`
-   * @returns {Promise} A Listing containing items on the modqueue
+   * @returns A Listing containing items on the modqueue
    * @example
    *
    * r.getSubreddit('snoowrap').getModqueue().then(console.log)
@@ -878,14 +760,13 @@ class Subreddit extends RedditContent {
    * //  ...
    * // ]
    */
-  getModqueue (options = {}) {
-    return this._getListing({uri: `r/${this.display_name}/about/modqueue`, qs: options});
+  getModqueue (options: FilterableListingQuery = {}) {
+    return this._getListing({uri: `r/${this.display_name}/about/modqueue`, qs: options})
   }
   /**
    * @summary Gets a list of unmoderated items on this subreddit.
    * @param {object} [options={}] Options for the resulting Listing
-   * @param {string} [options.only] Restricts the Listing to the specified type of item. One of `links, comments`
-   * @returns {Promise} A Listing containing unmoderated items
+   * @returns A Listing containing unmoderated items
    * @example
    *
    * r.getSubreddit('snoowrap').getUnmoderated().then(console.log)
@@ -896,14 +777,13 @@ class Subreddit extends RedditContent {
    * //  ...
    * // ]
    */
-  getUnmoderated (options = {}) {
-    return this._getListing({uri: `r/${this.display_name}/about/unmoderated`, qs: options});
+  getUnmoderated (options: FilterableListingQuery = {}) {
+    return this._getListing({uri: `r/${this.display_name}/about/unmoderated`, qs: options})
   }
   /**
    * @summary Gets a list of edited items on this subreddit.
    * @param {object} [options={}] Options for the resulting Listing
-   * @param {string} [options.only] Restricts the Listing to the specified type of item. One of `links, comments`
-   * @returns {Promise} A Listing containing edited items
+   * @returns A Listing containing edited items
    * @example
    *
    * r.getSubreddit('snoowrap').getEdited().then(console.log)
@@ -914,57 +794,57 @@ class Subreddit extends RedditContent {
    * //  ...
    * // ]
    */
-  getEdited (options = {}) {
-    return this._getListing({uri: `r/${this.display_name}/about/edited`, qs: options});
+  getEdited (options: FilterableListingQuery = {}) {
+    return this._getListing({uri: `r/${this.display_name}/about/edited`, qs: options})
   }
   /**
    * @summary Accepts an invite to become a moderator of this subreddit.
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').acceptModeratorInvite()
    */
   async acceptModeratorInvite () {
     const res = await this._post({
       url: `r/${this.display_name}/api/accept_moderator_invite`,
       form: {api_type}
-    });
-    handleJsonErrors(res);
-    return this;
+    })
+    handleJsonErrors(res)
+    return this
   }
   /**
    * @summary Abdicates moderator status on this subreddit.
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
+   * @returns A Promise that fulfills with this Subreddit when the request is complete.
    * @example r.getSubreddit('snoowrap').leaveModerator()
    */
   async leaveModerator () {
-    const name = (await this.fetch()).name;
-    const res = await this._post({url: 'api/leavemoderator', form: {id: name}});
-    handleJsonErrors(res);
-    return this;
+    const name = (await this.fetch())!.name
+    const res = await this._post({url: 'api/leavemoderator', form: {id: name}})
+    handleJsonErrors(res)
+    return this
   }
   /**
    * @summary Abdicates approved submitter status on this subreddit.
-   * @returns {Promise} A Promise that resolves with this Subreddit when the request is complete.
+   * @returns A Promise that resolves with this Subreddit when the request is complete.
    * @example r.getSubreddit('snoowrap').leaveContributor()
    */
   async leaveContributor () {
-    const name = (await this.fetch()).name;
-    const res = await this._post({url: 'api/leavecontributor', form: {id: name}});
-    handleJsonErrors(res);
-    return this;
+    const name = (await this.fetch())!.name
+    const res = await this._post({url: 'api/leavecontributor', form: {id: name}})
+    handleJsonErrors(res)
+    return this
   }
   /**
    * @summary Gets a subreddit's CSS stylesheet.
    * @desc **Note**: This function will not work when snoowrap is running in a browser, because the reddit server sends a
    * redirect which cannot be followed by a CORS request.
    * @desc **Note**: This method will return a 404 error if the subreddit in question does not have a custom stylesheet.
-   * @returns {Promise} A Promise for a string containing the subreddit's CSS.
+   * @returns A Promise for a string containing the subreddit's CSS.
    * @example
    *
    * r.getSubreddit('snoowrap').getStylesheet().then(console.log)
    * // => '.md blockquote,.md del,body{color:#121212}.usertext-body ... '
    */
-  getStylesheet () {
-    return this._get({url: `r/${this.display_name}/stylesheet`, json: false});
+  getStylesheet (): Promise<string> {
+    return this._get({url: `r/${this.display_name}/stylesheet`})
   }
   /**
    * @summary Conducts a search of reddit submissions, restricted to this subreddit.
@@ -974,7 +854,7 @@ class Subreddit extends RedditContent {
    * `hour, day, week, month, year, all`
    * @param {string} [options.sort] Determines how the results should be sorted. One of `relevance, hot, top, new, comments`
    * @param {string} [options.syntax='plain'] Specifies a syntax for the search. One of `cloudsearch, lucene, plain`
-   * @returns {Promise} A Listing containing the search results.
+   * @returns A Listing containing the search results.
    * @example
    *
    * r.getSubreddit('snoowrap').search({query: 'blah', sort: 'year'}).then(console.log)
@@ -985,13 +865,13 @@ class Subreddit extends RedditContent {
    * // ]
    */
   search (options) {
-    return this._r.search({...options, subreddit: this, restrictSr: true});
+    return this._r.search({...options, subreddit: this, restrictSr: true})
   }
   /**
    * @summary Gets the list of banned users on this subreddit.
    * @param {object} options Filtering options. Can also contain options for the resulting Listing.
    * @param {string} options.name A username on the list to jump to.
-   * @returns {Promise} A Listing of users
+   * @returns A Listing of users
    * @example
    *
    * r.getSubreddit('snoowrap').getBannedUsers().then(console.log)
@@ -1008,7 +888,7 @@ class Subreddit extends RedditContent {
    * @summary Gets the list of muted users on this subreddit.
    * @param {object} options Filtering options. Can also contain options for the resulting Listing.
    * @param {string} options.name A username on the list to jump to.
-   * @returns {Promise} A Listing of users
+   * @returns A Listing of users
    * @example
    *
    * r.getSubreddit('snoowrap').getBannedUsers().then(console.log)
@@ -1024,7 +904,7 @@ class Subreddit extends RedditContent {
    * @summary Gets the list of users banned from this subreddit's wiki.
    * @param {object} options Filtering options. Can also contain options for the resulting Listing.
    * @param {string} options.name A username on the list to jump to.
-   * @returns {Promise} A Listing of users
+   * @returns A Listing of users
    * @example
    *
    * r.getSubreddit('snoowrap').getWikibannedUsers().then(console.log)
@@ -1040,7 +920,7 @@ class Subreddit extends RedditContent {
    * @summary Gets the list of approved submitters on this subreddit.
    * @param {object} options Filtering options. Can also contain options for the resulting Listing.
    * @param {string} options.name A username on the list to jump to.
-   * @returns {Promise} A Listing of users
+   * @returns A Listing of users
    * @example
    *
    * r.getSubreddit('snoowrap').getContributors().then(console.log)
@@ -1056,7 +936,7 @@ class Subreddit extends RedditContent {
    * @summary Gets the list of approved wiki submitters on this subreddit .
    * @param {object} options Filtering options. Can also contain options for the resulting Listing.
    * @param {string} options.name A username on the list to jump to.
-   * @returns {Promise} A Listing of users
+   * @returns A Listing of users
    * @example
    *
    * r.getSubreddit('snoowrap').getWikiContributors().then(console.log)
@@ -1072,7 +952,7 @@ class Subreddit extends RedditContent {
    * @summary Gets the list of moderators on this subreddit.
    * @param {object} options
    * @param {string} [options.name] The name of a user to find in the list
-   * @returns {Promise} An Array of RedditUsers representing the moderators of this subreddit
+   * @returns An Array of RedditUsers representing the moderators of this subreddit
    * @example
    *
    * r.getSubreddit('AskReddit').getModerators().then(console.log)
@@ -1087,7 +967,7 @@ class Subreddit extends RedditContent {
   }
   /**
    * @summary Deletes the banner for this Subreddit.
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').deleteBanner()
    */
   async deleteBanner () {
@@ -1097,7 +977,7 @@ class Subreddit extends RedditContent {
   }
   /**
    * @summary Deletes the header image for this Subreddit.
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').deleteHeader()
    */
   async deleteHeader () {
@@ -1107,7 +987,7 @@ class Subreddit extends RedditContent {
   }
   /**
    * @summary Deletes this subreddit's icon.
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').deleteIcon()
    */
   async deleteIcon () {
@@ -1119,7 +999,7 @@ class Subreddit extends RedditContent {
    * @summary Deletes an image from this subreddit.
    * @param {object} options
    * @param {string} options.imageName The name of the image.
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').deleteImage()
    */
   async deleteImage ({image_name, imageName = image_name}) {
@@ -1132,14 +1012,14 @@ class Subreddit extends RedditContent {
   }
   /**
    * @summary Gets this subreddit's current settings.
-   * @returns {Promise} An Object containing this subreddit's current settings.
+   * @returns An Object containing this subreddit's current settings.
    * @example
    *
    * r.getSubreddit('snoowrap').getSettings().then(console.log)
    * // => SubredditSettings { default_set: true, submit_text: '', subreddit_type: 'private', ... }
    */
   getSettings () {
-    return this._get({url: `r/${this.display_name}/about/edit`});
+    return this._get({url: `r/${this.display_name}/about`});
   }
   /**
    * @summary Edits this subreddit's settings.
@@ -1188,10 +1068,10 @@ class Subreddit extends RedditContent {
    * @param {boolean} [options.collapse_deleted_comments=false] Determines whether deleted and removed comments should be
    * collapsed by default
    * @param {string} [options.suggested_comment_sort=undefined] The suggested comment sort for the subreddit. This should be
-   * one of `confidence, top, new, controversial, old, random, qa`.If left blank, there will be no suggested sort,
+   * one of `confidence, top, new, controversial, old, random, qa`. If left blank, there will be no suggested sort,
    * which means that users will see the sort method that is set in their own preferences (usually `confidence`.)
    * @param {boolean} [options.spoilers_enabled=false] Determines whether users can mark their posts as spoilers
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
+   * @returns A Promise that fulfills with this Subreddit when the request is complete.
    * @example r.getSubreddit('snoowrap').editSettings({submit_text: 'Welcome! Please be sure to read the rules.'})
    */
   async editSettings (options) {
@@ -1208,7 +1088,7 @@ class Subreddit extends RedditContent {
    * @summary Gets a list of recommended other subreddits given this one.
    * @param {object} [options]
    * @param {Array} [options.omit=[]] An Array of subreddit names that should be excluded from the listing.
-   * @returns {Promise} An Array of subreddit names
+   * @returns An Array of subreddit names
    * @example
    *
    * r.getSubreddit('AskReddit').getRecommendedSubreddits().then(console.log);
@@ -1221,7 +1101,7 @@ class Subreddit extends RedditContent {
   }
   /**
    * @summary Gets the submit text (which displays on the submission form) for this subreddit.
-   * @returns {Promise} The submit text, represented as a string.
+   * @returns The submit text, represented as a string.
    * @example
    *
    * r.getSubreddit('snoowrap').getSubmitText().then(console.log)
@@ -1236,7 +1116,7 @@ class Subreddit extends RedditContent {
    * @param {object} options
    * @param {string} options.css The new contents of the stylesheet
    * @param {string} [options.reason] The reason for the change (256 characters max)
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').updateStylesheet({css: 'body {color:#00ff00;}', reason: 'yay green'})
    */
   async updateStylesheet ({css, reason}) {
@@ -1257,7 +1137,7 @@ class Subreddit extends RedditContent {
   }
   /**
    * @summary Subscribes to this subreddit.
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').subscribe()
    */
   subscribe () {
@@ -1265,7 +1145,7 @@ class Subreddit extends RedditContent {
   }
   /**
    * @summary Unsubscribes from this subreddit.
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').unsubscribe()
    */
   async unsubscribe () {
@@ -1309,7 +1189,7 @@ class Subreddit extends RedditContent {
    * image file, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) in environments (e.g.
    * browsers) where the filesystem is unavailable.
    * @param {string} [options.imageType='png'] Determines how the uploaded image should be stored. One of `png, jpg`
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
+   * @returns A Promise that fulfills with this Subreddit when the request is complete.
    * @example r.getSubreddit('snoowrap').uploadSubredditImage({name: 'the cookie monster', file: './cookie_monster.png'})
    */
   uploadStylesheetImage ({name, file, image_type = 'png', imageType = image_type}) {
@@ -1322,7 +1202,7 @@ class Subreddit extends RedditContent {
    * image file, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) for environments (e.g.
    * browsers) where the filesystem is unavailable.
    * @param {string} [options.imageType='png'] Determines how the uploaded image should be stored. One of `png, jpg`
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
+   * @returns A Promise that fulfills with this Subreddit when the request is complete.
    * @example r.getSubreddit('snoowrap').uploadHeaderImage({name: 'the cookie monster', file: './cookie_monster.png'})
    */
   uploadHeaderImage ({file, image_type = 'png', imageType = image_type}) {
@@ -1335,7 +1215,7 @@ class Subreddit extends RedditContent {
    * image file, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) for environments (e.g.
    * browsers) where the filesystem is unavailable.
    * @param {string} [options.imageType='png'] Determines how the uploaded image should be stored. One of `png, jpg`
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
+   * @returns A Promise that fulfills with this Subreddit when the request is complete.
    * @example r.getSubreddit('snoowrap').uploadIcon({name: 'the cookie monster', file: './cookie_monster.png'})
    */
   uploadIcon ({file, image_type = 'png', imageType = image_type}) {
@@ -1348,7 +1228,7 @@ class Subreddit extends RedditContent {
    * image file, or a [ReadableStream](https://nodejs.org/api/stream.html#stream_class_stream_readable) for environments (e.g.
    * browsers) where the filesystem is unavailable.
    * @param {string} [options.imageType='png'] Determines how the uploaded image should be stored. One of `png, jpg`
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete.
+   * @returns A Promise that fulfills with this Subreddit when the request is complete.
    * @example r.getSubreddit('snoowrap').uploadBannerImage({name: 'the cookie monster', file: './cookie_monster.png'})
    */
   uploadBannerImage ({file, image_type = 'png', imageType = image_type}) {
@@ -1356,7 +1236,7 @@ class Subreddit extends RedditContent {
   }
   /**
    * @summary Gets information on this subreddit's rules.
-   * @returns {Promise} A Promise that fulfills with information on this subreddit's rules.
+   * @returns A Promise that fulfills with information on this subreddit's rules.
    * @example
    *
    * r.getSubreddit('snoowrap').getRules().then(console.log)
@@ -1385,7 +1265,7 @@ class Subreddit extends RedditContent {
    * @summary Gets the stickied post on this subreddit, or throws a 404 error if none exists.
    * @param {object} [options]
    * @param {number} [options.num=1] The number of the sticky to get. Should be either `1` (first sticky) or `2` (second sticky).
-   * @returns {Promise} A Submission object representing this subreddit's stickied submission
+   * @returns A Submission object representing this subreddit's stickied submission
    * @example
    * r.getSubreddit('snoowrap').getSticky({num: 2})
    * // => Submission { ... }
@@ -1416,7 +1296,7 @@ class Subreddit extends RedditContent {
    * @param {Array} [options.permissions] The moderator permissions that this user should have. This should be an array
    * containing some combination of `"wiki", "posts", "access", "mail", "config", "flair"`. To add a moderator with full
    * permissions, omit this property entirely.
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').inviteModerator({name: 'actually_an_aardvark', permissions: ['posts', 'wiki']})
    */
   inviteModerator ({name, permissions}) {
@@ -1426,7 +1306,7 @@ class Subreddit extends RedditContent {
    * @summary Revokes an invitation for the given user to be a moderator.
    * @param {object} options
    * @param {string} options.name The username of the account whose invitation should be revoked
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').revokeModeratorInvite({name: 'actually_an_aardvark'})
    */
   revokeModeratorInvite ({name}) {
@@ -1436,7 +1316,7 @@ class Subreddit extends RedditContent {
    * @summary Removes the given user's moderator status on this subreddit.
    * @param {object} options
    * @param {string} options.name The username of the account whose moderator status should be removed
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').removeModerator({name: 'actually_an_aardvark'})
    */
   removeModerator ({name}) {
@@ -1446,7 +1326,7 @@ class Subreddit extends RedditContent {
    * @summary Makes the given user an approved submitter of this subreddit.
    * @param {object} options
    * @param {string} options.name The username of the account that should be given this status
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').addContributor({name: 'actually_an_aardvark'})
    */
   addContributor ({name}) {
@@ -1456,7 +1336,7 @@ class Subreddit extends RedditContent {
    * @summary Revokes this user's approved submitter status on this subreddit.
    * @param {object} options
    * @param {string} options.name The username of the account whose status should be revoked
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').removeContributor({name: 'actually_an_aardvark'})
    */
   removeContributor ({name}) {
@@ -1472,7 +1352,7 @@ class Subreddit extends RedditContent {
    * @param {number} [options.duration] The duration of the ban, in days. For a permanent ban, omit this parameter.
    * @param {string} [options.banNote] A note that appears on the moderation log, usually used to indicate the reason for the
    * ban. This is not visible to the banned user. (300 characters max)
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').banUser({name: 'actually_an_aardvark', banMessage: 'You are now banned LOL'})
    */
   banUser ({
@@ -1494,7 +1374,7 @@ class Subreddit extends RedditContent {
    * @summary Unbans the given user from this subreddit.
    * @param {object} options
    * @param {string} options.name The username of the account that should be unbanned
-   * @returns {Promise} A Promise that fulfills when the request is complete
+   * @returns A Promise that fulfills when the request is complete
    * @example r.getSubreddit('snoowrap').unbanUser({name: 'actually_an_aardvark'})
    */
   unbanUser ({name}) {
@@ -1504,7 +1384,7 @@ class Subreddit extends RedditContent {
    * @summary Mutes the given user from messaging this subreddit for 72 hours.
    * @param {object} options
    * @param {string} options.name The username of the account that should be muted
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').muteUser({name: 'actually_an_aardvark'})
    */
   muteUser ({name}) {
@@ -1514,7 +1394,7 @@ class Subreddit extends RedditContent {
    * @summary Unmutes the given user from messaging this subreddit.
    * @param {object} options
    * @param {string} options.name The username of the account that should be muted
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').unmuteUser({name: 'actually_an_aardvark'})
    */
   unmuteUser ({name}) {
@@ -1524,7 +1404,7 @@ class Subreddit extends RedditContent {
    * @summary Bans the given user from editing this subreddit's wiki.
    * @param {object} options
    * @param {string} options.name The username of the account that should be wikibanned
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').wikibanUser({name: 'actually_an_aardvark'})
    */
   wikibanUser ({name}) {
@@ -1534,7 +1414,7 @@ class Subreddit extends RedditContent {
    * @summary Unbans the given user from editing this subreddit's wiki.
    * @param {object} options
    * @param {string} options.name The username of the account that should be unwikibanned
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').unwikibanUser({name: 'actually_an_aardvark'})
    */
   unwikibanUser ({name}) {
@@ -1544,7 +1424,7 @@ class Subreddit extends RedditContent {
    * @summary Adds the given user to this subreddit's list of approved wiki editors.
    * @param {object} options
    * @param {string} options.name The username of the account that should be given approved editor status
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').addWikiContributor({name: 'actually_an_aardvark'})
    */
   addWikiContributor ({name}) {
@@ -1554,7 +1434,7 @@ class Subreddit extends RedditContent {
    * @summary Removes the given user from this subreddit's list of approved wiki editors.
    * @param {object} options
    * @param {string} options.name The username of the account whose approved editor status should be revoked
-   * @returns {Promise} A Promise that fulfills with this Subreddit when the request is complete
+   * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').removeWikiContributor({name: 'actually_an_aardvark'})
    */
   removeWikiContributor ({name}) {
@@ -1567,7 +1447,7 @@ class Subreddit extends RedditContent {
    * @param {Array} [options.permissions] The new moderator permissions that this user should have. This should be an array
    * containing some combination of `"wiki", "posts", "access", "mail", "config", "flair"`. To add a moderator with full
    * permissions, omit this property entirely.
-   * @returns {Promise} A Promise that fulfills with this Subreddit when this request is complete
+   * @returns A Promise that fulfills with this Subreddit when this request is complete
    * @example r.getSubreddit('snoowrap').setModeratorPermissions({name: 'actually_an_aardvark', permissions: ['mail']})
    */
   async setModeratorPermissions ({name, permissions}) {
@@ -1587,12 +1467,12 @@ class Subreddit extends RedditContent {
    * r.getSubreddit('snoowrap').getWikiPage('index')
    * // => WikiPage { title: 'index', subreddit: Subreddit { display_name: 'snoowrap' } }
    */
-  getWikiPage (title) {
-    return this._r._newObject('WikiPage', {subreddit: this, title});
+  getWikiPage (title: string) {
+    return this._r._newObject('WikiPage', {subreddit: this, title})
   }
   /**
    * @summary Gets the list of wiki pages on this subreddit.
-   * @returns {Promise} An Array containing WikiPage objects
+   * @returns An Array containing WikiPage objects
    * @example
    *
    * r.getSubreddit('snoowrap').getWikiPages().then(console.log)
@@ -1604,13 +1484,13 @@ class Subreddit extends RedditContent {
    * // ]
    */
   async getWikiPages () {
-    const res = await this._get({url: `r/${this.display_name}/wiki/pages`});
-    return res.map(title => this.getWikiPage(title));
+    const res: string[] = await this._get({url: `r/${this.display_name}/wiki/pages`})
+    return res.map(title => this.getWikiPage(title))
   }
   /**
    * @summary Gets a list of revisions on this subreddit's wiki.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing wiki revisions
+   * @returns A Listing containing wiki revisions
    * @example
    *
    * r.getSubreddit('snoowrap').getWikiRevisions().then(console.log)
@@ -1619,9 +1499,9 @@ class Subreddit extends RedditContent {
    * //  ...
    * // ]
    */
-  getWikiRevisions (options) {
-    return this._getListing({uri: `r/${this.display_name}/wiki/revisions`, qs: options});
+  getWikiRevisions (options: ListingQuery) {
+    return this._getListing({uri: `r/${this.display_name}/wiki/revisions`, qs: options})
   }
-};
+}
 
-export default Subreddit;
+export default Subreddit

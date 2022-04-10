@@ -1,5 +1,5 @@
 import RedditContent from './RedditContent';
-
+//
 /**
  * @summary A class representing a multireddit.
  * <style> #MultiReddit {display: none} </style>
