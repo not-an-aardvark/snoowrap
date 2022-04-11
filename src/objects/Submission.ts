@@ -5,19 +5,19 @@ import type snoowrap from '../snoowrap'
 import type {Listing} from './'
 import type {FetchMoreOptions, FetchAllOptions, ListingQuery} from './Listing'
 import type {
-  OmitProps, RichTextFlair, Media, MediaEmbed, SecureMediaEmbed, ImagePreview, SubmitCrosspostOptions,
-  AssignFlairOptions, SelectFlairOptions
+  OmitProps, RichTextFlair, Media, MediaEmbed, SecureMediaEmbed, ImagePreview,
+  SubmitCrosspostOptions, AssignFlairOptions, SelectFlairOptions
 } from '../interfaces'
 import type {COMMENT_SORTS} from '../constants'
 
 const api_type = 'json'
+
 
 interface StickyOptions {
   num?: number
   state: boolean
   [key: string]: any
 }
-
 
 interface Submission {
   clicked: boolean
@@ -90,6 +90,8 @@ interface Submission {
  * r.getSubmission('2np694')
  */
 class Submission extends VoteableContent<Submission> {
+  static _name = 'Submission'
+
   _sort?: typeof COMMENT_SORTS[number]
   _children: {[id: string]: Comment}
 

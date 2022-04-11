@@ -5,44 +5,42 @@ import {formatModPermissions, handleJsonErrors, renameKey} from '../helper'
 import {InvalidMethodCallError} from '../errors'
 import RedditContent from './RedditContent'
 import type {
-  CreateFlairOptions, FlairCSVOptions, FlairSelectorOptions, OmitProps, SelectFlairOptions, SubmitLinkOptions,
+  CreateFlairOptions, FlairCSVOptions, FlairSelectorOptions, OmitProps, RichTextFlair, SelectFlairOptions, SubmitLinkOptions,
   SubmitImageOptions, SubmitVideoOptions, SubmitGalleryOptions, SubmitSelfpostOptions, SubmitPollOptions,
-  SubmitCrosspostOptions
+  SubmitCrosspostOptions,
+  SubredditOptions
 } from '../interfaces'
 import type {ListingQuery} from './Listing'
+import type {SearchOptions} from '../snoowrap'
+import type {AxiosError} from '../axiosCreate'
+import type {COMMENT_SORTS} from '../constants'
 //
 const api_type = 'json'
 
 
 interface FlairListingQuery extends ListingQuery {
-  /** A specific username to jump to */
+  /** A specific username to jump to. */
   name?: string
 }
 
 interface FlairSettings {
-  /** Determines whether user flair should be enabled */
+  /** Determines whether user flair should be enabled. */
   flair_enabled: boolean
-  /**
-   * Determines the orientation of user flair relative to a given username. This
-   * should be either the string 'left' or the string 'right'.
-   */
+  /** Determines the orientation of user flair relative to a given username. */
   flair_position: 'left'|'right'
-  /** Determines whether users should be able to edit their own flair */
+  /** Determines whether users should be able to edit their own flair. */
   flair_self_assign_enabled: boolean
-  /**
-   * Determines the orientation of link flair relative to a link title. This should
-   * be either 'left' or 'right'.
-   */
+  /** Determines the orientation of link flair relative to a link title. */
   link_flair_position: 'left'|'right'
-  /** Determines whether users should be able to edit the flair of their */
+  /** Determines whether users should be able to edit the flair of their. */
   link_flair_self_assign_enabled: boolean
   [key: string]: any
 }
 
 interface ModerationLogQuery extends ListingQuery {
-  /** An array of moderator names that the results should be restricted to */
+  /** An array of moderator names that the results should be restricted to. */
   mods?: string[]
-  /** A string of comma-separated moderator names */
+  /** A string of comma-separated moderator names. */
   mod?: string
   /** Restricts the results to the specified type. */
   type?: 'banuser'|'unbanuser'|'removelink'|'approvelink'|'removecomment'|'approvecomment'
@@ -55,8 +53,104 @@ interface ModerationLogQuery extends ListingQuery {
 }
 
 interface FilterableListingQuery extends ListingQuery {
-  /** Restricts the Listing to the specified type of item */
+  /** Restricts the Listing to the specified type of item. */
   only?: 'links'|'comments'
+}
+
+interface UserListingQuery extends ListingQuery {
+  /** A username on the list to jump to. */
+  user?: string
+  /** Expand subreddits. */
+  sr_detail?: boolean
+}
+
+interface Subreddit {
+  accounts_active_is_fuzzed: boolean
+  accounts_active: number
+  active_user_count: number
+  advertiser_category: string|null
+  all_original_content: boolean
+  allow_discovery: boolean
+  allow_images: boolean
+  allow_videogifs: boolean
+  allow_videos: boolean
+  /** HEX color code */
+  banner_background_color: string
+  /** URL of the banner image used on desktop Reddit */
+  banner_background_image: string
+  /** URL of the banner image used on the mobile Reddit app */
+  banner_img: string
+  banner_size: [number, number]|null
+  can_assign_link_flair: boolean
+  can_assign_user_flair: boolean
+  collapse_deleted_comments: boolean
+  comment_score_hide_mins: number
+  /** Image URL of the subreddit icon */
+  community_icon: string
+  created_utc: number
+  created: number
+  description_html: string
+  description: string
+  display_name: string
+  display_name_prefixed: string
+  emojis_custom_size: [number, number]|null
+  emojis_enabled: boolean
+  has_menu_widget: boolean
+  header_img: string|null
+  header_size: [number, number]|null
+  header_title: string|null
+  hide_ads: boolean
+  id: string
+  icon_img: string
+  icon_size: [number, number]|null
+  is_enrolled_in_new_modmail: boolean|null
+  key_color: string
+  lang: string
+  link_flair_enabled: boolean
+  link_flair_position: ''|'left'|'right'
+  name: string
+  /** Will be null if user is not subscribed to this subreddit */
+  notification_level: string|null
+  over18: boolean
+  /** HEX color code */
+  primary_color: string
+  public_description_html: string
+  public_description: string
+  public_traffic: boolean
+  quarantine: boolean
+  show_media_preview: boolean
+  show_media: boolean
+  spoilers_enabled: boolean
+  submission_type: 'any'|'link'|'self'
+  submit_link_label: string|null
+  submit_text_html: string
+  submit_text_label: string|null
+  submit_text: string
+  subreddit_type: 'public'|'private'|'restricted'|'gold_restricted'|'gold_only'|'archived'|'employees_only'
+  subscribers: number
+  suggested_comment_sort: typeof COMMENT_SORTS[number]|null
+  title: string
+  url: string
+  user_can_flair_in_sr: boolean
+  user_flair_background_color: string|null
+  user_flair_css_class: string|null
+  user_flair_enabled_in_sr: boolean
+  user_flair_position: ''|'left'|'right'
+  user_flair_richtext: RichTextFlair[]
+  user_flair_template_id: string|null
+  user_flair_text: string|null
+  user_flair_text_color: 'dark'|'light'|null
+  user_has_favorited: boolean
+  user_is_banned: boolean
+  user_is_contributor: boolean
+  user_is_moderator: boolean
+  user_is_muted: boolean
+  user_is_subscriber: boolean
+  user_sr_flair_enabled: boolean
+  user_sr_theme_enabled: boolean
+  whitelist_status: string
+  wiki_enabled: boolean
+  wls: number
 }
 
 /**
@@ -67,6 +161,8 @@ interface FilterableListingQuery extends ListingQuery {
  * r.getSubreddit('AskReddit')
  */
 class Subreddit extends RedditContent<Subreddit> {
+  static _name = 'Subreddit'
+
   get _uri () {
     return `r/${this.display_name}/about`
   }
@@ -231,7 +327,7 @@ class Subreddit extends RedditContent<Subreddit> {
    * r.getSubreddit('snoowrap').setMultipleUserFlairs([
    *   {name: 'actually_an_aardvark', text: "this is /u/actually_an_aardvark's flair text", css_class: 'some-css-class'},
    *   {name: 'snoowrap_testing', text: "this is /u/snoowrap_testing's flair text", css_class: 'some-css-class'}
-   * ]);
+   * ])
    * // the above request gets completed successfully
    *
    * r.getSubreddit('snoowrap').setMultipleUserFlairs([
@@ -417,7 +513,7 @@ class Subreddit extends RedditContent<Subreddit> {
    * // (new linkpost created on reddit)
    */
   submitLink (options: OmitProps<SubmitLinkOptions, 'sr'>) {
-    return this._r.submitLink({...options, sr: this.display_name});
+    return this._r.submitLink({...options, sr: this.display_name})
   }
   /**
    * @summary Submit an image submission to this subreddit. (Undocumented endpoint).
@@ -849,28 +945,21 @@ class Subreddit extends RedditContent<Subreddit> {
   /**
    * @summary Conducts a search of reddit submissions, restricted to this subreddit.
    * @param {object} options Search options. Can also contain options for the resulting Listing.
-   * @param {string} options.query The search query
-   * @param {string} [options.time] Describes the timespan that posts should be retrieved frome. One of
-   * `hour, day, week, month, year, all`
-   * @param {string} [options.sort] Determines how the results should be sorted. One of `relevance, hot, top, new, comments`
-   * @param {string} [options.syntax='plain'] Specifies a syntax for the search. One of `cloudsearch, lucene, plain`
-   * @returns A Listing containing the search results.
    * @example
    *
-   * r.getSubreddit('snoowrap').search({query: 'blah', sort: 'year'}).then(console.log)
+   * r.getSubreddit('snoowrap').search({q: 'blah', sort: 'year'}).then(console.log)
    * // => Listing [
    * //  Submission { ... },
    * //  Submission { ... },
    * //  ...
    * // ]
    */
-  search (options) {
-    return this._r.search({...options, subreddit: this, restrictSr: true})
+  search (options: OmitProps<SearchOptions, 'subreddit'|'restrict_sr'>) {
+    return this._r.search({...options, subreddit: this, restrict_sr: true})
   }
   /**
    * @summary Gets the list of banned users on this subreddit.
    * @param {object} options Filtering options. Can also contain options for the resulting Listing.
-   * @param {string} options.name A username on the list to jump to.
    * @returns A Listing of users
    * @example
    *
@@ -881,13 +970,12 @@ class Subreddit extends RedditContent<Subreddit> {
    * // ]
    *
    */
-  getBannedUsers (options) {
-    return this._getListing({uri: `r/${this.display_name}/about/banned`, qs: renameKey(options, 'name', 'user')});
+  getBannedUsers (options?: UserListingQuery) {
+    return this._getListing({uri: `r/${this.display_name}/about/banned`, qs: options})
   }
   /**
    * @summary Gets the list of muted users on this subreddit.
    * @param {object} options Filtering options. Can also contain options for the resulting Listing.
-   * @param {string} options.name A username on the list to jump to.
    * @returns A Listing of users
    * @example
    *
@@ -897,13 +985,12 @@ class Subreddit extends RedditContent<Subreddit> {
    * //  ...
    * // ]
    */
-  getMutedUsers (options) {
-    return this._getListing({uri: `r/${this.display_name}/about/muted`, qs: renameKey(options, 'name', 'user')});
+  getMutedUsers (options?: UserListingQuery) {
+    return this._getListing({uri: `r/${this.display_name}/about/muted`, qs: options})
   }
   /**
    * @summary Gets the list of users banned from this subreddit's wiki.
    * @param {object} options Filtering options. Can also contain options for the resulting Listing.
-   * @param {string} options.name A username on the list to jump to.
    * @returns A Listing of users
    * @example
    *
@@ -913,13 +1000,12 @@ class Subreddit extends RedditContent<Subreddit> {
    * //  ...
    * // ]
    */
-  getWikibannedUsers (options) {
-    return this._getListing({uri: `r/${this.display_name}/about/wikibanned`, qs: renameKey(options, 'name', 'user')});
+  getWikibannedUsers (options?: UserListingQuery) {
+    return this._getListing({uri: `r/${this.display_name}/about/wikibanned`, qs: options})
   }
   /**
    * @summary Gets the list of approved submitters on this subreddit.
    * @param {object} options Filtering options. Can also contain options for the resulting Listing.
-   * @param {string} options.name A username on the list to jump to.
    * @returns A Listing of users
    * @example
    *
@@ -929,13 +1015,12 @@ class Subreddit extends RedditContent<Subreddit> {
    * //  ...
    * // ]
    */
-  getContributors (options) {
-    return this._getListing({uri: `r/${this.display_name}/about/contributors`, qs: renameKey(options, 'name', 'user')});
+  getContributors (options?: UserListingQuery) {
+    return this._getListing({uri: `r/${this.display_name}/about/contributors`, qs: options})
   }
   /**
    * @summary Gets the list of approved wiki submitters on this subreddit .
    * @param {object} options Filtering options. Can also contain options for the resulting Listing.
-   * @param {string} options.name A username on the list to jump to.
    * @returns A Listing of users
    * @example
    *
@@ -945,13 +1030,12 @@ class Subreddit extends RedditContent<Subreddit> {
    * //  ...
    * // ]
    */
-  getWikiContributors (options) {
-    return this._getListing({uri: `r/${this.display_name}/about/wikicontributors`, qs: renameKey(options, 'name', 'user')});
+  getWikiContributors (options?: UserListingQuery) {
+    return this._getListing({uri: `r/${this.display_name}/about/wikicontributors`, qs: options})
   }
   /**
    * @summary Gets the list of moderators on this subreddit.
    * @param {object} options
-   * @param {string} [options.name] The name of a user to find in the list
    * @returns An Array of RedditUsers representing the moderators of this subreddit
    * @example
    *
@@ -962,8 +1046,8 @@ class Subreddit extends RedditContent<Subreddit> {
    * // ]
    *
    */
-  getModerators ({name} = {}) {
-    return this._get({url: `r/${this.display_name}/about/moderators`, params: {user: name}});
+  getModerators (options?: UserListingQuery) {
+    return this._get({url: `r/${this.display_name}/about/moderators`, params: options})
   }
   /**
    * @summary Deletes the banner for this Subreddit.
@@ -971,9 +1055,9 @@ class Subreddit extends RedditContent<Subreddit> {
    * @example r.getSubreddit('snoowrap').deleteBanner()
    */
   async deleteBanner () {
-    const res = await this._post({url: `r/${this.display_name}/api/delete_sr_banner`, form: {api_type}});
-    handleJsonErrors(res);
-    return this;
+    const res = await this._post({url: `r/${this.display_name}/api/delete_sr_banner`, form: {api_type}})
+    handleJsonErrors(res)
+    return this
   }
   /**
    * @summary Deletes the header image for this Subreddit.
@@ -981,9 +1065,9 @@ class Subreddit extends RedditContent<Subreddit> {
    * @example r.getSubreddit('snoowrap').deleteHeader()
    */
   async deleteHeader () {
-    const res = await this._post({url: `r/${this.display_name}/api/delete_sr_header`, form: {api_type}});
-    handleJsonErrors(res);
-    return this;
+    const res = await this._post({url: `r/${this.display_name}/api/delete_sr_header`, form: {api_type}})
+    handleJsonErrors(res)
+    return this
   }
   /**
    * @summary Deletes this subreddit's icon.
@@ -991,24 +1075,23 @@ class Subreddit extends RedditContent<Subreddit> {
    * @example r.getSubreddit('snoowrap').deleteIcon()
    */
   async deleteIcon () {
-    const res = await this._post({url: `r/${this.display_name}/api/delete_sr_icon`, form: {api_type}});
-    handleJsonErrors(res);
-    return this;
+    const res = await this._post({url: `r/${this.display_name}/api/delete_sr_icon`, form: {api_type}})
+    handleJsonErrors(res)
+    return this
   }
   /**
    * @summary Deletes an image from this subreddit.
-   * @param {object} options
-   * @param {string} options.imageName The name of the image.
+   * @param {string} img_name The name of the image.
    * @returns A Promise that fulfills with this Subreddit when the request is complete
    * @example r.getSubreddit('snoowrap').deleteImage()
    */
-  async deleteImage ({image_name, imageName = image_name}) {
+  async deleteImage (img_name: string) {
     const res = await this._post({
       url: `r/${this.display_name}/api/delete_sr_img`,
-      form: {api_type, img_name: imageName}
-    });
-    handleJsonErrors(res);
-    return this;
+      form: {api_type, img_name}
+    })
+    handleJsonErrors(res)
+    return this
   }
   /**
    * @summary Gets this subreddit's current settings.
@@ -1019,7 +1102,7 @@ class Subreddit extends RedditContent<Subreddit> {
    * // => SubredditSettings { default_set: true, submit_text: '', subreddit_type: 'private', ... }
    */
   getSettings () {
-    return this._get({url: `r/${this.display_name}/about`});
+    return this._get({url: `r/${this.display_name}/about`})
   }
   /**
    * @summary Edits this subreddit's settings.
@@ -1068,21 +1151,21 @@ class Subreddit extends RedditContent<Subreddit> {
    * @param {boolean} [options.collapse_deleted_comments=false] Determines whether deleted and removed comments should be
    * collapsed by default
    * @param {string} [options.suggested_comment_sort=undefined] The suggested comment sort for the subreddit. This should be
-   * one of `confidence, top, new, controversial, old, random, qa`. If left blank, there will be no suggested sort,
+   * one of `confidence, top, new, controversial, old, random, qa, live`. If left blank, there will be no suggested sort,
    * which means that users will see the sort method that is set in their own preferences (usually `confidence`.)
    * @param {boolean} [options.spoilers_enabled=false] Determines whether users can mark their posts as spoilers
    * @returns A Promise that fulfills with this Subreddit when the request is complete.
    * @example r.getSubreddit('snoowrap').editSettings({submit_text: 'Welcome! Please be sure to read the rules.'})
    */
-  async editSettings (options) {
-    const currentValues = await this.getSettings();
-    const name = (await this.fetch()).name;
+  async editSettings (options: SubredditOptions) {
+    const currentValues = await this.getSettings()
+    const name = (await this.fetch())!.name
     await this._r._createOrEditSubreddit({
       ...renameKey(currentValues, 'subreddit_type', 'type'),
       ...options,
       sr: name
-    });
-    return this;
+    })
+    return this
   }
   /**
    * @summary Gets a list of recommended other subreddits given this one.
@@ -1091,13 +1174,13 @@ class Subreddit extends RedditContent<Subreddit> {
    * @returns An Array of subreddit names
    * @example
    *
-   * r.getSubreddit('AskReddit').getRecommendedSubreddits().then(console.log);
+   * r.getSubreddit('AskReddit').getRecommendedSubreddits().then(console.log)
    * // [ 'TheChurchOfRogers', 'Sleepycabin', ... ]
    */
-  async getRecommendedSubreddits (options) {
-    const toOmit = options.omit && options.omit.join(',');
-    const names = await this._get({url: `api/recommend/sr/${this.display_name}`, params: {omit: toOmit}});
-    return map(names, 'sr_name');
+  async getRecommendedSubreddits (options: {omit: string[], [key: string]: any}) {
+    const toOmit = options.omit && options.omit.join(',')
+    const names = await this._get({url: `api/recommend/sr/${this.display_name}`, params: {omit: toOmit}})
+    return map(names, 'sr_name')
   }
   /**
    * @summary Gets the submit text (which displays on the submission form) for this subreddit.
@@ -1108,8 +1191,8 @@ class Subreddit extends RedditContent<Subreddit> {
    * // => 'Welcome! Please be sure to read the rules.'
    */
   async getSubmitText () {
-    const res = await this._get({url: `r/${this.display_name}/api/submit_text`});
-    return res.submit_text;
+    const res = await this._get({url: `r/${this.display_name}/api/submit_text`})
+    return res.submit_text
   }
   /**
    * @summary Updates this subreddit's stylesheet.
@@ -1123,17 +1206,17 @@ class Subreddit extends RedditContent<Subreddit> {
     const res = await this._post({
       url: `r/${this.display_name}/api/subreddit_stylesheet`,
       form: {api_type, op: 'save', reason, stylesheet_contents: css}
-    });
-    handleJsonErrors(res);
-    return this;
+    })
+    handleJsonErrors(res)
+    return this
   }
 
-  async _setSubscribed (status) {
+  async _setSubscribed (status: boolean) {
     await this._post({
       url: 'api/subscribe',
       form: {action: status ? 'sub' : 'unsub', sr_name: this.display_name}
-    });
-    return this;
+    })
+    return this
   }
   /**
    * @summary Subscribes to this subreddit.
@@ -1141,7 +1224,7 @@ class Subreddit extends RedditContent<Subreddit> {
    * @example r.getSubreddit('snoowrap').subscribe()
    */
   subscribe () {
-    return this._setSubscribed(true);
+    return this._setSubscribed(true)
   }
   /**
    * @summary Unsubscribes from this subreddit.
@@ -1158,28 +1241,28 @@ class Subreddit extends RedditContent<Subreddit> {
      * the subreddit doesn't exist, then the original error was of the second type, so throw it.
      */
     try {
-      await this._setSubscribed(false);
+      await this._setSubscribed(false)
     } catch (e) {
-      if (e.response.status === 404) {
-        return await this.fetch();
+      if ((e as AxiosError).response!.status === 404) {
+        return await this.fetch()
       }
-      throw e;
+      throw e
     }
-    return this;
+    return this
   }
   async _uploadSrImg ({name, file, uploadType, imageType}) {
     if (typeof file !== 'string' && !(stream && file instanceof stream.Readable)) {
-      throw new InvalidMethodCallError('Uploaded image filepath must be a string or a ReadableStream.');
+      throw new InvalidMethodCallError('Uploaded image filepath must be a string or a ReadableStream.')
     }
-    const parsedFile = typeof file === 'string' ? fs && fs.createReadStream(file) : file;
+    const parsedFile = typeof file === 'string' ? fs && fs.createReadStream(file) : file
     const result = await this._post({
       url: `r/${this.display_name}/api/upload_sr_img`,
       formData: {name, upload_type: uploadType, img_type: imageType, file: parsedFile}
-    });
+    })
     if (result.errors.length) {
-      throw result.errors[0];
+      throw result.errors[0]
     }
-    return this;
+    return this
   }
   /**
    * @summary Uploads an image for use in this subreddit's stylesheet.
@@ -1193,7 +1276,7 @@ class Subreddit extends RedditContent<Subreddit> {
    * @example r.getSubreddit('snoowrap').uploadSubredditImage({name: 'the cookie monster', file: './cookie_monster.png'})
    */
   uploadStylesheetImage ({name, file, image_type = 'png', imageType = image_type}) {
-    return this._uploadSrImg({name, file, imageType, uploadType: 'img'});
+    return this._uploadSrImg({name, file, imageType, uploadType: 'img'})
   }
   /**
    * @summary Uploads an image to use as this subreddit's header.
@@ -1206,7 +1289,7 @@ class Subreddit extends RedditContent<Subreddit> {
    * @example r.getSubreddit('snoowrap').uploadHeaderImage({name: 'the cookie monster', file: './cookie_monster.png'})
    */
   uploadHeaderImage ({file, image_type = 'png', imageType = image_type}) {
-    return this._uploadSrImg({file, imageType, uploadType: 'header'});
+    return this._uploadSrImg({file, imageType, uploadType: 'header'})
   }
   /**
    * @summary Uploads an image to use as this subreddit's mobile icon.
@@ -1219,7 +1302,7 @@ class Subreddit extends RedditContent<Subreddit> {
    * @example r.getSubreddit('snoowrap').uploadIcon({name: 'the cookie monster', file: './cookie_monster.png'})
    */
   uploadIcon ({file, image_type = 'png', imageType = image_type}) {
-    return this._uploadSrImg({file, imageType, uploadType: 'icon'});
+    return this._uploadSrImg({file, imageType, uploadType: 'icon'})
   }
   /**
    * @summary Uploads an image to use as this subreddit's mobile banner.
@@ -1232,7 +1315,7 @@ class Subreddit extends RedditContent<Subreddit> {
    * @example r.getSubreddit('snoowrap').uploadBannerImage({name: 'the cookie monster', file: './cookie_monster.png'})
    */
   uploadBannerImage ({file, image_type = 'png', imageType = image_type}) {
-    return this._uploadSrImg({file, imageType, upload_type: 'banner'});
+    return this._uploadSrImg({file, imageType, upload_type: 'banner'})
   }
   /**
    * @summary Gets information on this subreddit's rules.
@@ -1259,7 +1342,7 @@ class Subreddit extends RedditContent<Subreddit> {
    * }
    */
   getRules () {
-    return this._get({url: `r/${this.display_name}/about/rules`});
+    return this._get({url: `r/${this.display_name}/about/rules`})
   }
   /**
    * @summary Gets the stickied post on this subreddit, or throws a 404 error if none exists.
@@ -1271,23 +1354,23 @@ class Subreddit extends RedditContent<Subreddit> {
    * // => Submission { ... }
    */
   getSticky ({num = 1} = {}) {
-    return this._get({url: `r/${this.display_name}/about/sticky`, params: {num}});
+    return this._get({url: `r/${this.display_name}/about/sticky`, params: {num}})
   }
   async _friend (options) {
     const res = await this._post({
       url: `r/${this.display_name}/api/friend`,
       form: {...options, api_type}
-    });
-    handleJsonErrors(res);
-    return this;
+    })
+    handleJsonErrors(res)
+    return this
   }
   async _unfriend (options) {
     const res = await this._post({
       url: `r/${this.display_name}/api/unfriend`,
       form: {...options, api_type}
-    });
-    handleJsonErrors(res);
-    return this;
+    })
+    handleJsonErrors(res)
+    return this
   }
   /**
    * @summary Invites the given user to be a moderator of this subreddit.
@@ -1300,7 +1383,7 @@ class Subreddit extends RedditContent<Subreddit> {
    * @example r.getSubreddit('snoowrap').inviteModerator({name: 'actually_an_aardvark', permissions: ['posts', 'wiki']})
    */
   inviteModerator ({name, permissions}) {
-    return this._friend({name, permissions: formatModPermissions(permissions), type: 'moderator_invite'});
+    return this._friend({name, permissions: formatModPermissions(permissions), type: 'moderator_invite'})
   }
   /**
    * @summary Revokes an invitation for the given user to be a moderator.
@@ -1310,7 +1393,7 @@ class Subreddit extends RedditContent<Subreddit> {
    * @example r.getSubreddit('snoowrap').revokeModeratorInvite({name: 'actually_an_aardvark'})
    */
   revokeModeratorInvite ({name}) {
-    return this._unfriend({name, type: 'moderator_invite'});
+    return this._unfriend({name, type: 'moderator_invite'})
   }
   /**
    * @summary Removes the given user's moderator status on this subreddit.
@@ -1320,7 +1403,7 @@ class Subreddit extends RedditContent<Subreddit> {
    * @example r.getSubreddit('snoowrap').removeModerator({name: 'actually_an_aardvark'})
    */
   removeModerator ({name}) {
-    return this._unfriend({name, type: 'moderator'});
+    return this._unfriend({name, type: 'moderator'})
   }
   /**
    * @summary Makes the given user an approved submitter of this subreddit.
@@ -1330,7 +1413,7 @@ class Subreddit extends RedditContent<Subreddit> {
    * @example r.getSubreddit('snoowrap').addContributor({name: 'actually_an_aardvark'})
    */
   addContributor ({name}) {
-    return this._friend({name, type: 'contributor'});
+    return this._friend({name, type: 'contributor'})
   }
   /**
    * @summary Revokes this user's approved submitter status on this subreddit.
@@ -1340,7 +1423,7 @@ class Subreddit extends RedditContent<Subreddit> {
    * @example r.getSubreddit('snoowrap').removeContributor({name: 'actually_an_aardvark'})
    */
   removeContributor ({name}) {
-    return this._unfriend({name, type: 'contributor'});
+    return this._unfriend({name, type: 'contributor'})
   }
   /**
    * @summary Bans the given user from this subreddit.
@@ -1368,7 +1451,7 @@ class Subreddit extends RedditContent<Subreddit> {
       duration,
       note: banNote,
       type: 'banned'
-    });
+    })
   }
   /**
    * @summary Unbans the given user from this subreddit.
@@ -1378,7 +1461,7 @@ class Subreddit extends RedditContent<Subreddit> {
    * @example r.getSubreddit('snoowrap').unbanUser({name: 'actually_an_aardvark'})
    */
   unbanUser ({name}) {
-    return this._unfriend({name, type: 'banned'});
+    return this._unfriend({name, type: 'banned'})
   }
   /**
    * @summary Mutes the given user from messaging this subreddit for 72 hours.
@@ -1388,7 +1471,7 @@ class Subreddit extends RedditContent<Subreddit> {
    * @example r.getSubreddit('snoowrap').muteUser({name: 'actually_an_aardvark'})
    */
   muteUser ({name}) {
-    return this._friend({name, type: 'muted'});
+    return this._friend({name, type: 'muted'})
   }
   /**
    * @summary Unmutes the given user from messaging this subreddit.
@@ -1398,7 +1481,7 @@ class Subreddit extends RedditContent<Subreddit> {
    * @example r.getSubreddit('snoowrap').unmuteUser({name: 'actually_an_aardvark'})
    */
   unmuteUser ({name}) {
-    return this._unfriend({name, type: 'muted'});
+    return this._unfriend({name, type: 'muted'})
   }
   /**
    * @summary Bans the given user from editing this subreddit's wiki.
@@ -1408,7 +1491,7 @@ class Subreddit extends RedditContent<Subreddit> {
    * @example r.getSubreddit('snoowrap').wikibanUser({name: 'actually_an_aardvark'})
    */
   wikibanUser ({name}) {
-    return this._friend({name, type: 'wikibanned'});
+    return this._friend({name, type: 'wikibanned'})
   }
   /**
    * @summary Unbans the given user from editing this subreddit's wiki.
@@ -1418,7 +1501,7 @@ class Subreddit extends RedditContent<Subreddit> {
    * @example r.getSubreddit('snoowrap').unwikibanUser({name: 'actually_an_aardvark'})
    */
   unwikibanUser ({name}) {
-    return this._unfriend({name, type: 'wikibanned'});
+    return this._unfriend({name, type: 'wikibanned'})
   }
   /**
    * @summary Adds the given user to this subreddit's list of approved wiki editors.
@@ -1428,7 +1511,7 @@ class Subreddit extends RedditContent<Subreddit> {
    * @example r.getSubreddit('snoowrap').addWikiContributor({name: 'actually_an_aardvark'})
    */
   addWikiContributor ({name}) {
-    return this._friend({name, type: 'wikicontributor'});
+    return this._friend({name, type: 'wikicontributor'})
   }
   /**
    * @summary Removes the given user from this subreddit's list of approved wiki editors.
@@ -1438,7 +1521,7 @@ class Subreddit extends RedditContent<Subreddit> {
    * @example r.getSubreddit('snoowrap').removeWikiContributor({name: 'actually_an_aardvark'})
    */
   removeWikiContributor ({name}) {
-    return this._unfriend({name, type: 'wikicontributor'});
+    return this._unfriend({name, type: 'wikicontributor'})
   }
   /**
    * @summary Sets the permissions for a given moderator on this subreddit.
@@ -1454,9 +1537,9 @@ class Subreddit extends RedditContent<Subreddit> {
     const res = await this._post({
       url: `r/${this.display_name}/api/setpermissions`,
       form: {api_type, name, permissions: formatModPermissions(permissions), type: 'moderator'}
-    });
-    handleJsonErrors(res);
-    return this;
+    })
+    handleJsonErrors(res)
+    return this
   }
   /**
    * @summary Gets a given wiki page on this subreddit.

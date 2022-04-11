@@ -221,6 +221,7 @@ type SubredditType = 'public' | 'private' | 'restricted' | 'gold_restricted' | '
 type LinkType = 'any' | 'link' | 'self';
 
 type SpamLevel = 'low' | 'high' | 'all';
+
 export interface SubredditSettings {
   name: string;
   title: string;

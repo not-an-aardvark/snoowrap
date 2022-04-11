@@ -32,7 +32,6 @@ export interface RecentComment {
 
 /**
  * A class representing an author from a modmail conversation
- * <style> #ModmailConversationAuthor {display: none} </style>
  * @example
  *
  * // Get a Modmail Conversation author with a given ID
@@ -40,6 +39,8 @@ export interface RecentComment {
  * @extends RedditContent
  */
 export default class ModmailConversationAuthor extends RedditContent<ModmailConversationAuthor> {
+  static _name = 'ModmailConversationAuthor'
+
   name!: string;
   isMod?: boolean;
   isAdmin?: boolean;

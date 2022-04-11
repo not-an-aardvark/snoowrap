@@ -9,6 +9,8 @@ import RedditContent from './RedditContent';
  * r.getUser('multi-mod').getMultireddit('coding_languages')
  */
 class MultiReddit extends RedditContent {
+  static _name = 'MultiReddit'
+
   constructor (options, _r, _hasFetched) {
     super(options, _r, _hasFetched);
     if (_hasFetched) {

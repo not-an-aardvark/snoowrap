@@ -63,6 +63,8 @@ interface WikiPage {
  * r.getSubreddit('AskReddit').getWikiPage('rules')
  */
 class WikiPage extends RedditContent<WikiPage> {
+  static _name = 'WikiPage'
+
   _transformApiResponse (res: WikiPage) {
     res.title = this.title
     res.subreddit = this.subreddit

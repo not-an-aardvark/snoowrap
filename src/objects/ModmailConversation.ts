@@ -34,7 +34,6 @@ export const modActionStates = Object.freeze({
 /**
  * @class
  * A class representing a conversation from new modmail
- * <style> #ModmailConversation {display: none} </style>
  * @name ModmailConversation
  * @example
  *
@@ -43,6 +42,8 @@ export const modActionStates = Object.freeze({
  * @extends RedditContent
  */
 class ModmailConversation extends RedditContent {
+  static _name = 'ModmailConversation'
+
   static get conversationStates () {
     return conversationStates;
   }

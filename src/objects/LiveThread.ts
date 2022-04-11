@@ -8,7 +8,6 @@ const api_type = 'json';
 
 /**
  * A class representing a live reddit thread
- * <style> #LiveThread {display: none} </style>
  * @example
  *
  * // Get a livethread with the given ID
@@ -42,6 +41,8 @@ const api_type = 'json';
  * @extends RedditContent
  */
 class LiveThread extends RedditContent {
+  static _name = 'LiveThread'
+
   constructor (options, _r, _hasFetched) {
     super(options, _r, _hasFetched);
     this._rawStream = null;

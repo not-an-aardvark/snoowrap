@@ -479,7 +479,7 @@ class snoowrap extends BaseRequester {
       ? options.subreddit.display_name
       : options.subreddit
     delete options.subreddit
-    const qs = {restrict_sr: true, syntax: 'plain', ...options}
+    const qs = {syntax: 'plain', ...options}
     return this._getListing({uri: `${subreddit ? `r/${subreddit}/` : ''}search`, qs})
   }
 

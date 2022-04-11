@@ -7,13 +7,14 @@ import type {ListingQuery} from './Listing'
 
 /**
  * A class representing a reddit user
- * <style> #RedditUser {display: none} </style>
  * @example
  *
  * // Get a user with the given username
  * r.getUser('spez')
  */
 class RedditUser extends RedditContent<RedditUser> {
+  static _name = 'RedditUser'
+
   get _uri () {
     if (typeof this.name !== 'string' || !USERNAME_REGEX.test(this.name)) {
       throw new InvalidUserError(this.name)
@@ -64,7 +65,7 @@ class RedditUser extends RedditContent<RedditUser> {
 
   /**
    * @summary Removes this user from the requester's friend list.
-   * @returns {Promise} A Promise that fulfills with this user when the request is complete
+   * @returns A Promise that fulfills with this user when the request is complete
    * @example r.getUser('actually_an_aardvark').unfriend()
    */
   unfriend () {
@@ -73,7 +74,7 @@ class RedditUser extends RedditContent<RedditUser> {
 
   /**
    * @summary Gets information on this user related to their presence on the friend list.
-   * @returns {Promise} A Promise that fulfills with an object containing friend information
+   * @returns A Promise that fulfills with an object containing friend information
    * @example
    *
    * r.getUser('not_an_aardvark').getFriendInformation().then(console.log)
@@ -85,7 +86,7 @@ class RedditUser extends RedditContent<RedditUser> {
 
   /**
    * @summary Gets a list of this user's trophies.
-   * @returns {Promise} A TrophyList containing this user's trophies
+   * @returns A TrophyList containing this user's trophies
    * @example
    *
    * r.getUser('not_an_aardvark').getTrophies().then(console.log)
@@ -102,7 +103,7 @@ class RedditUser extends RedditContent<RedditUser> {
   /**
    * @summary Gets a Listing of the content this user has submitted.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing Submissions and Comments
+   * @returns A Listing containing Submissions and Comments
    * @example
    *
    * r.getUser('spez').getOverview().then(console.log)
@@ -120,7 +121,7 @@ class RedditUser extends RedditContent<RedditUser> {
   /**
    * @summary Gets a Listing of this user's submissions.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing Submissions
+   * @returns A Listing containing Submissions
    * @example
    *
    * r.getUser('spez').getSubmissions().then(console.log)
@@ -138,7 +139,7 @@ class RedditUser extends RedditContent<RedditUser> {
   /**
    * @summary Gets a Listing of this user's comments.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing Comments
+   * @returns A Listing containing Comments
    * @example
    *
    * r.getUser('spez').getComments().then(console.log)
@@ -158,7 +159,7 @@ class RedditUser extends RedditContent<RedditUser> {
    * @desc **Note**: This can only be used to view one's own upvoted content, unless the user in question has chosen to
    * make this information public in their preferences.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing Submissions and Comments
+   * @returns A Listing containing Submissions and Comments
    * @example
    *
    * r.getMe().getUpvotedContent().then(console.log)
@@ -178,7 +179,7 @@ class RedditUser extends RedditContent<RedditUser> {
    * @desc **Note**: This can only be used to view one's own downvoted content, unless the user in question has chosen to
    * make this information public in their preferences.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing Submissions and Comments
+   * @returns A Listing containing Submissions and Comments
    * @example
    *
    * r.getMe().getDownvotedContent().then(console.log)
@@ -198,7 +199,7 @@ class RedditUser extends RedditContent<RedditUser> {
    * @desc **Note**: This can only be used to view one's own set of hidden posts, as reddit will return a 403 error when
    * attempting to view another users' hidden posts.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing Submissions
+   * @returns A Listing containing Submissions
    * @example
    *
    * r.getMe().getHiddenContent().then(console.log)
@@ -218,7 +219,7 @@ class RedditUser extends RedditContent<RedditUser> {
    * @desc **Note**: This can only be used to view one's own set of saved content, as reddit will return a 403 error when
    * attempting to view other users' saved content.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing Submissions and Comments.
+   * @returns A Listing containing Submissions and Comments.
    * @example
    *
    * r.getMe().getSavedContent().then(console.log)
@@ -236,7 +237,7 @@ class RedditUser extends RedditContent<RedditUser> {
   /**
    * @summary Gets a Listing of this user's content which has been gilded.
    * @param {object} [options] Options for the resulting Listing
-   * @returns {Promise} A Listing containing Submissions and Comments
+   * @returns A Listing containing Submissions and Comments
    * @example
    *
    * r.getMe().getGildedContent().then(console.log)
@@ -270,7 +271,7 @@ class RedditUser extends RedditContent<RedditUser> {
 
   /**
    * @summary Gets an Array of all of this user's MultiReddits.
-   * @returns {Promise} A Promise that fulfills with an Array containing MultiReddits.
+   * @returns A Promise that fulfills with an Array containing MultiReddits.
    * @example
    *
    * r.getUser('multi-mod').getMultireddits().then(console.log)

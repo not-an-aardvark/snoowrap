@@ -9,7 +9,7 @@
     "prepublishOnly": "npm run compile",
     "prepare": "npm run compile",
     "compile": "npm run type-check && npm run build:babel && npm run build:types && node ./scripts/copyTSTypes.js",
-    "lint": "eslint --ignore-path .gitignore . --ext .ts --cache",
+    "lint": "eslint . --ext .ts,.tsx --ignore-path .gitignore --cache",
     "test": "npm run lint && npm run test:mocha",
     "test:mocha": "npm run compile && mocha --require @babel/register test/snoowrap.spec.js",
     "test:browser": "npm run compile && browserify --im test/snoowrap.spec.js -o test/_browser.spec.js -t [ babelify ] && five-server --ignore=** --open=/test/run-tests.html",

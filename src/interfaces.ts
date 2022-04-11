@@ -1,8 +1,8 @@
 import type stream from 'stream'
 import type snoowrap from './snoowrap'
 import type {Comment} from './objects'
-import type {Options, ListingQuery} from './objects/Listing'
 import type {MediaImg, MediaVideo, MediaGif} from './objects/MediaFile'
+import type {COMMENT_SORTS} from './constants'
 
 export type OmitProps<T, K extends PropertyKey> = {
   [P in keyof T as Exclude<P, K>]: T[P]
@@ -12,8 +12,8 @@ export interface CredentialsResponse {
   access_token: string
   expires_in: number
   refresh_token: string
-  scope: string,
-  token_type: string,
+  scope: string
+  token_type: string
   error: string
   error_description: string
 }
@@ -27,9 +27,9 @@ export interface JSONResponse<T> {
       name: string
       url: string
       [key: string]: any
-    },
+    }
     error: string[][]
-  },
+  }
   /** Custom */
   _children: {[id: string]: Comment}
 }
@@ -40,16 +40,16 @@ export interface Fancypants {
     id: string
     obfuscation_descriptor: any[]
     obfuscation_reason: string|null
-  }[],
+  }[]
   output: {
     document: {
-      c?: string|Fancypants['output']['document'],
-      e?: string,
-      f?: number[][],
+      c?: string|Fancypants['output']['document']
+      e?: string
+      f?: number[][]
       id?: string
       t?: string
     }[]
-  },
+  }
   /** @example 'rtjson' */
   output_mode: string
 }
@@ -57,23 +57,29 @@ export interface Fancypants {
 export interface UploadResponse {
   args: {
     /** @example '//reddit-uploaded-video.s3-accelerate.amazonaws.com' */
-    action: string,
+    action: string
     /** Headers */
     fields: {
-      name: string,
+      name: string
       value: string
     }[]
-  },
+  }
   asset: {
-    asset_id: string,
+    asset_id: string
     payload: {
       filepath: string
-    },
-    processing_state: string,
+    }
+    processing_state: string
     /** @example 'wss://ws-0ffbcc476ebd6c972.wss.redditmedia.com/<asset_id>?m=<random-base64-string>' */
     websocket_url: string
   }
 }
+
+export interface Children {
+  [key: string]: Comment
+}
+
+// #region Submit
 
 export interface UploadMediaOptions {
   /**
@@ -117,65 +123,65 @@ export interface MediaType {
 
 export interface SubmitOptions {
   /** The name of the subreddit where to submit the post. */
-  sr: string,
+  sr: string
   /** The submission kind. */
-  kind: 'link'|'image'|'video'|'videogif'|'gallery'|'self'|'poll'|'crosspost',
+  kind: 'link'|'image'|'video'|'videogif'|'gallery'|'self'|'poll'|'crosspost'
   /** The title of the submission. */
-  title: string,
+  title: string
   /** The url that the link submission should point to. */
-  url: string,
+  url: string
   /** The video thumbnail url. */
-  video_poster_url: string,
+  video_poster_url: string
   /** The url of the websocket used to obtain the id of the newly-created submission. */
-  websocketUrl: string,
+  websocketUrl: string
   /** An array containing raw gallery items.*/
   items: {
     media_id: string
-    caption?: string,
+    caption?: string
     outbound_url?: string
-  }[],
+  }[]
   /** The selftext of the submission. */
-  text?: string,
+  text?: string
   /**
    * The body of the submission in `richtext_json` format. See {@link snoowrap#convertToFancypants}
    * for more details. This will override `options.text` and `options.inlineMedia`.
    */
-  richtext_json?: {[key: string]: any},
+  richtext_json?: {[key: string]: any}
   /** An array of 2 to 6 poll options. */
-  options: string[],
+  options: string[]
   /** The number of days the poll should accept votes. Valid values are between 1 and 7, inclusive. */
-  duration: number,
+  duration: number
   /** The fullname of the original post which is being crossposted. */
-  crosspost_fullname: string,
+  crosspost_fullname: string
   /**
    * If this is `false` and same link has already been submitted to this subreddit in the past,
    * reddit will return an error. This could be used to avoid accidental reposts.
    */
-  resubmit?: boolean,
+  resubmit?: boolean
   /** Determines whether inbox replies should be enabled for this submission. */
-  sendreplies?: boolean,
+  sendreplies?: boolean
   /** Whether or not the submission should be marked NSFW. */
-  nsfw?: boolean,
+  nsfw?: boolean
   /** Whether or not the submission should be marked as a spoiler. */
-  spoiler?: boolean,
+  spoiler?: boolean
   /** The flair template to select. */
-  flair_id?: string,
+  flair_id?: string
   /**
    * If a flair template is selected and its property `flair_text_editable` is `true`, this will
    * customize the flair text.
    */
-  flair_text?: string,
+  flair_text?: string
   /** The UUID of a collection to add the newly-submitted post to. */
-  collection_id?: string,
+  collection_id?: string
   /** Set to `CHAT` to enable live discussion instead of traditional comments. */
-  discussion_type?: string,
+  discussion_type?: string
   /**
    * A captcha identifier. This is only necessary if the authenticated account
    * requires a captcha to submit posts and comments.
    */
-  iden?: string,
+  iden?: string
   /** The response to the captcha with the given identifier. */
-  captcha?: string,
+  captcha?: string
   [key: string]: any
 }
 
@@ -287,55 +293,43 @@ export interface SubmitCrosspostOptions extends OmitProps<
   originalPost: InstanceType<typeof snoowrap.objects.Submission>|string
 }
 
-export interface Children {
-  [key: string]: Comment
-}
+// #endregion
 
 export interface SubredditOptions {
-  name: string,
-  title: string,
-  public_description: string,
-  description: string,
-  allow_images: boolean,
-  allow_top: boolean,
-  captcha: string,
-  captcha_iden: string,
-  collapse_deleted_comments: boolean,
-  comment_score_hide_mins: number,
-  exclude_banned_modqueue: boolean,
-  'header-title': string,
-  hide_ads: boolean,
-  lang: string,
-  link_type: string,
-  over_18: boolean,
-  public_traffic: boolean,
-  show_media: boolean,
-  show_media_preview: boolean,
-  spam_comments: string,
-  spam_links: string,
-  spam_selfposts: string,
-  spoilers_enabled: boolean,
-  sr: string,
-  submit_link_label: string,
-  submit_text_label: string,
-  submit_text: string,
-  suggested_comment_sort: string,
-  type: string,
-  wiki_edit_age: number,
-  wiki_edit_karma: number,
-  wikimode: string,
+  name: string
+  title: string
+  public_description: string
+  default_set: boolean
+  description: string
+  allow_images: boolean
+  allow_top: boolean
+  captcha: string
+  captcha_iden: string
+  collapse_deleted_comments: boolean
+  comment_score_hide_mins: number
+  exclude_banned_modqueue: boolean
+  'header-title': string
+  hide_ads: boolean
+  lang: string
+  link_type: 'any'|'link'|'self'
+  over_18: boolean
+  public_traffic: boolean
+  show_media: boolean
+  show_media_preview: boolean
+  spam_comments: 'low'|'high'|'all'
+  spam_links: 'low'|'high'|'all'
+  spam_selfposts: 'low'|'high'|'all'
+  spoilers_enabled: boolean
+  sr: string
+  submit_link_label: string
+  submit_text_label: string
+  submit_text: string
+  suggested_comment_sort: typeof COMMENT_SORTS[number]
+  type: 'public'|'private'|'restricted'|'gold_restricted'|'gold_only'|'archived'|'employees_only'
+  wiki_edit_age: number
+  wiki_edit_karma: number
+  wikimode: string
   [key: string]: any
-}
-
-export interface RichTextFlair {
-  /** The string representation of the emoji */
-  a?: string
-  /** The type of the flair entry */
-  e: 'text' | 'emoji'
-  /** URL of the emoji image */
-  u?: string
-  /** The text content of a text flair */
-  t?: string
 }
 
 export interface Gildings {
@@ -347,7 +341,20 @@ export interface Gildings {
   gid_3: number
 }
 
-export type SubredditType = 'gold_restricted'|'archived'|'restricted'|'employees_only'|'gold_only'|'private'|'user'|'public'
+export type SubredditType = 'public'|'private'|'restricted'|'gold_restricted'|'gold_only'|'archived'|'employees_only'|'user'
+
+// #region Submission
+
+export interface RichTextFlair {
+  /** The string representation of the emoji */
+  a?: string
+  /** The type of the flair entry */
+  e: 'text'|'emoji'
+  /** URL of the emoji image */
+  u?: string
+  /** The text content of a text flair */
+  t?: string
+}
 
 export interface Media {
   oembed?: {
@@ -408,6 +415,9 @@ export interface ImagePreview {
   variants: any // ?
   id: string
 }
+
+// #endregion
+
 
 export interface AssignFlairOptions {
   /** The text that the flair should have */

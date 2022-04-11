@@ -6,7 +6,11 @@ export interface Options {
 }
 
 export default class UserList {
+  ['construsctor']: typeof UserList
+  static _name = 'UserList'
+
   constructor (options: Options, _r: snoowrap) {
+    // @ts-ignore
     return options.children.map(user => _r._newObject('RedditUser', user))
   }
 }
