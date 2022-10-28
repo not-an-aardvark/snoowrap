@@ -5,7 +5,6 @@ const expect = require('chai').use(require('dirty-chai')).expect;
 const Promise = require('bluebird');
 const _ = require('lodash');
 const moment = require('moment');
-const request = require('request-promise');
 const util = require('util');
 const snoowrap = require('..');
 
@@ -45,24 +44,6 @@ describe('snoowrap', function () {
       this.retries(3);
     }
     r.config({request_delay: 1000});
-
-    if (!isBrowser) {
-      const defaultRequest = request.defaults({
-        headers: {'user-agent': oauthInfo.user_agent},
-        json: true,
-        jar: request.jar(),
-        baseUrl: 'https://www.reddit.com/'
-      });
-
-      const loginResponse = await defaultRequest.post('api/login').form({
-        user: oauthInfo.username,
-        passwd: oauthInfo.password,
-        api_type: 'json'
-      });
-
-      expect(loginResponse.json.errors.length).to.equal(0);
-      cookieAgent = defaultRequest.defaults({headers: {'X-Modhash': loginResponse.json.data.modhash}});
-    }
   });
 
   describe('.constructor', () => {
