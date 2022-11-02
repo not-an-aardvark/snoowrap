@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {EventEmitter} from 'events';
 import Listing, { ListingOptions } from './Listing';
 import RedditContent from './RedditContent';

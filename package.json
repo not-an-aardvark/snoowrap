@@ -1,6 +1,6 @@
 {
   "name": "snoowrap",
-  "version": "1.23.0",
+  "version": "2.0.0",
   "license": "MIT",
   "description": "A JavaScript wrapper for the reddit API",
   "main": "dist/snoowrap.js",
@@ -9,18 +9,22 @@
     "prepublishOnly": "npm run compile",
     "prepare": "npm run compile",
     "compile": "npm run type-check && npm run build:babel && npm run build:types && node ./scripts/copyTSTypes.js",
-    "lint": "eslint --ignore-path .gitignore . --cache",
+    "lint": "eslint . --ext .ts,.tsx --ignore-path .gitignore --cache",
     "test": "npm run lint && npm run test:mocha",
     "test:mocha": "npm run compile && mocha --require @babel/register test/snoowrap.spec.js",
-    "test:browser": "npm run compile && browserify --im test/snoowrap.spec.js -o test/_browser.spec.js -t [ babelify ] && open test/run-tests.html",
+    "test:browser": "npm run compile && browserify --im test/snoowrap.spec.js -o test/_browser.spec.js -t [ babelify ] && five-server --ignore=** --open=/test/run-tests.html",
     "smoketest": "npm run test -- -g 'smoketest'",
+    "browser": "npm run compile && browserify --im browser/index.js -o browser/_index.js -t [ babelify ] && five-server --ignore=** --open=/browser/index.html",
     "build-docs": "npm run build:docs",
     "build:docs": "scripts/build_docs.sh",
-    "build:babel": "babel -q -d dist/ src/",
+    "build:babel": "babel -d dist/ src/",
     "build:types": "tsc -p tsconfig.gen-dts.json",
     "bundle-size": "npm run build-docs && gzip -c doc/snoowrap-v$(npm info . version).min.js | wc -c | xargs",
     "coverage": "istanbul cover _mocha -- --require @babel/register test/snoowrap.spec.js",
-    "type-check": "tsc -p tsconfig.typecheck.json"
+    "type-check": "tsc -p tsconfig.typecheck.json",
+    "docs": "typedoc --out docs --entryPointStrategy expand src --sort source-order",
+    "dev": "vite dev",
+    "bui": "vite build"
   },
   "files": [
     "dist/"
@@ -42,15 +46,14 @@
   },
   "homepage": "https://github.com/not-an-aardvark/snoowrap",
   "dependencies": {
-    "bluebird": "^3.5.5",
+    "axios": "^0.21.1",
+    "form-data": "^4.0.0",
     "lodash": "^4.17.15",
-    "promise-chains": "^0.3.11",
-    "request": "^2.88.2",
-    "request-promise": "^4.2.6",
-    "ws": "^3.3.1"
+    "path-browserify": "^1.0.1",
+    "ws": "^8.5.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.0.0",
+    "@babel/cli": "^7.14.8",
     "@babel/core": "^7.0.0",
     "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
     "@babel/plugin-transform-arrow-functions": "^7.0.0",
@@ -63,32 +66,38 @@
     "@babel/plugin-transform-template-literals": "^7.0.0",
     "@babel/plugin-transform-typescript": "^7.0.0",
     "@babel/register": "^7.5.5",
+    "@types/lodash": "^4.14.179",
+    "@types/path-browserify": "^1.0.0",
     "@types/request": "^2.48.2",
-    "@typescript-eslint/eslint-plugin": "^1.13.0",
-    "@typescript-eslint/parser": "^1.13.0",
+    "@types/ws": "^8.5.3",
+    "@typescript-eslint/eslint-plugin": "^5.15.0",
+    "@typescript-eslint/parser": "^5.15.0",
     "babelify": "^10.0.0",
     "browserify": "^13.1.0",
     "chai": "^3.5.0",
     "dirty-chai": "^1.2.2",
-    "eslint": "^6.1.0",
-    "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-promise": "^4.2.1",
+    "eslint": "^8.11.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-promise": "^6.0.0",
+    "five-server": "0.0.28",
     "fs-extra": "^8.1.0",
     "ink-docstrap": "^1.2.1",
     "istanbul": "^1.0.0-alpha.2",
-    "jsdoc": "^3.6.3",
+    "jsdoc": "^3.6.7",
     "mocha": "^6.0.0",
     "moment": "^2.14.1",
-    "typescript": "^3.5.3",
-    "uglify-js": "git://github.com/mishoo/UglifyJS2.git#1db50c3b169ee4195e1935013d6721628eb5b4bd"
+    "typedoc": "^0.22.13",
+    "typescript": "^4.6.2",
+    "uglify-js": "git://github.com/mishoo/UglifyJS2.git#1db50c3b169ee4195e1935013d6721628eb5b4bd",
+    "vite": "^2.9.1"
   },
   "engines": {
     "node": ">=4.0.0"
   },
   "browser": {
     "fs": false,
-    "request-promise": false,
     "util": false,
-    "ws": false
+    "ws": false,
+    "form-data": false
   }
 }

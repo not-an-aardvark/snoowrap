@@ -1,4 +1,4 @@
-# snoowrap [![Build Status](https://travis-ci.org/not-an-aardvark/snoowrap.svg?branch=master)](https://travis-ci.org/not-an-aardvark/snoowrap) [![Gitter chat](https://badges.gitter.im/not-an-aardvark/snoowrap.svg)](https://gitter.im/not-an-aardvark/snoowrap 'Join the chat at https://gitter.im/not-an-aardvark/snoowrap')
+# snoowrap [![Build Status](https://travis-ci.org/not-an-aardvark/snoowrap.svg?branch=master)](https://travis-ci.org/not-an-aardvark/snoowrap) [![Gitter chat](https://badges.gitter.im/not-an-aardvark/snoowrap.svg)](https://gitter.im/not-an-aardvark/snoowrap 'Join the chat at https://gitter.im/not-an-aardvark/snoowrap') [![Discord](https://img.shields.io/discord/722505412057759917?color=%235865F2&logo=discord&logoColor=white)](https://discord.gg/vVpM7VgmGN 'Join the unofficial Discord channel at https://discord.gg/vVpM7VgmGN')
 
 A fully-featured JavaScript wrapper for the reddit API. ([Documentation](https://not-an-aardvark.github.io/snoowrap))
 

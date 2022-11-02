@@ -1,15 +1,16 @@
-import { BaseSearchOptions, ModAction, Sort, SubmitLinkOptions, SubmitSelfPostOptions } from '../snoowrap';
+// @ts-nocheck
+import {BaseSearchOptions, ModAction, Sort, SubmitLinkOptions, SubmitSelfPostOptions} from '../snoowrap';
 import Comment from './Comment';
-import Listing, { ListingOptions } from './Listing';
+import Listing, {ListingOptions} from './Listing';
 import PrivateMessage from './PrivateMessage';
 import RedditContent from './RedditContent';
 import RedditUser from './RedditUser';
 import Submission from './Submission';
-import { RichTextFlair } from './VoteableContent';
-import WikiPage, { WikiPageRevision } from './WikiPage';
+import {RichTextFlair} from './VoteableContent';
+import WikiPage, {WikiPageRevision} from './WikiPage';
 import ModmailConversation from './ModmailConversation';
 
-export default class Subreddit extends RedditContent<Subreddit> {
+export default class Subreddit<T = any> extends RedditContent<T> {
   accounts_active_is_fuzzed: boolean;
   accounts_active: number;
   active_user_count: number;
@@ -220,6 +221,7 @@ type SubredditType = 'public' | 'private' | 'restricted' | 'gold_restricted' | '
 type LinkType = 'any' | 'link' | 'self';
 
 type SpamLevel = 'low' | 'high' | 'all';
+
 export interface SubredditSettings {
   name: string;
   title: string;

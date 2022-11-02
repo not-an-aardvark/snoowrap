@@ -10,7 +10,7 @@ rules:
   comma-spacing: error
   comma-style: error
   computed-property-spacing: error
-  curly: error
+  curly: [error, multi-line]
   dot-notation: error
   dot-location: [error, property]
   eol-last: error
@@ -19,18 +19,18 @@ rules:
   indent: [error, 2, {FunctionDeclaration: {body: 1, parameters: 1}, FunctionExpression: {body: 1, parameters: 1}, CallExpression: {arguments: 1}, SwitchCase: 1, MemberExpression: 1}]
   key-spacing: error
   keyword-spacing: error
-  linebreak-style: [error, unix]
   max-statements-per-line: error
   new-parens: error
   no-caller: error
   no-catch-shadow: error
   no-console: error
-  no-duplicate-imports: error
+  no-dupe-class-members: off
+  no-duplicate-imports: off
   no-else-return: error
   no-eval: error
   no-extra-bind: error
   no-extra-label: error
-  no-extra-parens: [error, all, {nestedBinaryExpressions: false}]
+  no-extra-parens: off
   no-floating-decimal: error
   no-global-assign: error
   no-implied-eval: error
@@ -46,6 +46,7 @@ rules:
   no-octal-escape: error
   no-proto: error
   no-prototype-builtins: error
+  no-redeclare: off
   no-restricted-properties: [error, {object: describe, property: only}, {object: it, property: only}]
   no-script-url: error
   no-self-compare: error
@@ -54,10 +55,11 @@ rules:
   no-tabs: error
   no-template-curly-in-string: error
   no-trailing-spaces: error
+  no-undef: off # TypeScript will handle this
   no-unneeded-ternary: error
   no-unsafe-negation: error
   no-unused-expressions: error
-  no-unused-vars: error
+  no-unused-vars: off
   no-useless-call: error
   no-useless-computed-key: error
   no-useless-concat: error
@@ -79,8 +81,8 @@ rules:
   prefer-spread: error
   quote-props: [error, as-needed]
   quotes: [error, single, avoid-escape]
-  semi: [error, always]
-  semi-spacing: error
+  # semi: [error, never]
+  # semi-spacing: error
   space-before-blocks: error
   space-before-function-paren: error
   space-in-parens: error
@@ -99,12 +101,19 @@ rules:
   promise/catch-or-return: error
   promise/no-return-wrap: error
   promise/param-names: error
-  promise/no-native: error
+  '@typescript-eslint/consistent-type-imports': error
+  '@typescript-eslint/no-dupe-class-members': error
+  '@typescript-eslint/no-duplicate-imports': error
+  '@typescript-eslint/no-extra-parens': [error, all, {nestedBinaryExpressions: false}]
+  '@typescript-eslint/no-redeclare': error
+  '@typescript-eslint/no-unused-vars': error
 
 extends:
   - eslint:recommended
   - plugin:import/errors
   - plugin:import/warnings
+  - plugin:import/typescript
+
 plugins:
   - import
   - promise
@@ -123,3 +132,4 @@ parserOptions:
 env:
   node: true
   es6: true
+  browser: true

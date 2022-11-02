@@ -1,7 +1,8 @@
+// @ts-nocheck
 import RedditContent from './RedditContent';
 import RedditUser from './RedditUser';
-import * as Snoowrap from '../snoowrap';
-
+import snoowrap from '../snoowrap';
+//
 export interface BanStatus {
   endDate?: string | null;
   reason: string;
@@ -31,7 +32,6 @@ export interface RecentComment {
 
 /**
  * A class representing an author from a modmail conversation
- * <style> #ModmailConversationAuthor {display: none} </style>
  * @example
  *
  * // Get a Modmail Conversation author with a given ID
@@ -39,6 +39,8 @@ export interface RecentComment {
  * @extends RedditContent
  */
 export default class ModmailConversationAuthor extends RedditContent<ModmailConversationAuthor> {
+  static _name = 'ModmailConversationAuthor'
+
   name!: string;
   isMod?: boolean;
   isAdmin?: boolean;
@@ -55,7 +57,7 @@ export default class ModmailConversationAuthor extends RedditContent<ModmailConv
   recentConvos?: { [id: string]: RecentConvo };
   recentComments?: { [id: string]: RecentComment };
 
-  constructor (options: any, r: Snoowrap, hasFetched: boolean) {
+  constructor (options: any, r: snoowrap, hasFetched: boolean) {
     super(options, r, hasFetched);
 
     options.recentComments = Object.keys(options.recentComments).map(commentId => this._r._newObject('Comment', {
@@ -82,4 +84,4 @@ export default class ModmailConversationAuthor extends RedditContent<ModmailConv
   getUser (): Promise<RedditUser> {
     return this._r.getUser(this.name);
   }
-};
+}
