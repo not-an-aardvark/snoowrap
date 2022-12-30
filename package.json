@@ -77,7 +77,7 @@
     "ink-docstrap": "^1.2.1",
     "istanbul": "^1.0.0-alpha.2",
     "jsdoc": "^3.6.3",
-    "mocha": "^6.0.0",
+    "mocha": "^10.2.0",
     "moment": "^2.14.1",
     "typescript": "^3.5.3",
     "uglify-js": "git://github.com/mishoo/UglifyJS2.git#1db50c3b169ee4195e1935013d6721628eb5b4bd"
